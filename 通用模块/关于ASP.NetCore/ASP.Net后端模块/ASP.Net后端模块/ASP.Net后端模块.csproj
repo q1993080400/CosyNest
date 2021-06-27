@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Microsoft.AspNetCore</RootNamespace>
+    <AssemblyName>ToolASPNet</AssemblyName>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\..\..\关于XML和Json\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
+    <ProjectReference Include="..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
+    <ProjectReference Include="..\..\..\关于网络\通用网络模块\通用网络模块\通用网络模块.csproj" />
+    <ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+    <ProjectReference Include="..\..\ASP.Net中台模块\ASP.Net中台模块\ASP.Net中台模块.csproj" />
+  </ItemGroup>
+</Project>

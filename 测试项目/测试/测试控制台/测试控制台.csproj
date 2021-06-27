@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>System</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\PC专用\PC通用模块\PC通用模块\PC通用模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于Office\EPPlusOffice模块\EPPlusOffice模块\EPPlusOffice模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于Office\Office标准模块\Office标准模块\Office标准模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于Office\微软Office模块\微软Office模块\微软Office模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于XML和JSON\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于图像\绘图工具模块\绘图工具模块\绘图工具模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于时间和日期\时间工具模块\时间工具模块\时间工具模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于测绘\通用测绘模块\通用测绘模块\通用测绘模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于网络\通用网络模块\通用网络模块\通用网络模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\通用工具模块\通用工具模块\通用工具模块.csproj" />
+  </ItemGroup>
+
+</Project>

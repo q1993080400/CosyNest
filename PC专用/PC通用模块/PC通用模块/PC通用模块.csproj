@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <RootNamespace>System.Underlying.PC</RootNamespace>
+    <AssemblyName>ToolCommonPC</AssemblyName>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\通用模块\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
+    <ProjectReference Include="..\..\..\通用模块\通用工具模块\通用工具模块\通用工具模块.csproj" />
+  </ItemGroup>
+
+</Project>

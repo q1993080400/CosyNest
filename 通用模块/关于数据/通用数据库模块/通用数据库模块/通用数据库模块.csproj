@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>System.DataFrancis.DB</RootNamespace>
+    <AssemblyName>ToolDB</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\关于编译和表达式树\编译和表达式树模块\编译和表达式树模块\编译和表达式树模块.csproj" />
+    <ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+    <ProjectReference Include="..\..\通用数据模块\通用数据模块\通用数据模块.csproj" />
+  </ItemGroup>
+
+</Project>

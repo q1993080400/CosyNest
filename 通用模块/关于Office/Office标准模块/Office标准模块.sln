@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用工具模块", "..\..\通用工具模块\通用工具模块\通用工具模块.csproj", "{BF60A2C5-85AB-4BBC-94B9-7D972DEEFF54}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Office标准模块", "Office标准模块\Office标准模块.csproj", "{515CD970-7AB4-4962-ACF8-66523EA48084}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "绘图工具模块", "..\..\关于图像\绘图工具模块\绘图工具模块\绘图工具模块.csproj", "{26686B96-FF52-41EA-ADCB-2E26D23C4BA6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用数据模块", "..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj", "{E07F55F1-4F1E-466D-937B-634F4D0DEB6D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "数学工具模块", "..\..\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj", "{62562CAC-16A7-449E-A093-92BB8D8AA09D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF60A2C5-85AB-4BBC-94B9-7D972DEEFF54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF60A2C5-85AB-4BBC-94B9-7D972DEEFF54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF60A2C5-85AB-4BBC-94B9-7D972DEEFF54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF60A2C5-85AB-4BBC-94B9-7D972DEEFF54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{515CD970-7AB4-4962-ACF8-66523EA48084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{515CD970-7AB4-4962-ACF8-66523EA48084}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{515CD970-7AB4-4962-ACF8-66523EA48084}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{515CD970-7AB4-4962-ACF8-66523EA48084}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26686B96-FF52-41EA-ADCB-2E26D23C4BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26686B96-FF52-41EA-ADCB-2E26D23C4BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26686B96-FF52-41EA-ADCB-2E26D23C4BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26686B96-FF52-41EA-ADCB-2E26D23C4BA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E07F55F1-4F1E-466D-937B-634F4D0DEB6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E07F55F1-4F1E-466D-937B-634F4D0DEB6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E07F55F1-4F1E-466D-937B-634F4D0DEB6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E07F55F1-4F1E-466D-937B-634F4D0DEB6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62562CAC-16A7-449E-A093-92BB8D8AA09D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62562CAC-16A7-449E-A093-92BB8D8AA09D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62562CAC-16A7-449E-A093-92BB8D8AA09D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62562CAC-16A7-449E-A093-92BB8D8AA09D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {30B75E9F-0F90-417F-B5E1-FB72E548B432}
+	EndGlobalSection
+EndGlobal

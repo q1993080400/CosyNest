@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ToolTreeObject</AssemblyName>
+    <RootNamespace>System.TreeObject</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+  </ItemGroup>
+
+</Project>
