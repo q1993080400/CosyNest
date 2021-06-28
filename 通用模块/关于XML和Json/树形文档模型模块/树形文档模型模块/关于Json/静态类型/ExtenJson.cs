@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.TreeObject;
@@ -34,13 +33,9 @@ namespace System
         /// </summary>
         /// <param name="options">要检查的<see cref="JsonSerializerOptions"/></param>
         /// <param name="converterType">待转换的类型</param>
-        /// <param name="exclude">指定要排除的<see cref="JsonConverter"/>对象的类型，
-        /// 如果它不为<see langword="null"/>，且<paramref name="options"/>的自定义转换器列表中存在同类型转换器，则返回<see langword="false"/>，
-        /// 指定它可以避免在序列化和反序列化方法中由于调用自身所引发的无限递归</param>
         /// <returns></returns>
-        public static bool CanConverter(this JsonSerializerOptions options, Type converterType, Type? exclude = null)
-            => options.GetConverter(converterType) is { } c &&
-            (exclude is null || !options.Converters.Any(x => exclude == x.GetType()));
+        public static bool CanConverter(this JsonSerializerOptions options, Type converterType)
+            => options.GetConverter(converterType) is { };
         #endregion
         #endregion
         #region 关于适配

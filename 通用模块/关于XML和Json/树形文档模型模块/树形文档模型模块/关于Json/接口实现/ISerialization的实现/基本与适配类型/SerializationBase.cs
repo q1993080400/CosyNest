@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -39,13 +38,16 @@ namespace System.TreeObject.Json
           请务必严格遵守本规范，否则将造成反序列化的次序混乱，
           下一个递归执行的方法很可能找不到需要的值*/
         #endregion
-        #region 对序列化的判断
+        #region 判断是否可转换
         #region 指定是否由本转换器序列化null
         public override bool HandleNull => true;
         #endregion
         #region 确定是否可转换类型
+        private static JsonSerializerOptions OptionsDefault { get; } = new();
+
         public override bool CanConvert(Type typeToConvert)
-            => typeof(Output).IsAssignableFrom(typeToConvert);
+            => !(PriorityDefault && OptionsDefault.CanConverter(typeToConvert)) &&
+            typeof(Output).IsAssignableFrom(typeToConvert);
 
         /*问：在ISerialization接口中，
           可序列化和可反序列化的类型是分开的，
@@ -54,27 +56,33 @@ namespace System.TreeObject.Json
           答：遵循的原则是：如果某一类型既可以被序列化，
           也可以被反序列化，即它为这两者的交集，则返回true，否则返回flase*/
         #endregion
-        #endregion 
+        #region 是否优先使用默认转换器
+        /// <summary>
+        /// 如果这个属性返回<see langword="true"/>，
+        /// 则代表优先使用默认转换器，本转换器有可能不会被调用
+        /// </summary>
+        protected virtual bool PriorityDefault => false;
+
+        /*问：既然JsonSerializerOptions.Converters集合中已经添加了本自定义转换器，
+          那么为什么还要优先调用默认转换器？
+          答：它是为了解决以下问题而设计：
+          假设需要转换一个泛型类，随着泛型参数的不同，
+          它有时候可以被默认转换器转换，有时候不行，这样一来产生了两种取舍：
+          
+          1.有人希望在类型受到支持的情况下尽量使用默认转换器，
+          因为它被微软高度优化，性能较高，而且对Json规范的支持最标准
+        
+          2.有人希望在任何时候使用自定义的转换器，
+          它可以被抽象类的实现者完全控制，以满足一些特殊的要求
+        
+          为此，作者提供了这个API作为开关，它可以用来控制上述行为，
+          但是作者还是建议：如果某一类型可以被完全确定受默认转换器支持，
+          则应该尽量使用默认转换器，不要为此开发自定义转换器，它费时费力，而且效果不好*/
+        #endregion
+        #endregion
         #region 返回协议名称
         string ISerialization.Agreement
             => SerializationAgreement.Json;
-        #endregion
-        #region 返回不包含自身对象的JsonSerializerOptions副本
-        /// <summary>
-        /// 返回一个<see cref="JsonSerializerOptions"/>对象的近似副本，
-        /// 它的自定义转换器列表中不包含和本对象相同类型的转换器，
-        /// 通过这个方法可以避免在序列化和反序列化的方法中，
-        /// 由于调用自身所引发的无限递归
-        /// </summary>
-        /// <param name="options">要创建副本的<see cref="JsonSerializerOptions"/></param>
-        /// <returns></returns>
-        private JsonSerializerOptions GetOptions(JsonSerializerOptions options)
-        {
-            var type = GetType();
-            var newOptions = new JsonSerializerOptions(options);
-            newOptions.Converters.RemoveWhere(x => x.GetType() == type);
-            return newOptions;
-        }
         #endregion
         #region 关于序列化
         #region 检查是否可序列化
@@ -131,11 +139,8 @@ namespace System.TreeObject.Json
                 WriteNull(writer);
                 return;
             }
-            var type = value.GetType();
-            ISerialization.CheckSerialization(this, value, type);
-            if (options.CanConverter(type, GetType()))               //尽量使用原生方法
-                JsonSerializer.Serialize(writer, value, type, GetOptions(options));
-            else WriteTemplate(writer, value, options);
+            ISerialization.CheckSerialization(this, value, value.GetType());
+            WriteTemplate(writer, value, options);
         }
         #endregion
         #region 模板方法
@@ -176,10 +181,8 @@ namespace System.TreeObject.Json
         #region JsonConverter版本
         public sealed override Output? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            ISerialization.CheckDeserialize(this, typeToConvert);           //尽量使用原生方法
-            return options.CanConverter(typeToConvert, GetType()) ?
-                (Output?)JsonSerializer.Deserialize(ref reader, typeToConvert, GetOptions(options)) :
-                ReadTemplate(ref reader, typeToConvert, options);
+            ISerialization.CheckDeserialize(this, typeToConvert);
+            return ReadTemplate(ref reader, typeToConvert, options);
         }
         #endregion
         #region 模板方法

@@ -14,7 +14,11 @@ namespace System.TreeObject.Json
         #region 所必需的对象
 
         #endregion
-        #region 是否可序列化
+        #region 关于检查是否可转换
+        #region 是否优先使用默认转换器
+        protected override bool PriorityDefault => true;
+        #endregion 
+        #region 是否可转换
         public override bool CanConvert(Type typeToConvert)
         {
             var t = typeToConvert;
@@ -25,6 +29,7 @@ namespace System.TreeObject.Json
                 (t.IsRealizeGeneric(dt) && t.CanNew());
         }
         #endregion
+        #endregion 
         #region 序列化对象
         protected override void WriteTemplate(Utf8JsonWriter writer, IEnumerable value, JsonSerializerOptions options)
         {
@@ -66,7 +71,7 @@ namespace System.TreeObject.Json
             #endregion
             var almightyPropertys = typeToConvert.GetProperties().Where(x => x.IsAlmighty()).ToDictionary(x => (x.Name, x.PropertyType), true);
             var propertys = Fun(ref reader, almightyPropertys, options);
-
+            return default;
         }
         #endregion 
     }

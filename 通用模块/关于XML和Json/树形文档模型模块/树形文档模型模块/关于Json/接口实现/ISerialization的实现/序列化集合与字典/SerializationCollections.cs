@@ -29,6 +29,9 @@ namespace System.TreeObject.Json
         private Func<Type, IEnumerable<object?>, Collections> CreateCollections { get; }
         #endregion
         #endregion
+        #region 是否优先使用默认转换器
+        protected override bool PriorityDefault => true;
+        #endregion 
         #region 关于序列化和反序列化
         #region 反序列化
         protected override Collections? ReadTemplate(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

@@ -70,7 +70,7 @@ namespace System.Text.Json.Serialization
                 false => throw new JsonException("读取器已到达末尾，但找不到要反序列化的属性值或数组元素，该Json字符串可能不合法"),
                 true => typeToConvert switch
                 {
-                    { } t when options.CanConverter(t, GetType()) => JsonSerializer.Deserialize(ref reader, t, options),
+                    { } t when options.CanConverter(t) => JsonSerializer.Deserialize(ref reader, t, options),
                     { } t => throw new JsonException($"找不到支持{t}的序列化器"),
                     null => reader.TokenType switch
                     {
