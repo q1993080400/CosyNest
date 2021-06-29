@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 
 namespace System.TreeObject.Json
@@ -11,13 +10,10 @@ namespace System.TreeObject.Json
     /// </summary>
     class SerializationDictionary : SerializationBase<IEnumerable>
     {
-        #region 所必需的对象
-
-        #endregion
         #region 关于检查是否可转换
         #region 是否优先使用默认转换器
         protected override bool PriorityDefault => true;
-        #endregion 
+        #endregion
         #region 是否可转换
         public override bool CanConvert(Type typeToConvert)
         {
@@ -47,9 +43,9 @@ namespace System.TreeObject.Json
         protected override IEnumerable? ReadTemplate(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             #region 本地函数
-            static LinkedList<(string Key, object? Value)> Fun(ref Utf8JsonReader reader, IDictionary<string, Type> propertys, JsonSerializerOptions options)
+            static LinkedList<(object Key, object? Value)> Fun(ref Utf8JsonReader reader, Type keyType, Type valueType, JsonSerializerOptions options)
             {
-                var list = new LinkedList<(string, object?)>();
+                var list = new LinkedList<(object, object?)>();
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
@@ -57,8 +53,8 @@ namespace System.TreeObject.Json
                         case JsonTokenType.PropertyName:
                             var key = reader.GetString()!;
                             reader.Read();
-                            var value = JsonSerializer.Deserialize(ref reader, propertys[key], options);
-                            list.AddLast((key, value));
+                            var value = JsonSerializer.Deserialize(ref reader, valueType, options);
+                            list.AddLast((key.To(keyType), value));
                             break;
                         case JsonTokenType.EndObject:
                             return list;
@@ -69,10 +65,17 @@ namespace System.TreeObject.Json
                 return list;
             }
             #endregion
-            var almightyPropertys = typeToConvert.GetProperties().Where(x => x.IsAlmighty()).ToDictionary(x => (x.Name, x.PropertyType), true);
-            var propertys = Fun(ref reader, almightyPropertys, options);
-            return default;
+            var arguments = typeToConvert.GetGenericArguments();
+            dynamic dictionary = (typeToConvert.IsGenericRealize(typeof(IDictionary<,>)) ||
+                typeToConvert.IsGenericRealize(typeof(IReadOnlyDictionary<,>)) ?
+                typeof(Dictionary<,>).MakeGenericType(arguments) : typeToConvert).
+                GetTypeData().ConstructorCreate<object>();
+            foreach (var (key, value) in Fun(ref reader, arguments[0], arguments[1], options))
+            {
+                dictionary[key] = value;
+            }
+            return dictionary;
         }
-        #endregion 
+        #endregion
     }
 }
