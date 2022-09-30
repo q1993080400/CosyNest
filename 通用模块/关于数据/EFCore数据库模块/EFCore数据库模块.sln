@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用工具模块", "..\..\通用工具模块\通用工具模块\通用工具模块.csproj", "{C59CB81D-F1B9-4B31-A37C-1C9D876620B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用数据模块", "..\通用数据模块\通用数据模块\通用数据模块.csproj", "{F92639CF-D223-4893-94B0-22F9C860E856}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用安全模块", "..\..\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj", "{0B48A771-5D77-4AB7-A706-38D89BC719D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCore数据库模块", "EFCore数据库模块\EFCore数据库模块.csproj", "{398A8012-EECA-46E5-8042-2E42081E1A1B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C59CB81D-F1B9-4B31-A37C-1C9D876620B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C59CB81D-F1B9-4B31-A37C-1C9D876620B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C59CB81D-F1B9-4B31-A37C-1C9D876620B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C59CB81D-F1B9-4B31-A37C-1C9D876620B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F92639CF-D223-4893-94B0-22F9C860E856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F92639CF-D223-4893-94B0-22F9C860E856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F92639CF-D223-4893-94B0-22F9C860E856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F92639CF-D223-4893-94B0-22F9C860E856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B48A771-5D77-4AB7-A706-38D89BC719D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B48A771-5D77-4AB7-A706-38D89BC719D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B48A771-5D77-4AB7-A706-38D89BC719D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B48A771-5D77-4AB7-A706-38D89BC719D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{398A8012-EECA-46E5-8042-2E42081E1A1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398A8012-EECA-46E5-8042-2E42081E1A1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398A8012-EECA-46E5-8042-2E42081E1A1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398A8012-EECA-46E5-8042-2E42081E1A1B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9CF948F9-8AE7-4676-A153-6A40601F3B5C}
+	EndGlobalSection
+EndGlobal

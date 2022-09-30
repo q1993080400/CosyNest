@@ -1,0 +1,29 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@using System.Underlying
+@inherits ComponentBase
+
+<ConditionEnvironment>
+    @{
+        #region 本地函数
+        Type? Fun(string suffix)
+        {
+            #region 获取类型
+            Type? GetComponentsType(string suffix)
+            => Assembly.GetTypes().FirstOrDefault(x => typeof(IComponent).
+            IsAssignableFrom(x) && x.Name == Prefix + suffix);
+            #endregion
+            return GetComponentsType(suffix) ?? GetComponentsType("Other");
+        }
+        #endregion
+        var type = context?.HardwareType switch
+        {
+            HardwareTypeName.PC => Fun(HardwareTypeName.PC),
+            HardwareTypeName.Phone => Fun(HardwareTypeName.Phone),
+            _ => null
+        };
+    }
+    @if (type is { })
+    {
+        <DynamicComponent Type=type Parameters=Parameters />
+    }
+</ConditionEnvironment>

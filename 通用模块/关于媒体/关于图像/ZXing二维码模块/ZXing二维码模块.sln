@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "媒体工具模块", "..\..\媒体工具模块\媒体工具模块\媒体工具模块.csproj", "{624E775B-8FAE-4D01-8EFD-4FC87917664E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用工具模块", "..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj", "{72C8605D-3E8D-4256-9F68-117615A032FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "数学工具模块", "..\..\..\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj", "{DF289A99-F9CE-455C-95FF-635A45BFEB98}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "底层交互模块", "..\..\..\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj", "{7E71FD80-974D-4AC3-95CE-6E93E1AAC102}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZXing二维码模块", "ZXing二维码模块\ZXing二维码模块.csproj", "{A7048044-4E0A-4A95-BECA-295F557DA5E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{624E775B-8FAE-4D01-8EFD-4FC87917664E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{624E775B-8FAE-4D01-8EFD-4FC87917664E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{624E775B-8FAE-4D01-8EFD-4FC87917664E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{624E775B-8FAE-4D01-8EFD-4FC87917664E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72C8605D-3E8D-4256-9F68-117615A032FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72C8605D-3E8D-4256-9F68-117615A032FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72C8605D-3E8D-4256-9F68-117615A032FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72C8605D-3E8D-4256-9F68-117615A032FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF289A99-F9CE-455C-95FF-635A45BFEB98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF289A99-F9CE-455C-95FF-635A45BFEB98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF289A99-F9CE-455C-95FF-635A45BFEB98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF289A99-F9CE-455C-95FF-635A45BFEB98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E71FD80-974D-4AC3-95CE-6E93E1AAC102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E71FD80-974D-4AC3-95CE-6E93E1AAC102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E71FD80-974D-4AC3-95CE-6E93E1AAC102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E71FD80-974D-4AC3-95CE-6E93E1AAC102}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7048044-4E0A-4A95-BECA-295F557DA5E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7048044-4E0A-4A95-BECA-295F557DA5E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7048044-4E0A-4A95-BECA-295F557DA5E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7048044-4E0A-4A95-BECA-295F557DA5E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF6DAD9D-2020-4FEF-A4E8-225CD43F796F}
+	EndGlobalSection
+EndGlobal

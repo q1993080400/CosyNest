@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6-windows</TargetFramework>
+		<AssemblyName>OfficeRealizeMicrosoft</AssemblyName>
+		<RootNamespace>System.Office</RootNamespace>
+		<LangVersion>preview</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<COMReference Include="Microsoft.Office.Core" PrivateAssets="compile">
+			<WrapperTool>primary</WrapperTool>
+			<VersionMinor>8</VersionMinor>
+			<VersionMajor>2</VersionMajor>
+			<Guid>2df8d04c-5bfa-101b-bde5-00aa0044de52</Guid>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+		<COMReference Include="Microsoft.Office.Interop.Excel" PrivateAssets="compile">
+			<WrapperTool>primary</WrapperTool>
+			<VersionMinor>9</VersionMinor>
+			<VersionMajor>1</VersionMajor>
+			<Guid>00020813-0000-0000-c000-000000000046</Guid>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+		<COMReference Include="Microsoft.Office.Interop.Word" PrivateAssets="compile">
+			<WrapperTool>primary</WrapperTool>
+			<VersionMinor>7</VersionMinor>
+			<VersionMajor>8</VersionMajor>
+			<Guid>00020905-0000-0000-c000-000000000046</Guid>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Drawing.Common" Version="6.0.0" PrivateAssets="compile" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\PC专用\PC通用模块\PC通用模块\PC通用模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用模块\关于Office\Office标准模块\Office标准模块\Office标准模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用模块\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用模块\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用模块\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用模块\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用模块\通用工具模块\通用工具模块\通用工具模块.csproj" />
+	</ItemGroup>
+</Project>

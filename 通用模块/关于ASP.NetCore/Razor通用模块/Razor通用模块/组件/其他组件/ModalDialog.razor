@@ -1,0 +1,11 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if ((IsOpen, ChildContent) is (true, { }))
+{
+    <div class="occupyScre modalDialog" @attributes="InputAttributes">
+        <NineGrids style="z-index:2147483647">
+            @ChildContent
+        </NineGrids>
+    </div>
+}

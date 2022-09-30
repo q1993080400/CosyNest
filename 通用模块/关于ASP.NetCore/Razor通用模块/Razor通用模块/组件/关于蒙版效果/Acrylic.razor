@@ -1,0 +1,15 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@{
+    var hasContent = ChildContent is { };
+    var additionalCss = hasContent ? "" : "occupyScre";
+}
+<div style="background-image:@($"url({BackgroundUri})");position:@(hasContent?"initial":"fixed")" class="acrylic @additionalCss" @attributes="InputAttributes">
+    <div class="@MaskCSS @additionalCss">
+        @if (hasContent)
+        {
+            @ChildContent
+        }
+    </div>
+</div>

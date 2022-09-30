@@ -1,0 +1,12 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if (Value?.ToString() is { } t)
+{
+    <div>
+        @foreach (var item in t.Split(Environment.NewLine))
+        {
+            <div>@item</div>
+        }
+    </div>
+}

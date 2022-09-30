@@ -1,0 +1,7 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@inject IJSWindow JSWindow
+
+<div @ontouchmove=OnTouchMove @ontouchend="OnTouchEnd" @attributes=ContainerAttributes>
+    @ChildContent
+</div>

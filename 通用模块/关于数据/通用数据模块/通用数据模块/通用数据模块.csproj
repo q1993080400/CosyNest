@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AssemblyName>ToolData</AssemblyName>
+		<RootNamespace>System.DataFrancis</RootNamespace>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\关于树形文档模型\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
+		<ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+	</ItemGroup>
+
+</Project>

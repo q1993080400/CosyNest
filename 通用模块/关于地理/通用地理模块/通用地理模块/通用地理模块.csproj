@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6</TargetFramework>
+		<AssemblyName>ToolGeography</AssemblyName>
+		<RootNamespace>System.Geography</RootNamespace>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+	</ItemGroup>
+
+</Project>

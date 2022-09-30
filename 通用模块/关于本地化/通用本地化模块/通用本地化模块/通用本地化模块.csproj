@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>ToolLocalization</AssemblyName>
+		<RootNamespace>System.Localization</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="hyjiacan.pinyin4net" Version="4.1.1" PrivateAssets="compile" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+	</ItemGroup>
+
+</Project>

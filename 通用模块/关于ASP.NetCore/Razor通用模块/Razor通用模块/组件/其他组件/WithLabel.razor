@@ -1,0 +1,11 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if (ChildContent is { })
+{
+    var id = Guid.NewGuid();
+    <div @attributes=InputAttributes>
+        <label for="@id" class="@LabelCSS">@Label</label>
+        @ChildContent(id)
+    </div>
+}

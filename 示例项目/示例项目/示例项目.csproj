@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>System</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.8">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\通用模块\关于Office\EPPlusOffice模块\EPPlusOffice模块\EPPlusOffice模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于Office\NpoiOffice模块\NpoiOffice模块\NpoiOffice模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于Office\Office标准模块\Office标准模块\Office标准模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于数据\EFCore数据库模块\EFCore数据库模块\EFCore数据库模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于树形文档模型\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于编译和表达式树\编译和表达式树模块\编译和表达式树模块\编译和表达式树模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\关于网络\通用网络模块\通用网络模块\通用网络模块.csproj" />
+		<ProjectReference Include="..\..\通用模块\通用工具模块\通用工具模块\通用工具模块.csproj" />
+	</ItemGroup>
+
+</Project>

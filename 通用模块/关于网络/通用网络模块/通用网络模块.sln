@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31911.260
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用网络模块", "通用网络模块\通用网络模块.csproj", "{F36CCE7E-E3EA-48CA-B49C-6B1FEF7239E2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用工具模块", "..\..\通用工具模块\通用工具模块\通用工具模块.csproj", "{3F1F3A49-3D98-4190-9734-E030F3324643}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用数据模块", "..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj", "{69DDD280-F745-4569-BEC5-B67352EDBDB1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用安全模块", "..\..\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj", "{7FF6EC02-7839-48DD-B69D-281D48C6FD9E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "编译和表达式树模块", "..\..\关于编译和表达式树\编译和表达式树模块\编译和表达式树模块\编译和表达式树模块.csproj", "{90DDC68F-3A08-4EE4-8C6B-EF57096A7D29}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "数学工具模块", "..\..\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj", "{ACB2DDE5-B5C6-43E6-9B16-C2E290355B13}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "底层交互模块", "..\..\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj", "{F0445958-3A1E-4401-8ED6-7FF6D12B34FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F36CCE7E-E3EA-48CA-B49C-6B1FEF7239E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F36CCE7E-E3EA-48CA-B49C-6B1FEF7239E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F36CCE7E-E3EA-48CA-B49C-6B1FEF7239E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F36CCE7E-E3EA-48CA-B49C-6B1FEF7239E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F1F3A49-3D98-4190-9734-E030F3324643}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F1F3A49-3D98-4190-9734-E030F3324643}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F1F3A49-3D98-4190-9734-E030F3324643}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F1F3A49-3D98-4190-9734-E030F3324643}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69DDD280-F745-4569-BEC5-B67352EDBDB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69DDD280-F745-4569-BEC5-B67352EDBDB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69DDD280-F745-4569-BEC5-B67352EDBDB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69DDD280-F745-4569-BEC5-B67352EDBDB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FF6EC02-7839-48DD-B69D-281D48C6FD9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FF6EC02-7839-48DD-B69D-281D48C6FD9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FF6EC02-7839-48DD-B69D-281D48C6FD9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FF6EC02-7839-48DD-B69D-281D48C6FD9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90DDC68F-3A08-4EE4-8C6B-EF57096A7D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90DDC68F-3A08-4EE4-8C6B-EF57096A7D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90DDC68F-3A08-4EE4-8C6B-EF57096A7D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90DDC68F-3A08-4EE4-8C6B-EF57096A7D29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACB2DDE5-B5C6-43E6-9B16-C2E290355B13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACB2DDE5-B5C6-43E6-9B16-C2E290355B13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACB2DDE5-B5C6-43E6-9B16-C2E290355B13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB2DDE5-B5C6-43E6-9B16-C2E290355B13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0445958-3A1E-4401-8ED6-7FF6D12B34FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0445958-3A1E-4401-8ED6-7FF6D12B34FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0445958-3A1E-4401-8ED6-7FF6D12B34FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0445958-3A1E-4401-8ED6-7FF6D12B34FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D8C4F55-EBDD-4928-9DBC-819101BE01DE}
+	EndGlobalSection
+EndGlobal

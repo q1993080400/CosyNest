@@ -1,0 +1,21 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@{
+    var maxLength = MaxRowLength * MaxRow;
+}
+<div title="@Text" style="display:grid;grid-template:min-content auto/1fr auto 1fr" @attributes="InputAttributes">
+    <div style="grid-column:2">
+        @Icon(Text)
+    </div>
+    <div style="text-align:center;grid-column:1/4;grid-row:2;width:@(MaxRowLength+1)em">
+        @if (Text.Length <= maxLength)
+        {
+            @Text
+        }
+        else
+        {
+            @(Text[..maxLength]+"..")
+        }
+    </div>
+</div>

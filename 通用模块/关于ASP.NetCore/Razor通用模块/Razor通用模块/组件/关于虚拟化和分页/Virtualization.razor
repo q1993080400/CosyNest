@@ -1,0 +1,11 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits Component
+@typeparam Element
+@inject IJSWindow JSWindow
+
+<div id="@ID" style="overflow-y:auto;max-height:100vh" @onscroll="OnScroll" @attributes="ContainerAttributes">
+    @foreach (var (item, index, _) in Rendered.PackIndex())
+    {
+        @RenderElement((item,index,GetElementID(index)))
+    }
+</div>

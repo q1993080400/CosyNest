@@ -1,0 +1,68 @@
+﻿
+/*本样式表储存了有关布局的样式*/
+
+/*相对于父元素的中部居中布局，水平垂直方向皆居中*/
+.centerMiddRelatively
+{
+    display: grid;
+    grid-template: 1fr auto 1fr/1fr auto 1fr;
+    left: 0;
+    top: 0;
+    min-width: 100%;
+    min-height: 100%
+}
+
+/*占满屏幕布局*/
+.occupyScre
+{
+    position: fixed;
+    left: 0;
+    top: 0;
+    min-width: 100vw;
+    min-height: 100vh;
+}
+
+/*相对于屏幕的中部居中布局，水平垂直方向皆居中*/
+.centerMiddAbsolute
+{
+    position: fixed;
+    display: grid;
+    grid-template: 1fr auto 1fr/1fr auto 1fr;
+    left: 0;
+    top: 0;
+    min-width: 100vw;
+    min-height: 100vh;
+}
+
+/*中部居中元素布局*/
+.centerMiddleEleme
+{
+    grid-area: 2/2
+}
+
+/*表示一个紧凑居中布局，它一般用来排列按钮*/
+.compactCentered
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly
+}
+
+
+/*横向屏幕，即宽大于高，一般用于电脑*/
+@media (orientation: landscape)
+{
+}
+
+/*竖向屏幕，即高大于宽，一般用于手机*/
+@media (orientation: portrait)
+{
+    /*横屏显示*/
+    .horizontalScreen
+    {
+        min-width: 100vh;
+        min-height: 100vw;
+        transform-origin: left top;
+        transform: translateX(100vw) rotate(90deg)
+    }
+}

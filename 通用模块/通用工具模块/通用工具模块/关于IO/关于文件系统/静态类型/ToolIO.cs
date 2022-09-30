@@ -1,0 +1,24 @@
+﻿namespace System.IO;
+
+/// <summary>
+/// 有关IO的工具类
+/// </summary>
+public static class ToolIO
+{
+    #region 说明文档
+    /*问：BCL有File，Directory等与本类型功能相似的类型，
+      那么为什么还需要本类型？
+      答：这是因为它们的实现非常怪异，令人忍无可忍，例如：
+      File.WriteAllText在父目录不存在的时候宁可抛出异常，
+      就是不愿意自动帮你创建一个父目录，作者想不明白这是为什么，
+      可能是遇事不决，抛出异常最省事？*/
+    #endregion
+    #region 写入文本
+    /// <inheritdoc cref="File.WriteAllText(string, string?)"/>
+    public static void WriteAllText(string path, string text)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path, text);
+    }
+    #endregion
+}

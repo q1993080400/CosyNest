@@ -1,0 +1,16 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@inject IJSWindow JSWindow
+@inject IJSRuntime JSRuntime
+
+<div onpointerover="@OnPointerOver" onpointerout="@OnPointerOut">
+    <div id="@MenuID">
+        @MenuItem
+    </div>
+    <div style="position:fixed;opacity:0" id="@SubID">
+        <CascadingValue Value="true" Name=@(nameof(IsSub))>
+            @MenuSub
+        </CascadingValue>
+    </div>
+</div>
+

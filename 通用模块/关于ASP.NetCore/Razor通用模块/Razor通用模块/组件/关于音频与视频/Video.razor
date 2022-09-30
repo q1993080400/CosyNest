@@ -1,0 +1,5 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits Component
+@inject IJSWindow JSWindow
+
+<video id="@ID" @ontimeupdate="OnTimeupDate" @onloadedmetadata="OnLoadedMetaData" @onended="OnEnded" @attributes="VideoAttributes" />

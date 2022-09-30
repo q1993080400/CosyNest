@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6-windows</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <AssemblyName>ToolTimePC</AssemblyName>
+    <RootNamespace>System.Time</RootNamespace>
+	<Nullable>enable</Nullable>
+	  <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <COMReference Include="TaskScheduler">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>e34cb9f1-c7f7-424c-be29-027dcc09363a</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+    <ProjectReference Include="..\..\时间工具模块\时间工具模块\时间工具模块.csproj" />
+  </ItemGroup>
+
+</Project>

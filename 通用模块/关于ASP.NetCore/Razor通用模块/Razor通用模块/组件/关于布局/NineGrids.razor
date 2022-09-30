@@ -1,0 +1,12 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if (@ChildContent is { })
+{
+    <div class="@(IsAbsolute?"centerMiddAbsolute":"centerMiddRelatively") @(IsAbsolute&&CanHorizontalScreen?"horizontalScreen":"")"
+     @attributes="ContainerAttributes">
+        <div style="grid-row:@Row;grid-column:@Column" class="@ChildContentCSS">
+            @ChildContent
+        </div>
+    </div>
+}
