@@ -75,6 +75,8 @@ public static partial class ExtenText
         while (enumerator.MoveNext())
         {
             var current = enumerator.Current;
+            if (current.IsVoid())
+                continue;
             if (trimStart ? text.StartsWith(current) : text.EndsWith(current))
             {
                 var len = current.Length;

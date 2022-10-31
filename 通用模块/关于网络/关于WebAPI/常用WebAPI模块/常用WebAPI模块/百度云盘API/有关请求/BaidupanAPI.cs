@@ -48,7 +48,7 @@ public sealed class BaidupanAPI : WebApi
         var infoDictionary = responseInfo!.ToDictionary(GetPath, x => x);
         foreach (var item in file)
         {
-            yield return new BaidupanFile(item, infoDictionary[GetPath(item)], this);
+            yield return new BaidupanFile(item, infoDictionary[GetPath(item)], AccessToken, HttpClientProvide);
         }
     }
     #endregion

@@ -1,4 +1,4 @@
-﻿namespace System.Geography;
+﻿namespace System.Geography.Weather;
 
 /// <summary>
 /// 这个记录表示某一地区某一时间段中的天气

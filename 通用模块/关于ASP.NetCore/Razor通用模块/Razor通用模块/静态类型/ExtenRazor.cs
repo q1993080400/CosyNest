@@ -1,11 +1,13 @@
 ﻿using System.NetFrancis;
 using System.Reflection;
+using System.NetFrancis.Http;
 
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using System.Net.Http.Headers;
 
 namespace System;
 
@@ -123,32 +125,20 @@ public static class ExtenRazor
     public static IServiceCollection AddJSWindow(this IServiceCollection services)
         => services.AddScoped<IJSWindow, JSWindow>();
     #endregion
-    #region 注入ISignalRProvide
+    #region 注入IUriManager
     /// <summary>
-    /// 以暂时模式注册一个<see cref="ISignalRProvide"/>服务
-    /// </summary>
-    /// <param name="services">要注册的服务容器</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="CreateNet.SignalRProvide(Func{string, HubConnection}?, Func{string, string}?)"/>
-    public static IServiceCollection AddSignalRProvide(this IServiceCollection services, Func<string, HubConnection>? create = null)
-        => services.AddTransient
-        (x => CreateNet.SignalRProvide(create,
-            uri => x.GetRequiredService<NavigationManager>().ToAbsoluteUri(uri).AbsoluteUri));
-    #endregion
-    #region 注入IHttpClient
-    /// <summary>
-    /// 注入一个<see cref="IHttpClient"/>，
-    /// 它可以用于请求WebApi
+    /// 以范围模式注入一个<see cref="IUriManager"/>，
+    /// 它可以用于管理本机Uri，本服务依赖于<see cref="NavigationManager"/>，
+    /// 适用于前端
     /// </summary>
     /// <param name="services">待注入的服务容器</param>
-    /// <param name="baseAddress">请求的基地址，它通常是服务器的域名</param>
     /// <returns></returns>
-    public static IServiceCollection AddIHttpClient(this IServiceCollection services, string baseAddress)
-    {
-        services.AddHttpClient("webapi", client => client.BaseAddress = new(baseAddress));
-        var a = services.AddScoped(server => server.GetRequiredService<IHttpClientFactory>().CreateClient("webapi").ToHttpClient());
-        return services;
-    }
+    public static IServiceCollection AddUriManagerClient(this IServiceCollection services)
+        => services.AddScoped(x =>
+        {
+            var navigationManager = x.GetRequiredService<NavigationManager>();
+            return CreateNet.UriManager(navigationManager.BaseUri);
+        });
     #endregion
     #endregion
     #region 有关组件
@@ -163,20 +153,29 @@ public static class ExtenRazor
     public static void StateHasChanged(this ComponentBase component)
         => StateHasChangedMethod.Invoke<object>(component);
     #endregion
-    #region 返回支持同步读取上传文件的流
+    #region 将IBrowserFile集合转换为一个MultipartFormDataContent
     /// <summary>
-    /// 读取一个待上传的文件，并返回一个支持同步读取的流，
-    /// 只支持10M以内的文件
+    /// 将<see cref="IBrowserFile"/>集合转换为一个<see cref="MultipartFormDataContent"/>，
+    /// 它可以用于后续向后端请求数据
     /// </summary>
-    /// <param name="file">用于读取上传文件的对象</param>
+    /// <param name="files">待转换的<see cref="IBrowserFile"/>集合</param>
+    /// <param name="maxFileSize">单个文件的最大大小，超出会产生异常，默认为10M</param>
     /// <returns></returns>
-    public static async Task<Stream> OpenSynchronizeReadStream(this IBrowserFile file)
+    public static async Task<MultipartFormDataContent> ToFormDataContent(this IEnumerable<IBrowserFile> files, long maxFileSize = 1024 * 1024 * 10)
     {
-        using var stream = file.OpenReadStream(1024 * 1024 * 10);
-        var memoryStream = new MemoryStream();
-        await stream.CopyToAsync(memoryStream);
-        memoryStream.Reset();
-        return memoryStream;
+        var content = new MultipartFormDataContent();
+        foreach (var file in files)
+        {
+            using var fileStream = file.OpenReadStream(maxFileSize);
+            var memoryStream = new MemoryStream();
+            await fileStream.CopyToAsync(memoryStream);
+            memoryStream.Reset();
+            var fileContent = new StreamContent(memoryStream);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue(file.ContentType);
+            content.Add(fileContent, "\"files\"", file.Name);
+        }
+        return content;
     }
     #endregion
     #endregion

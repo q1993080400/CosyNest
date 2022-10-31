@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.IOFrancis.Bit;
+using System.Text.Json;
 
 namespace Microsoft.JSInterop;
 
@@ -80,6 +81,18 @@ public interface IJSDocument
     ValueTask<IElementJS?> ActiveElement { get; }
     #endregion
     #endregion
+    #region video截图
+    /// <summary>
+    /// 对一个video进行截图，
+    /// 并以管道的形式返回截图结果，
+    /// 如果截图未能成功，返回<see langword="null"/>
+    /// </summary>
+    /// <param name="id">video的id</param>
+    /// <param name="format">截图格式</param>
+    /// <param name="cancellation">一个用来取消异步操作的令牌</param>
+    /// <returns></returns>
+    ValueTask<IBitRead?> VideoScreenshot(string id, string format = "png", CancellationToken cancellation = default);
+    #endregion
     #region 关于JS调用Net方法
     #region 为JS对象添加Net事件
     /// <summary>
@@ -103,13 +116,14 @@ public interface IJSDocument
     /// <summary>
     /// 将Net方法注册为一个JS方法
     /// </summary>
-    /// <param name="action">待包装的Net方法，
-    /// 它的参数是一个Json对象，可以用来封装方法参数</param>
+    /// <typeparam name="Obj">方法的参数类型，
+    /// 它只支持<see cref="JsonElement"/>和<see cref="IJSStreamReference"/></typeparam>
+    /// <param name="action">待包装的Net方法</param>
     /// <param name="methodName">指定封装的JS的方法的名字，
     /// 如果为<see langword="null"/>，则指定一个不重复的名称</param>
     /// <param name="cancellation">一个用于取消异步操作的令牌</param>
     /// <returns>一个元组，它的项分别是封装完成后的JS方法的名称，以及一个用来释放封装的Net对象的对象</returns>
-    ValueTask<(string MethodName, IDisposable Freed)> PackNetMethod(Action<JsonElement> action, string? methodName = null, CancellationToken cancellation = default);
+    ValueTask<(string MethodName, IDisposable Freed)> PackNetMethod<Obj>(Action<Obj> action, string? methodName = null, CancellationToken cancellation = default);
     #endregion
     #endregion
 }

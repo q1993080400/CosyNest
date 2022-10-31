@@ -1,4 +1,6 @@
-﻿namespace System.Geography;
+﻿using System.Geography.Weather;
+
+namespace System.Geography;
 
 /// <summary>
 /// 这个静态类可以用来创建和地理有关的对象

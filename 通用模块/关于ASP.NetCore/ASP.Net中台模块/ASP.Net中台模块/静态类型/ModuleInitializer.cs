@@ -14,7 +14,7 @@ static class ModuleInitializer
     [ModuleInitializer]
     public static void Initializer()
     {
-        CreateJson.SerializationCommon.Add(CreateASP.SerializationIdentity);
+        CreateJson.SerializationCommon.Add(ToolASP.SerializationIdentity);
     }
     #endregion
 }

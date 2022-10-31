@@ -38,6 +38,25 @@ public static class ExtenNet
         return await read(r.Content);
     }
     #endregion
+    #region HttpContent转换为IHttpContent
+    /// <summary>
+    /// 将<see cref="HttpContent"/>转换为等效的<see cref="IHttpContent"/>
+    /// </summary>
+    /// <param name="content">待转换的<see cref="HttpContent"/></param>
+    /// <returns></returns>
+    public static async Task<HttpContentRecording?> ToHttpContent(this HttpContent? content)
+    {
+        if (content is null)
+            return null;
+        var stream = new MemoryStream();
+        await content.CopyToAsync(stream);
+        return new HttpContentRecording()
+        {
+            Content = stream.ToBitPipe().Read,
+            Header = new(content.Headers)
+        };
+    }
+    #endregion
     #endregion
     #region 内部成员
     #region 将HttpRequestRecording转换为HttpRequestMessage
@@ -47,14 +66,14 @@ public static class ExtenNet
     /// <param name="recording">待转换的<see cref="HttpRequestRecording"/></param>
     /// <param name="baseAddress">请求目标Uri的基地址</param>
     /// <returns></returns>
-    internal static HttpRequestMessage ToHttpRequestMessage(this IHttpRequest recording, Uri? baseAddress)
+    internal static async Task<HttpRequestMessage> ToHttpRequestMessage(this IHttpRequest recording, Uri? baseAddress)
     {
         var uri = recording.UriComplete;
         var m = new HttpRequestMessage()
         {
             RequestUri = baseAddress is null ? new(uri) : new(baseAddress, uri),
             Method = recording.HttpMethod,
-            Content = recording.Content.ToHttpContent(),
+            Content = await recording.Content.ToHttpContent(),
         };
         recording.Header.CopyHeader(m.Headers);
         return m;
@@ -66,11 +85,12 @@ public static class ExtenNet
     /// </summary>
     /// <param name="content">待转换的<see cref="HttpContent"/></param>
     /// <returns></returns>
-    private static HttpContent? ToHttpContent(this IHttpContent? content)
+    private static async Task<HttpContent?> ToHttpContent(this IHttpContent? content)
     {
         if (content is null)
             return null;
-        var arryContent = new ByteArrayContent(content.Content.ReadComplete().Result);
+        var array = await content.Content.ReadComplete();
+        var arryContent = new ByteArrayContent(array);
         content.Header.CopyHeader(arryContent.Headers);
         return arryContent;
     }
@@ -89,7 +109,23 @@ public static class ExtenNet
         }
     }
     #endregion
-    #endregion 
+    #region 将HttpResponseMessage转换为HttpResponse
+    /// <summary>
+    /// 将<see cref="HttpResponseMessage"/>转换为<see cref="HttpResponse"/>
+    /// </summary>
+    /// <param name="message">待转换的<see cref="HttpResponseMessage"/></param>
+    /// <returns></returns>
+    internal async static Task<HttpResponse> ToHttpResponse(this HttpResponseMessage message)
+        => new HttpResponse()
+        {
+            Status = message.StatusCode,
+            RequestUri = message.RequestMessage?.RequestUri?.AbsoluteUri ??
+            $"这条消息不是通过{nameof(IHttpClient)}发送的，所以无法获取请求地址",
+            Header = new HttpHeaderResponse(message.Headers),
+            Content = (await message.Content.ToHttpContent())!
+        };
+    #endregion
+    #endregion
     #endregion
     #region 有关字符串互相转换
     #region 转换Uri字符串
@@ -212,5 +248,20 @@ public static class ExtenNet
         => Path.Combine("wwwroot", realityPath.Text.TrimStart('\\'));
     #endregion
     #endregion
+    #endregion
+    #region 获取Uri的基准地址
+    /// <summary>
+    /// 将一个Uri拆分成基准地址和扩展地址，
+    /// 基本地址包括协议，域名，端口，
+    /// 扩展地址是Uri中除它以外的部分
+    /// </summary>
+    /// <param name="uri">要返回基准地址的Uri</param>
+    /// <returns></returns>
+    public static (string Base, string Extend) Split(this Uri uri)
+    {
+        var @base = uri.IsAbsoluteUri ?
+        $"{uri.Scheme}://{uri.Authority}" : "";
+        return (@base, uri.ToString().Trim(true, @base));
+    }
     #endregion
 }

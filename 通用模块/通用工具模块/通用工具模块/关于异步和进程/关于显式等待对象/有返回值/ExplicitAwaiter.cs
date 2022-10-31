@@ -48,9 +48,10 @@ public sealed class ExplicitAwaiter<T> : INotifyCompletion
     {
         if (IsCompleted)
             return;
-        IsCompleted = true;
         Result = result;
+        IsCompleted = true;
         Continuation?.Invoke();
+        Continuation = null;
     }
     #endregion
     #region 结果返回值

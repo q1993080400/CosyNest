@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+
+using System.NetFrancis;
+using System.NetFrancis.Http;
 
 namespace System;
 
@@ -88,6 +92,7 @@ public static class ExtenASP
     #endregion
     #endregion
     #region 注入IHttpClient
+    #region 不指定基地址
     /// <summary>
     /// 注入一个<see cref="IHttpClient"/>，
     /// 它可以用来发起Http请求
@@ -99,6 +104,39 @@ public static class ExtenASP
         services.AddHttpClient();
         return services.AddTransient(x => x.GetRequiredService<IHttpClientFactory>().CreateClient().ToHttpClient());
     }
+    #endregion
+    #region 指定基地址
+    /// <summary>
+    /// 注入一个<see cref="IHttpClient"/>，
+    /// 它可以用于请求WebApi
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <param name="getBaseAddress">用来获取请求基地址的委托，
+    /// 基地址通常是服务器的域名</param>
+    /// <returns></returns>
+    public static IServiceCollection AddIHttpClient(this IServiceCollection services, Func<IServiceProvider, string> getBaseAddress)
+    {
+        services.AddHttpClient("webapi", (server, client) => client.BaseAddress = new(getBaseAddress(server)));
+        var a = services.AddScoped(server => server.GetRequiredService<IHttpClientFactory>().CreateClient("webapi").ToHttpClient());
+        return services;
+    }
+    #endregion
+    #endregion 
+    #region 注入SignalRProvide对象
+    /// <summary>
+    /// 以瞬间模式注入一个<see cref="ISignalRProvide"/>对象，
+    /// 该依赖注入能够自动处理绝对路径和相对路径的转换，
+    /// 它依赖于<see cref="IUriManager"/>服务
+    /// </summary>
+    /// <param name="services">待注入的容器</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="CreateNet.SignalRProvide(Func{string, HubConnection}?, Func{string, string}?)"/>
+    public static IServiceCollection AddISignalRProvide(this IServiceCollection services, Func<string, HubConnection>? create = null)
+        => services.AddTransient(server =>
+        {
+            var navigation = server.GetRequiredService<IUriManager>();
+            return CreateNet.SignalRProvide(create, uri => navigation.ToAbs(uri));
+        });
     #endregion
     #endregion
 }

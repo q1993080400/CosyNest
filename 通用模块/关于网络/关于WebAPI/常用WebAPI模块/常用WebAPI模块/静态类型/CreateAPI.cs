@@ -1,8 +1,4 @@
-﻿using System.Geography;
-using System.Geography.Map;
-using System.NetFrancis.Api.Map;
-using System.NetFrancis.Api.ShortMessage;
-using System.NetFrancis.Api.Weather;
+﻿using System.NetFrancis.Api.ShortMessage;
 using System.NetFrancis.Http;
 using System.Underlying.Phone;
 
@@ -13,17 +9,6 @@ namespace System.NetFrancis.Api;
 /// </summary>
 public static class CreateAPI
 {
-    #region 创建天气接口
-    #region 易源天气接口
-    /// <summary>
-    /// 创建易源天气接口
-    /// </summary>
-    /// <inheritdoc cref="WeatherYiYuan.WeatherYiYuan(string, Func{IHttpClient}?)"/>
-    /// <returns></returns>
-    public static IWeather WeatherYiYuan(string appCode, Func<IHttpClient>? httpClientProvide = null)
-        => new WeatherYiYuan(appCode, httpClientProvide);
-    #endregion
-    #endregion
     #region 创建短信接口
     #region 创建国阳短信接口
     #region 测试模板ID
@@ -51,16 +36,6 @@ public static class CreateAPI
     /// <inheritdoc cref="ShortMessageShenYuanHengJi(string, Func{IHttpClient}?)"/>
     public static IShortMessageManage SMSShenYuanHengJi(string appCode, Func<IHttpClient>? httpClientProvide = null)
         => new ShortMessageShenYuanHengJi(appCode, httpClientProvide);
-    #endregion
-    #endregion
-    #region 创建地图接口
-    #region 创建百度地图接口
-    /// <summary>
-    /// 创建一个使用百度地图实现的地图接口
-    /// </summary>
-    /// <inheritdoc cref="BaiduMap(string, Func{Task{ILocation?}}?, Func{IHttpClient}?)"/>
-    public static IMap MapBaiDu(string ak, Func<Task<ILocation?>>? position = null, Func<IHttpClient>? httpClientProvide = null)
-        => new BaiduMap(ak, position, httpClientProvide);
     #endregion
     #endregion
 }

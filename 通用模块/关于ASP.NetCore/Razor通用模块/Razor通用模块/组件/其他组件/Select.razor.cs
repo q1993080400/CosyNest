@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿using Microsoft.JSInterop;
+
+namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 这个组件是一个选择器，
@@ -116,7 +118,7 @@ public static class Select
     /// <param name="maxSelect">当元素被选择时，如果<paramref name="selectCollect"/>的元素数量超过了这个上限，
     /// 则禁止选择，如果为<see langword="null"/>，表示没有上限</param>
     /// <returns></returns>
-    public static (Func<Obj, Task<bool>> GetSelectState, Func<Obj, bool, Task> SetSelectState) SelectPropertyCollect<Obj>
+    public static (Func<Obj, Task<bool>> GetSelectState, Func<Obj, bool, Task> SetSelectState) FromCollect<Obj>
         (ICollection<Obj> selectCollect, int? maxSelect = null)
         => (x => selectCollect.Contains(x).ToTask(),
         (obj, isSelect) =>
@@ -127,6 +129,25 @@ public static class Select
                 selectCollect.Add(obj);
             else selectCollect.Remove(obj);
             return Task.CompletedTask;
+        }
+    );
+    #endregion
+    #region 根据在本地存储中的键来确定是否选择
+    /// <summary>
+    /// 根据在本地存储中是否存在指定的键，
+    /// 来确定一个选择器是否被选择，
+    /// 它的返回值通常被赋值给<see cref="Select{Obj}.SelectProperty"/>属性
+    /// </summary>
+    /// <typeparam name="Obj">元素类型</typeparam>
+    /// <param name="jsWindow">用来获取本地存储的JS运行时对象</param>
+    /// <param name="key">用来读写本地存储的键</param>
+    /// <returns></returns>
+    public static (Func<Obj, Task<bool>> GetSelectState, Func<Obj, bool, Task> SetSelectState) FromLocalStorage<Obj>
+        (IJSWindow jsWindow, string key)
+        => (async _ => (await jsWindow.LocalStorage.TryGetValueAsync(key)) is (true, "True"),
+        async (_, value) =>
+        {
+            await jsWindow.LocalStorage.IndexAsync.Set(key, value.ToString());
         }
     );
     #endregion

@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+
+namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 如果得到授权，
@@ -66,8 +68,8 @@ public partial class Monitor : ComponentBase, IDisposable
     {
         if (!firstRender)
             return;
-        (var authorizationSucceeded, AuthorizationSucceededPack) = await JSWindow.Document.PackNetMethod(_ => AuthorizationSucceeded?.Invoke());
-        (var authorizationFailed, AuthorizationFailedPack) = await JSWindow.Document.PackNetMethod(_ => AuthorizationFailed?.Invoke());
+        (var authorizationSucceeded, AuthorizationSucceededPack) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AuthorizationSucceeded?.Invoke());
+        (var authorizationFailed, AuthorizationFailedPack) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AuthorizationFailed?.Invoke());
         var script = $$$"""
         var element=document.getElementById('{{{VideoID}}}');
         var constraints={ audio: true, video: true,

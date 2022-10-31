@@ -6,6 +6,14 @@
 public sealed class ExplicitTask<T>
 {
     #region 公开成员
+    #region 超时时间
+    /// <summary>
+    /// 获取超时时间，
+    /// 如果它不为<see langword="null"/>，
+    /// 超过这个时间后，任务自动失败
+    /// </summary>
+    public TimeSpan? TimeOut { get; init; }
+    #endregion
     #region 通知任务已完成
     /// <summary>
     /// 调用本方法以完成任务
@@ -27,9 +35,17 @@ public sealed class ExplicitTask<T>
     /// </summary>
     /// <returns></returns>
     public ExplicitAwaiter<T> GetAwaiter()
-        => Awaiter is null ?
-        Awaiter = new() :
-        throw new NotSupportedException($"{nameof(ExplicitTask)}对象不允许等待两次");
+    {
+        Awaiter = Awaiter is null ? new() : throw new NotSupportedException($"{nameof(ExplicitTask)}对象不允许等待两次");
+        if (TimeOut is { } @out)
+            Task.Run(async () =>
+            {
+                await Task.Delay(@out);
+                if (!this.IsCompleted)
+                    throw new TimeoutException($"显式等待的执行时间超过了{@out}上限");
+            });
+        return Awaiter;
+    }
     #endregion
     #endregion
     #region 内部成员

@@ -70,8 +70,14 @@ public interface IDirect : IRestrictedDictionary<string, object?>
     Ret? GetValueRecursion<Ret>(string path, bool checkExist = true)
     {
         object? direct = this;
-        foreach (var item in path.Split("."))
+        foreach (var (item, i, count) in path.Split(".").PackIndex(true))
         {
+            if (direct is null)
+            {
+                if (i == (count - 1))
+                    return (dynamic?)null;
+                throw new NullReferenceException($"对象{item}为null，无法递归读取它后面的属性");
+            }
             if (direct is not (IDirect or IEnumerable<object>))
                 throw new ArgumentException($"递归读取属性只支持{nameof(IDirect)}和{nameof(IEnumerable<object>)}");
             var regex =/*language=regex*/@"(?<property>[^\[]+)(\[(?<index>\d+)\])?".Op().Regex().MatcheFirst(item)!;

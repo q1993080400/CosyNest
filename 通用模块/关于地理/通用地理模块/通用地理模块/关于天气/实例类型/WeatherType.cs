@@ -1,4 +1,4 @@
-﻿namespace System.Geography;
+﻿namespace System.Geography.Weather;
 
 /// <summary>
 /// 这个枚举表示天气的类型

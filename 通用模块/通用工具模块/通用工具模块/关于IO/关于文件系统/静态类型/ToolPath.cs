@@ -34,8 +34,14 @@ public static class ToolPath
     public static string RefactoringPath(PathText path, string? newSimple = null, string? newExtension = null)
     {
         var (simple, extended, _) = SplitPathFile(path);
-        var father = Path.GetDirectoryName(path)!;
-        return Path.Combine(father, GetFullName(newSimple ?? simple, newExtension ?? extended));
+        var father = Path.GetDirectoryName(path);
+        var name = GetFullName(newSimple ?? simple, newExtension ?? extended);
+        return father switch
+        {
+            null => name,
+            "" => Path.Combine(Environment.CurrentDirectory, name),
+            var f => Path.Combine(f, name)
+        };
     }
     #endregion
     #region 修改名称，直到不重复
@@ -63,7 +69,7 @@ public static class ToolPath
     /// 如果为<see langword="null"/>，代表没有扩展名</param>
     /// <returns></returns>
     public static string GetFullName(string? nameSimple = null, string? nameExtension = null)
-        => nameSimple ?? Guid.NewGuid().ToString() + (nameExtension.IsVoid() ? null : $".{nameExtension}");
+        => (nameSimple ?? Guid.NewGuid().ToString()) + (nameExtension.IsVoid() ? null : $".{nameExtension}");
     #endregion
     #endregion
     #region 检查路径

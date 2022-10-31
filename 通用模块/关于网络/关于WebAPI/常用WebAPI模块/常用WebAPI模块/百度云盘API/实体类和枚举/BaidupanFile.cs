@@ -1,5 +1,6 @@
 ﻿using System.Design.Direct;
 using System.IOFrancis.FileSystem;
+using System.NetFrancis.Http;
 
 namespace System.NetFrancis.Api.Baidupan;
 
@@ -26,17 +27,17 @@ public sealed record BaidupanFile : BaidupanFD
     /// <returns></returns>
     public async Task DownloadFile(PathText path, CancellationToken cancellationToken = default)
     {
-        var read = await API.HttpClientProvide().RequestDownload(Download, cancellationToken: cancellationToken);
+        var read = await HttpClientProvide().RequestDownload(Download, cancellationToken: cancellationToken);
         await read.SaveToFile(path, cancellation: cancellationToken);
     }
     #endregion
     #endregion
     #region 内部成员
-    #region 百度云API
+    #region Http工厂
     /// <summary>
-    /// 获取封装的百度云API
+    /// 获取提供Http客户端的工厂
     /// </summary>
-    private BaidupanAPI API { get; }
+    private Func<IHttpClient> HttpClientProvide { get; }
     #endregion
     #endregion
     #region 构造函数
@@ -45,12 +46,13 @@ public sealed record BaidupanFile : BaidupanFD
     /// </summary>
     /// <param name="fileData">文件数据，它包含文件的基本信息</param>
     /// <param name="infoData">元数据数据，它包含文件的扩展信息，如下载地址等</param>
-    /// <param name="api">封装的百度云盘API，它可用于文件下载</param>
-    internal BaidupanFile(IDirect fileData, IDirect infoData, BaidupanAPI api)
+    /// <param name="accessToken">百度云盘访问令牌</param>
+    /// <param name="httpClientProvide">用来提供Http客户端的工厂</param>
+    internal BaidupanFile(IDirect fileData, IDirect infoData, string accessToken, Func<IHttpClient> httpClientProvide)
         : base(fileData)
     {
-        this.API = api;
-        Download = infoData.GetValue<string>("dlink")! + $"&access_token={API.AccessToken}";
+        this.HttpClientProvide = httpClientProvide;
+        Download = infoData.GetValue<string>("dlink")! + $"&access_token={accessToken}";
     }
     #endregion 
 }

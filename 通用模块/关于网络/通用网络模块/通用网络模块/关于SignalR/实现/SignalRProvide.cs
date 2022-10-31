@@ -30,11 +30,11 @@ sealed class SignalRProvide : ISignalRProvide
     #region 正式方法
     public async Task<HubConnection> GetConnection(string uri)
     {
-        uri = ToAbs(uri);
-        var (exist, value) = Cache.TrySetValue(uri, Create);
+        var newUuri = ToAbs(uri);
+        var (exist, value) = Cache.TrySetValue(newUuri, Create);
         if (!exist)
         {
-            Configuration?.Invoke(value, uri);
+            Configuration?.Invoke(value, newUuri);
             await value.StartAsync();
         }
         return value;
@@ -46,8 +46,7 @@ sealed class SignalRProvide : ISignalRProvide
 
     public void SetConfiguration(Action<HubConnection, string> configuration)
     {
-        if (this.Configuration is null)
-            this.Configuration = configuration;
+        this.Configuration ??= configuration;
     }
     #endregion
     #region 释放对象

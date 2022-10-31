@@ -33,8 +33,8 @@ public static class CreateNet
     /// <param name="obj">要序列化的对象</param>
     /// <param name="options">控制序列化过程的选项</param>
     /// <returns></returns>
-    public static HttpContentRecording HttpContentJson<Obj>(Obj? obj, JsonSerializerOptions? options = null)
-        => new(JsonContent.Create(obj, options: options));
+    public static Task<HttpContentRecording> HttpContentJson<Obj>(Obj? obj, JsonSerializerOptions? options = null)
+        => JsonContent.Create(obj, options: options).ToHttpContent()!;
     #endregion
     #endregion
     #region 创建ISignalRProvide
@@ -45,6 +45,19 @@ public static class CreateNet
     /// <inheritdoc cref="SignalRProvide.SignalRProvide(Func{string, HubConnection}?, Func{string, string}?)"/>
     public static ISignalRProvide SignalRProvide(Func<string, HubConnection>? create = null, Func<string, string>? toAbs = null)
         => new SignalRProvide(create, toAbs);
+    #endregion
+    #region 创建IUriManager
+    /// <summary>
+    /// 创建一个<see cref="IUriManager"/>对象，
+    /// 它可以用来管理本机Uri
+    /// </summary>
+    /// <param name="host">本机Uri</param>
+    /// <returns></returns>
+    public static IUriManager UriManager(string host)
+        => new UriManager()
+        {
+            Host = host
+        };
     #endregion
     #region 静态构造函数
     static CreateNet()

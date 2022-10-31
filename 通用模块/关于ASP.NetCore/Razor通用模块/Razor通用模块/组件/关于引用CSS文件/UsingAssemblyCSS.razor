@@ -2,5 +2,8 @@
 @inherits ComponentBase
 
 <HeadContent>
-    <link rel="stylesheet" href="_content/@(this.GetType().Assembly.GetName().Name)/css/layout.css" />
+    @{
+        var assembly = this.GetType().Assembly.GetName().Name;
+    }
+    <link rel="stylesheet" href="_content/@(assembly)/css/layout.css" />
 </HeadContent>

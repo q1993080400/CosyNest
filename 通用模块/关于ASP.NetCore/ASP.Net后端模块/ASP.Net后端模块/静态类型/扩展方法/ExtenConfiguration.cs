@@ -70,7 +70,7 @@ public static partial class ExtenWebApi
     /// </summary>
     /// <param name="host">函数通过<see cref="IHost.Services"/>来获取<see cref="IServiceProvider"/></param>
     public static void SetSingleServiceProvider(this IHost host)
-        => CreateASP.SingleServiceProvider = host.Services;
+        => ToolASP.SingleServiceProvider = host.Services;
 
     /*本方法存在以下隐患：
       如果使用本方法进行初始化，

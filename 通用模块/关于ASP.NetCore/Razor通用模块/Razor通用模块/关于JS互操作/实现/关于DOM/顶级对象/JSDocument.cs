@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 
+using System.IOFrancis.Bit;
 using System.Text.Json;
 
 namespace Microsoft.JSInterop;
@@ -53,19 +54,58 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
     }
     #endregion
     #endregion
+    #region video截图
+    public async ValueTask<IBitRead?> VideoScreenshot(string id, string format = "png", CancellationToken cancellation = default)
+    {
+        var objName = ToolASP.CreateJSObjectName();
+        var task = new ExplicitTask<IJSStreamReference>();
+        var (methodName, freed) = await PackNetMethod<IJSStreamReference>(task.Completed, cancellation: cancellation);
+        try
+        {
+            _ = Task.Run(async () =>
+            {
+                var script = $$"""
+            var player = document.getElementById("{{id}}");  
+            player.setAttribute("crossOrigin", "anonymous");  
+            var canvas = document.createElement("canvas");
+            canvas.width = player.clientWidth;
+            canvas.height = player.clientHeight;
+            canvas.getContext("2d").drawImage(player, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(x=>
+            {
+                window.{{methodName}}(x);
+            },"image/{{format}}");  
+            """;
+                await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
+            }, cancellation);
+            await using var jsStream = await task;
+            if (jsStream is null)
+                return null;
+            using var stream = await jsStream.OpenReadStreamAsync(1024 * 1024 * 50, cancellation);
+            var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream, cancellation);
+            return memoryStream.ToBitPipe(format).Read;
+        }
+        finally
+        {
+            freed.Dispose();
+        }
+    }
+    #endregion
     #region 关于JS调用Net方法
     #region 私有辅助类
     #region Net方法封装
     /// <summary>
     /// 这个类型封装了注册到JS运行时中的Net方法
     /// </summary>
-    private sealed class NetMethodPack
+    /// <typeparam name="Obj">方法的参数类型</typeparam>
+    private sealed class NetMethodPack<Obj>
     {
         #region 封装的Net方法
         /// <summary>
         /// 获取事件中执行的Net方法
         /// </summary>
-        private Action<JsonElement> Action { get; }
+        private Action<Obj> Action { get; }
         #endregion
         #region 执行Net方法
         /// <summary>
@@ -75,7 +115,7 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         /// 这些参数会被反序列化并传给底层的委托，
         /// 请从JS调用本方法，不要从Net调用本方法</param>
         [JSInvokable]
-        public void Invoke(JsonElement obj)
+        public void Invoke(Obj obj)
         {
             Action(obj);
         }
@@ -85,7 +125,7 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         /// 使用指定的参数初始化对象
         /// </summary>
         /// <param name="action">事件中执行的Net方法</param>
-        public NetMethodPack(Action<JsonElement> action)
+        public NetMethodPack(Action<Obj> action)
         {
             this.Action = action;
         }
@@ -165,18 +205,68 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
     }
     #endregion
     #region 将Net方法注册为JS方法
-    public async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethod(Action<JsonElement> action, string? methodName = null, CancellationToken cancellation = default)
+    #region 正式类型
+    public ValueTask<(string MethodName, IDisposable Freed)> PackNetMethod<Obj>(Action<Obj> action, string? methodName = null, CancellationToken cancellation = default)
+        => action switch
+        {
+            Action<JsonElement> a => PackNetMethodJson(a, methodName, cancellation),
+            Action<IJSStreamReference> a => PackNetMethodStream(a, methodName, cancellation),
+            null => throw new ArgumentNullException(nameof(action)),
+            _ => throw new NotSupportedException($"本方法的的泛型参数只支持{nameof(JsonElement)}或{nameof(IJSStreamReference)}")
+        };
+    #endregion
+    #region 方法参数为JsonElement
+    /// <inheritdoc cref="IJSDocument.PackNetMethod{Obj}(Action{Obj}, string?, CancellationToken)"/>
+    private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodJson(Action<JsonElement> action, string? methodName = null, CancellationToken cancellation = default)
     {
         var springboard = ToolASP.CreateJSObjectName();
         methodName ??= ToolASP.CreateJSObjectName();
-        var script = $@"window.{springboard}=function(net){{window.{methodName}=function(parameter){{net.invokeMethodAsync('{nameof(NetMethodPack.Invoke)}',parameter)}}}}";
-        var netMethodPack = DotNetObjectReference.Create(new NetMethodPack(action));
+        var script = $$"""
+            window.{{springboard}}=
+            function(net)
+            {
+                window.{{methodName}}=function(parameter)
+                {
+                    net.invokeMethodAsync('{{nameof(NetMethodPack<JsonElement>.Invoke)}}',parameter);
+                }
+            }
+""";
+        var netMethodPack = DotNetObjectReference.Create(new NetMethodPack<JsonElement>(action));
         await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
         await JSRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
         return (methodName, netMethodPack);
     }
     #endregion
-    #endregion 
+    #region 
+    /// <inheritdoc cref="IJSDocument.PackNetMethod{Obj}(Action{Obj}, string?, CancellationToken)"/>
+    private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodStream(Action<IJSStreamReference> action, string? methodName = null, CancellationToken cancellation = default)
+    {
+        var streamName = ToolASP.CreateJSObjectName();
+        var springboard = ToolASP.CreateJSObjectName();
+        methodName ??= ToolASP.CreateJSObjectName();
+        var script = $$"""
+            window.{{springboard}}=
+            function(net)
+            {
+                window.{{methodName}}=function(parameter)
+                {
+                    window.{{streamName}}=parameter;
+                    net.invokeMethodAsync('{{nameof(NetMethodPack<JsonElement>.Invoke)}}',null);
+                }
+            }
+""";
+        var netMethodPack = DotNetObjectReference.Create(new NetMethodPack<JsonElement>(async _ =>
+        {
+            var stream = await JSRuntime.InvokeCodeAsync<IJSStreamReference>(streamName);
+            action(stream);
+        }));
+        await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
+        await JSRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
+        return (methodName, netMethodPack);
+    }
+    #endregion
+    #endregion
+    #endregion
     #region 构造函数
     /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
     public JSDocument(IJSRuntime jsRuntime)

@@ -50,6 +50,7 @@ public sealed class ExplicitAwaiter : INotifyCompletion
             return;
         IsCompleted = true;
         Continuation?.Invoke();
+        Continuation = null;
     }
     #endregion
     #endregion

@@ -15,12 +15,12 @@ sealed class JSGeolocation : JSRuntimeBase, IPosition
     {
         var task = new ExplicitTask<ILocation?>();
         var document = new JSDocument(JSRuntime);
-        var (successMethod, successDisposable) = await document.PackNetMethod(x =>
+        var (successMethod, successDisposable) = await document.PackNetMethod<JsonElement>(x =>
         {
             var latitudeAndLongitude = x.Deserialize<double[]>()!;
             task.Completed(CreateGeography.Location((decimal)latitudeAndLongitude[0], (decimal)latitudeAndLongitude[1]));
         });
-        var (failMethod, failDisposable) = await document.PackNetMethod(_ => task.Completed(null));
+        var (failMethod, failDisposable) = await document.PackNetMethod<JsonElement>(_ => task.Completed(null));
         try
         {
             var script = $"navigator.geolocation.getCurrentPosition(x=>{successMethod}([x.coords.longitude,x.coords.latitude]),{failMethod});";

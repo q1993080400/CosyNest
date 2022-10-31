@@ -1,4 +1,4 @@
-﻿namespace System.Geography;
+﻿namespace System.Geography.Weather;
 
 /// <summary>
 /// 凡是实现这个接口的类型，

@@ -60,7 +60,7 @@ public static class CreateWebApi
     /// <inheritdoc cref="HttpAuthentication(Func{HttpContext, string?}, Func{string, Task{ClaimsPrincipal}})"/>
     public static HttpAuthentication HttpAuthenticationSimple
         (Func<string, Task<ClaimsPrincipal>> authentication,
-        string authenticationKey = CreateASP.AuthenticationKey)
+        string authenticationKey = ToolASP.AuthenticationKey)
         => HttpAuthentication(http =>
         http.Request.Headers.TryGetValue("Authentication", out var headers) && headers is [{ } h, ..] ?
         h.Split(" ")[1] :
