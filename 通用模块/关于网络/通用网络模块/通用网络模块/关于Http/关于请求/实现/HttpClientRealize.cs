@@ -124,10 +124,10 @@ sealed class HttpClientRealize : IHttpClient
     {
         if (method.GetCustomAttribute<RouteDescriptionAttribute>() is { Template: { } methodTemplate })
             return methodTemplate;
-        if (!(interfaceType.GetCustomAttribute<RouteDescriptionAttribute>() is { Template: { } interfaceTemplate }))
-            throw new NotSupportedException($"在接口和接口的方法上都没有找到{nameof(RouteDescriptionAttribute)}特性，无法确定API路由");
-        return interfaceTemplate.Replace("[controller]", interfaceType.Name.TrimStart('I').Trim(false, "Controller")).
-            Replace("[action]", method.Name);
+        if (interfaceType.GetCustomAttribute<RouteDescriptionAttribute>() is { Template: { } interfaceTemplate })
+            return interfaceTemplate.Replace("[controller]", interfaceType.Name.TrimStart('I').Trim(false, "Controller")).
+                Replace("[action]", method.Name);
+        throw new NotSupportedException($"在接口和接口的方法上都没有找到{nameof(RouteDescriptionAttribute)}特性，无法确定API路由");
     }
     #endregion
     #endregion

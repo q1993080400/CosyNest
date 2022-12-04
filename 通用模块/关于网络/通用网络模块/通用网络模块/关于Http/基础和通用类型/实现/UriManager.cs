@@ -7,6 +7,6 @@
 sealed class UriManager : IUriManager
 {
     #region 获取本机Uri
-    public string Host { get; init; }
+    public required string Host { get; init; }
     #endregion 
 }

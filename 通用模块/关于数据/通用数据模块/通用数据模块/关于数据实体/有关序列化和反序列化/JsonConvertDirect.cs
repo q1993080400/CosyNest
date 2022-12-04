@@ -1,23 +1,15 @@
 ﻿using System.DataFrancis;
 using System.Design.Direct;
-using System.Reflection;
-using System.TreeObject.Json;
 
 namespace System.Text.Json.Serialization;
 
 /// <summary>
-/// 这个类型可以使用Json序列化和反序列化<see cref="IDirect"/>
+/// 这个类型执行对<see cref="IDirect"/>的Json转换逻辑
 /// </summary>
-sealed class SerializationIDirect : SerializationBase<IDirect>
+/// <typeparam name="Obj"></typeparam>
+sealed class JsonConvertDirect<Obj> : JsonConverter<Obj>
+    where Obj : IDirect
 {
-    #region 重写的CanConvert方法
-    public override bool CanConvert(Type typeToConvert)
-        => typeToConvert == typeof(IDirect) ||
-        typeToConvert == typeof(IData) ||
-        typeToConvert == typeof(DataRealize) ||
-        (typeof(IDirect).IsAssignableFrom(typeToConvert) && typeToConvert.CanNew());
-    #endregion
-    #region 关于序列化和反序列化
     #region 反序列化
     #region 说明文档
     /*本类型根据以下原则执行反序列化：
@@ -41,7 +33,7 @@ sealed class SerializationIDirect : SerializationBase<IDirect>
     /// <param name="reader">用来读取Json字符串的反序列化器</param>
     /// <param name="options">用于配置反序列化的选项</param>
     /// <returns></returns>
-    private object?[] ReadArray(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    private static object?[] ReadArray(ref Utf8JsonReader reader, JsonSerializerOptions options)
     {
         var link = new LinkedList<object?>();
         reader.Read();
@@ -64,7 +56,7 @@ sealed class SerializationIDirect : SerializationBase<IDirect>
     /// 如果为<see langword="null"/>，表示执行弱类型反序列化</param>
     /// <param name="options">用于配置反序列化的选项</param>
     /// <returns></returns>
-    private object? ReadObject(ref Utf8JsonReader reader, Type? typeToConvert, JsonSerializerOptions options)
+    private static object? ReadObject(ref Utf8JsonReader reader, Type? typeToConvert, JsonSerializerOptions options)
         => typeToConvert switch
         {
             { } t when options.CanConverter(t) => JsonSerializer.Deserialize(ref reader, t, options),
@@ -92,7 +84,7 @@ sealed class SerializationIDirect : SerializationBase<IDirect>
     /// 如果为<see langword="null"/>，表示执行弱类型反序列化</param>
     /// <param name="options">用于配置反序列化的选项</param>
     /// <returns></returns>
-    private IDirect? ReadDirect(ref Utf8JsonReader reader, Type? typeToConvert, JsonSerializerOptions options)
+    private static IDirect? ReadDirect(ref Utf8JsonReader reader, Type? typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType is JsonTokenType.Null)
             return null;
@@ -134,26 +126,14 @@ sealed class SerializationIDirect : SerializationBase<IDirect>
     }
     #endregion
     #region 正式方法
-    protected override IDirect ReadTemplate(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        => ReadDirect(ref reader, typeToConvert, options)!;
+    public override Obj? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        => ReadDirect(ref reader, typeToConvert, options).To<Obj?>();
     #endregion
     #endregion
     #region 序列化
-    protected override void WriteTemplate(Utf8JsonWriter writer, IDirect? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, Obj value, JsonSerializerOptions options)
     {
-        var keyValue = value is IData { Metadata: { } metadata } ?
-            value.Prepend(new(nameof(IData.Metadata), metadata)) : value;
-        var type = value?.GetTypeData();
-        var dictionary = keyValue?.Where(x =>
-        {
-            if (x.Value is null)
-                return false;
-            var (exist, value) = type!.PropertyDictionary.TryGetValue(x.Key);
-            return !(exist && value.Single().GetCustomAttribute<JsonIgnoreAttribute>() is { });  //不序列化具有JsonIgnoreAttribute特性的属性
-
-        }).ToDictionary(true);               //不序列化为null的列，提高性能
-        JsonSerializer.Serialize<IReadOnlyDictionary<string, object?>?>(writer, dictionary, options);
+        JsonSerializer.Serialize<IReadOnlyDictionary<string, object?>>(writer, value, options);
     }
-    #endregion
-    #endregion
+    #endregion 
 }

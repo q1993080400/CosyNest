@@ -66,21 +66,24 @@ public interface IHttpContent
     /// 将Http内容解释为树形文档对象，并将其反序列化后返回
     /// </summary>
     /// <typeparam name="Obj">反序列化的返回类型</typeparam>
-    /// <param name="serialization">用于反序列化的选项，
+    /// <param name="options">用于反序列化的选项，
     /// 如果为<see langword="null"/>，则使用默认选项</param>
     /// <returns></returns>
-    async Task<Obj?> ToObject<Obj>(IOptionsJson? serialization = null)
+    async Task<Obj?> ToObject<Obj>(JsonSerializerOptions? options = null)
     {
         var array = await Content.ReadComplete();
-        if (serialization is { })
-            return JsonSerializer.Deserialize<Obj>(array, serialization.FitJson());
-        return JsonSerializer.Deserialize<Obj>(array, CreateJson.SerializationCommonOptions);
+#if DEBUG
+        var json = Encoding.UTF8.GetString(array);
+#endif
+        if (options is { })
+            return JsonSerializer.Deserialize<Obj>(array, options);
+        return JsonSerializer.Deserialize<Obj>(array, CreateJson.JsonCommonOptions);
     }
     #endregion
     #region 非泛型方法
-    /// <inheritdoc cref="ToObject{Obj?}(IOptionsJson?)"/>
-    async Task<IDirect> ToObject(IOptionsJson? serialization = null)
-       => (await ToObject<IDirect>(serialization)) ?? CreateDataObj.DataEmpty();
+    /// <inheritdoc cref="ToObject{Obj}(JsonSerializerOptions?)"/>
+    async Task<IDirect> ToObject(JsonSerializerOptions? options = null)
+       => (await ToObject<IDirect>(options)) ?? CreateDataObj.DataEmpty();
     #endregion
     #endregion
     #endregion

@@ -1,6 +1,5 @@
 ﻿using System.Design.Direct;
 using System.Text.Json.Serialization;
-using System.TreeObject.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using System.DataFrancis.Verify;
@@ -72,7 +71,7 @@ public static class CreateDataObj
     /// 并具有无参数构造函数的类型
     /// </summary>
     /// <returns></returns>
-    public static SerializationBase<IDirect> JsonDirect { get; } = new SerializationIDirect();
+    public static JsonConverter JsonDirect { get; } = new JsonConvertFactoryDirect();
     #endregion
     #endregion
     #region 创建数据管道

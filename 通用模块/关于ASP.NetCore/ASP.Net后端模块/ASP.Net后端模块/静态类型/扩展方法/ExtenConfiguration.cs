@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 
 using System.Reflection;
-using System.Text.Json.Serialization;
 using System.TreeObject.Json;
 
 using static Microsoft.AspNetCore.CreateWebApi;
@@ -25,17 +24,9 @@ public static partial class ExtenWebApi
     /// <param name="options">待添加支持的Mvc配置</param>
     public static void AddFormatterJson(this MvcOptions options)
     {
-        #region 添加格式化器的本地函数
-        void Add(params JsonConverter[] items)
-        {
-            foreach (var item in items.Select(x => x.Fit()))
-            {
-                options.InputFormatters.Insert(0, InputFormatterJson(item));
-                options.OutputFormatters.Insert(0, OutputFormatterJson(item));
-            }
-        }
-        #endregion
-        Add(CreateJson.SerializationCommon.ToArray());
+        var jsonConvert = CreateJson.JsonCommonOptions;
+        options.InputFormatters.Insert(0, InputFormatterJson(jsonConvert));
+        options.OutputFormatters.Insert(0, OutputFormatterJson(jsonConvert));
     }
     #endregion
     #endregion

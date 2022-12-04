@@ -1,8 +1,5 @@
 ﻿using System.IOFrancis;
 using System.IOFrancis.FileSystem;
-using System.SafetyFrancis;
-using System.Security.Principal;
-using System.TreeObject.Json;
 
 namespace Microsoft.AspNetCore;
 
@@ -31,28 +28,6 @@ public static class ToolASP
       答：这是因为在只请求单例服务的情况下，
       IServiceProvider实际上可以也应该静态化，
       它比较方便，而且可以让静态对象也能够请求服务*/
-    #endregion
-    #region 获取序列化IIdentity的对象
-    #region 正式方法
-    /// <summary>
-    /// 获取一个可以序列化和反序列化<see cref="IIdentity"/>的对象
-    /// </summary>
-    public static SerializationBase<IIdentity> SerializationIdentity { get; }
-        = CreateJson.JsonMap<PseudoIIdentity, IIdentity>
-            (value => value is null ? null : new()
-            {
-                AuthenticationType = value.AuthenticationType,
-                Name = value.Name
-            },
-            vaule => vaule is null ? null : CreateSafety.Identity(vaule.AuthenticationType, vaule.Name));
-    #endregion
-    #region 私有辅助类
-    private class PseudoIIdentity
-    {
-        public string? AuthenticationType { get; set; }
-        public string? Name { get; set; }
-    }
-    #endregion
     #endregion
     #region 获取提取身份验证信息的键名
     /// <summary>
@@ -101,7 +76,7 @@ public static class ToolASP
     /// </summary>
     public static void InitializerModule()
     {
-        _ = SerializationIdentity;
+
     }
     #endregion
 }

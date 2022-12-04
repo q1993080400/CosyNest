@@ -23,6 +23,7 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     public RenderFragment<(Element, int, string)> RenderElement { get; set; }
     #endregion
     #region 枚举元素的迭代器
+#pragma warning disable BL0007
     private IAsyncEnumerator<Element> ElementsField;
 
     /// <summary>
@@ -41,6 +42,7 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
             ElementsField = value;
         }
     }
+#pragma warning restore
     #endregion
     #region 每次渲染增加的数量
     /// <summary>

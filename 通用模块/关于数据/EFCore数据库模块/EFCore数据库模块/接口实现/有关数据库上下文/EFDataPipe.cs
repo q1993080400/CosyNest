@@ -69,13 +69,6 @@ sealed class EFDataPipe : IDataPipe
       也不要使用除了Guid以外的其他类型作为ID*/
     #endregion
     #region 删除实体
-    #region 按照条件
-    Task IDataPipe.Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
-    {
-        IDataPipe pipe = this;
-        return pipe.Delete(pipe.Query<Data>().Where(expression), cancellation);
-    }
-    #endregion
     #region 按照实体
     async Task IDataPipeTo.Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
     {
@@ -84,7 +77,16 @@ sealed class EFDataPipe : IDataPipe
         dbSet.RemoveRange(datas);
         await db.SaveChangesAsync(cancellation);
     }
-    #endregion 
+    #endregion
+    #region 按照条件
+    Task IDataPipe.Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
+    {
+        var db = CreateDbContext(typeof(Data));
+        var dbSet = db.Set<Data>();
+        dbSet.Where(expression).ExecuteDelete();
+        return Task.CompletedTask;
+    }
+    #endregion
     #endregion
     #endregion
     #region 内部成员

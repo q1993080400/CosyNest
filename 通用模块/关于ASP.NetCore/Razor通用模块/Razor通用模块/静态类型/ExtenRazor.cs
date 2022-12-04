@@ -1,6 +1,7 @@
 ﻿using System.NetFrancis;
 using System.Reflection;
 using System.NetFrancis.Http;
+using System.SafetyFrancis.Authentication;
 
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
@@ -8,6 +9,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace System;
 
@@ -138,6 +141,21 @@ public static class ExtenRazor
         {
             var navigationManager = x.GetRequiredService<NavigationManager>();
             return CreateNet.UriManager(navigationManager.BaseUri);
+        });
+    #endregion
+    #region 注入IAuthentication
+    /// <summary>
+    /// 注入一个<see cref="IAuthentication{Parameter}"/>，
+    /// 它通过在Cookie中写入和移除键值对来执行登录和注销操作
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="AuthenticationCookie(IJSWindow, string)"/>
+    public static IServiceCollection AddAuthenticationCookie(this IServiceCollection services, string key = ToolASP.AuthenticationKey)
+        => services.AddScoped(server =>
+        {
+            var jsWindow = server.GetRequiredService<IJSWindow>();
+            return CreateRazor.AuthenticationCookie(jsWindow, key);
         });
     #endregion
     #endregion

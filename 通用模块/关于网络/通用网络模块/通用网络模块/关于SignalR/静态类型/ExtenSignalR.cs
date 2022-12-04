@@ -91,7 +91,7 @@ public static class ExtenSignalR
     public static JsonHubProtocolOptions AddFormatterJson(this JsonHubProtocolOptions options)
     {
         options.PayloadSerializerOptions.
-            Converters.Add(CreateJson.SerializationCommon);
+            Converters.Add(CreateJson.JsonCommon);
         return options;
     }
     #endregion

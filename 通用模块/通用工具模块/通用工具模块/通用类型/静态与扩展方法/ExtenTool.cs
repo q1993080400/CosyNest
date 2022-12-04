@@ -1,4 +1,6 @@
-﻿using System.Maths;
+﻿using System.ComponentModel;
+using System.Maths;
+using System.Reflection;
 
 namespace System;
 
@@ -36,6 +38,22 @@ public static partial class ExtenTool
     {
         var bit = ToolBit.RemoveFlag(obj.To<int>(), remove.Select(x => x.To<int>()).ToArray());
         return (Obj)Enum.ToObject(typeof(Obj), bit);
+    }
+    #endregion
+    #region 获取枚举的描述
+    /// <summary>
+    /// 获取枚举的描述，
+    /// 如果没有描述，返回<see langword="null"/>
+    /// </summary>
+    /// <typeparam name="Enum">枚举的类型</typeparam>
+    /// <param name="enum">待返回描述的枚举</param>
+    /// <returns></returns>
+    public static string? GetDescription<Enum>(this Enum @enum)
+        where Enum : struct, System.Enum
+    {
+        var description = typeof(Enum).GetField(@enum.ToString())?.
+            GetCustomAttributes<DescriptionAttribute>(true)?.SingleOrDefault();
+        return description is { Description: { } d } ? d : null;
     }
     #endregion
     #endregion

@@ -99,16 +99,46 @@ public static partial class ExtenReflection
     /// </summary>
     /// <param name="type">要检查的类型</param>
     /// <param name="generic">要检查是否继承或实现的泛型类型</param>
-    /// <returns></returns>
-    public static bool IsRealizeGeneric(this Type type, Type generic)
+    /// <returns>一个元组，它的项分别是是否继承或实现泛型类型，
+    /// 以及如果继承或实现了，该泛型类型的泛型参数</returns>
+    public static (bool IsRealize, Type[] GenericParameter) IsRealizeGeneric(this Type type, Type generic)
     {
         #region 本地函数
-        bool Fun(IEnumerable<Type> types)
-           => types.Prepend(type).Any(x => x == generic || x.IsGenericRealize(generic));
+        (bool IsRealize, Type[] GenericParameter) Fun(IEnumerable<Type> types)
+        {
+            var realize = types.Prepend(type).FirstOrDefault(x => x == generic || x.IsGenericRealize(generic));
+            return realize is null ?
+                (false, Array.Empty<Type>()) :
+                (true, realize.GetGenericArguments());
+        }
         #endregion
-        return generic.IsGenericType ?
-            (Fun(type.BaseTypeAll()) || Fun(type.GetInterfaces())) :
-            throw new ArgumentException($"{generic}不是泛型类型");
+        return generic switch
+        {
+            { IsGenericType: true } => Fun(type.BaseTypeAll()) switch
+            {
+                (true, { } parameter) => (true, parameter),
+                _ => Fun(type.GetInterfaces())
+            },
+            _ => throw new ArgumentException($"{generic}不是泛型类型")
+        };
+    }
+    #endregion
+    #region 返回集合的元素类型
+    /// <summary>
+    /// 如果一个类型是集合，则返回它的元素类型，
+    /// 否则返回<see langword="null"/>
+    /// </summary>
+    /// <param name="type">要检查的类型</param>
+    /// <returns></returns>
+    public static Type? GetCollectionElementType(this Type type)
+    {
+        if (type.IsArray)
+            return type.GetElementType();
+        if (type.IsRealizeGeneric(typeof(IEnumerable<>)) is (true, { } elementType))
+            return elementType.First();
+        if (typeof(Collections.IEnumerable).IsAssignableFrom(type))
+            return typeof(object);
+        return null;
     }
     #endregion
     #endregion

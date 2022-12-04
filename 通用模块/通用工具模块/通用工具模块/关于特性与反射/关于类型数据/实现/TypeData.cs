@@ -56,7 +56,9 @@ sealed partial class TypeData : ITypeData
     #endregion
     #region 搜索构造函数，并且创建对象
     public Obj ConstructorCreate<Obj>(params object[] parameters)
-        => ConstructorDictionary[new ConstructSignature(parameters)].Invoke<Obj>(parameters);
+        => ConstructorDictionary.TryGetValue(new ConstructSignature(parameters)).Value is { } c ?
+        c.Invoke<Obj>() :
+        throw new KeyNotFoundException($"{Type}不含具有{parameters.Join(x => x.GetType().ToString(), "，")}参数的构造函数");
     #endregion
     #endregion
     #region 关于事件

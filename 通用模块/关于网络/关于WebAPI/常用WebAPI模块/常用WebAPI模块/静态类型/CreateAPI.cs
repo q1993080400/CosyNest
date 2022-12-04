@@ -1,4 +1,5 @@
-﻿using System.NetFrancis.Api.ShortMessage;
+﻿using System.NetFrancis.Api.Bing.Image;
+using System.NetFrancis.Api.ShortMessage;
 using System.NetFrancis.Http;
 using System.Underlying.Phone;
 
@@ -37,5 +38,14 @@ public static class CreateAPI
     public static IShortMessageManage SMSShenYuanHengJi(string appCode, Func<IHttpClient>? httpClientProvide = null)
         => new ShortMessageShenYuanHengJi(appCode, httpClientProvide);
     #endregion
+    #endregion
+    #region 创建一个必应图片API接口
+    /// <summary>
+    /// 创建一个必应图片API接口
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="BingImageAPI(Func{IHttpClient}?)"/>
+    public static IBingImageAPI ImageAPI(Func<IHttpClient>? httpClientProvide = null)
+        => new BingImageAPI(httpClientProvide);
     #endregion
 }

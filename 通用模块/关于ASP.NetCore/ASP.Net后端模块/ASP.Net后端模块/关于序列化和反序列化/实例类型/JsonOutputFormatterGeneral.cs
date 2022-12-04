@@ -1,7 +1,6 @@
 ﻿using System.NetFrancis;
 using System.Text;
-using System.TreeObject;
-using System.TreeObject.Json;
+using System.Text.Json;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -17,30 +16,31 @@ sealed class JsonOutputFormatterGeneral : TextOutputFormatter
 {
     #region 获取封装的序列化器
     /// <summary>
-    /// 获取封装的序列化器，本对象的功能就是通过它实现的
+    /// 获取封装的转换器配置，
+    /// 它决定了本对象如何转换Json
     /// </summary>
-    private ISerializationText Serialization { get; }
+    private JsonSerializerOptions Options { get; }
     #endregion
     #region 检查序列化的类型
     protected override bool CanWriteType(Type? type)
-        => Serialization.CanSerialization(type ?? throw new ArgumentNullException(nameof(type)));
+        => Options.CanConverter(type ?? throw new ArgumentNullException(nameof(type)));
     #endregion
     #region 序列化对象
     public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
     {
-        var text = Serialization.SerializationUTF16(context.Object, context.ObjectType, CreateJson.SerializationCommonOptions.FitJson());
+        var text = JsonSerializer.Serialize(context.Object, context.ObjectType!, Options);
         return context.HttpContext.Response.WriteAsync(text);
     }
     #endregion
     #region 构造函数
     /// <summary>
-    /// 使用指定的序列化器初始化对象
+    /// 使用指定的转换器初始化对象
     /// </summary>
-    /// <param name="serialization">指定的序列化器，
+    /// <param name="options">指定的转换器，
     /// 它提供了将对象序列化为Json的功能</param>
-    public JsonOutputFormatterGeneral(ISerializationText serialization)
+    public JsonOutputFormatterGeneral(JsonSerializerOptions options)
     {
-        this.Serialization = serialization;
+        this.Options = options;
         SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.Json));
         SupportedEncodings.Add(Encoding.UTF8);
         SupportedEncodings.Add(Encoding.Unicode);

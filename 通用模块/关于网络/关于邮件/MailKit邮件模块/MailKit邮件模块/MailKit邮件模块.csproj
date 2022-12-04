@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6</TargetFramework>
+		<TargetFramework>net7</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<AssemblyName>MailRealizeMailKit</AssemblyName>
 		<RootNamespace>System.NetFrancis.Mail</RootNamespace>
@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MailKit" Version="3.4.1" PrivateAssets="compile" />
+		<PackageReference Include="MailKit" Version="3.4.2" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

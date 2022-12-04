@@ -58,14 +58,10 @@ public interface IData : IDirect
     /// 通过它可以获取一个<see cref="Guid"/>，
     /// 它可以用来标志数据的唯一性，如果为<see langword="null"/>，代表不存在标识
     /// </summary>
-    string? IDColumnName { get; set; }
+    string? IDColumnName { get; }
 
     /*实现本API请遵循以下规范：
-      #除非该属性为null，否则在写入它的时候即引发异常
     
-      #按照约定，标识必须为Guid类型，不能为自增列或其他对象
-    
-      #在写入这个属性时，如果写入的值不为null，
-      且现在的Guid为默认值，则给数据分配一个新的Guid*/
+      #按照约定，标识必须为Guid类型，不能为自增列或其他对象*/
     #endregion
 }

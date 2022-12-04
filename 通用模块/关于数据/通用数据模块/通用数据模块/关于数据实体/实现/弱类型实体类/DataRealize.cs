@@ -22,6 +22,9 @@ sealed record DataRealize : DataBase, IData
     protected override IData CreateSelf()
         => new DataRealize(Array.Empty<KeyValuePair<string, object?>>(), false);
     #endregion
+    #region 数据ID
+    public override string? IDColumnName => null;
+    #endregion
     #endregion
     #region 构造函数
     /// <summary>

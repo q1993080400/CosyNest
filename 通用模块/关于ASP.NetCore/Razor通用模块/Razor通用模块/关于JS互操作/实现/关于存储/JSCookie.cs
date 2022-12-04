@@ -99,7 +99,7 @@ sealed class JSCookie : JSRuntimeBase, IAsyncDictionary<string, string>
     {
         IndexAsync = CreateTasks.AsyncIndex<string, string>(
            async (key, cancellation) => (await this.Linq(x => x.First(y => y.Key == key))).Value,
-           (key, value, cancellation) => SetCookie($"{key}={value};expires=Thu, 01 Jan 2099 00:00:00 GMT", cancellation).AsTask());
+           (key, value, cancellation) => SetCookie($"{key}={value};max-age={3600 * 24 * 365}", cancellation).AsTask());
     }
     #endregion
 }

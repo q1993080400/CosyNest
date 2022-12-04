@@ -14,7 +14,7 @@ static class ModuleInitializer
     [ModuleInitializer]
     public static void Initializer()
     {
-        CreateJson.SerializationCommon.Add(CreateDataObj.JsonDirect);
+        CreateJson.JsonCommon.Add(CreateDataObj.JsonDirect);
     }
     #endregion
 }

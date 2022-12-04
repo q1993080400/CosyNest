@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6-windows</TargetFramework>
+		<TargetFramework>net7-windows</TargetFramework>
 		<RootNamespace>System</RootNamespace>
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>

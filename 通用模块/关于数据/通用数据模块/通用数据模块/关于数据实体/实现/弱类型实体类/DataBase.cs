@@ -97,7 +97,6 @@ public abstract record DataBase : IData
             {
                 copy[name] = value;
             }
-        copy.IDColumnName = this.IDColumnName;
         return copy;
     }
     #endregion
@@ -111,20 +110,7 @@ public abstract record DataBase : IData
     #endregion
     #endregion
     #region 数据ID的列名
-    private string? IDColumnNameField;
-
-    public string? IDColumnName
-    {
-        get => IDColumnNameField;
-        set
-        {
-            if (IDColumnNameField is { })
-                throw new NotSupportedException($"除非{nameof(IDColumnName)}为null，否则不能写入这个属性");
-            if (value is { } && this.GetValueOrDefault(value).To<Guid>(false) == default)
-                this[value] = Guid.NewGuid();
-            IDColumnNameField = value;
-        }
-    }
+    public abstract string? IDColumnName { get; }
     #endregion
     #region 本对象的Json形式
     public string Json

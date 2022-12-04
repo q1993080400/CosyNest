@@ -21,6 +21,13 @@ public abstract class Entity : IData
     /// </summary>
     public Guid ID { get; set; }
     #endregion
+    #region 指示数据是否被隐藏
+    /// <summary>
+    /// 获取或设置数据是否被隐藏，
+    /// 被隐藏的数据没有被删除，但是不会显示
+    /// </summary>
+    public bool IsHide { get; set; }
+    #endregion
     #region 数据的元数据
     [NotMapped]
     public object? Metadata { get; set; }
@@ -28,10 +35,7 @@ public abstract class Entity : IData
     #region 获取数据列名
     [NotMapped]
     public virtual string? IDColumnName
-    {
-        get => nameof(ID);
-        set => throw new NotSupportedException("不允许显式写入数据列名");
-    }
+        => nameof(ID);
     #endregion
     #region 数据架构
     #region 缓存属性

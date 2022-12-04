@@ -1,10 +1,7 @@
 ﻿using System.Design;
 using System.Design.Direct;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.TreeObject;
-using System.TreeObject.Json;
 
 namespace System;
 
@@ -38,88 +35,6 @@ public static class ExtenJson
     /// <returns></returns>
     public static bool CanConverter(this JsonSerializerOptions options, Type converterType)
         => options.GetConverter(converterType) is { };
-    #endregion
-    #endregion
-    #region 关于适配
-    #region 适配ISerializationText和JsonConverter
-    #region 说明文档
-    /*说明文档
-      问：ISerializationText和JsonConverter之间的适配存在相当多的限制，它主要体现在哪里？
-      答：体现在以下方面：
-      #从JsonConverter适配为ISerializationText不存在任何问题
-
-      #实际上无法从ISerializationText适配为JsonConvertern，
-      现在的适配实际上是假适配，它和简单类型转换差不了多少，
-      这是因为微软对序列化的限制过于严格，Utf8JsonWriter不能直接写入原始字符串，
-      这导致无法将ISerializationText序列化后的字符串写入序列化器
-
-      问：既然如此，如何最大程度的保障序列化器的兼容性？
-      答：建议在实现ISerializationText时，从可选基类SerializationBase继承，
-      它既继承自JsonConverter，又实现了ISerializationText，
-      同时，序列化和反序列化的逻辑应该放在JsonConverter的抽象方法中，
-      因为这两个抽象方法易于实现，但是难以适配*/
-    #endregion
-    #region 从JsonConverter<T>适配
-    /// <summary>
-    /// 将<see cref="JsonConverter{T}"/>适配为<see cref="SerializationBase{Output}"/>
-    /// </summary>
-    /// <typeparam name="Output">可序列化的目标类型</typeparam>
-    /// <param name="converter">待适配的转换器</param>
-    /// <returns></returns>
-    public static SerializationBase<Output> Fit<Output>(this JsonConverter<Output> converter)
-        => converter as SerializationBase<Output> ?? new FitJsonConverter<Output>(converter);
-    #endregion
-    #region 从JsonConverter适配
-    /// <summary>
-    /// 将<see cref="JsonConverter"/>适配为<see cref="ISerializationText"/>
-    /// </summary>
-    /// <param name="converter">待适配的序列化器</param>
-    /// <returns></returns>
-    public static ISerializationText Fit(this JsonConverter converter)
-        => converter as ISerializationText ??
-        throw new ArgumentException($"{nameof(converter)}必须是一个{nameof(ISerializationText)}，否则无法适配");
-    #endregion
-    #region 从ISerializationText适配
-    /// <summary>
-    /// 将<see cref="ISerializationText"/>适配为<see cref="JsonConverter"/>，
-    /// 但除非它本身就是一个<see cref="JsonConverter"/>，否则无法适配
-    /// </summary>
-    /// <param name="serialization">待适配的序列化器</param>
-    /// <returns></returns>
-    public static JsonConverter Fit(this ISerializationText serialization)
-        => serialization as JsonConverter ??
-        throw new ArgumentException($"{nameof(serialization)}必须是一个{nameof(JsonConverter)}，否则无法适配");
-    #endregion
-    #endregion
-    #region 适配IOptionsBase和JsonSerializerOptions
-    #region 从JsonSerializerOptions适配
-    /// <summary>
-    /// 将一个<see cref="JsonSerializerOptions"/>适配为<see cref="IOptionsBase"/>
-    /// </summary>
-    /// <param name="options">待适配的对象</param>
-    /// <param name="copy">如果这个值为<see langword="true"/>，
-    /// 则使用<paramref name="options"/>的副本创建选项，否则使用它的原始引用</param>
-    /// <returns></returns>
-    [return: NotNullIfNotNull("options")]
-    public static IOptionsJson? FitJson(this JsonSerializerOptions? options, bool copy = false)
-        => options is null ? null : new OptionsJsonFit(copy ? new(options) : options);
-    #endregion
-    #region 从IOptionsBase适配
-    /// <summary>
-    /// 将一个<see cref="IOptionsBase"/>适配为<see cref="JsonSerializerOptions"/>
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="FitJson(JsonSerializerOptions?, bool)"/>
-    [return: NotNullIfNotNull("options")]
-    public static JsonSerializerOptions? FitJson(this IOptionsBase? options, bool copy = false)
-        => options switch
-        {
-            null => null,
-            OptionsJsonFit { Options: { } o } => copy ? new(o) : o,
-            not IOptionsJson => throw new JsonException($"{options}不是Json序列化选项，无法适配"),
-            _ => throw new ArgumentException($"{options}没有封装{nameof(JsonSerializerOptions)}，无法进行适配")
-        };
-    #endregion
     #endregion
     #endregion
     #region 关于读取Json

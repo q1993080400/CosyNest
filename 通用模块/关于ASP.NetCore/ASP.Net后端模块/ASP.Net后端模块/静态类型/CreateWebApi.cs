@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using System.TreeObject;
+using System.Text.Json;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -20,22 +20,20 @@ public static class CreateWebApi
     /// 创建一个<see cref="TextOutputFormatter"/>，
     /// 它可以将受支持的类型序列化为Json并在WebApi中返回
     /// </summary>
-    /// <param name="serialization">>指定的序列化器，
-    /// 它提供了将对象序列化为Json的功能</param>
     /// <returns></returns>
-    public static TextOutputFormatter OutputFormatterJson(ISerializationText serialization)
-        => new JsonOutputFormatterGeneral(serialization);
+    /// <inheritdoc cref="JsonOutputFormatterGeneral(JsonSerializerOptions)"/>
+    public static TextOutputFormatter OutputFormatterJson(JsonSerializerOptions options)
+        => new JsonOutputFormatterGeneral(options);
     #endregion
     #region 输入Json
     /// <summary>
     /// 创建一个<see cref="TextInputFormatter"/>，
     /// 它可以在WeiApi中接受Json，并将其反序列化为受支持的类型
     /// </summary>
-    /// <param name="serialization">指定的反序列化器，
-    /// 它提供了将Json反序列化为对象的功能</param>
     /// <returns></returns>
-    public static TextInputFormatter InputFormatterJson(ISerializationText serialization)
-        => new JsonInputFormatter(serialization);
+    /// <inheritdoc cref="JsonInputFormatterGeneral(JsonSerializerOptions)"/>
+    public static TextInputFormatter InputFormatterJson(JsonSerializerOptions options)
+        => new JsonInputFormatterGeneral(options);
     #endregion
     #endregion
     #endregion

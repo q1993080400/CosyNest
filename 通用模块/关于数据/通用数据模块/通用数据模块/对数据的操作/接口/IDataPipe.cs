@@ -43,7 +43,7 @@ public interface IDataPipe : IDataPipeTo, IDataPipeFrom
     #endregion
     #endregion
     #endregion
-    #region 删除数据
+    #region 按条件删除数据
     #region 说明文档
     /*问：按照通常的思维习惯，删除数据和添加数据是相对应的，
       这个功能应该放在IDataPipeTo中，那么为什么会放在这里？

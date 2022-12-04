@@ -13,10 +13,14 @@ sealed class HttpResponse : IHttpResponse
     public HttpStatusCode Status { get; init; }
     #endregion
     #region 响应的标头
-    public IHttpHeaderResponse Header { get; init; }
+    public required IHttpHeaderResponse Header { get; init; }
     #endregion
     #region 响应的正文
-    public IHttpContent Content { get; init; }
+    public required IHttpContent Content { get; init; }
+    #endregion
+    #region 响应是否成功
+    public bool IsSuccess
+         => (int)Status is >= 200 and <= 299;
     #endregion
     #region 如果响应不成功，则抛出异常
     /// <summary>
@@ -38,7 +42,7 @@ Http请求未能成功
     /// <summary>
     /// 获取请求的Uri
     /// </summary>
-    internal string RequestUri { get; init; }
+    internal required string RequestUri { get; init; }
     #endregion
     #endregion
 }

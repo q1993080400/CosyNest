@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Design.Direct;
 using System.TreeObject.Json;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace System.NetFrancis.Http;
 
@@ -74,18 +75,22 @@ public interface IHttpClient
     /// 发起Post请求，并返回结果
     /// </summary>
     /// <param name="content">这个对象会被序列化，并放在请求体的内部</param>
-    /// <param name="serialization">用来序列化<paramref name="content"/>的对象，
+    /// <param name="options">用来序列化<paramref name="content"/>的对象，
     /// 就算为<see langword="null"/>，它仍自带有对<see cref="IDirect"/>的支持</param>
     /// <param name="parameters">请求的Uri参数名称和值，
     /// 是的，即便是Post请求，它也可以包含Uri参数</param>
     /// <inheritdoc cref="Request(string, ValueTuple{string,string}[], CancellationToken)"/>
-    async Task<IHttpResponse> RequestPost(string uri, object content, IOptionsJson? serialization = null,
+    async Task<IHttpResponse> RequestPost(string uri, object content, JsonSerializerOptions? options = null,
         (string Parameter, string? Value)[]? parameters = null, CancellationToken cancellationToken = default)
     {
+        var json = JsonContent.Create(content, options: options ?? CreateJson.JsonCommonOptions);
+#if DEBUG
+        var jsonText = await json.ReadAsStringAsync(cancellationToken);
+#endif
         var request = HttpRequestRecording.Create(uri, parameters) with
         {
             HttpMethod = HttpMethod.Post,
-            Content = await JsonContent.Create(content, options: serialization?.FitJson() ?? CreateJson.SerializationCommonOptions).ToHttpContent()
+            Content = await json.ToHttpContent()
         };
         return await Request(request, cancellationToken);
     }

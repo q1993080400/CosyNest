@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using System.TreeObject.Json;
 
 namespace Microsoft.AspNetCore;
 
@@ -14,7 +13,7 @@ static class ModuleInitializer
     [ModuleInitializer]
     public static void Initializer()
     {
-        CreateJson.SerializationCommon.Add(ToolASP.SerializationIdentity);
+
     }
     #endregion
 }

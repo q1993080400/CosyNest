@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6</TargetFramework>
+    <TargetFramework>net7</TargetFramework>
 	  <LangVersion>preview</LangVersion>
 	  <AssemblyName>FTPRealizeFluent</AssemblyName>
 	  <RootNamespace>System.NetFrancis.FTP</RootNamespace>
@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentFTP" Version="40.0.0" PrivateAssets="compile" />
+    <PackageReference Include="FluentFTP" Version="42.0.1" PrivateAssets="compile" />
   </ItemGroup>
 
   <ItemGroup>

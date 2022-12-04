@@ -21,6 +21,20 @@ public interface IUriManager
     /// </summary>
     string Host { get; }
     #endregion
+    #region 基准Uri
+    /// <summary>
+    /// 获取本机的基准Uri
+    /// </summary>
+    string Base
+    {
+        get
+        {
+            var u = new Uri(Host, UriKind.RelativeOrAbsolute);
+            var (@base, _) = u.Split();
+            return @base;
+        }
+    }
+    #endregion
     #region 转换为绝对Uri
     /// <summary>
     /// 转换为绝对Uri

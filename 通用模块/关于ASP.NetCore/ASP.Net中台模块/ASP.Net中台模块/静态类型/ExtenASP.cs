@@ -108,18 +108,35 @@ public static class ExtenASP
     #region 指定基地址
     /// <summary>
     /// 注入一个<see cref="IHttpClient"/>，
-    /// 它可以用于请求WebApi
+    /// 它可以用于请求WebApi，且支持通过相对地址请求
     /// </summary>
     /// <param name="services">待注入的服务容器</param>
     /// <param name="getBaseAddress">用来获取请求基地址的委托，
     /// 基地址通常是服务器的域名</param>
     /// <returns></returns>
-    public static IServiceCollection AddIHttpClient(this IServiceCollection services, Func<IServiceProvider, string> getBaseAddress)
+    public static IServiceCollection AddIHttpClientHasAddress(this IServiceCollection services, Func<IServiceProvider, string> getBaseAddress)
     {
-        services.AddHttpClient("webapi", (server, client) => client.BaseAddress = new(getBaseAddress(server)));
-        var a = services.AddScoped(server => server.GetRequiredService<IHttpClientFactory>().CreateClient("webapi").ToHttpClient());
+        services.AddHttpClient("webapi");
+        services.AddScoped(server =>
+        {
+            var http = server.GetRequiredService<IHttpClientFactory>().CreateClient("webapi");
+            var uri = getBaseAddress(server);
+            http.BaseAddress = new(uri);
+            return http.ToHttpClient();
+        });
         return services;
     }
+    #endregion
+    #region 指定基地址，依赖于IUriManager
+    /// <summary>
+    /// 注入一个<see cref="IHttpClient"/>，
+    /// 它可以用于请求WebApi，且支持通过相对地址请求，
+    /// 它依赖于服务<see cref="IUriManager"/>
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <returns></returns>
+    public static IServiceCollection AddIHttpClientHasAddress(this IServiceCollection services)
+        => services.AddIHttpClientHasAddress(x => x.GetRequiredService<IUriManager>().Base);
     #endregion
     #endregion 
     #region 注入SignalRProvide对象

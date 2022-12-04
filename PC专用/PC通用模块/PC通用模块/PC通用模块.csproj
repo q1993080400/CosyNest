@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6-windows</TargetFramework>
+		<TargetFramework>net7-windows</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<RootNamespace>System.Underlying.PC</RootNamespace>
 		<AssemblyName>ToolCommonPC</AssemblyName>
