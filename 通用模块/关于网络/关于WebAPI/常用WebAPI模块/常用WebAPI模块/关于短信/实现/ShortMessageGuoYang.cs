@@ -36,16 +36,15 @@ sealed class ShortMessageGuoYang : WebApi, IShortMessageManage
             if (split.Length > 1)
                 uri += $"&param={split[1]}";
             var httpClient = HttpClientProvide();
-            var request = new HttpRequestRecording()
+            var request = new HttpRequestRecording(uri)
             {
-                Uri = new(uri),
                 Header = new()
                 {
                     Authorization = new("APPCODE", AppCode)
                 },
                 HttpMethod = HttpMethod.Post
             };
-            var result = await httpClient.Request(request, cancellation).Read(x => x.ToObject());
+            var result = await httpClient.Request(request, cancellationToken: cancellation).Read(x => x.ToObject());
             if (result?.GetValue<int>("code") is not 0)
                 throw new APIException($"发送到{mobile}的短信失败，错误信息：{result!["msg"]}");
         }

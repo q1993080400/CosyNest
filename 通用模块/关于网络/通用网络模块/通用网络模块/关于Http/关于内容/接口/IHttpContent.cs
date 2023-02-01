@@ -1,9 +1,9 @@
 ﻿using System.DataFrancis;
+using System.Design;
 using System.Design.Direct;
 using System.IOFrancis.Bit;
 using System.Text;
 using System.Text.Json;
-using System.TreeObject.Json;
 
 namespace System.NetFrancis.Http;
 
@@ -77,7 +77,7 @@ public interface IHttpContent
 #endif
         if (options is { })
             return JsonSerializer.Deserialize<Obj>(array, options);
-        return JsonSerializer.Deserialize<Obj>(array, CreateJson.JsonCommonOptions);
+        return JsonSerializer.Deserialize<Obj>(array, CreateDesign.JsonCommonOptions);
     }
     #endregion
     #region 非泛型方法

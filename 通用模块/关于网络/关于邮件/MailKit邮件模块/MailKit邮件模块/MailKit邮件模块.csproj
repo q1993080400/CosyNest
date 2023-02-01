@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MailKit" Version="3.4.2" PrivateAssets="compile" />
+		<PackageReference Include="MailKit" Version="3.4.3" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

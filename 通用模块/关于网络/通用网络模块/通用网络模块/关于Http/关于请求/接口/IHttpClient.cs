@@ -1,9 +1,9 @@
 ﻿using System.IOFrancis.Bit;
 using System.Net.Http.Json;
 using System.Design.Direct;
-using System.TreeObject.Json;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Design;
 
 namespace System.NetFrancis.Http;
 
@@ -42,9 +42,12 @@ public interface IHttpClient
     /// 发起Http请求，并返回结果
     /// </summary>
     /// <param name="request">请求消息的内容</param>
+    /// <param name="transformation">一个函数，它输入旧的Http请求对象，
+    /// 返回一个新的Http请求对象，它可以用来改变Http请求的默认值，
+    /// 如果为<see langword="null"/>，则不做改变</param>
     /// <param name="cancellationToken">一个用于取消操作的令牌</param>
     /// <returns>Http请求的结果</returns>
-    Task<IHttpResponse> Request(IHttpRequest request, CancellationToken cancellationToken = default);
+    Task<IHttpResponse> Request(HttpRequestRecording request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default);
     #endregion
     #region 返回IBitRead
     /// <summary>
@@ -52,23 +55,23 @@ public interface IHttpClient
     /// 它可以用于下载
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="Request(IHttpRequest,CancellationToken)"/>
-    Task<IBitRead> RequestDownload(IHttpRequest request, CancellationToken cancellationToken = default);
+    /// <inheritdoc cref="Request(HttpRequestRecording, Func{HttpRequestRecording, HttpRequestRecording}?, CancellationToken)"/>
+    Task<IBitRead> RequestDownload(HttpRequestRecording request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default);
     #endregion
     #endregion
     #region 发起Http请求（指定Uri）
     #region 直接返回IHttpResponse
     /// <param name="uri">请求的Uri</param>
     /// <param name="parameters">枚举请求的参数名称和值（如果有）</param>
-    /// <inheritdoc cref="Request(IHttpRequest,CancellationToken)"/>
-    Task<IHttpResponse> Request(string uri, (string Parameter, string? Value)[]? parameters = null, CancellationToken cancellationToken = default)
-        => Request(HttpRequestRecording.Create(uri, parameters), cancellationToken);
+    /// <inheritdoc cref="Request(HttpRequestRecording,Func{HttpRequestRecording, HttpRequestRecording}?,CancellationToken)"/>
+    Task<IHttpResponse> Request(string uri, (string Parameter, string Value)[]? parameters = null, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
+        => Request(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region 返回IBitRead
-    /// <inheritdoc cref="RequestDownload(IHttpRequest,CancellationToken)"/>
-    /// <inheritdoc cref="Request(string, ValueTuple{string,string?}[],CancellationToken)"/>
-    Task<IBitRead> RequestDownload(string uri, (string Parameter, string? Value)[]? parameters = null, CancellationToken cancellationToken = default)
-        => RequestDownload(HttpRequestRecording.Create(uri, parameters), cancellationToken);
+    /// <inheritdoc cref="RequestDownload(HttpRequestRecording,Func{HttpRequestRecording, HttpRequestRecording}?,CancellationToken)"/>
+    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],Func{HttpRequestRecording, HttpRequestRecording}?,CancellationToken)"/>
+    Task<IBitRead> RequestDownload(string uri, (string Parameter, string Value)[]? parameters = null, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
+        => RequestDownload(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region Post请求
     /// <summary>
@@ -79,33 +82,37 @@ public interface IHttpClient
     /// 就算为<see langword="null"/>，它仍自带有对<see cref="IDirect"/>的支持</param>
     /// <param name="parameters">请求的Uri参数名称和值，
     /// 是的，即便是Post请求，它也可以包含Uri参数</param>
-    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[], CancellationToken)"/>
+    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],Func{HttpRequestRecording, HttpRequestRecording}?, CancellationToken)"/>
     async Task<IHttpResponse> RequestPost(string uri, object content, JsonSerializerOptions? options = null,
-        (string Parameter, string? Value)[]? parameters = null, CancellationToken cancellationToken = default)
+        (string Parameter, string Value)[]? parameters = null, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
     {
-        var json = JsonContent.Create(content, options: options ?? CreateJson.JsonCommonOptions);
+        var json = JsonContent.Create(content, options: options ?? CreateDesign.JsonCommonOptions);
 #if DEBUG
         var jsonText = await json.ReadAsStringAsync(cancellationToken);
 #endif
-        var request = HttpRequestRecording.Create(uri, parameters) with
+        var request = new HttpRequestRecording(uri, parameters) with
         {
             HttpMethod = HttpMethod.Post,
             Content = await json.ToHttpContent()
         };
-        return await Request(request, cancellationToken);
+        return await Request(request, transformation, cancellationToken);
     }
     #endregion
     #endregion
     #region 强类型Http请求
+    #region 返回IHttpResponse
     /// <summary>
     /// 发起强类型Http请求，并返回结果，
     /// 它只支持Get请求
     /// </summary>
     /// <typeparam name="API">API接口的类型</typeparam>
     /// <param name="request">用于描述请求路径和参数的表达式</param>
+    /// <param name="options">一个用于执行Json转换的对象</param>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
-    Task<IHttpResponse> Request<API>(Expression<Func<API, object?>> request, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="Request(HttpRequestRecording, Func{HttpRequestRecording, HttpRequestRecording}?, CancellationToken)"/>
+    Task<IHttpResponse> Request<API>(Expression<Func<API, object?>> request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null,
+        JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         where API : class;
 
     /*问：如何使用这个方法？
@@ -116,5 +123,22 @@ public interface IHttpClient
     
       这个接口方法的返回值可以为任意类型，
       因为该接口方法实际上不会被执行*/
+    #endregion
+    #region 返回Json对象
+    /// <summary>
+    /// 发起强类型Http请求，并将结果反序列化为Json后返回，
+    /// 它只支持Get请求
+    /// </summary>
+    /// <typeparam name="Ret">返回值类型</typeparam>
+    /// <returns></returns>
+    /// <inheritdoc cref="Request{API}(Expression{Func{API, object?}},Func{HttpRequestRecording, HttpRequestRecording}?,JsonSerializerOptions?, CancellationToken)"/>
+    async Task<Ret?> Request<API, Ret>(Expression<Func<API, Task<Ret>>> request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null,
+        JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        where API : class
+    {
+        var expression = Expression.Lambda<Func<API, object?>>(request.Body, request.Parameters);
+        return await Request(expression, transformation, options, cancellationToken).Read(x => x.ToObject<Ret>(options));
+    }
+    #endregion
     #endregion
 }

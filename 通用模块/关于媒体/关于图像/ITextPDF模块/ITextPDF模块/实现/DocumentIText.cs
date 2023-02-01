@@ -167,7 +167,7 @@ sealed class DocumentIText : FromIO, IPDFDocument
     public DocumentIText(Stream stream, PathText? path)
         : base(path, IPDFDocument.FileTypePDF)
     {
-        using var memory = stream.CopyToMemory();
+        using var memory = stream.CopyToMemory().Result;
         ReadField = new(new PdfReader(memory));
         InitializationWrite();
         Pages = new PagesIText(this);

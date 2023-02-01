@@ -33,15 +33,15 @@ public interface IRegex
     /// 以及匹配的结果（如果没有任何匹配，则返回空数组）</returns>
     (bool IsMatch, IMatch[] Matches) Matches(string? text);
     #endregion
-    #region 返回第一个匹配到的结果
+    #region 返回唯一匹配到的结果
     /// <summary>
-    /// 返回第一个匹配到的结果，
-    /// 如果没有任何匹配，返回<see langword="null"/>
+    /// 返回唯一一个匹配到的结果，
+    /// 如果没有任何匹配，返回<see langword="null"/>，
+    /// 如果存在多个匹配，则引发异常
     /// </summary>
     /// <param name="text">待匹配的文本</param>
     /// <returns></returns>
-    IMatch? MatcheFirst(string text)
-        => Matches(text).Matches.FirstOrDefault();
+    IMatch? MatcheSingle(string text);
     #endregion
     #endregion
     #region 关于替换与删除

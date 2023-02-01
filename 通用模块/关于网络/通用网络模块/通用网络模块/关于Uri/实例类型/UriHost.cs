@@ -1,0 +1,75 @@
+﻿using System.Text.RegularExpressions;
+
+namespace System.NetFrancis.Http;
+
+/// <summary>
+/// 这个类型代表Uri的主机部分，
+/// 它包括协议，域名，端口号等等
+/// </summary>
+public sealed record UriHost : UriBase
+{
+    #region 隐式类型转换
+    public static implicit operator UriHost(string uri)
+        => new(uri);
+    #endregion
+    #region 公开成员
+    #region 协议
+    /// <summary>
+    /// 获取主机的协议
+    /// </summary>
+    public string Agreement { get; init; }
+    #endregion
+    #region 域名
+    /// <summary>
+    /// 获取主机的域名
+    /// </summary>
+    public string DomainName { get; init; }
+    #endregion
+    #region 端口
+    /// <summary>
+    /// 获取主机的端口，
+    /// 如果为<see langword="null"/>，
+    /// 表示使用默认端口
+    /// </summary>
+    public int? Port { get; init; }
+    #endregion
+    #region 主机地址
+    public override string Text
+    {
+        get
+        {
+            var text = $"{Agreement}://{DomainName}";
+            if (Port is { })
+                text += $":{Port}";
+            return text;
+        }
+    }
+    #endregion
+    #endregion
+    #region 构造函数
+    #region 正则表达式
+    /// <summary>
+    /// 获取用来匹配主机地址的正则表达式
+    /// </summary>
+    private static IRegex Regex { get; } =/*language=regex*/@"^(?<agreement>[a-z]+)://(?<domainName>(\w|\.|-)+)(:(?<port>\d+))?/?$".
+        Op().Regex(RegexOptions.IgnoreCase);
+    #endregion
+    #region 正式方法
+    /// <summary>
+    /// 使用主机地址初始化对象
+    /// </summary>
+    /// <param name="host">主机的地址，
+    /// 它包括协议，域名，端口号等</param>
+    public UriHost(string host)
+    {
+        var match = Regex.MatcheSingle(host);
+        if (match is null)
+            throw new ArgumentException($"{host}不是合法的主机字符串");
+        Agreement = match["agreement"].Match;
+        DomainName = match["domainName"].Match;
+        if (match.GroupsNamed.TryGetValue("port", out var port))
+            Port = port.Match.To<int>();
+    }
+    #endregion
+    #endregion
+}

@@ -23,6 +23,12 @@ public abstract class DbContextFrancis : DbContext
 #endif
     #endregion
     #endregion
+    #region 析构函数
+    ~DbContextFrancis()
+    {
+        Dispose();
+    }
+    #endregion
     #region 构造函数
     protected DbContextFrancis()
     {

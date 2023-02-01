@@ -1,7 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Design;
 using System.Design.Direct;
+using System.Design.Logging;
 using System.Runtime.CompilerServices;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace System;
 
@@ -41,6 +45,7 @@ public static class ExtenDesign
     #endregion
     #endregion
     #endregion
+    #region 关于IDirect
     #region 检查IDirect的架构
     #region 同步迭代器版本
     /// <summary>
@@ -78,5 +83,25 @@ public static class ExtenDesign
     public static IEnumerable<Entity> CastEntity<Entity>(this IEnumerable<IDirect> datas)
         where Entity : IDirect
         => datas.Select(x => x is Entity e ? e : x.Copy<Entity>());
+    #endregion
+    #endregion
+    #region 关于日志
+    #region 添加日志记录函数
+    /// <summary>
+    /// 添加一个日志记录函数
+    /// </summary>
+    /// <param name="builder">日志创建器对象</param>
+    /// <param name="clearProviders">如果这个值为<see langword="true"/>，
+    /// 则会移除掉现有的日志提供程序</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="LoggerProviderFunction(Func{IServiceProvider, Exception, object?, Task}, IServiceProvider)"/>
+    public static ILoggingBuilder AddLoggerFunction(this ILoggingBuilder builder, Func<IServiceProvider, Exception, object?, Task> setLog, bool clearProviders = false)
+    {
+        if (clearProviders)
+            builder.ClearProviders();
+        builder.Services.AddSingleton<ILoggerProvider>(x => new LoggerProviderFunction(setLog, x));
+        return builder;
+    }
+    #endregion
     #endregion
 }

@@ -1,6 +1,8 @@
 ﻿using System.IOFrancis.Bit;
 using System.Text.Json;
 
+using Microsoft.AspNetCore;
+
 namespace Microsoft.JSInterop;
 
 /// <summary>
@@ -14,7 +16,7 @@ public interface IJSDocument
     /// <summary>
     /// 返回一个字典，它可以用来索引Cookie
     /// </summary>
-    IAsyncDictionary<string, string> Cookie { get; }
+    ICookie Cookie { get; }
 
     /*说明文档
       设置Cookie时需要特别小心，它必须遵循以下原则，

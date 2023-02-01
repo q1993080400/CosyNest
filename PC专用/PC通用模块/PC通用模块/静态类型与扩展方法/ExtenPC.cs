@@ -6,6 +6,7 @@ using IWshRuntimeLibrary;
 
 using Microsoft.VisualBasic.FileIO;
 
+using IDrive = System.IOFrancis.FileSystem.IDrive;
 using IFile = System.IOFrancis.FileSystem.IFile;
 
 namespace System;
@@ -50,6 +51,27 @@ public static class ExtenPC
         var shortcut = (IWshShortcut)shell.CreateShortcut(pos.Path + ".lnk");
         shortcut.TargetPath = io.Path;
         shortcut.Save();
+    }
+    #endregion
+    #region 格式化驱动器
+    /// <param name="drive">待格式化的驱动器</param>
+    /// <inheritdoc cref="IDrive.Format(DriveFormat,string)"/>
+    public static void Format(this IDrive drive, DriveFormat format, string label = "")
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = "format.com",
+            WorkingDirectory = Environment.SystemDirectory,
+            Arguments = $"""
+            /FS:{format} /Y /V:{label} /Q {drive.Name}:
+            """,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardInput = true
+        };
+        var formatProcess = Process.Start(psi)!;
+        formatProcess.WaitForExit();
     }
     #endregion
     #endregion

@@ -3,7 +3,8 @@
 /// <summary>
 /// 这个类型执行对集合的Json转换逻辑
 /// </summary>
-/// <typeparam name="Obj">要转换的集合的类型</typeparam>
+/// <typeparam name="CollectionType">要转换的集合的类型</typeparam>
+/// <typeparam name="ElementType">要转换的集合的元素的类型</typeparam>
 sealed class JsonConvertCollection<CollectionType, ElementType> : JsonConverter<CollectionType>
     where CollectionType : ICollection<ElementType?>
 {

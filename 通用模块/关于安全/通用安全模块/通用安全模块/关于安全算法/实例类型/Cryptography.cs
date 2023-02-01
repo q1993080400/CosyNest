@@ -10,7 +10,7 @@ namespace System.SafetyFrancis.Algorithm;
 /// </summary>
 /// <param name="Encryption">用来加密的管道</param>
 /// <param name="Decrypt">用来解密的管道</param>
-sealed record Cryptography(BitMapping Encryption, BitMapping Decrypt)
+public sealed record Cryptography(BitMapping Encryption, BitMapping Decrypt)
 {
     #region 加密管道
     /// <summary>

@@ -9,24 +9,37 @@ namespace System.NetFrancis.Http;
 public sealed record HttpHeaderContent : HttpHeader, IHttpHeaderContent
 {
     #region 获取编码标头
-    public IEnumerable<string> ContentEncoding { get; init; }
+    public IEnumerable<string>? ContentEncoding
+    {
+        get => HeadersVar.TryGetValue("Content-Encoding").Value;
+        init
+        {
+            if (value is null)
+                HeadersVar.Remove("Content-Encoding");
+            else
+                HeadersVar["Content-Encoding"] = value;
+        }
+    }
     #endregion
     #region 获取媒体类型标头
-    public MediaTypeHeaderValue? ContentType { get; init; }
-    #endregion
-    #region 枚举预定义标头属性
-    protected override IEnumerable<(string Name, string? Value)> Predefined()
-        => new[]
+    public MediaTypeHeaderValue? ContentType
+    {
+        get => HeadersVar.TryGetValue("Content-Type").Value is { } v ?
+            MediaTypeHeaderValue.Parse(v.Join(";")) : null;
+        init
         {
-                ("Content-Encoding",ContentEncoding?.Join(",")),
-                ("Content-Type",ContentType?.ToString())
-        };
+            if (value is null)
+                HeadersVar.Remove("Content-Type");
+            else
+                HeadersVar["Content-Type"] = value.ToString().Split(";").ToArray();
+        }
+    }
     #endregion
     #region 构造函数
     #region 无参数构造函数
     public HttpHeaderContent()
     {
-        ContentEncoding = Array.Empty<string>();
+
     }
     #endregion
     #region 复制HttpContentHeaders
@@ -37,7 +50,7 @@ public sealed record HttpHeaderContent : HttpHeader, IHttpHeaderContent
     internal HttpHeaderContent(HttpContentHeaders headers)
         : base(headers)
     {
-        this.ContentEncoding = headers.ContentEncoding;
+
     }
     #endregion
     #endregion

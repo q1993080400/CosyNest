@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.DataFrancis.DB.EF;
 using System.Reflection;
 
 using Microsoft.EntityFrameworkCore;
@@ -20,26 +21,26 @@ sealed class DbContextFactoryMerge
     #endregion
     #region 创建DbContext
     /// <summary>
-    /// 根据实体类的类型，创建一个<see cref="DbContext"/>
+    /// 根据实体类的类型，创建一个<see cref="DbContextFrancis"/>
     /// </summary>
     /// <param name="entityType">实体类的类型</param>
     /// <returns></returns>
-    public DbContext Create(Type entityType)
+    public DbContextFrancis Create(Type entityType)
         => MapConstructor.TryGetValue(entityType, out var constructor) ?
-        constructor.Invoke<DbContext>() :
-        throw new KeyNotFoundException($"没有注册实体类型{entityType}所在的{nameof(DbContext)}");
+        constructor.Invoke<DbContextFrancis>() :
+        throw new KeyNotFoundException($"没有注册实体类型{entityType}所在的{nameof(DbContextFrancis)}");
     #endregion
     #region 构造函数
     /// <summary>
     /// 使用指定的参数初始化对象
     /// </summary>
-    /// <param name="dbContextType">这个迭代器枚举了所有应该考虑的<see cref="DbContext"/>类型</param>
+    /// <param name="dbContextType">这个迭代器枚举了所有应该考虑的<see cref="DbContextFrancis"/>类型</param>
     public DbContextFactoryMerge(IEnumerable<Type> dbContextType)
     {
         MapConstructor = dbContextType.Select(type =>
         {
-            if (!typeof(DbContext).IsAssignableFrom(type))
-                throw new NotSupportedException($"{type}不继承自{nameof(DbContext)}");
+            if (!typeof(DbContextFrancis).IsAssignableFrom(type))
+                throw new NotSupportedException($"{type}不继承自{nameof(DbContextFrancis)}");
             if (!type.CanNew())
                 throw new NotSupportedException($"{type}不可直接实例化");
             var typeData = type.GetTypeData();

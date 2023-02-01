@@ -10,16 +10,34 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
 {
     #region 标头属性
     #region 获取身份验证标头
-    public AuthenticationHeaderValue? Authorization { get; init; }
+    public AuthenticationHeaderValue? Authorization
+    {
+        get => HeadersVar.TryGetValue("Authorization").Value is { } v ?
+            AuthenticationHeaderValue.Parse(v.Join(" ")) : null;
+        init
+        {
+            if (value is null)
+                HeadersVar.Remove("Authorization");
+            else
+                HeadersVar["Authorization"] = value.ToString().Split(' ').ToArray();
+        }
+    }
+    #endregion
+    #region Cookie标头
+    public string? Cookie
+    {
+        get => HeadersVar.TryGetValue("Cookie").Value is { } v ?
+            v.Join(";") : null;
+        init
+        {
+            if (value is null)
+                HeadersVar.Remove("Cookie");
+            else
+                HeadersVar["Cookie"] = value.Split(";").ToArray();
+        }
+    }
     #endregion
     #endregion 
-    #region 枚举预定义标头属性
-    protected override IEnumerable<(string Name, string? Value)> Predefined()
-        => new[]
-        {
-                (nameof(Authorization),Authorization?.ToString()),
-        };
-    #endregion
     #region 构造函数
     #region 无参数构造函数
     public HttpHeaderRequest()
@@ -27,29 +45,10 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
 
     }
     #endregion
-    #region 传入HttpRequestHeaders
-    /// <summary>
-    /// 复制一个<see cref="HttpRequestHeaders"/>的所有属性，并初始化对象
-    /// </summary>
-    /// <param name="headers">待复制的请求标头</param>
-    internal HttpHeaderRequest(HttpRequestHeaders headers)
-        : base(headers)
-    {
-        Authorization = headers.Authorization;
-    }
-    #endregion
     #region 传入字典
     /// <inheritdoc cref="HttpHeader(IEnumerable{KeyValuePair{string, IEnumerable{string}}})"/>
     public HttpHeaderRequest(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
         : base(headers)
-    {
-
-    }
-    #endregion
-    #region 传入字符串字典
-    /// <inheritdoc cref="HttpHeader(IEnumerable{KeyValuePair{string, IEnumerable{string}}})"/>
-    public HttpHeaderRequest(IEnumerable<KeyValuePair<string, string>> headers)
-        : base(headers.Select(x => (x.Key, (IEnumerable<string>)new[] { x.Value })).ToDictionary(true))
     {
 
     }

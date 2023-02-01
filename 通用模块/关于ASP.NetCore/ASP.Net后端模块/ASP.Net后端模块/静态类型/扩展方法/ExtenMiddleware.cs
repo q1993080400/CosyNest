@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Security.Claims;
 
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -30,44 +29,36 @@ public static partial class ExtenWebApi
             await next();
         });
     #endregion
-    #region 重视异常中间件
+    #region 异常善后异常中间件
     /// <summary>
-    /// 添加一个重视异常中间件，
-    /// 当处于非开发状态时，它不执行任何操作，
-    /// 处于开发状态时，如果产生异常，它会中断整个服务器，方便寻找Bug
+    /// 添加一个异常善后中间件，当发生异常时，
+    /// 如果不处于开发状态，不做任何操作，
+    /// 否则将异常抛出，中断整个程序，方便寻找Bug
     /// </summary>
-    /// <param name="application"></param>
+    /// <param name="application">要添加中间件的<see cref="IApplicationBuilder"/>对象</param>
     /// <returns></returns>
-    public static IApplicationBuilder UseImportanceException(this IApplicationBuilder application)
+    public static IApplicationBuilder UseExceptionAftermath(this IApplicationBuilder application)
     {
         var environment = application.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
         if (!environment.IsDevelopment())
             return application;
         application.UseExceptionHandler(exceptionHandlerApp =>
         {
-            exceptionHandlerApp.Use((HttpContext context, RequestDelegate _) =>
+            exceptionHandlerApp.Use(async (HttpContext context, RequestDelegate requestDelegate) =>
             {
                 var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-                var exception = exceptionHandlerPathFeature!.Error;
-                throw new Exception("服务器发生错误，详情请参阅内部异常", exception);
+                if (exceptionHandlerPathFeature is null)
+                    throw new NullReferenceException($"尚未找到中间件功能{nameof(IExceptionHandlerPathFeature)}");
+                var exception = exceptionHandlerPathFeature.Error;
+                if (exception is not BusinessException)
+                {
+                    throw new Exception("服务器发生错误，详情请参阅内部异常", exception);
+                }
+                await requestDelegate(context);
             });
         });
         return application;
     }
-    #endregion
-    #region 添加身份验证中间件
-    /// <summary>
-    /// 添加一个身份验证中间件，
-    /// 它依赖于服务<see cref="HttpAuthentication"/>
-    /// </summary>
-    /// <param name="application">待添加中间件的<see cref="IApplicationBuilder"/></param>
-    /// <returns></returns>
-    public static IApplicationBuilder UseAuthenticationFrancis(this IApplicationBuilder application)
-            => application.Use(static async (context, next) =>
-            {
-                await context.RequestServices.GetRequiredService<HttpAuthentication>()(context);
-                await next();
-            });
     #endregion
     #region 添加配置服务中间件
     /// <summary>
@@ -117,6 +108,5 @@ public static partial class ExtenWebApi
             await statistics(http.Connection.RemoteIpAddress!, http.User, application.ApplicationServices);
             await follow();
         });
-
     #endregion
 }

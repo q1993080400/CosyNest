@@ -18,7 +18,7 @@ public sealed class BilibiliAPI : WebApi
     /// <returns></returns>
     public async Task<(string AID, string CID)> GetID(string uri, CancellationToken cancellationToken = default)
     {
-        var match =/*language=regex*/"video/(?<bv>BV[^/?]+)".Op().Regex().MatcheFirst(uri);
+        var match =/*language=regex*/"video/(?<bv>BV[^/?]+)".Op().Regex().MatcheSingle(uri);
         if (match is null)
             throw new ArgumentException(@"这个地址不是B站视频地址");
         var json = await (await HttpClientProvide().Request($"http://api.bilibili.com/x/web-interface/view?bvid={match["bv"].Match}", cancellationToken: cancellationToken)).Content.ToObject();
@@ -45,10 +45,10 @@ public sealed class BilibiliAPI : WebApi
             $"https://api.bilibili.com/x/player/playurl?fnval=80&avid={aid}&cid={cid}";
         var request = new HttpRequestRecording(uri)
         {
-            Header = new(new Dictionary<string, string>()
+            Header = new(new Dictionary<string, IEnumerable<string>>()
             {
-                ["Referer"] = "https://www.bilibili.com",
-                ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
+                ["Referer"] = new[] { "https://www.bilibili.com" },
+                ["User-Agent"] = new[] { "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36" }
             })
         };
         var id = clear switch
@@ -60,7 +60,7 @@ public sealed class BilibiliAPI : WebApi
             var c => throw new NotSupportedException($"不支持的值：{c}")
         };
         var http = HttpClientProvide();
-        var json = await http.Request(request, cancellationToken).Read(x => x.ToObject());
+        var json = await http.Request(request, cancellationToken: cancellationToken).Read(x => x.ToObject());
         var dash = json!.GetValueRecursion<IDirect>("data.dash")!;
         var audio = dash.GetValueRecursion<string>("audio[0].base_url")!;
         var video = dash.GetValue<object[]>("video")!.Cast<IDirect>().FirstOrDefault(x => Equals(x["id"], id)) ??
@@ -68,11 +68,11 @@ public sealed class BilibiliAPI : WebApi
         return (await http.RequestDownload(request with
         {
             Uri = new(video["base_url"]!.ToString()!)
-        }, cancellationToken),
+        }, cancellationToken: cancellationToken),
         await http.RequestDownload(request with
         {
             Uri = new(audio)
-        }, cancellationToken));
+        }, cancellationToken: cancellationToken));
     }
     #endregion
     #region 传入Uri

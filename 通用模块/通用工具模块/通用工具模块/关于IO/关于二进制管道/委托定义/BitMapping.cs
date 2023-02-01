@@ -8,4 +8,4 @@
 /// <param name="pipe">待转换的<see cref="IBitRead"/></param>
 /// <returns></returns>
 public delegate IBitRead BitMapping(IBitRead pipe);
-#endregion 
+#endregion

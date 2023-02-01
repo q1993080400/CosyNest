@@ -4,7 +4,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<RootNamespace>Microsoft.AspNetCore.Components.BootstrapBlazor</RootNamespace>
+		<RootNamespace>BootstrapBlazor.Components</RootNamespace>
 		<AssemblyName>ToolBootstrapBlazor</AssemblyName>
 	</PropertyGroup>
 
@@ -14,9 +14,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="7.1.0" />
-		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
+		<PackageReference Include="BootstrapBlazor" Version="7.2.4" />
+		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>

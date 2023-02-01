@@ -22,10 +22,15 @@ public static partial class ExtenWebApi
     public static IServiceCollection AddUriManagerServer(this IServiceCollection services)
         => services.AddScoped(x =>
         {
-            var httpContext = x.GetService<IHttpContextAccessor>();
-            var path = httpContext!.HttpContext!.Request.GetEncodedUrl();
-            var uri = new Uri(path).Split().Base;
-            return CreateNet.UriManager(uri);
+            var httpContext = x.GetRequiredService<IHttpContextAccessor>();
+            var path = httpContext.HttpContext?.Request.GetEncodedUrl() ?? "http://127.0.0.1";
+            return CreateNet.UriManager(path);
         });
+
+    /*此API存在潜在问题：
+      当不存在HttpContext的时候，
+      本函数返回一个回退地址，这个可能会产生问题，
+      但是，考虑到当不存在HttpContext时，基本不会用到服务，
+      所以本函数出现问题的概率应该相当小*/
     #endregion
 }

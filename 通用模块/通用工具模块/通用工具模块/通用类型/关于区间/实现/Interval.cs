@@ -15,6 +15,6 @@ class Interval<Obj> : IInterval<Obj>
     #endregion
     #region 重写的ToString方法
     public override string ToString()
-        => $"区间上限：{Min?.ToString() ?? "不受限制"}，区间下限：{Max?.ToString() ?? "不受限制"}";
+        => $"区间下限：{Min?.ToString() ?? "不受限制"}，区间上限：{Max?.ToString() ?? "不受限制"}";
     #endregion
 }

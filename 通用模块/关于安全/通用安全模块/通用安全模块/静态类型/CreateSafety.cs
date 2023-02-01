@@ -41,7 +41,8 @@ public static class CreateSafety
     /// <summary>
     /// 返回一个未通过验证的<see cref="ClaimsPrincipal"/>
     /// </summary>
-    public static ClaimsPrincipal PrincipalDefault { get; } = new(new ClaimsIdentity());
+    public static ClaimsPrincipal PrincipalDefault()
+        => new(new ClaimsIdentity());
     #endregion
     #region 使用主标识创建ClaimsPrincipal
     /// <summary>
@@ -68,7 +69,7 @@ public static class CreateSafety
     /// <param name="create">该委托用来创建哈希算法对象，请务必保证每调用一次，都会创建一个新的对象</param>
     /// <returns>该委托的输入是读取原始二进制数据的管道，返回值是读取计算后哈希值的管道</returns>
     public static BitMapping Hash(bool optimization = false, Func<HashAlgorithm>? create = null)
-        => new HashBCL()
+        => new HashPack()
         {
             Optimization = optimization,
             Create = create ?? SHA512.Create
@@ -83,11 +84,11 @@ public static class CreateSafety
     /// <param name="coding">该委托传入待计算哈希值的字符串，
     /// 返回读取该字符串二进制形式的管道，如果为<see langword="null"/>，默认使用UTF16编码</param>
     /// <returns></returns>
-    public static Func<string, byte[]> HashText(BitMapping? hash = null, Func<string, IBitRead>? coding = null)
+    public static Func<string, Task<byte[]>> HashText(BitMapping? hash = null, Func<string, IBitRead>? coding = null)
     {
         coding ??= Coding;
         hash ??= Hash();
-        return x => hash(coding(x)).ReadComplete().Result;
+        return x => hash(coding(x)).ReadComplete();
     }
     #endregion
     #endregion
@@ -133,9 +134,86 @@ public static class CreateSafety
     /// 使用RSA非对称算法创建一个<see cref="BitMapping"/>
     /// </summary>
     /// <returns>该管道可以使用RSA加密或解密数据</returns>
-    /// <inheritdoc cref="RSABCL(string)"/>
-    public static BitMapping CryptologyRSA(string key)
-        => new RSABCL(key).Convert;
+    /// <inheritdoc cref="RSAPack(string)"/>
+    public static BitMapping RSA(string key)
+        => new RSAPack(key).Convert;
+    #endregion
+    #endregion
+    #region 关于对称加密管道
+    #region 创建对称加密算法工厂
+    #region 使用字节数组
+    /// <summary>
+    /// 创建对称加密算法工厂，
+    /// 它可以用来返回具备相同IV和Key参数的对称算法对象
+    /// </summary>
+    /// <param name="iv">初始化向量</param>
+    /// <param name="key">密钥</param>
+    /// <returns></returns>
+    public static Func<SymmetricAlgorithm> AlgorithmFactory(byte[] iv, byte[] key)
+        => () =>
+        {
+            var algorithm = Aes.Create();
+            algorithm.IV = iv;
+            algorithm.Key = key;
+            return algorithm;
+        };
+    #endregion
+    #region 使用字符串
+    /// <param name="encoding">一个用来将字符串转换为字节数组的函数，
+    /// 如果为<see langword="null"/>，默认使用Base64转换</param>
+    /// <inheritdoc cref="AlgorithmFactory(byte[], byte[])"/>
+    public static Func<SymmetricAlgorithm> AlgorithmFactory(string iv, string key, Func<string, byte[]>? encoding = null)
+    {
+        encoding ??= Convert.FromBase64String;
+        return AlgorithmFactory(encoding(iv), encoding(key));
+    }
+    #endregion
+    #endregion
+    #region 创建转换字节数组的管道
+    /// <summary>
+    /// 创建一个通过对称算法，
+    /// 加密或解密字节数组的双向管道
+    /// </summary>
+    /// <param name="algorithmFactory">对称加密算法的工厂，
+    /// 本函数的功能依赖于它的返回值，为正确使用本函数，
+    /// 它返回的<see cref="Security.Cryptography.SymmetricAlgorithm"/>的IV和Key必须相同</param>
+    /// <returns></returns>
+    public static Cryptography SymmetricAlgorithm(Func<SymmetricAlgorithm> algorithmFactory)
+    {
+        #region 加密本地函数
+        IBitRead Encryption(IBitRead x) => new SymmetricAlgorithmPipe()
+        {
+            AlgorithmFactory = algorithmFactory,
+            IsEncryptor = true,
+            Source = x
+        };
+        #endregion
+        #region 解密本地函数
+        IBitRead Decrypt(IBitRead x) => new SymmetricAlgorithmPipe()
+        {
+            AlgorithmFactory = algorithmFactory,
+            IsEncryptor = false,
+            Source = x
+        };
+        #endregion
+        return new Cryptography(Encryption, Decrypt);
+    }
+    #endregion
+    #region 创建转换字符串的管道
+    /// <summary>
+    /// 创建一个通过对称算法，
+    /// 加密或解密字符串的双向管道，
+    /// 字符串使用Base64编码
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="SymmetricAlgorithm(Func{SymmetricAlgorithm})"/>
+    public static (Func<string, Task<string>> Encryption, Func<string, Task<string>> Decrypt) SymmetricAlgorithmText
+        (Func<SymmetricAlgorithm> algorithmFactory)
+    {
+        var (encryption, decrypt) = SymmetricAlgorithm(algorithmFactory);
+        return (encryption.ConvertText(),
+            decrypt.ConvertText(Convert.FromBase64String, Encoding.UTF8.GetString));
+    }
     #endregion
     #endregion
 }

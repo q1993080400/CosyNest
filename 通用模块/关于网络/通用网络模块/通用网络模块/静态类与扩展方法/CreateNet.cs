@@ -51,12 +51,12 @@ public static class CreateNet
     /// 创建一个<see cref="IUriManager"/>对象，
     /// 它可以用来管理本机Uri
     /// </summary>
-    /// <param name="host">本机Uri</param>
+    /// <param name="host">本机完整绝对Uri</param>
     /// <returns></returns>
     public static IUriManager UriManager(string host)
         => new UriManager()
         {
-            Host = host
+            Uri = host
         };
     #endregion
     #region 静态构造函数

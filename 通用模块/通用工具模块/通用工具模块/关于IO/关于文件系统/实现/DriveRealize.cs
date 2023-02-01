@@ -21,8 +21,25 @@ sealed class DriveRealize : IDrive
         => PackDrive.Name[0].ToString();
     #endregion
     #region 获取驱动器格式
-    public string Format
-        => PackDrive.DriveFormat;
+    public DriveFormat DriveFormat
+        => PackDrive.DriveFormat switch
+        {
+            "FAT32" => DriveFormat.FAT32,
+            "NTFS" => DriveFormat.NTFS,
+            "FACDRomT32" => DriveFormat.CDRom,
+            _ => DriveFormat.Unknown
+        };
+    #endregion
+    #region 格式化驱动器
+    public void Format(DriveFormat format, string label = "")
+    {
+        if (CreateIO.DriveFormatRealize is null)
+            throw new NotImplementedException($"请先设置{nameof(CreateIO)}.{nameof(CreateIO.DriveFormatRealize)}属性，" +
+                $"然后才能使用本方法");
+        if (format is DriveFormat.Unknown)
+            throw new ArgumentException($"不能将驱动器格式化为未知格式");
+        CreateIO.DriveFormatRealize(this, format, label);
+    }
     #endregion
     #region 关于容量
     #region 获取总容量

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 
 using System.DataFrancis.DB;
 using System.DataFrancis.DB.EF;
@@ -25,48 +24,49 @@ public static class CreateEFCoreDB
         {
             DataSource = "(local)",
             InitialCatalog = dbName,
-            IntegratedSecurity = true
+            IntegratedSecurity = true,
+            Encrypt = true,
+            TrustServerCertificate = true,
         }.ToString();
     #endregion
     #region 创建数据管道
     #region 指定工厂
     /// <summary>
-    /// 创建一个底层使用EFCore实现的数据管道，
-    /// 它支持表连接查询，但是不支持更新
+    /// 创建一个底层使用EFCore实现的数据管道
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="EFDataPipe(Func{Type,DbContext})"/>
-    public static IDataPipe Pipe(Func<Type, DbContext> createDbContext)
+    /// <inheritdoc cref="EFDataPipe(Func{Type,DbContextFrancis})"/>
+    public static IDataPipe Pipe(Func<Type, DbContextFrancis> createDbContext)
         => new EFDataPipe(createDbContext);
     #endregion
     #region 指定类型，直接使用无参数构造函数
     /// <typeparam name="DB">数据库上下文的类型</typeparam>
-    /// <inheritdoc cref="Pipe(Func{Type,DbContext})"/>
+    /// <inheritdoc cref="Pipe(Func{Type,DbContextFrancis})"/>
     public static IDataPipe Pipe<DB>()
-        where DB : DbContext, new()
+        where DB : DbContextFrancis, new()
         => Pipe(_ => new DB());
     #endregion
     #endregion
     #region 创建DbContext工厂
     #region 传入DbContext类型
     /// <summary>
-    /// 创建一个<see cref="DbContext"/>工厂，
+    /// 创建一个<see cref="DbContextFrancis"/>工厂，
     /// 它能够根据传入的实体类的类型，
-    /// 决定应该创建哪一个<see cref="DbContext"/>
+    /// 决定应该创建哪一个<see cref="DbContextFrancis"/>
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="DbContextFactoryMerge(IEnumerable{Type})"/>
-    public static Func<Type, DbContext> DbContextFactory(IEnumerable<Type> dbContextType)
+    public static Func<Type, DbContextFrancis> DbContextFactory(IEnumerable<Type> dbContextType)
         => new DbContextFactoryMerge(dbContextType).Create;
     #endregion
     #region 传入程序集，注册其中的所有DbContext
     /// <param name="dbContextAssembly">这个程序集中的所有公开，可创建的，
-    /// 继承自<see cref="DbContext"/>的类型都会被注册进工厂中</param>
+    /// 继承自<see cref="DbContextFrancis"/>的类型都会被注册进工厂中</param>
     /// <inheritdoc cref="DbContextFactory(IEnumerable{Type})"/>
-    public static Func<Type, DbContext> DbContextFactory(Assembly dbContextAssembly)
+    public static Func<Type, DbContextFrancis> DbContextFactory(Assembly dbContextAssembly)
     {
         var types = dbContextAssembly.GetTypes().
-            Where(x => x.IsPublic && typeof(DbContext).IsAssignableFrom(x) && x.CanNew()).ToArray();
+            Where(x => x.IsPublic && typeof(DbContextFrancis).IsAssignableFrom(x) && x.CanNew()).ToArray();
         return DbContextFactory(types);
     }
     #endregion

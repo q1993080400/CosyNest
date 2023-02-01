@@ -1,8 +1,5 @@
-﻿using System.Security.Claims;
-using System.Text.Json;
+﻿using System.Text.Json;
 
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
@@ -34,35 +31,6 @@ public static class CreateWebApi
     /// <inheritdoc cref="JsonInputFormatterGeneral(JsonSerializerOptions)"/>
     public static TextInputFormatter InputFormatterJson(JsonSerializerOptions options)
         => new JsonInputFormatterGeneral(options);
-    #endregion
-    #endregion
-    #endregion
-    #region 创建HttpAuthentication
-    #region 通过Cookies和Authentication标头进行验证
-    #region 直接创建
-    /// <summary>
-    /// 创建一个<see cref="Authentication.HttpAuthentication"/>，
-    /// 它从Cookies和Authentication标头中提取信息，并验证身份
-    /// </summary>
-    /// <param name="extraction"> 这个委托被用于从<see cref="HttpContext"/>中提取身份验证信息，
-    /// 如果不存在身份验证信息，则返回<see langword="null"/></param>
-    /// <param name="authentication">这个委托的参数是提取到的验证信息，返回值是验证结果</param>
-    /// <returns></returns>
-    public static HttpAuthentication HttpAuthentication
-        (Func<HttpContext, string?> extraction,
-        Func<string, Task<ClaimsPrincipal>> authentication)
-        => new HttpAuthenticationRealize(extraction, authentication).Authentication;
-    #endregion
-    #region 简单版本
-    /// <param name="authenticationKey">用来从Cookies中提取身份验证信息的键名</param>
-    /// <inheritdoc cref="HttpAuthentication(Func{HttpContext, string?}, Func{string, Task{ClaimsPrincipal}})"/>
-    public static HttpAuthentication HttpAuthenticationSimple
-        (Func<string, Task<ClaimsPrincipal>> authentication,
-        string authenticationKey = ToolASP.AuthenticationKey)
-        => HttpAuthentication(http =>
-        http.Request.Headers.TryGetValue("Authentication", out var headers) && headers is [{ } h, ..] ?
-        h.Split(" ")[1] :
-        http.Request.Cookies[authenticationKey], authentication);
     #endregion
     #endregion
     #endregion

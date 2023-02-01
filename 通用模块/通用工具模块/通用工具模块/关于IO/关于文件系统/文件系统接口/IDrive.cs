@@ -36,9 +36,18 @@ public interface IDrive : INode
     #endregion
     #region 获取驱动器格式
     /// <summary>
-    /// 获取驱动器文件系统的格式名称
+    /// 获取驱动器文件系统的格式
     /// </summary>
-    string Format { get; }
+    DriveFormat DriveFormat { get; }
+    #endregion
+    #region 格式化驱动器
+    /// <summary>
+    /// 格式化驱动器，
+    /// 本方法非常危险，不要随便使用
+    /// </summary>
+    /// <param name="format">格式化后驱动器的文件格式</param>
+    /// <param name="label">格式化后驱动器的卷标</param>
+    void Format(DriveFormat format, string label = "");
     #endregion
     #region 关于容量
     #region 获取总容量

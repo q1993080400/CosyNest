@@ -20,4 +20,4 @@ public delegate IAsyncEnumerable<Obj> ObjRead<out Obj>(IBitRead bitRead);
 /// <param name="obj">要写入的对象</param>
 /// <returns></returns>
 public delegate Task ObjWrite<in Obj>(IBitWrite bitWrite, Obj obj);
-#endregion 
+#endregion

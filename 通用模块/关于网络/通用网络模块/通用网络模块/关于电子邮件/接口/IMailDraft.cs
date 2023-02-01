@@ -28,7 +28,7 @@ public interface IMailDraft : IMail
     /// 代表正文是纯文本，否则代表正文是HTML文档，
     /// 第二个项是邮件的正文部分
     /// </summary>
-    new(bool IsText, string Body) Body { get; }
+    new (bool IsText, string Body) Body { get; }
     #endregion
     #region 附件
     /// <summary>

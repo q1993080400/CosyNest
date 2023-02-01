@@ -12,7 +12,7 @@ sealed class DataPipeVerify : IDataPipe
 {
     #region 公开成员
     #region 添加和更新
-    async Task IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    async Task<IEnumerable<Data>> IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
     {
         datas = datas.ToArray();
         foreach (var item in datas)
@@ -21,18 +21,37 @@ sealed class DataPipeVerify : IDataPipe
                 throw new BusinessException("数据验证失败" + Environment.NewLine + message.Join(Environment.NewLine));
         }
         await Pipe.AddOrUpdate(datas, cancellation);
+        return datas;
     }
     #endregion
     #region 删除
     Task IDataPipeTo.Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
         => Pipe.Delete(datas, cancellation);
 
-    Task IDataPipe.Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
+    Task IDataPipeTo.Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
         => Pipe.Delete(expression, cancellation);
     #endregion
     #region 查询
     IQueryable<Data> IDataPipeFrom.Query<Data>()
         => Pipe.Query<Data>();
+    #endregion
+    #region 执行事务
+    #region 无返回值
+    public Task Transaction(Func<IDataPipe, Task> transaction)
+        => Pipe.Transaction(pipe =>
+        {
+            var newPipe = pipe.UseVerify(Verify);
+            return transaction(newPipe);
+        });
+    #endregion
+    #region 有返回值
+    public Task<Obj> Transaction<Obj>(Func<IDataPipe, Task<Obj>> transaction)
+        => Pipe.Transaction(pipe =>
+        {
+            var newPipe = pipe.UseVerify(Verify);
+            return transaction(newPipe);
+        });
+    #endregion
     #endregion
     #endregion
     #region 内部成员

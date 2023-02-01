@@ -37,29 +37,23 @@ sealed class EFDataPipe : IDataPipe
     #endregion
     #region 公开成员
     #region 查询实体
-    IQueryable<Data> IDataPipeFrom.Query<Data>()
+    public IQueryable<Data> Query<Data>()
+        where Data : class, IData
     {
         var db = CreateDbContext(typeof(Data));
-        var dbSet = db.Set<Data>().AsNoTracking();
-        return new QueryableFreed<Data>(dbSet, db);
+        return db.Set<Data>();
     }
     #endregion
     #region 添加或更新实体
-    async Task IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    public async Task<IEnumerable<Data>> AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+        where Data : class, IData
     {
+        datas = datas.ToArray();
         using var db = CreateDbContext(typeof(Data));
         var dbSet = db.Set<Data>();
-        var (hasKey, notKey) = datas.Split(x =>
-        {
-            var idColumnName = x.IDColumnName;
-            if (idColumnName is null)
-                return false;
-            var id = x[idColumnName];
-            return id is Guid guid && guid != default;
-        });
-        dbSet.UpdateRange(hasKey);
-        await dbSet.AddRangeAsync(notKey, cancellation);
+        dbSet.UpdateRange(datas);
         await db.SaveChangesAsync(cancellation);
+        return datas;
     }
 
     /*注意事项：
@@ -70,7 +64,8 @@ sealed class EFDataPipe : IDataPipe
     #endregion
     #region 删除实体
     #region 按照实体
-    async Task IDataPipeTo.Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    public async Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+        where Data : class, IData
     {
         using var db = CreateDbContext(typeof(Data));
         var dbSet = db.Set<Data>();
@@ -79,14 +74,34 @@ sealed class EFDataPipe : IDataPipe
     }
     #endregion
     #region 按照条件
-    Task IDataPipe.Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
+    public Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
+        where Data : class, IData
     {
-        var db = CreateDbContext(typeof(Data));
+        using var db = CreateDbContext(typeof(Data));
         var dbSet = db.Set<Data>();
-        dbSet.Where(expression).ExecuteDelete();
+        dbSet.Where(expression).ExecuteDelete();        //由于ExecuteDelete立即执行删除操作，故不需要保存
         return Task.CompletedTask;
     }
     #endregion
+    #endregion
+    #region 执行事务
+    #region 无返回值
+    public async Task Transaction(Func<IDataPipe, Task> transaction)
+    {
+        using var dataPipe = new EFDataPipeTransaction(CreateDbContext);
+        await transaction(dataPipe);
+        await dataPipe.Save();
+    }
+    #endregion
+    #region 有返回值
+    public async Task<Obj> Transaction<Obj>(Func<IDataPipe, Task<Obj>> transaction)
+    {
+        using var dataPipe = new EFDataPipeTransaction(CreateDbContext);
+        var @return = await transaction(dataPipe);
+        await dataPipe.Save();
+        return @return;
+    }
+    #endregion 
     #endregion
     #endregion
     #region 内部成员
@@ -95,7 +110,7 @@ sealed class EFDataPipe : IDataPipe
     /// 这个工厂方法用于创建数据库上下文，
     /// 它的参数就是请求的实体类的类型
     /// </summary>
-    private Func<Type, DbContext> CreateDbContext { get; }
+    private Func<Type, DbContextFrancis> CreateDbContext { get; }
     #endregion
     #endregion
     #region 构造函数
@@ -104,7 +119,7 @@ sealed class EFDataPipe : IDataPipe
     /// </summary>
     /// <param name="createDbContext">这个工厂方法用于创建数据库上下文，
     /// 它的参数就是请求的实体类的类型</param>
-    public EFDataPipe(Func<Type, DbContext> createDbContext)
+    public EFDataPipe(Func<Type, DbContextFrancis> createDbContext)
     {
         CreateDbContext = createDbContext;
     }

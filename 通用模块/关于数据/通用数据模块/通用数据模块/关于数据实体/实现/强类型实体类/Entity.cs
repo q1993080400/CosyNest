@@ -21,20 +21,13 @@ public abstract class Entity : IData
     /// </summary>
     public Guid ID { get; set; }
     #endregion
-    #region 指示数据是否被隐藏
-    /// <summary>
-    /// 获取或设置数据是否被隐藏，
-    /// 被隐藏的数据没有被删除，但是不会显示
-    /// </summary>
-    public bool IsHide { get; set; }
-    #endregion
     #region 数据的元数据
     [NotMapped]
-    public object? Metadata { get; set; }
+    object? IData.Metadata { get; set; }
     #endregion
     #region 获取数据列名
     [NotMapped]
-    public virtual string? IDColumnName
+    string? IData.IDColumnName
         => nameof(ID);
     #endregion
     #region 数据架构
@@ -55,20 +48,20 @@ public abstract class Entity : IData
     #endregion
     #region 正式属性
     [NotMapped]
-    public ISchema? Schema
+    ISchema? IDirect.Schema
     {
         get => SchemaCache[GetType()];
         set => throw new NotSupportedException("本类型是强类型实体类，不支持显式写入架构约束");
     }
-    #endregion 
+    #endregion
     #endregion
     #region 有关键值对集合
     #region 获取列数
-    public int Count
-        => CacheProperty[GetType()].Count;
+    int IReadOnlyCollection<KeyValuePair<string, object?>>.Count
+       => CacheProperty[GetType()].Count;
     #endregion
     #region 枚举数据
-    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator()
+    IEnumerator<KeyValuePair<string, object?>> IEnumerable<KeyValuePair<string, object?>>.GetEnumerator()
     {
         var property = CacheProperty[GetType()];
         foreach (var (key, value) in property)
@@ -78,19 +71,19 @@ public abstract class Entity : IData
     }
 
     IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
+        => this.To<IEnumerable<KeyValuePair<string, object?>>>().GetEnumerator();
     #endregion
     #region 检查键是否存在
-    public bool ContainsKey(string key)
-        => CacheProperty[GetType()].ContainsKey(key);
+    bool IReadOnlyDictionary<string, object?>.ContainsKey(string key)
+       => CacheProperty[GetType()].ContainsKey(key);
     #endregion
     #region 键集合
-    public IEnumerable<string> Keys
-        => this.Select(x => x.Key);
+    IEnumerable<string> IReadOnlyDictionary<string, object?>.Keys
+       => this.Select(x => x.Key);
     #endregion
     #region 值集合
-    public IEnumerable<object?> Values
-        => this.Select(x => x.Value);
+    IEnumerable<object?> IReadOnlyDictionary<string, object?>.Values
+       => this.Select(x => x.Value);
     #endregion
     #region 读写数据
     #region 缓存属性
@@ -128,11 +121,11 @@ public abstract class Entity : IData
     #endregion
     #endregion
     #region 本对象的Json形式
-    public string Json
-          => JsonSerializer.Serialize(this, CreateDataObj.JsonDirect.ToOptions());
+    string IDirect.Json
+         => JsonSerializer.Serialize(this, CreateDataObj.JsonDirect.ToOptions());
     #endregion
     #region 返回数据的副本
-    public IDirect Copy(bool copyValue = true, Type? type = null)
+    IDirect IDirect.Copy(bool copyValue, Type? type)
     {
         if (type is { } && !typeof(IDirect).IsAssignableFrom(type))
             throw new ArgumentException($"{type}不实现{nameof(IDirect)}，无法复制");

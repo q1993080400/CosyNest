@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 
+using System.Design;
 using System.Reflection;
-using System.TreeObject.Json;
 
 using static Microsoft.AspNetCore.CreateWebApi;
 
@@ -24,7 +25,7 @@ public static partial class ExtenWebApi
     /// <param name="options">待添加支持的Mvc配置</param>
     public static void AddFormatterJson(this MvcOptions options)
     {
-        var jsonConvert = CreateJson.JsonCommonOptions;
+        var jsonConvert = CreateDesign.JsonCommonOptions;
         options.InputFormatters.Insert(0, InputFormatterJson(jsonConvert));
         options.OutputFormatters.Insert(0, OutputFormatterJson(jsonConvert));
     }
@@ -68,5 +69,27 @@ public static partial class ExtenWebApi
       不要在单例服务初始化时访问CreateASP.SingleServiceProvider，
       这是因为在WebApplicationBuilder.Build()调用后才会执行本方法，
       它发生在单例服务初始化之后*/
+    #endregion
+    #region 配置AuthorizationOptions
+    /// <summary>
+    /// 通过约定先于配置的方式，
+    /// 为授权策略配置验证方式
+    /// </summary>
+    /// <param name="options">待配置的授权策略</param>
+    /// <param name="policyValidation">这个类型中所有返回<see cref="bool"/>，
+    /// 有且仅有一个类型为<see cref="AuthorizationHandlerContext"/>的公开静态方法的名称会作为策略的名称，
+    /// 方法作为策略的验证方法，并将其添加到授权策略中</param>
+    public static void AddPolicyValidation(this AuthorizationOptions options, Type policyValidation)
+    {
+        var signature = CreateReflection.MethodSignature(typeof(bool), typeof(AuthorizationHandlerContext));
+        var methods = policyValidation.GetMethods().
+            Where(x => x.IsStatic && x.IsSame(signature)).
+            ToDictionary(x => x.Name, x => x);
+        foreach (var (name, method) in methods)
+        {
+            var fun = method.CreateDelegate<Func<AuthorizationHandlerContext, bool>>();
+            options.AddPolicy(name, x => x.RequireAssertion(fun));
+        }
+    }
     #endregion
 }

@@ -89,7 +89,7 @@ public static partial class ExtenTool
                     return o is string text ?
                         (Ret)Enum.Parse(type, text) :
                         (Ret)Enum.ToObject(type, o.To(Enum.GetUnderlyingType(type)));
-                case string t when type == typeof(Guid)||type==typeof(Guid?):        //为Guid做优化
+                case string t when type == typeof(Guid) || type == typeof(Guid?):        //为Guid做优化
                     return (dynamic)Guid.Parse(t);
                 case IConvertible o:
                     var targetType = type.IsGenericRealize(typeof(Nullable<>)) ?              //如果目标类型是可空值类型，则函数知道应该转换为它的实际类型

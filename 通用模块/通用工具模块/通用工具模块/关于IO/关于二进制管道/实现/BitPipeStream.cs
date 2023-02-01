@@ -1,4 +1,5 @@
 ﻿using System.Design;
+using System.Runtime.CompilerServices;
 
 namespace System.IOFrancis.Bit;
 
@@ -58,43 +59,27 @@ sealed class BitPipeStream : AutoRelease, IBitRead, IBitWrite
     #endregion
     #endregion
     #region 读取数据
-    public IEnumerableFit<byte> Read(CancellationToken cancellation = default)
+    public async IAsyncEnumerable<byte[]> Read(int bufferSize = 1024, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        #region 枚举字节的本地函数
-        async IAsyncEnumerable<byte> ReadAsync()
+        ExceptionIntervalOut.Check(1, null, bufferSize);
+        CheckLock();
+        using var @lock = FastRealize.Disposable(() => Lock = true, () => Lock = false);
+        Stream.Reset();
+        while (true)
         {
-            #region 枚举字节数组
-            async IAsyncEnumerable<byte[]> Fun()
+            var memory = new byte[bufferSize];
+            switch (await Stream.ReadAsync(memory, cancellation))
             {
-                CheckLock();
-                using var @lock = FastRealize.Disposable(() => Lock = true, () => Lock = false);
-                Stream.Reset();
-                var bufferSize = 1024;
-                while (true)
-                {
-                    var memory = new byte[bufferSize];
-                    switch (await Stream.ReadAsync(memory, cancellation))
-                    {
-                        case 0:
-                            yield break;
-                        case var c when c < bufferSize:
-                            yield return memory[0..c]; break;
-                        default:
-                            yield return memory; break;
-                    }
-                }
-            }
-            #endregion
-            await foreach (var array in Fun())
-            {
-                foreach (var item in array)
-                {
-                    yield return item;
-                }
+                case 0:
+                    yield break;
+                case var c when c < bufferSize:
+                    yield return memory[0..c];
+                    break;
+                default:
+                    yield return memory;
+                    break;
             }
         }
-        #endregion
-        return ReadAsync().Fit();
     }
     #endregion
     #region 写入数据

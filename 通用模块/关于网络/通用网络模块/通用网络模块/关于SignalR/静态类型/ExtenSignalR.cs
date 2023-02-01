@@ -1,5 +1,5 @@
-﻿using System.Linq.Expressions;
-using System.TreeObject.Json;
+﻿using System.Design;
+using System.Linq.Expressions;
 
 namespace Microsoft.AspNetCore.SignalR.Client;
 
@@ -91,7 +91,7 @@ public static class ExtenSignalR
     public static JsonHubProtocolOptions AddFormatterJson(this JsonHubProtocolOptions options)
     {
         options.PayloadSerializerOptions.
-            Converters.Add(CreateJson.JsonCommon);
+            Converters.Add(CreateDesign.JsonCommon);
         return options;
     }
     #endregion

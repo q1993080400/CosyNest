@@ -102,7 +102,7 @@ public abstract class Component : ComponentBase
     {
         if (State >= RenderState.CreateRender3)
             RenderCount++;
-        await OnAfterRenderAsyncRealize();
+        await OnAfterRenderAsyncRealize(RenderCount is 1);
         if (OnAfterRenderAsyncEvent is { } e)
             await e(State, RenderCount);
         State = State == RenderState.CreateRender2 ? RenderState.CreateRender3 : State;
@@ -114,8 +114,10 @@ public abstract class Component : ComponentBase
     /// 如果希望重写该方法的逻辑，可以重写本方法，
     /// 本方法可以通过<see cref="State"/>和<see cref="RenderCount"/>来获取关于呈现阶段的信息
     /// </summary>
+    /// <param name="firstCompletelyRender">指示此次渲染是否为第一次完全渲染，
+    /// 完全渲染指组件的<see cref="OnParametersSetAsync"/>方法已经等待完毕</param>
     /// <returns></returns>
-    protected virtual Task OnAfterRenderAsyncRealize()
+    protected virtual Task OnAfterRenderAsyncRealize(bool firstCompletelyRender)
         => Task.CompletedTask;
     #endregion
     #endregion

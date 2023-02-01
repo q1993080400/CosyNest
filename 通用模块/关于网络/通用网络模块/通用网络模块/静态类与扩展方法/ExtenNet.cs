@@ -1,6 +1,10 @@
 ﻿using System.Net.Http.Headers;
+using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Text;
+
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace System;
 
@@ -66,9 +70,9 @@ public static class ExtenNet
     /// <param name="recording">待转换的<see cref="HttpRequestRecording"/></param>
     /// <param name="baseAddress">请求目标Uri的基地址</param>
     /// <returns></returns>
-    internal static async Task<HttpRequestMessage> ToHttpRequestMessage(this IHttpRequest recording, Uri? baseAddress)
+    internal static async Task<HttpRequestMessage> ToHttpRequestMessage(this HttpRequestRecording recording, Uri? baseAddress)
     {
-        var uri = recording.UriComplete;
+        var uri = recording.Uri;
         var m = new HttpRequestMessage()
         {
             RequestUri = baseAddress is null ? new(uri) : new(baseAddress, uri),
@@ -103,7 +107,8 @@ public static class ExtenNet
     /// <param name="bclHeader"><paramref name="header"/>的所有标头将被复制到这个参数中</param>
     internal static void CopyHeader(this IHttpHeader header, HttpHeaders bclHeader)
     {
-        foreach (var (key, value) in header.Headers())
+        bclHeader.Clear();
+        foreach (var (key, value) in header.Headers)
         {
             bclHeader.Add(key, value);
         }
@@ -249,19 +254,82 @@ public static class ExtenNet
     #endregion
     #endregion
     #endregion
-    #region 获取Uri的基准地址
+    #region 关于依赖注入
+    #region 注入IHttpClient
+    #region 不指定基地址
     /// <summary>
-    /// 将一个Uri拆分成基准地址和扩展地址，
-    /// 基本地址包括协议，域名，端口，
-    /// 扩展地址是Uri中除它以外的部分
+    /// 注入一个<see cref="IHttpClient"/>，
+    /// 它可以用来发起Http请求
     /// </summary>
-    /// <param name="uri">要返回基准地址的Uri</param>
+    /// <param name="services">要注入的服务集合</param>
     /// <returns></returns>
-    public static (string Base, string Extend) Split(this Uri uri)
+    public static IServiceCollection AddIHttpClient(this IServiceCollection services)
     {
-        var @base = uri.IsAbsoluteUri ?
-        $"{uri.Scheme}://{uri.Authority}" : "";
-        return (@base, uri.ToString().Trim(true, @base));
+        services.AddHttpClient();
+        return services.AddTransient(x => x.GetRequiredService<IHttpClientFactory>().CreateClient().ToHttpClient());
     }
     #endregion
+    #region 指定基地址
+    /// <summary>
+    /// 注入一个<see cref="IHttpClient"/>，
+    /// 它可以用于请求WebApi，且支持通过相对地址请求
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <param name="getBaseAddress">用来获取请求基地址的委托，
+    /// 基地址通常是服务器的域名</param>
+    /// <returns></returns>
+    public static IServiceCollection AddIHttpClientHasAddress(this IServiceCollection services, Func<IServiceProvider, string> getBaseAddress)
+    {
+        services.AddHttpClient("webapi");
+        services.AddScoped(server =>
+        {
+            var http = server.GetRequiredService<IHttpClientFactory>().CreateClient("webapi");
+            var uri = getBaseAddress(server);
+            http.BaseAddress = new(uri);
+            return http.ToHttpClient();
+        });
+        return services;
+    }
+    #endregion
+    #region 指定基地址，依赖于IUriManager
+    /// <summary>
+    /// 注入一个<see cref="IHttpClient"/>，
+    /// 它可以用于请求WebApi，且支持通过相对地址请求，
+    /// 它依赖于服务<see cref="IUriManager"/>
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <returns></returns>
+    public static IServiceCollection AddIHttpClientHasAddress(this IServiceCollection services)
+        => services.AddIHttpClientHasAddress
+        (x => x.GetRequiredService<IUriManager>().Uri.UriHost ??
+        throw new NullReferenceException($"{nameof(IUriManager)}对象返回的是相对Uri，它没有主机部分"));
+    #endregion
+    #endregion 
+    #region 注入SignalRProvide对象
+    /// <summary>
+    /// 以瞬间模式注入一个<see cref="ISignalRProvide"/>对象，
+    /// 该依赖注入能够自动处理绝对路径和相对路径的转换，
+    /// 它依赖于<see cref="IUriManager"/>服务
+    /// </summary>
+    /// <param name="services">待注入的容器</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="CreateNet.SignalRProvide(Func{string, HubConnection}?, Func{string, string}?)"/>
+    public static IServiceCollection AddISignalRProvide(this IServiceCollection services, Func<string, HubConnection>? create = null)
+        => services.AddTransient(server =>
+        {
+            var navigation = server.GetRequiredService<IUriManager>();
+            return CreateNet.SignalRProvide(create, uri => navigation.Convert(uri, true));
+        });
+    #endregion
+    #region 注入HttpRequestTransformation
+    /// <summary>
+    /// 以范围模式注入一个<see cref="HttpRequestHelp"/>，
+    /// 它可以封装一个Http转换函数
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <returns></returns>
+    public static IServiceCollection AddHttpRequestTransformation(this IServiceCollection services)
+        => services.AddScoped<HttpRequestHelp>();
+    #endregion
+    #endregion 
 }

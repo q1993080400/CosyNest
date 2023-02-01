@@ -37,15 +37,14 @@ public interface IBitRead : IBitPipeBase
     /// 以流的形式读取二进制数据
     /// </summary>
     /// <param name="cancellation">用于取消迭代的令牌</param>
+    /// <param name="bufferSize">缓冲区最大大小，以字节为单位，
+    /// 如果待读取字节数不足，最后返回的字节数可能小于这个数量</param>
     /// <returns></returns>
-    IEnumerableFit<byte> Read(CancellationToken cancellation = default);
+    IAsyncEnumerable<byte[]> Read(int bufferSize = 1024, CancellationToken cancellation = default);
 
     /*实现本API请遵循以下规范：
       #每次遍历该迭代器时，都应该从数据的开头返回数据，
       换言之，在多次读取数据时，不应该像Stream一样需要手动的复位操作
-
-      #虽然从外表上看不出来，但是在底层应该启用缓冲，
-      来避免一次性读取全部数据
 
       #本API应该是一个纯函数，换言之，
       修改返回的字节数组中的值，不应该影响下一次调用方法返回的数据，
@@ -57,9 +56,25 @@ public interface IBitRead : IBitPipeBase
     /// 如果没有任何数据，则返回一个空数组
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="Read(CancellationToken)"/>
-    Task<byte[]> ReadComplete(CancellationToken cancellation = default)
-        => Task.Run(() => Read(cancellation).ToArray());
+    /// <inheritdoc cref="Read(int, CancellationToken)"/>
+    async Task<byte[]> ReadComplete(CancellationToken cancellation = default)
+    {
+        var list = new List<byte[]>();
+        var size = 0;
+        await foreach (var item in Read(cancellation: cancellation))
+        {
+            list.Add(item);
+            size += item.Length;
+        }
+        var array = new byte[size];
+        var pos = 0;
+        foreach (var item in list)
+        {
+            Array.Copy(item, 0, array, pos, item.Length);
+            pos += item.Length;
+        }
+        return array;
+    }
     #endregion
     #region 以Base64的形式读取二进制管道
     /// <summary>
@@ -81,8 +96,13 @@ public interface IBitRead : IBitPipeBase
     /// </summary>
     /// <param name="write">复制的目标管道</param>
     /// <param name="cancellation">一个用于取消异步操作的令牌</param>
-    Task CopyTo(IBitWrite write, CancellationToken cancellation = default)
-       => write.Write(Read(cancellation), cancellation).AsTask();
+    async Task CopyTo(IBitWrite write, CancellationToken cancellation = default)
+    {
+        await foreach (var item in Read(cancellation: cancellation))
+        {
+            await write.Write(item, cancellation);
+        }
+    }
     #endregion
     #region 复制到另一个流
     /// <summary>
@@ -93,9 +113,9 @@ public interface IBitRead : IBitPipeBase
     /// <inheritdoc cref="CopyTo(IBitWrite, CancellationToken)"/>
     async Task CopyTo(Stream write, CancellationToken cancellation = default)
     {
-        await foreach (var item in Read(cancellation))
+        await foreach (var item in Read(cancellation: cancellation))
         {
-            write.WriteByte(item);
+            write.Write(item);
         }
     }
     #endregion

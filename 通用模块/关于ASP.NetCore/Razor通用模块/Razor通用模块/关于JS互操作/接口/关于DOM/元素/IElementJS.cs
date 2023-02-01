@@ -44,20 +44,33 @@ public interface IElementJS : IElementBase
     /// <summary>
     /// 获取已经滚动的百分比
     /// </summary>
-    /// <param name="calculateCurrentScreen">如果这个值为<see langword="true"/>，
-    /// 则在计算滚动百分比时，会把当前视口屏幕计算进去，
-    /// 否则不会计算，它会导致滚动进度永远不会达到1</param>
+    /// <param name="notScrollingTreatedAs0">如果这个值为<see langword="true"/>，
+    /// 则在计算滚动的时候，会加上ClientHeight，它会导致滚动进度永远不为0，
+    /// 否则不会加上，它会导致滚动进度永远达不到1</param>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
-    async ValueTask<double> ScrollPercentage(bool calculateCurrentScreen, CancellationToken cancellationToken = default)
+    async ValueTask<double> ScrollPercentage(bool notScrollingTreatedAs0, CancellationToken cancellationToken = default)
     {
-        var top = await ScrollTop + (calculateCurrentScreen ? await ClientHeight : 0);
+        var scrollTop = await ScrollTop;
         var height = await ScrollHeight;
+        var clientHeight = await ClientHeight;
+        var top = scrollTop + (notScrollingTreatedAs0 ? 0 : clientHeight);
         return top / height;
     }
 
     /*注意：
-      出于未知原因，这个滚动百分比不是特别精确，
-      它有可能已经全部滚动完了，但是返回值不是1，而是一个很接近的数值*/
+      #出于未知原因，这个滚动百分比不是特别精确，
+      它有可能已经全部滚动完了，但是返回值不是1，而是一个很接近的数值
+    
+      问：为什么要有notScrollingTreatedAs0这个参数？它似乎很费解
+      答：这是因为关于滚动进度，存在以下歧义：
+
+      #如果一个元素不需要滚动，那么它的滚动进度是0还是1？
+      也就是，它是没有滚动，还是滚动到底了？
+
+      #如果一个元素的ScrollTop是100，ClientHeight是900，ScrollHeight是1000，
+      那么它的滚动进度是0.1还是1？
+      认为滚动了0.1的人看来，它距离视口顶端有100的距离
+      认为滚动了1的人看来，这个元素已经滚动到视口底部*/
     #endregion
     #region 滚动到指定位置
     #region 指定滚动坐标

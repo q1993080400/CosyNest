@@ -29,7 +29,7 @@ sealed class JSNavigator : JSRuntimeBase, IJSNavigator
     public IAsyncProperty<string?> ClipboardText
         => ClipboardTextFiled ??= CreateTasks.AsyncProperty
         (token => JSRuntime.InvokeCodeAsync<string?>("navigator.clipboard.readText()", true, token).AsTask(),
-            (value, token) => JSRuntime.InvokeCodeVoidAsync($@"navigator.clipboard.writeText(""{value}"")", true, cancellation: token).AsTask());
+            (value, token) => JSRuntime.InvokeCodeVoidAsync($@"navigator.clipboard.writeText({value.ToJSSecurity()})", true, cancellation: token).AsTask());
     #endregion
     #region 获取定位对象
     public IPosition Geolocation { get; }

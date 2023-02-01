@@ -64,7 +64,7 @@ abstract class CompressionDirectoryBase : CompressionItem, ICompressionDirectory
         get
         {
             var regex =/*language=regex*/@$"^{Path}/?[^/]+/?".Op().Regex();
-            var items = Zip.Entries.Select(x => regex.MatcheFirst(x.FullName)).
+            var items = Zip.Entries.Select(x => regex.MatcheSingle(x.FullName)).
                 Where(x => x is { }).Select(x => x!.Match).Distinct().ToArray();
             foreach (var item in items)
             {

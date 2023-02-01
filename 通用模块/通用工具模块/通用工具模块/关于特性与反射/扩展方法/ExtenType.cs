@@ -34,9 +34,8 @@ public static partial class ExtenReflection
     /// <param name="type">要判断的类型</param>
     /// <returns></returns>
     public static bool CanNew(this Type type)
-        => type.IsValueType ||
-        (!type.IsAbstract && !type.IsInterface && !type.ContainsGenericParameters &&
-        type.GetConstructors().Any(x => x.IsPublic && x.GetParameters().Length is 0));
+        => !type.IsAbstract && !type.IsInterface && !type.ContainsGenericParameters &&
+        type.GetConstructors().Any(x => x.IsPublic && x.GetParameters().Length is 0);
     #endregion
     #region 判断一个类型是否为静态类
     /// <summary>

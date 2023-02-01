@@ -46,7 +46,7 @@ public static class ToolASP
     #region 获取前端基准超时时间
     /// <summary>
     /// 获取前端基准超时时间，
-    /// 它可以用来全局地控制等待前端DOM渲染的时间
+    /// 它可以用来全局地控制等待前端DOM渲染的时间，默认为100毫秒
     /// </summary>
     public static TimeSpan BaseTimeOut { get; set; } = TimeSpan.FromMilliseconds(100);
 

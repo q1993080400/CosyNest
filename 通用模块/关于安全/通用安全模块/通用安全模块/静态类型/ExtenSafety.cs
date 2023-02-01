@@ -1,6 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Design;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Text.Json;
 
 namespace System;
 
@@ -28,36 +30,58 @@ public static class ExtenSafety
     /// </summary>
     /// <param name="principal">要返回声明标识的主体</param>
     /// <returns></returns>
-    public static ClaimsIdentity? Identity(this ClaimsPrincipal principal)
-        => (ClaimsIdentity?)principal.Identity;
+    public static ClaimsIdentity Identity(this ClaimsPrincipal principal)
+        => principal.Identity switch
+        {
+            null => throw new NullReferenceException($"{nameof(principal.Identity)}为null"),
+            ClaimsIdentity identity => identity,
+            var identity => throw new NotSupportedException($"{nameof(principal.Identity)}是{identity.GetType()}类型，" +
+                $"无法转换为{nameof(ClaimsIdentity)}")
+        };
     #endregion
-    #endregion
-    #region 关于ClaimsIdentity 
-    #region 返回验证不通过的原因
+    #region 关于标识Json对象
+    #region ClaimsIdentity中储存对象的键
     /// <summary>
-    /// 返回标识验证不通过的原因，
-    /// 如果标识验证通过，或者没有记载原因，
-    /// 则返回<see langword="null"/>
+    /// 获取在<see cref="ClaimsIdentity"/>中储存对象的键
     /// </summary>
-    /// <param name="identity">待返回验证不通过原因的标识</param>
+    private static string ClaimsPrincipalInfoKey { get; } = "ClaimsPrincipalInfoKey";
+    #endregion
+    #region 获取ClaimsIdentity中储存的对象
+    /// <summary>
+    /// 获取<see cref="ClaimsPrincipal"/>中储存的对象
+    /// </summary>
+    /// <typeparam name="Obj">储存的对象的类型</typeparam>
+    /// <param name="principal">储存对象的<see cref="ClaimsPrincipal"/></param>
+    /// <param name="options">一个用于控制Json转换的对象</param>
     /// <returns></returns>
-    public static string? GetBanReason(this ClaimsIdentity identity)
-        => !identity.IsAuthenticated && identity.FindFirst("BanReason") is { } c ? c.Value : null;
-    #endregion
-    #region 写入验证不通过的原因
-    /// <summary>
-    /// 写入标识验证不通过的原因，
-    /// 如果标识已经验证通过，则不执行任何操作
-    /// </summary>
-    /// <param name="identity">待写入验证不通过原因的标识</param>
-    /// <param name="reason">验证不通过的原因</param>
-    /// <returns>原路返回<paramref name="identity"/></returns>
-    public static ClaimsIdentity SetBanReason(this ClaimsIdentity identity, string reason)
+    public static Obj? GetInfo<Obj>(this ClaimsPrincipal principal, JsonSerializerOptions? options = null)
     {
-        if (!identity.IsAuthenticated)
-            identity.AddClaim(new("BanReason", reason));
-        return identity;
+        var identity = principal.Identity();
+        var first = identity.FindFirst(x => x.Type == ClaimsPrincipalInfoKey);
+        return first is null ?
+            default :
+            JsonSerializer.Deserialize<Obj>(first.Value, options ?? CreateDesign.JsonCommonOptions);
     }
     #endregion
+    #region 写入ClaimsIdentity中储存的对象
+    /// <summary>
+    /// 写入<see cref="ClaimsPrincipal"/>中储存的对象
+    /// </summary>
+    /// <param name="obj">待写入的对象，
+    /// 如果写入<see langword="null"/>，表示移除对象</param>
+    /// <inheritdoc cref="GetInfo{Obj}(ClaimsPrincipal, JsonSerializerOptions?)"/>
+    public static void SetInfo<Obj>(this ClaimsPrincipal principal, Obj? obj, JsonSerializerOptions? options = null)
+    {
+        var identity = principal.Identity();
+        var first = identity.FindFirst(x => x.Type == ClaimsPrincipalInfoKey);
+        if (first is { })
+            identity.RemoveClaim(first);
+        if (obj is null)
+            return;
+        var json = JsonSerializer.Serialize(obj, options ?? CreateDesign.JsonCommonOptions);
+        identity.AddClaim(new(ClaimsPrincipalInfoKey, json));
+    }
+    #endregion
+    #endregion 
     #endregion
 }

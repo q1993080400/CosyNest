@@ -12,6 +12,6 @@ public interface IHttpHeader
     /// 它的键是属性的名称，值是属性的值
     /// </summary>
     /// <returns></returns>
-    IReadOnlyDictionary<string, string> Headers();
+    IReadOnlyDictionary<string, IEnumerable<string>> Headers { get; }
     #endregion
 }

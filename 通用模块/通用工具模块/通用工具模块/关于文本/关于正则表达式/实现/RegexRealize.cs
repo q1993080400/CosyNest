@@ -31,11 +31,16 @@ sealed class RegexRealize : IRegex
         return (matcher.Any(), matcher);
     }
     #endregion
-    #region 返回第一个匹配到的结果
-    public IMatch? MatcheFirst(string text)
+    #region 返回唯一一个匹配到的结果
+    public IMatch? MatcheSingle(string text)
     {
-        var match = Regex.Match(text, RegexText, Options);
-        return match.Success ? new RegexMatch(match, RegexText) : null;
+        var matchs = Regex.Matches(text, RegexText, Options);
+        return matchs switch
+        {
+            [] => null,
+            [var match] => new RegexMatch(match, RegexText),
+            _ => throw new ArgumentException($"""正则表达式"{RegexText}"对文本"{text}"的匹配找到了多个结果""")
+        };
     }
     #endregion
     #region 替换匹配到的字符

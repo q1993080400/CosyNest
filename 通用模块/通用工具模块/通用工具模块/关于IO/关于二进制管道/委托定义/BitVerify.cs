@@ -7,4 +7,4 @@
 /// <param name="pipe">待验证的管道</param>
 /// <returns>如果验证通过，返回<see langword="true"/>，否则返回<see langword="false"/></returns>
 public delegate Task<bool> BitVerify(IBitRead pipe);
-#endregion 
+#endregion

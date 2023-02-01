@@ -1,4 +1,5 @@
 ﻿using System.Design;
+using System.Runtime.CompilerServices;
 
 namespace System.IOFrancis.Bit;
 
@@ -51,7 +52,7 @@ sealed class BitReadEnumerable<Byte> : IBitRead
         };
     #endregion
     #region 读取数据
-    public IEnumerableFit<byte> Read(CancellationToken cancellation = default)
+    public async IAsyncEnumerable<byte[]> Read(int bufferSize = 1024, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         #region 本地函数
         async IAsyncEnumerable<byte> Fun()
@@ -75,7 +76,17 @@ sealed class BitReadEnumerable<Byte> : IBitRead
             }
         }
         #endregion
-        return Fun().Fit();
+        ExceptionIntervalOut.Check(1, null, bufferSize);
+        await using var enumerator = Fun().GetAsyncEnumerator(cancellation);
+        while (true)
+        {
+            var (element, toEnd) = await enumerator.MoveRange(bufferSize);
+            var array = element.ToArray();
+            if (array.Any())
+                yield return array;
+            if (toEnd)
+                yield break;
+        }
     }
     #endregion
     #region 关于释放对象

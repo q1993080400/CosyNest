@@ -135,29 +135,31 @@ public static partial class ExtenIEnumerable
     /// <typeparam name="Obj">枚举器的元素类型</typeparam>
     /// <param name="enumerator">待批量枚举的枚举器</param>
     /// <param name="count">要枚举的元素数量</param>
-    /// <returns>批量枚举到的元素，如果已经枚举完毕，元素数量可能小于<paramref name="count"/></returns>
-    public static IEnumerable<Obj> MoveRange<Obj>(this IEnumerator<Obj> enumerator, int count)
+    /// <returns>一个元组，它的元素分别是批量枚举到的元素，以及是否已经枚举到末尾</returns>
+    public static (IEnumerable<Obj> Element, bool ToEnd) MoveRange<Obj>(this IEnumerator<Obj> enumerator, int count)
     {
+        var list = new LinkedList<Obj>();
         for (int i = 0; i < count; i++)
         {
             if (!enumerator.MoveNext())
-                yield break;
-            yield return enumerator.Current;
+                return (list, true);
+            list.Add(enumerator.Current);
         }
+        return (list, false);
     }
     #endregion
     #region 异步版本
     /// <inheritdoc cref="MoveRange{Obj}(IEnumerator{Obj}, int)"/>
-    public static async Task<IEnumerable<Obj>> MoveRange<Obj>(this IAsyncEnumerator<Obj> enumerator, int count)
+    public static async Task<(IEnumerable<Obj> Element, bool ToEnd)> MoveRange<Obj>(this IAsyncEnumerator<Obj> enumerator, int count)
     {
         var list = new LinkedList<Obj>();
         for (int i = 0; i < count; i++)
         {
             if (!await enumerator.MoveNextAsync())
-                return list;
+                return (list, true);
             list.Add(enumerator.Current);
         }
-        return list;
+        return (list, false);
     }
     #endregion
     #endregion

@@ -80,7 +80,7 @@ public interface IDirect : IRestrictedDictionary<string, object?>
             }
             if (direct is not (IDirect or IEnumerable<object>))
                 throw new ArgumentException($"递归读取属性只支持{nameof(IDirect)}和{nameof(IEnumerable<object>)}");
-            var regex =/*language=regex*/@"(?<property>[^\[]+)(\[(?<index>\d+)\])?".Op().Regex().MatcheFirst(item)!;
+            var regex =/*language=regex*/@"(?<property>[^\[]+)(\[(?<index>\d+)\])?".Op().Regex().MatcheSingle(item)!;
             if (direct is IDirect d)
             {
                 var key = regex["property"].Match;

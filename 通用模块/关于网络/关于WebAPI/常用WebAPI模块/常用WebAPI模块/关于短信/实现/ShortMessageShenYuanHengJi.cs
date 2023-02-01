@@ -28,15 +28,14 @@ sealed class ShortMessageShenYuanHengJi : WebApi, IShortMessageManage
             var httpClient = HttpClientProvide();
             var content = split[1].Replace("=", "%3A");
             var body = $"content={content}&phone_number={mobile}&template_id={split[0]}";
-            var request = new HttpRequestRecording()
+            var request = new HttpRequestRecording("http://dfsns.market.alicloudapi.com/data/send_sms")
             {
-                Uri = new("http://dfsns.market.alicloudapi.com/data/send_sms"),
                 Header = new()
                 {
                     Authorization = new("APPCODE", AppCode),
                 },
                 HttpMethod = HttpMethod.Post,
-                Content = new()
+                Content = new HttpContentRecording()
                 {
                     Content = body.ToBytes().ToBitRead(),
                     Header = new()
@@ -45,7 +44,7 @@ sealed class ShortMessageShenYuanHengJi : WebApi, IShortMessageManage
                     }
                 }
             };
-            var result = await httpClient.Request(request, cancellation).Read(x => x.ToObject());
+            var result = await httpClient.Request(request, cancellationToken: cancellation).Read(x => x.ToObject());
             if (result!["status"] is not "OK")
                 throw new APIException($"发送到{mobile}的短信失败，错误信息：{result["reason"]}");
         }

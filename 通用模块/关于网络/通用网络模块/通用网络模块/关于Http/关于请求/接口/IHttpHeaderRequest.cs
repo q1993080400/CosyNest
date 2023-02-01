@@ -10,9 +10,15 @@ public interface IHttpHeaderRequest : IHttpHeader
 {
     #region 获取身份验证标头
     /// <summary>
-    /// 获取Authorization标头值，
-    /// 它用于身份验证
+    /// 获取Authorization标头，
+    /// 它被用来执行身份验证
     /// </summary>
     AuthenticationHeaderValue? Authorization { get; }
+    #endregion
+    #region Cookie标头
+    /// <summary>
+    /// 获取Cookie标头，它控制浏览器Cookie
+    /// </summary>
+    string? Cookie { get; }
     #endregion
 }

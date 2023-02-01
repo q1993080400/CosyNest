@@ -1,41 +1,20 @@
 ﻿using System.Text.RegularExpressions;
 
+using Microsoft.AspNetCore;
+
 namespace Microsoft.JSInterop;
 
 /// <summary>
 /// 这个类型可以通过JS互操作来索引和修改Cookie
 /// </summary>
-sealed class JSCookie : JSRuntimeBase, IAsyncDictionary<string, string>
+sealed class JSCookie : JSRuntimeBase, ICookie
 {
-    #region 通过JS读写Cookie文本
-    #region 读取
-    /// <summary>
-    /// 通过JS互操作直接读取document.cookie属性
-    /// </summary>
-    /// <param name="cancellation">用于取消异步任务的令牌</param>
-    /// <returns></returns>
-    private ValueTask<string> GetCookie(CancellationToken cancellation = default)
-        => JSRuntime.GetProperty<string>("document.cookie", cancellation);
-    #endregion
-    #region 写入
-    /// <summary>
-    /// 通过JS互操作直接写入document.cookie属性
-    /// </summary>
-    /// <param name="cookie">要写入的Cookie文本</param>
-    /// <param name="cancellation">用于取消异步任务的令牌</param>
-    /// <returns></returns>
-    private ValueTask SetCookie(string cookie, CancellationToken cancellation = default)
+    #region 公开成员
+    #region 关于读取和写入Cookie
+    #region 写入原始Cookie
+    public ValueTask SetCookieOriginal(string cookie, CancellationToken cancellation = default)
         => JSRuntime.SetProperty("document.cookie", cookie, cancellation);
     #endregion
-    #region 返回最小UTC时间的字符串
-    /// <summary>
-    /// 返回JS中UTC最小时间的字符串格式，
-    /// 在删除Cookie时会用到
-    /// </summary>
-    private const string MinDate = "Thu, 01 Jan 1970 00:00:00 GMT";
-    #endregion
-    #endregion
-    #region 关于读取和写入Cookie
     #region 读取或写入值（异步索引器）
     public IAsyncIndex<string, string> IndexAsync { get; }
     #endregion
@@ -90,6 +69,35 @@ sealed class JSCookie : JSRuntimeBase, IAsyncDictionary<string, string>
     #region 添加键值对
     public Task AddAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
         => IndexAsync.Set(item.Key, item.Value, cancellation);
+    #endregion
+    #endregion
+    #endregion
+    #region 内部成员
+    #region 读取Cookie
+    /// <summary>
+    /// 通过JS互操作直接读取document.cookie属性
+    /// </summary>
+    /// <param name="cancellation">用于取消异步任务的令牌</param>
+    /// <returns></returns>
+    private ValueTask<string> GetCookie(CancellationToken cancellation = default)
+        => JSRuntime.GetProperty<string>("document.cookie", cancellation);
+    #endregion
+    #region 写入Cookie
+    /// <summary>
+    /// 通过JS互操作直接写入document.cookie属性
+    /// </summary>
+    /// <param name="cookie">要写入的Cookie文本</param>
+    /// <param name="cancellation">用于取消异步任务的令牌</param>
+    /// <returns></returns>
+    private ValueTask SetCookie(string cookie, CancellationToken cancellation = default)
+        => SetCookieOriginal($"{cookie};expires=Thu, 01 Jan 2099 00:00:00 GMT", cancellation);
+    #endregion
+    #region 返回最小UTC时间的字符串
+    /// <summary>
+    /// 返回JS中UTC最小时间的字符串格式，
+    /// 在删除Cookie时会用到
+    /// </summary>
+    private string MinDate { get; } = "Thu, 01 Jan 1970 00:00:00 GMT";
     #endregion
     #endregion
     #region 构造函数

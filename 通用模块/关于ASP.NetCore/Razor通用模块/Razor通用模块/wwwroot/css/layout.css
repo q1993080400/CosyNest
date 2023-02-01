@@ -15,7 +15,7 @@
 /*占满屏幕布局*/
 .occupyScre
 {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
     min-width: 100vw;
@@ -25,7 +25,7 @@
 /*相对于屏幕的中部居中布局，水平垂直方向皆居中*/
 .centerMiddAbsolute
 {
-    position: fixed;
+    position: absolute;
     display: grid;
     grid-template: 1fr auto 1fr/1fr auto 1fr;
     left: 0;
@@ -39,15 +39,6 @@
 {
     grid-area: 2/2
 }
-
-/*表示一个紧凑居中布局，它一般用来排列按钮*/
-.compactCentered
-{
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly
-}
-
 
 /*横向屏幕，即宽大于高，一般用于电脑*/
 @media (orientation: landscape)

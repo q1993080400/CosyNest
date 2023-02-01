@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.NetFrancis.Http.Realize;
+﻿using System.NetFrancis.Http.Realize;
 
 namespace System.NetFrancis.Http;
 
@@ -8,17 +7,23 @@ namespace System.NetFrancis.Http;
 /// </summary>
 sealed record HttpHeaderResponse : HttpHeader, IHttpHeaderResponse
 {
-    #region 枚举预定义标头属性
-    protected override IEnumerable<(string Name, string? Value)> Predefined()
-        => Array.Empty<(string, string?)>();
+    #region 写入Cookie
+    public IEnumerable<string>? SetCookie
+    {
+        get => HeadersVar.TryGetValue("Set-Cookie").Value;
+        init
+        {
+            if (value is null)
+                HeadersVar.Remove("Set-Cookie");
+            else
+                HeadersVar["Set-Cookie"] = value;
+        }
+    }
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 复制一个<see cref="HttpResponseHeaders"/>的所有属性，并初始化对象
-    /// </summary>
-    /// <param name="header">待复制的响应标头</param>
-    public HttpHeaderResponse(HttpResponseHeaders header)
-        : base(header)
+    /// <inheritdoc cref="HttpHeader(IEnumerable{KeyValuePair{string, IEnumerable{string}}})"/>
+    public HttpHeaderResponse(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
+        : base(headers)
     {
 
     }

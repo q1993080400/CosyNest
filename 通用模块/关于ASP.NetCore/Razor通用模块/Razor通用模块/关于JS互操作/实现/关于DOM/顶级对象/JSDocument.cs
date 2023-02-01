@@ -14,7 +14,7 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
     #region 返回索引Cookie的字典
     private JSCookie? CookieField;
 
-    public IAsyncDictionary<string, string> Cookie
+    public ICookie Cookie
         => CookieField ??= new(JSRuntime);
     #endregion
     #region 获取或设置标题

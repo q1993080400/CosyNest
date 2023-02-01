@@ -41,7 +41,7 @@ public sealed class BaidupanAPI : WebApi
             }
         }
         var ids = file.Select(x => x.GetValue<long>("fs_id"));
-        var requestInfo = HttpRequestRecording.Create("http://pan.baidu.com/rest/2.0/xpan/multimedia",
+        var requestInfo = new HttpRequestRecording("http://pan.baidu.com/rest/2.0/xpan/multimedia",
          new[] {("method", "filemetas"), ("access_token", AccessToken),
            ("fsids", $"[{ids.Join(",")}]"), ("dlink", "1") }!);
         var responseInfo = GetList(await Base(async () => (await HttpClientProvide().Request(requestInfo).Read(x => x.ToObject()))!));
@@ -130,16 +130,16 @@ public sealed class BaidupanAPI : WebApi
     /// <returns>一个元组，它的项分别是创造的请求对象，
     /// 以及这个Uri是否为单个文件，如果是单个文件，需要进行特殊处理</returns>
     /// <inheritdoc cref="GetFD(string, string?)"/>
-    private (IHttpRequest Request, bool IsSingleFile) CreateRequest(string dir, string? search)
+    private (HttpRequestRecording Request, bool IsSingleFile) CreateRequest(string dir, string? search)
     {
         if (search is null)
         {
             var isSingleFile = !Path.GetExtension(dir).IsVoid();
             dir = isSingleFile ? Path.GetDirectoryName(dir)!.Op().ToUriPath() : dir;
-            return (HttpRequestRecording.Create("https://pan.baidu.com/rest/2.0/xpan/file",
+            return (new HttpRequestRecording("https://pan.baidu.com/rest/2.0/xpan/file",
                 new[] { ("method", "list"), ("access_token", AccessToken), ("dir", dir) }!), isSingleFile);
         }
-        return (HttpRequestRecording.Create("http://pan.baidu.com/rest/2.0/xpan/file",
+        return (new HttpRequestRecording("http://pan.baidu.com/rest/2.0/xpan/file",
             new[] { ("method", "search"), ("access_token", AccessToken),
             ("key", search), ("dir", dir), ("recursion", "1")}!), false);
     }

@@ -33,7 +33,7 @@ public static partial class ExtenText
     public static IRegex Regex(this StringOperate op, RegexOptions options = RegexOptions.None)
         => new RegexRealize(op.Text, options);
     #endregion
-    #region 转换为字节数组
+    #region 从字符串转换为字节数组
     /// <summary>
     /// 将一个字符串转换为它的二进制形式，并返回
     /// </summary>
@@ -43,6 +43,17 @@ public static partial class ExtenText
     /// <returns></returns>
     public static byte[] ToBytes(this string text, Encoding? encoding = null)
         => (encoding ?? Encoding.UTF8).GetBytes(text);
+    #endregion
+    #region 从字节数组转换为字符串
+    /// <summary>
+    /// 将一个字节数组转换为字符串
+    /// </summary>
+    /// <param name="bytes">待转换的字符串</param>
+    /// <param name="encoding">字符串使用的编码，
+    /// 如果为<see langword="null"/>，默认为UTF-8</param>
+    /// <returns></returns>
+    public static string ToText(this byte[] bytes, Encoding? encoding = null)
+        => (encoding ?? Encoding.UTF8).GetString(bytes);
     #endregion
     #region 删除指定字符
     #region 直接删除

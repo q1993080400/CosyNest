@@ -42,11 +42,13 @@ public static class CreateGeography
     /// </summary>
     /// <param name="longitude">经度，正值表示东经，负值表示西经</param>
     /// <param name="latitude">纬度，正值表示北纬，负值表示南纬</param>
-    public static ILocation Location(decimal longitude, decimal latitude)
+    /// <param name="accuracy">定位的精度，以米为单位</param>
+    public static ILocation Location(decimal longitude, decimal latitude, decimal accuracy = 50)
         => new Location
         {
             Longitude = longitude,
             Latitude = latitude,
+            Accuracy = accuracy
         };
     #endregion
 }

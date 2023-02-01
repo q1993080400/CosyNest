@@ -1,16 +1,14 @@
-﻿using System.NetFrancis;
-using System.Reflection;
+﻿using System.Net.Http.Headers;
+using System.NetFrancis;
 using System.NetFrancis.Http;
-using System.SafetyFrancis.Authentication;
+using System.Reflection;
 
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
-using System.Net.Http.Headers;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Authorization;
 
 namespace System;
 
@@ -61,6 +59,27 @@ public static class ExtenRazor
     /// <inheritdoc cref="InvokeCodeVoidAsync(IJSRuntime, string,bool, CancellationToken)"/>
     public static ValueTask<Ret> InvokeCodeAsync<Ret>(this IJSRuntime js, string jsCode, bool isAsynchronous = false, CancellationToken cancellation = default)
         => js.InvokeAsync<Ret>("eval", cancellation, ToAsynchronous(jsCode, isAsynchronous), jsCode);
+    #endregion
+    #region 将字符串转换为JS安全形式
+    /// <summary>
+    /// 将字符串转换为JS安全形式，
+    /// 它通常在拼接JS代码时使用，
+    /// 建议对所有可能由用户输入或控制的，
+    /// 字符串形式的JS方法参数调用本方法
+    /// </summary>
+    /// <param name="text">待转换的字符串</param>
+    /// <returns></returns>
+    public static string ToJSSecurity(this string? text)
+    {
+        if (text is null)
+            return "null";
+        var base64 = Convert.ToBase64String(text.ToBytes());
+        return $"atob(\"{base64}\")";
+    }
+
+    /*本方法的目的在于：
+      防止注入式攻击，或因为出现特殊字符，
+      导致的JS语法错误*/
     #endregion
     #endregion
     #region 有关JS属性
@@ -140,22 +159,7 @@ public static class ExtenRazor
         => services.AddScoped(x =>
         {
             var navigationManager = x.GetRequiredService<NavigationManager>();
-            return CreateNet.UriManager(navigationManager.BaseUri);
-        });
-    #endregion
-    #region 注入IAuthentication
-    /// <summary>
-    /// 注入一个<see cref="IAuthentication{Parameter}"/>，
-    /// 它通过在Cookie中写入和移除键值对来执行登录和注销操作
-    /// </summary>
-    /// <param name="services">待注入的服务容器</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="AuthenticationCookie(IJSWindow, string)"/>
-    public static IServiceCollection AddAuthenticationCookie(this IServiceCollection services, string key = ToolASP.AuthenticationKey)
-        => services.AddScoped(server =>
-        {
-            var jsWindow = server.GetRequiredService<IJSWindow>();
-            return CreateRazor.AuthenticationCookie(jsWindow, key);
+            return CreateNet.UriManager(navigationManager.Uri);
         });
     #endregion
     #endregion

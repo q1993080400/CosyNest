@@ -7,9 +7,6 @@
 /// <typeparam name="Element">元素的类型</typeparam>
 public sealed partial class Virtualization<Element> : Component, IAsyncDisposable
 {
-    #region 说明文档
-    /*欲正确使用本组件，需保证触发父容器div的onscroll事件*/
-    #endregion
     #region 组件参数
     #region 渲染每个元素的委托
     /// <summary>
@@ -67,6 +64,19 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     [Parameter]
     public int? Jump { get; set; }
     #endregion
+    #region 是否为倒序容器
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示该容器为倒序容器，它初始滚动到容器最下方，
+    /// 当滚动到容器最上方时，延迟加载元素
+    /// </summary>
+    [Parameter]
+    public bool IsReverse { get; set; }
+
+    /*注意：
+      当这个属性为false时，建议对Elements也进行优化，
+      先返回后面的元素*/
+    #endregion
     #region 参数展开
     /// <summary>
     /// 该参数展开控制父div容器的样式
@@ -91,8 +101,7 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     #region 根据索引生成元素ID
     /// <summary>
     /// 根据元素的索引，生成一个元素ID，
-    /// 如果<see cref="RenderElement"/>中使用了它为元素ID赋值，
-    /// 则可以在JS中找到生成的每个元素
+    /// 它让JS可以找到生成的每个元素
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
@@ -100,42 +109,30 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
         => $"{ID}-{index}";
     #endregion
     #region 滚动时触发的事件
-    #region 指示是否不触发事件
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示不触发<see cref="OnScroll"/>事件，
-    /// 它可以避免大量重复的事件触发
-    /// </summary>
-    private bool NotTrigger { get; set; }
-    #endregion
-    #region 事件本体
     /// <summary>
     /// 滚动容器div触发的事件
     /// </summary>
     /// <returns></returns>
     public async Task OnScroll()
     {
-        if (NotTrigger)
-            return;
-        NotTrigger = true;
         var element = (await JSWindow.Document.GetElementById(ID))!;
-        var percentage = await element.ScrollPercentage(true);
-        if (percentage > 0.99)
+        if (IsReverse ? (await element.ScrollPercentage(true) < 0.01) :
+            (await element.ScrollPercentage(false) > 0.99))
         {
-            var newElement = await Elements.MoveRange(Plus);
+            var newElement = (await Elements.MoveRange(Plus)).Element;
             if (newElement.Any())
             {
                 Rendered.Add(newElement);
+                if (IsReverse)
+                    await element.ScrollFromPercentage(0, 0.02);
             }
         }
-        NotTrigger = false;
     }
 
     /*问：为什么要公开这个方法？
       答：这是因为如果通过参数展开为容器div设置了Onscroll事件，
       则这个方法会被覆盖，无法调用，进一步导致虚拟化加载功能失效，
       因此需要将方法公开，使调用者能够在Onscroll事件中重新调用本方法*/
-    #endregion
     #endregion
     #region 释放对象
     public async ValueTask DisposeAsync()
@@ -166,43 +163,32 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
         if (AgainRender)
         {
             Rendered.Clear();
-            Rendered.Add(await Elements.MoveRange(Initial));
+            Rendered.Add((await Elements.MoveRange(Initial)).Element);
         }
     }
     #endregion
-    #region 线程安全锁
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 则不允许进入<see cref="OnAfterRenderAsyncRealize"/>方法的while块，
-    /// 保护线程安全
-    /// </summary>
-    private bool InLock { get; set; }
-    #endregion
     #region 重写OnAfterRenderAsync
-    protected override async Task OnAfterRenderAsyncRealize()
+    protected override async Task OnAfterRenderAsyncRealize(bool firstCompletelyRender)
     {
-        var renderCount = RenderCount;
-        if (renderCount is 1)
-            await Task.Delay(ToolASP.BaseTimeOut * 2);
+        if (!firstCompletelyRender)
+            return;
+        await Task.Delay(ToolASP.BaseTimeOut * 2);
         var div = (await JSWindow.Document.GetElementById(ID))!;
-        if (!InLock)
+        while (await div.ScrollTop is 0 && await div.ScrollPercentage(false) >= 0.98)
         {
-            InLock = true;
-            while (await div.ScrollTop is 0 && await div.ScrollPercentage(true) >= 0.98)
+            //这是为了防止由于Initial过低，初始加载完全部的元素后仍然不显示滚动条，导致无法滚动加载剩余元素的问题
+            var newElement = (await Elements.MoveRange(Plus)).Element;
+            if (newElement.Any())
             {
-                //这是为了防止由于Initial过低，初始加载完全部的元素后仍然不显示滚动条，导致无法滚动加载剩余元素的问题
-                var newElement = await Elements.MoveRange(Plus);
-                if (newElement.Any())
-                {
-                    Rendered.Add(newElement);
-                }
-                else break;
-                StateHasChanged();
-                await Task.Delay(ToolASP.BaseTimeOut * 1.5);
+                Rendered.Add(newElement);
             }
-            InLock = false;
+            else break;
+            StateHasChanged();
+            await Task.Delay(ToolASP.BaseTimeOut * 1.5);
+            if (IsReverse)
+                await div.ScrollFromPercentage(0, 1);
         }
-        if ((renderCount, Jump) is (1, { } i))
+        if (Jump is { } i)
             await JSWindow.Document.ScrollIntoView(GetElementID(i));
     }
     #endregion

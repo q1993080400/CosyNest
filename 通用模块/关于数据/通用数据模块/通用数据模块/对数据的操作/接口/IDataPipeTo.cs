@@ -1,4 +1,6 @@
-﻿namespace System.DataFrancis;
+﻿using System.Linq.Expressions;
+
+namespace System.DataFrancis;
 
 /// <summary>
 /// 所有实现这个接口的类型，
@@ -15,20 +17,24 @@ public interface IDataPipeTo
     /// <typeparam name="Data">数据的类型</typeparam>
     /// <param name="datas">待添加或更新的数据</param>
     /// <param name="cancellation">用于取消异步操作的令牌</param>
-    /// <returns></returns>
-    Task AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
+    /// <returns>添加或更新到数据源后的数据</returns>
+    Task<IEnumerable<Data>> AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class, IData;
+
+    /*问：为什么需要将添加后的数据原路返回？
+      答：因为新添加的数据是没有ID的，但是将它们添加到数据源以后，
+      就会被赋予一个ID，将它们原路返回，可以使调用者能够获取到这个ID*/
     #endregion
     #region 传入异步集合
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, CancellationToken)"/>
-    async Task AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
+    async Task<IEnumerable<Data>> AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class, IData
         => await AddOrUpdate(await datas.ToListAsync(), cancellation);
     #endregion
     #region 传入单个数据
     /// <param name="data">待添加或更新的数据</param>
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, CancellationToken)"/>
-    Task AddOrUpdate<Data>(Data data, CancellationToken cancellation = default)
+    Task<IEnumerable<Data>> AddOrUpdate<Data>(Data data, CancellationToken cancellation = default)
         where Data : class, IData
         => AddOrUpdate(new[] { data }, cancellation);
     #endregion
@@ -56,6 +62,15 @@ public interface IDataPipeTo
     async Task Delete<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class, IData
         => await Delete(await datas.ToListAsync(), cancellation);
+    #endregion
+    #region 按条件删除数据
+    /// <summary>
+    /// 直接从数据源中删除符合指定谓词的数据，不返回结果集
+    /// </summary>
+    /// <param name="expression">一个用来指定删除条件的表达式</param>
+    /// <inheritdoc cref="IDataPipeFrom.Query{Data}"/>
+    Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation = default)
+        where Data : class, IData;
     #endregion
     #endregion
 }

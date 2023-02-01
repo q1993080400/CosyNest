@@ -13,7 +13,7 @@ public interface IHttpHeaderContent : IHttpHeader
     /// 获取Content-Encoding标头值，
     /// 它指定了Http内容的编码
     /// </summary>
-    IEnumerable<string> ContentEncoding { get; }
+    IEnumerable<string>? ContentEncoding { get; }
     #endregion
     #region 获取媒体类型标头
     /// <summary>

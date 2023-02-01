@@ -4,8 +4,14 @@
 @inject IJSWindow JSWindow
 
 <div id="@ID" class="container" @onscroll="OnScroll" @attributes="ContainerAttributes">
-    @foreach (var (item, index, _) in Rendered.PackIndex())
+    @{
+        var rendered = IsReverse ? Rendered.Reverse() : Rendered;
+    }
+    @foreach (var (item, index, _) in rendered.PackIndex())
     {
-        @RenderElement((item,index,GetElementID(index)))
+        var id = GetElementID(index);
+        <div id="@id">
+            @RenderElement((item,index,id))
+        </div>
     }
 </div>

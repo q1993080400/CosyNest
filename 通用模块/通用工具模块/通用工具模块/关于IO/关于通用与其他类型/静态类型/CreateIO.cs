@@ -18,6 +18,21 @@ public static class CreateIO
     public static IFileSystem FileSystem { get; }
     = new FileSystemRealize();
     #endregion
+    #region 用来格式化驱动器的委托
+    /// <summary>
+    /// 这个委托用来执行格式化驱动器的操作，
+    /// 它的第一个参数是要格式化的驱动器，
+    /// 第二个参数是格式化后的文件系统格式，第三个参数是格式化后的卷标，
+    /// 只有当它被设置以后，<see cref="IDrive.Format(DriveFormat,string)"/>方法才能正常调用
+    /// </summary>
+    public static Action<IDrive, DriveFormat, string>? DriveFormatRealize { get; set; }
+
+    /*问：为什么需要本属性？
+      答：格式化驱动器的方法是一个接口成员，但是，
+      该方法的实现与各个平台是紧密耦合的，
+      如果为每一个平台提供独立的IDrive实现，这非常麻烦，
+      因此作者将该方法的实现单独抽离出来放在这里*/
+    #endregion
     #region 创建文件或目录对象
     #region 创建一个文件对象
     /// <summary>

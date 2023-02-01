@@ -14,6 +14,12 @@ public interface IAdministrativeArea
     /// </summary>
     IReadOnlyList<string> Area { get; }
     #endregion
+    #region 行政区名字
+    /// <summary>
+    /// 获取这个行政区的名称
+    /// </summary>
+    string Name => Area[^1];
+    #endregion
     #region 行政级别
     /// <summary>
     /// 获取行政区的级别，从0开始，

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>preview</LangVersion>
+		<AssemblyName>GeographyIPGeolocation</AssemblyName>
+		<RootNamespace>System.Geography</RootNamespace>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="IP2Location.IPGeolocation" Version="8.10.1" PrivateAssets="compile" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+		<ProjectReference Include="..\..\通用地理模块\通用地理模块\通用地理模块.csproj" />
+	</ItemGroup>
+</Project>
