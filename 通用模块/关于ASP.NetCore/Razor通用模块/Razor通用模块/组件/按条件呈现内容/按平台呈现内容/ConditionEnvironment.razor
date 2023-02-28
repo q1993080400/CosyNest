@@ -1,0 +1,10 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ConditionPresent<IEnvironmentInfoWeb>
+@using System.Underlying
+
+@if ((ChildContent, GetCondition) is ({ }, { }))
+{
+    <CascadingValue Value="GetCondition">
+        @ChildContent(GetCondition)
+    </CascadingValue>
+}

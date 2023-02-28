@@ -1,4 +1,5 @@
-﻿using System.Office.Excel;
+﻿using System.Linq.Expressions;
+using System.Office.Excel;
 
 namespace System.DataFrancis.Office.Block;
 
@@ -30,19 +31,25 @@ sealed record BlockToComplex : IDataPipeTo
     #endregion
     #region 有关推送数据
     #region 删除数据
+    Task IDataPipeTo.Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
+    {
+        throw new NotImplementedException();
+    }
+
     Task IDataPipeTo.Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
     {
         throw new NotImplementedException();
     }
     #endregion
     #region 添加或更新数据
-    Task IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    Task<IEnumerable<Data>> IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
         => Task.Run(() =>
         {
             foreach (var item in BlockFilter(datas))
             {
                 BlockSet(item, Sheet[BlockFind(item)]);
             }
+            return datas;
         }, cancellation);
     #endregion
     #endregion

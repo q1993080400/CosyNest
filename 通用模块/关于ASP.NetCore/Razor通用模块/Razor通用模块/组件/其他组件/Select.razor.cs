@@ -1,6 +1,4 @@
-﻿using Microsoft.JSInterop;
-
-namespace Microsoft.AspNetCore.Components;
+﻿namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 这个组件是一个选择器，

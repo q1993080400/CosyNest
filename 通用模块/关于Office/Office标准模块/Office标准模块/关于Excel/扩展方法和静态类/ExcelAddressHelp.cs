@@ -184,7 +184,7 @@ public static partial class ExcelRealizeHelp
     public static (int BeginRow, int BeginCol, int EndRow, int EndCol) AddressToTupts(string addressA1)
     {
         addressA1 = addressA1.ToUpper();
-        var mathce = MatchA1.MatcheFirst(addressA1)?.GroupsNamed ??
+        var mathce = MatchA1.MatcheSingle(addressA1)?.GroupsNamed ??
             throw new Exception($"{addressA1}不是合法的A1地址格式");
         #region 用来获取列号的本地函数
         static int Get(IMatch add)

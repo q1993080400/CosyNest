@@ -34,9 +34,12 @@ public interface IDataPipeTo
     #region 传入单个数据
     /// <param name="data">待添加或更新的数据</param>
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, CancellationToken)"/>
-    Task<IEnumerable<Data>> AddOrUpdate<Data>(Data data, CancellationToken cancellation = default)
+    async Task<Data> AddOrUpdate<Data>(Data data, CancellationToken cancellation = default)
         where Data : class, IData
-        => AddOrUpdate(new[] { data }, cancellation);
+    {
+        var datas = await AddOrUpdate(new[] { data }, cancellation);
+        return datas.Single();
+    }
     #endregion
     #endregion
     #region 关于删除数据

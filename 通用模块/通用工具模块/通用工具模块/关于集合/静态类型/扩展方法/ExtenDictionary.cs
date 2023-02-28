@@ -40,14 +40,12 @@ public static partial class ExtenIEnumerable
     /// <param name="noFound">如果键不存在，则通过这个延迟对象返回默认值</param>
     /// <returns></returns>
     public static (bool Exist, Value? Value) TryGetValue<Key, Value>(this IEnumerable<KeyValuePair<Key, Value>> dictionary, Key key, LazyPro<Value>? noFound = default)
-    {
-        if (dictionary is IDictionary<Key, Value> or IReadOnlyDictionary<Key, Value>)
+        => dictionary switch
         {
-            return dictionary.To<dynamic>().TryGetValue(key, out Value value) ?
-             (true, value) : (false, noFound);
-        }
-        throw new TypeUnlawfulException(dictionary, typeof(IDictionary<Key, Value>), typeof(IReadOnlyDictionary<Key, Value>));
-    }
+            IDictionary<Key, Value> d => d.TryGetValue(key, out Value? value) ? (true, value) : (false, noFound),
+            IReadOnlyDictionary<Key, Value> d => d.TryGetValue(key, out Value? v) ? (true, v) : (false, noFound),
+            _ => throw new TypeUnlawfulException(dictionary, typeof(IDictionary<Key, Value>), typeof(IReadOnlyDictionary<Key, Value>)),
+        };
     #endregion
     #endregion
     #endregion

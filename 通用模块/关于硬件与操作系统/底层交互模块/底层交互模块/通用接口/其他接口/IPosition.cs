@@ -12,8 +12,9 @@ public interface IPosition
     /// <summary>
     /// 执行定位操作
     /// </summary>
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns>当前用户所在的地理位置，
     /// 如果定位失败，则为<see langword="null"/></returns>
-    Task<ILocation?> Position();
+    Task<ILocation?> Position(CancellationToken cancellationToken = default);
     #endregion
 }

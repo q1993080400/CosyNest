@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.Json;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
 

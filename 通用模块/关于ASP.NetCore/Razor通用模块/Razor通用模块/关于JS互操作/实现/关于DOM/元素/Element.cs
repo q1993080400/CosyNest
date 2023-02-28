@@ -105,17 +105,18 @@ sealed class Element : JSRuntimeBase, IElementJS
     }
     #endregion
     #region 未实现的成员
-
     public string Type => throw new NotImplementedException();
 
     public string CssClass => throw new NotImplementedException();
 
-    public IEnumerable<Element1> Find<Element1>(Expression<Func<Element1, bool>> where) where Element1 : IElementBase
+    public string Text => throw new NotImplementedException();
+
+    public IEnumerable<Element1> Find<Element1>(Expression<Func<Element1, bool>> where, bool ignoreException) where Element1 : IElementBase
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Element1> FindFromCss<Element1>(string cssSelect) where Element1 : IElementBase
+    public IEnumerable<Element1> FindFromCss<Element1>(string cssSelect, bool ignoreException) where Element1 : IElementBase
     {
         throw new NotImplementedException();
     }

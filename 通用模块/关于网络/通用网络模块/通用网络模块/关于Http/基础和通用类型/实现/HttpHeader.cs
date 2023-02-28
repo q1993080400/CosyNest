@@ -9,19 +9,51 @@ public abstract record HttpHeader : IHttpHeader
 {
     #region 公开成员
     #region 标头属性
-    #region 正式属性
-    public IReadOnlyDictionary<string, IEnumerable<string>> Headers => HeadersVar;
+    #region 不可变字典
+    IReadOnlyDictionary<string, IEnumerable<string>> IHttpHeader.Headers => Headers;
     #endregion
-    #region 标头字典
+    #region 可变字典
     /// <summary>
     /// 获取标头字典，它是可变的
     /// </summary>
-    protected Dictionary<string, IEnumerable<string>> HeadersVar { get; } = new();
+    public Dictionary<string, IEnumerable<string>> Headers { get; } = new();
     #endregion
+    #endregion
+    #endregion
+    #region 内部成员
+    #region 获取标头
+    /// <summary>
+    /// 获取标头的模板方法，如果键存在，
+    /// 则通过一个委托获取值，否则返回<see langword="null"/>
+    /// </summary>
+    /// <typeparam name="Header">标头类型</typeparam>
+    /// <param name="key">用来获取标头的键</param>
+    /// <param name="ifExist"></param>
+    /// <returns></returns>
+    protected Header? GetHeader<Header>(string key, Func<IEnumerable<string>, Header> ifExist)
+        where Header : class
+        => Headers.TryGetValue(key).Value is { } v ?
+        ifExist(v) : null;
+    #endregion
+    #region 设置标头
+    /// <summary>
+    /// 设置标头的模板方法，如果要写入的值为<see langword="null"/>，
+    /// 则移除指定的标头，否则将标头转换后写入
+    /// </summary>
+    /// <param name="value">要写入的标头</param>
+    /// <param name="convertValue">用来转换标头写入值的函数</param>
+    /// <inheritdoc cref="GetHeader{Header}(string, Func{IEnumerable{string}, Header})"/>
+    protected void SetHeader<Header>(string key, Header? value, Func<Header, IEnumerable<string>> convertValue)
+    {
+        if (value is null)
+            Headers.Remove(key);
+        else
+            Headers[key] = convertValue(value);
+    }
     #endregion
     #endregion
     #region 重写的ToString方法
-    public override string ToString()
+    public sealed override string ToString()
         => Headers.Join(x => $"{x.Key}:{x.Value.Join(",")}", Environment.NewLine);
     #endregion
     #region 构造函数
@@ -43,12 +75,12 @@ public abstract record HttpHeader : IHttpHeader
             Where(x => !x.Key.IsVoid() && x.Item2.Any()).ToArray();
         foreach (var (k, v) in h)
         {
-            if (HeadersVar.TryGetValue(k, out var value))
+            if (Headers.TryGetValue(k, out var value))
             {
-                HeadersVar[k] = value.Concat(v).ToArray();
+                Headers[k] = value.Concat(v).ToArray();
             }
             else
-                HeadersVar[k] = v;
+                Headers[k] = v;
         }
     }
     #endregion

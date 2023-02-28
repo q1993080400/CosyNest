@@ -11,7 +11,7 @@ public sealed partial class ModalDialog : ComponentBase, IContentComponent<Rende
     /// 获取对话框是否打开
     /// </summary>
     [Parameter]
-    public bool IsOpen { get; set; }
+    public bool IsOpen { get; set; } = true;
     #endregion
     #region 组件的子内容
     [Parameter]

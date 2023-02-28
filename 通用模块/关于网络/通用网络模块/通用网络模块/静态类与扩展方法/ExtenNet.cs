@@ -52,11 +52,10 @@ public static class ExtenNet
     {
         if (content is null)
             return null;
-        var stream = new MemoryStream();
-        await content.CopyToAsync(stream);
+        var array = await content.ReadAsByteArrayAsync();
         return new HttpContentRecording()
         {
-            Content = stream.ToBitPipe().Read,
+            Content = array.ToBitRead(),
             Header = new(content.Headers)
         };
     }
@@ -239,8 +238,11 @@ public static class ExtenNet
     /// <returns></returns>
     public static string ToVirtualPath(this StringOperate localPath)
     {
-        var split = localPath.Text.Split("wwwroot");
-        return split.Length == 1 ? split[0] : split[^1];
+        const string wwwroot = "wwwroot";
+        var index = localPath.Text.IndexOf("wwwroot");
+        return index < 0 ?
+            throw new ArgumentException($"路径{localPath}不包含{wwwroot}文件夹") :
+            localPath.Text[(index + wwwroot.Length)..];
     }
     #endregion
     #region 将虚拟路径转换为真实路径

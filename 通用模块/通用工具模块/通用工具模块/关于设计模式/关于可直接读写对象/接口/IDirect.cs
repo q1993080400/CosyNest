@@ -33,7 +33,7 @@ public interface IDirect : IRestrictedDictionary<string, object?>
     /// <param name="realize">一个实现本接口的对象</param>
     /// <param name="newValue"><see cref="Schema"/>的新值</param>
     /// <returns>如果可以写入架构约束，将<paramref name="newValue"/>参数原路返回，否则引发异常</returns>
-    [return: NotNullIfNotNull("newValue")]
+    [return: NotNullIfNotNull(nameof(newValue))]
     protected static ISchema? CheckSchemaSet(IDirect realize, ISchema? newValue)
     {
         if (realize.Schema is { })

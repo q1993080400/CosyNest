@@ -156,6 +156,19 @@ public static partial class ExtenReflection
         => property.SetValue(target, property.GetValue(source));
     #endregion
     #endregion
+    #region 获取虚属性的定义
+    /// <summary>
+    /// 如果一个属性是重写后的虚属性，
+    /// 则返回它的定义，否则返回它自己
+    /// </summary>
+    /// <param name="property">待检查的属性</param>
+    /// <returns></returns>
+    public static PropertyInfo GetBaseDefinition(this PropertyInfo property)
+    {
+        var baseType = property.GetAccessors().First().GetBaseDefinition().DeclaringType!;
+        return baseType.GetTypeData().PropertyDictionary[property.Name].Single();
+    }
+    #endregion
     #endregion
     #region 关于成员
     #region 返回是否为编译器生成

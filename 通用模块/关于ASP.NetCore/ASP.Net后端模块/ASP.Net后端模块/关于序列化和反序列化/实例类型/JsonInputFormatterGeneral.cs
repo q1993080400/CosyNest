@@ -28,7 +28,8 @@ sealed class JsonInputFormatterGeneral : TextInputFormatter
     public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
     {
         using var read = context.ReaderFactory(context.HttpContext.Request.Body, encoding);
-        var obj = JsonSerializer.Deserialize(await read.ReadToEndAsync(), context.ModelType, Options);
+        var json = await read.ReadToEndAsync();
+        var obj = JsonSerializer.Deserialize(json, context.ModelType, Options);
         return await InputFormatterResult.SuccessAsync(obj ?? "null");
     }
     #endregion

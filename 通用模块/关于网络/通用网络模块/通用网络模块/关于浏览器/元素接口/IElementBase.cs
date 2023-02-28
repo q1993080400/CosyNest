@@ -35,6 +35,12 @@ public interface IElementBase
     /// </summary>
     string CssClass { get; }
     #endregion
+    #region 元素的显示文本
+    /// <summary>
+    /// 获取元素的显示文本
+    /// </summary>
+    string Text { get; }
+    #endregion
     #endregion
     #region 触发鼠标点击事件
     /// <summary>
@@ -50,16 +56,18 @@ public interface IElementBase
     /// 查找这个元素的后代元素
     /// </summary>
     /// <param name="where">用来查找元素的谓词</param>
+    /// <param name="ignoreException">如果这个值为<see langword="true"/>，
+    /// 则在超时的时候，不引发异常，而是返回一个空数组</param>
     /// <typeparam name="Element">浏览器元素的具体类型</typeparam>
     /// <returns></returns>
-    IEnumerable<Element> Find<Element>(Expression<Func<Element, bool>> where)
+    IEnumerable<Element> Find<Element>(Expression<Func<Element, bool>> where, bool ignoreException = false)
         where Element : IElementBase;
     #endregion
     #region 根据CSS选择器
     /// <param name="cssSelect">用来匹配后代元素的CSS选择器文本</param>
     /// <returns></returns>
-    /// <inheritdoc cref="Find{Element}(Expression{Func{Element, bool}})"/>
-    IEnumerable<Element> FindFromCss<Element>(string cssSelect)
+    /// <inheritdoc cref="Find{Element}(Expression{Func{Element, bool}},bool)"/>
+    IEnumerable<Element> FindFromCss<Element>(string cssSelect, bool ignoreException = false)
         where Element : IElementBase;
     #endregion
     #endregion

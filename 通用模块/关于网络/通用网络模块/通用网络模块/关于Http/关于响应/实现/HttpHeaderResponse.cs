@@ -10,14 +10,8 @@ sealed record HttpHeaderResponse : HttpHeader, IHttpHeaderResponse
     #region 写入Cookie
     public IEnumerable<string>? SetCookie
     {
-        get => HeadersVar.TryGetValue("Set-Cookie").Value;
-        init
-        {
-            if (value is null)
-                HeadersVar.Remove("Set-Cookie");
-            else
-                HeadersVar["Set-Cookie"] = value;
-        }
+        get => GetHeader("Set-Cookie", v => v);
+        init => SetHeader("Set-Cookie", value, v => v);
     }
     #endregion
     #region 构造函数

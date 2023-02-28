@@ -28,7 +28,7 @@ sealed class WeatherYiYuan : WebApi, IWeather
                 Authorization = new("APPCODE", AppCode)
             }
         };
-        var result = await httpClient.Request(request, cancellation).Read(x => x.ToObject());
+        var result = await httpClient.Request(request, null, cancellation).Read(x => x.ToObject());
         var hourList = result!.GetValueRecursion<object[]>("showapi_res_body.hourList")!.Cast<IDirect>();
         var now = DateTimeOffset.Now;
         now = now.ToDay().AddHours(now.Hour);

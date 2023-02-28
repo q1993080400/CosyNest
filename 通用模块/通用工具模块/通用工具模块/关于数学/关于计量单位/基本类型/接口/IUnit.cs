@@ -42,8 +42,15 @@ public interface IUnit<Template> : IComparable<IUnit<Template>>, IEquatable<IUni
     #region 重载比较运算符
     public static bool operator >(IUnit<Template> a, IUnit<Template> b)
         => a.ValueMetric > b.ValueMetric;
+
     public static bool operator <(IUnit<Template> a, IUnit<Template> b)
         => a.ValueMetric < b.ValueMetric;
+
+    public static bool operator >=(IUnit<Template> a, IUnit<Template> b)
+        => a.ValueMetric >= b.ValueMetric;
+
+    public static bool operator <=(IUnit<Template> a, IUnit<Template> b)
+        => a.ValueMetric <= b.ValueMetric;
     #endregion
     #region 可以和任意数字运算
     public static IUnit<Template> operator *(IUnit<Template> u, Num num)

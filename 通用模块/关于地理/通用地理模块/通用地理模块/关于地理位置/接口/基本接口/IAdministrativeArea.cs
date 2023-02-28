@@ -20,6 +20,12 @@ public interface IAdministrativeArea
     /// </summary>
     string Name => Area[^1];
     #endregion
+    #region 行政区划全名
+    /// <summary>
+    /// 获取行政区划的全名
+    /// </summary>
+    string FullName => Area.Join(" ");
+    #endregion
     #region 行政级别
     /// <summary>
     /// 获取行政区的级别，从0开始，

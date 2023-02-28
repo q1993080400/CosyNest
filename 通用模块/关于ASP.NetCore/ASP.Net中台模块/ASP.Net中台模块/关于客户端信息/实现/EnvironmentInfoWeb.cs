@@ -13,30 +13,43 @@ sealed class EnvironmentInfoWeb : IEnvironmentInfoWeb
     public string UserAgent { get; }
     #endregion
     #region 操作系统的名称
-    public string OS
+    public OS OS
     {
         get
         {
             if (UserAgent.Contains("Windows NT"))
-                return OSName.Windows;
+                return OS.Windows;
             if (UserAgent.Contains("Android"))
-                return OSName.Android;
+                return OS.Android;
             if (UserAgent.Contains("iPhone OS"))
-                return OSName.IOS;
+                return OS.IOS;
             if (UserAgent.Contains("Mac OS"))
-                return OSName.Mac;
-            return OSName.Unknown;
+                return OS.Mac;
+            return OS.Other;
         }
     }
     #endregion
     #region 硬件类型
-    public string HardwareType
+    public HardwareType HardwareType
         => OS switch
         {
-            OSName.Windows or OSName.Mac => HardwareTypeName.PC,
-            OSName.Android or OSName.IOS => HardwareTypeName.Phone,
-            _ => HardwareTypeName.Unknown
+            OS.Windows or OS.Mac => HardwareType.PC,
+            OS.Android or OS.IOS => HardwareType.Phone,
+            _ => HardwareType.Other
         };
+    #endregion
+    #region 浏览器
+    public Browser Browser
+    {
+        get
+        {
+            if (UserAgent.Contains("MicroMessenger"))
+                return Browser.WeChat;
+            if (UserAgent.Contains("QQ"))
+                return Browser.QQ;
+            return Browser.Other;
+        }
+    }
     #endregion
     #region 构造函数
     /// <summary>

@@ -5,16 +5,16 @@
 /// </summary>
 public interface IEnvironmentInfo
 {
-    #region 操作系统的名称
+    #region 操作系统
     /// <summary>
-    /// 获取操作系统的名称
+    /// 获取操作系统
     /// </summary>
-    string OS { get; }
+    OS OS { get; }
     #endregion
     #region 硬件类型
     /// <summary>
     /// 获取硬件类型，如PC，手机等
     /// </summary>
-    string HardwareType { get; }
+    HardwareType HardwareType { get; }
     #endregion
 }

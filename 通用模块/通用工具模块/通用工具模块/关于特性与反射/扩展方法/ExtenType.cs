@@ -77,6 +77,28 @@ public static partial class ExtenReflection
         TypeCode.Empty or TypeCode.DateTime or
         TypeCode.Char or TypeCode.String or TypeCode.Boolean);
     #endregion
+    #region 判断一个类型是否为通用类型
+    /// <summary>
+    /// 判断一个类型是否为通用类型，
+    /// 通用类型包括数字，布尔，时间，枚举，Guid类型，以及它们的可空版本，
+    /// 它们在很多不同的平台上都得到广泛支持
+    /// </summary>
+    /// <param name="type">要检查的类型</param>
+    /// <returns></returns>
+    public static bool IsCommonType(this Type? type)
+        => type switch
+        {
+            null => false,
+            { IsEnum: true } => true,
+            var t => Type.GetTypeCode(t) switch
+            {
+                TypeCode.Object when t.IsGenericRealize(typeof(Nullable<>)) => t.GenericTypeArguments[0].IsCommonType(),
+                TypeCode.Object => t == typeof(DateTimeOffset) || t == typeof(Guid),
+                TypeCode.DBNull => false,
+                _ => true
+            }
+        };
+    #endregion
     #region 关于泛型类型
     #region 判断泛型类型实现和定义之间的关系
     /// <summary>

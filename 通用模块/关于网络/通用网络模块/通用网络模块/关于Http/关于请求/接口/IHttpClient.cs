@@ -102,8 +102,7 @@ public interface IHttpClient
     #region 强类型Http请求
     #region 返回IHttpResponse
     /// <summary>
-    /// 发起强类型Http请求，并返回结果，
-    /// 它只支持Get请求
+    /// 发起强类型Http请求，并返回结果
     /// </summary>
     /// <typeparam name="API">API接口的类型</typeparam>
     /// <param name="request">用于描述请求路径和参数的表达式</param>

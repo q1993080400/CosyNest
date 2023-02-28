@@ -1,12 +1,7 @@
 ﻿using System.Net;
 using System.Security.Claims;
 
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace System;
 
@@ -46,9 +41,8 @@ public static partial class ExtenWebApi
         {
             exceptionHandlerApp.Use(async (HttpContext context, RequestDelegate requestDelegate) =>
             {
-                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-                if (exceptionHandlerPathFeature is null)
-                    throw new NullReferenceException($"尚未找到中间件功能{nameof(IExceptionHandlerPathFeature)}");
+                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>() ??
+                throw new NullReferenceException($"尚未找到中间件功能{nameof(IExceptionHandlerPathFeature)}");
                 var exception = exceptionHandlerPathFeature.Error;
                 if (exception is not BusinessException)
                 {
@@ -71,12 +65,13 @@ public static partial class ExtenWebApi
     /// <param name="configuration">用来配置服务的委托，
     /// 它的第一个参数是当前请求的<see cref="HttpContext"/>，第二个参数是请求到的服务</param>
     /// <returns></returns>
-    public static IApplicationBuilder UseConfigurationService<Service>(this IApplicationBuilder application, Action<HttpContext, Service> configuration)
+    public static IApplicationBuilder UseConfigurationService<Service>(this IApplicationBuilder application, Func<HttpContext, Service, Task> configuration)
         where Service : class
-        => application.Use((context, next) =>
+        => application.Use(async (context, next) =>
          {
-             configuration(context, context.RequestServices.GetRequiredService<Service>());
-             return next();
+             var service = context.RequestServices.GetRequiredService<Service>();
+             await configuration(context, service);
+             await next();
          });
 
     /*问：该方法有什么意义？

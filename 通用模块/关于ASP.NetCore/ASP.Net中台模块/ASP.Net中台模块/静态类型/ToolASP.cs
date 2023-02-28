@@ -29,12 +29,6 @@ public static class ToolASP
       IServiceProvider实际上可以也应该静态化，
       它比较方便，而且可以让静态对象也能够请求服务*/
     #endregion
-    #region 获取提取身份验证信息的键名
-    /// <summary>
-    /// 获取从Cookies中提取身份验证信息的默认键名
-    /// </summary>
-    public const string AuthenticationKey = "Authentication";
-    #endregion
     #region 获取Web根文件夹
     /// <summary>
     /// 获取Web根文件夹
@@ -68,15 +62,5 @@ public static class ToolASP
         return $"a{guid.Remove("-")}";
     }
     #endregion
-    #endregion
-    #region 显式初始化模块
-    /// <summary>
-    /// 显式执行模块初始化器，
-    /// 初始化器通常隐式执行，但某些情况下可能需要显式控制它
-    /// </summary>
-    public static void InitializerModule()
-    {
-
-    }
     #endregion
 }

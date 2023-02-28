@@ -30,7 +30,7 @@ sealed class BaiduMap : WebApi, IMap
             const int pageSize = 20;
             var request = new HttpRequestRecording(new("https://api.map.baidu.com/place/v2/search")
             {
-                UriParameters = new Dictionary<string, string?>()
+                UriParameter = new(new Dictionary<string, string>()
                 {
                     ["ak"] = AK,
                     ["query"] = "美食",
@@ -40,8 +40,9 @@ sealed class BaiduMap : WebApi, IMap
                     ["coord_type"] = "1",
                     ["page_size"] = pageSize.ToString(),
                     ["page_num"] = pageNum.ToString(),
-                    ["output"] = "json"
-                }
+                    ["output"] = "json",
+                    ["ret_coordtype"] = "gcj02ll"
+                })
             });
             var (hasNext, iterate) = await this.Iterate(request, pageNum, pageSize);
             foreach (var item in iterate)
@@ -72,7 +73,7 @@ sealed class BaiduMap : WebApi, IMap
     /// <param name="pageNum">翻页数量</param>
     /// <param name="pageSize">每一页的大小</param>
     /// <returns>一个元组，它的项分别是是否有下一页，以及当前页的实体</returns>
-    private async Task<(bool HasNext, IEnumerable<IGeographicRepast> Iterate)> Iterate(IHttpRequest httpRequest, int pageNum, int pageSize)
+    private async Task<(bool HasNext, IEnumerable<IGeographicRepast> Iterate)> Iterate(HttpRequestRecording httpRequest, int pageNum, int pageSize)
     {
         var response = await HttpClientProvide().Request(httpRequest).Read(x => x.ToObject());
         if (response.GetValue<int>("status") is not 0)

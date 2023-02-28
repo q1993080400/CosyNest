@@ -1,9 +1,5 @@
-﻿
-using Microsoft.AspNetCore.Html;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
-
-using System.IOFrancis.Bit;
-using System.Maths.Plane;
 
 namespace Microsoft.AspNetCore;
 
@@ -21,13 +17,12 @@ public static class CreateASP
     public static IEnvironmentInfoWeb EnvironmentInfo(string userAgent)
         => new EnvironmentInfoWeb(userAgent);
     #endregion
-    #region 创建图片提供者对象
+    #region 创建文件路径协议
     /// <summary>
-    /// 创建图片提供者对象，它可以用来管理原图和缩略图
+    /// 创建文件路径协议，它是一个委托元组，
+    /// 它的第一个项可以编码文件路径，第二个项可以解码文件路径
     /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="ImageProvided.ImageProvided(string, string, Func{IBitRead, ISizePixel, Task{IBitRead}})"/>
-    public static IImageProvided ImageProvided(string original, string thumbnail, Func<IBitRead, ISizePixel, Task<IBitRead>> toThumbnail)
-        => new ImageProvided(original, thumbnail, toThumbnail);
+    public static (Func<IEnumerable<MediaPathGenerateParameters>, IEnumerable<MediaServerPosition>> Generate, Func<IEnumerable<string>, IEnumerable<MediaSource>> Analysis) MediaPathProtocol { get; }
+        = (Components.MediaPathProtocol.Generate, Components.MediaPathProtocol.Analysis);
     #endregion
 }

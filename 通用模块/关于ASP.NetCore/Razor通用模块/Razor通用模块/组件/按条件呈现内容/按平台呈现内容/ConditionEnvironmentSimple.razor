@@ -5,21 +5,17 @@
 <ConditionEnvironment>
     @{
         #region 本地函数
-        Type? Fun(string suffix)
-        {
-            #region 获取类型
-            Type? GetComponentsType(string suffix)
-            => Assembly.GetTypes().FirstOrDefault(x => typeof(IComponent).
-            IsAssignableFrom(x) && x.Name == Prefix + suffix);
-            #endregion
-            return GetComponentsType(suffix) ?? GetComponentsType("Other");
-        }
+        Type Fun(HardwareType suffix)
+        => Assembly.GetTypes().FirstOrDefault(x => typeof(IComponent).
+        IsAssignableFrom(x) && x.Name == Prefix + suffix) ??
+        throw new NotSupportedException($"在{suffix}环境下，没有在程序集{Assembly}中找到名为{Prefix + suffix}的组件");
         #endregion
         var type = context?.HardwareType switch
         {
-            HardwareTypeName.PC => Fun(HardwareTypeName.PC),
-            HardwareTypeName.Phone => Fun(HardwareTypeName.Phone),
-            _ => null
+            HardwareType.PC => Fun(HardwareType.PC),
+            HardwareType.Phone => Fun(HardwareType.Phone),
+            null => null,
+            var h => throw new NotSupportedException($"程序目前不识别{h}环境，无法执行对应的渲染")
         };
     }
     @if (type is { })

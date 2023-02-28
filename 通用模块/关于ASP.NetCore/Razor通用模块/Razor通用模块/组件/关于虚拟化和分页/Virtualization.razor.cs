@@ -10,14 +10,21 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     #region 组件参数
     #region 渲染每个元素的委托
     /// <summary>
-    /// 获取用来渲染每个元素的委托，
-    /// 它的参数依次是待渲染的元素，
-    /// 元素的索引，以及一个为该元素生成的唯一ID，
-    /// 通过ID可以找到这个元素
+    /// 获取用来渲染每个元素的委托
     /// </summary>
     [EditorRequired]
     [Parameter]
-    public RenderFragment<(Element, int, string)> RenderElement { get; set; }
+    public RenderFragment<VirtualizationRender<Element>> RenderElement { get; set; }
+    #endregion
+    #region 渲染组件的委托
+    /// <summary>
+    /// 获取用来渲染组件的委托，
+    /// 通过它可以自定义组件的容器，
+    /// 它的参数就是用来渲染每个元素的委托
+    /// </summary>
+    [EditorRequired]
+    [Parameter]
+    public RenderFragment<IEnumerable<RenderFragment>> RenderComponent { get; set; }
     #endregion
     #region 枚举元素的迭代器
 #pragma warning disable BL0007
@@ -191,6 +198,16 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
         if (Jump is { } i)
             await JSWindow.Document.ScrollIntoView(GetElementID(i));
     }
+    #endregion
+    #region 简化渲染
+    /// <summary>
+    /// 这个高阶函数返回一个函数，
+    /// 它可以用来渲染单个元素
+    /// </summary>
+    /// <param name="render">渲染的参数</param>
+    /// <returns></returns>
+    private RenderFragment SimplifyRender(VirtualizationRender<Element> render)
+        => RenderElement(render);
     #endregion
     #endregion
 }

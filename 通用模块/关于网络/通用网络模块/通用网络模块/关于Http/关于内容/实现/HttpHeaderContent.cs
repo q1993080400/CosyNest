@@ -11,28 +11,16 @@ public sealed record HttpHeaderContent : HttpHeader, IHttpHeaderContent
     #region 获取编码标头
     public IEnumerable<string>? ContentEncoding
     {
-        get => HeadersVar.TryGetValue("Content-Encoding").Value;
-        init
-        {
-            if (value is null)
-                HeadersVar.Remove("Content-Encoding");
-            else
-                HeadersVar["Content-Encoding"] = value;
-        }
+        get => GetHeader("Content-Encoding", x => x);
+        init => SetHeader("Content-Encoding", value, x => x);
+
     }
     #endregion
     #region 获取媒体类型标头
     public MediaTypeHeaderValue? ContentType
     {
-        get => HeadersVar.TryGetValue("Content-Type").Value is { } v ?
-            MediaTypeHeaderValue.Parse(v.Join(";")) : null;
-        init
-        {
-            if (value is null)
-                HeadersVar.Remove("Content-Type");
-            else
-                HeadersVar["Content-Type"] = value.ToString().Split(";").ToArray();
-        }
+        get => GetHeader("Content-Type", x => MediaTypeHeaderValue.Parse(x.Join(";")));
+        init => SetHeader("Content-Type", value, x => x.ToString().Split(";").ToArray());
     }
     #endregion
     #region 构造函数

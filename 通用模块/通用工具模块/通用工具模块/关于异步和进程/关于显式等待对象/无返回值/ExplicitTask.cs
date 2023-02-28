@@ -19,7 +19,7 @@ public sealed class ExplicitTask
     /// 调用本方法以完成任务
     /// </summary>
     public void Completed()
-        => (Awaiter ?? throw new NullReferenceException("无法完成尚未等待的任务")).Completed();
+        => (Awaiter ??= GetAwaiter()).Completed();
     #endregion
     #region 是否成功完成
     /// <summary>
@@ -35,7 +35,7 @@ public sealed class ExplicitTask
     /// <returns></returns>
     public ExplicitAwaiter GetAwaiter()
     {
-        Awaiter = Awaiter is null ? new() : throw new NotSupportedException($"{nameof(ExplicitTask)}对象不允许等待两次");
+        Awaiter = Awaiter ??= new();
         if (TimeOut is { } @out)
             Task.Run(async () =>
             {

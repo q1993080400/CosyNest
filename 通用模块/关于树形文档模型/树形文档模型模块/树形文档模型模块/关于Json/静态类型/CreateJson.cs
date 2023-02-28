@@ -21,4 +21,14 @@ public static class CreateJson
     /// </summary>
     public static JsonConverter JsonTuple { get; } = new JsonConvertFactoryTuple();
     #endregion
+    #region 创建投影转换器
+    /// <summary>
+    /// 创建一个投影转换器，它可以将将复杂的类型转换为一个简单的类型，
+    /// 再将其转换为Json，或执行此操作的反向操作
+    /// </summary>
+    /// <inheritdoc cref="JsonConvertMap{ConvertTo, Map}"/>
+    /// <inheritdoc cref="JsonConvertMap{ConvertTo, Map}.JsonConvertMap(Func{ConvertTo, Map}, Func{Map, ConvertTo})"/>
+    public static JsonConverter<ConvertTo> JsonMap<ConvertTo, Map>(Func<ConvertTo, Map> toMap, Func<Map, ConvertTo> fromMap)
+        => new JsonConvertMap<ConvertTo, Map>(toMap, fromMap);
+    #endregion
 }

@@ -133,7 +133,25 @@ sealed class JsonConvertDirect<Obj> : JsonConverter<Obj>
     #region 序列化
     public override void Write(Utf8JsonWriter writer, Obj value, JsonSerializerOptions options)
     {
-        JsonSerializer.Serialize<IReadOnlyDictionary<string, object?>>(writer, value, options);
+        #region 枚举待序列化的值的本地函数
+        IEnumerable<(string Key, object? Value)> Fun()
+        {
+            var objType = typeof(Obj);
+            var notEntity = !typeof(Entity).IsAssignableFrom(objType);
+            var include = objType.GetProperties().Where(x => x.HasAttributes<JsonIncludeAttribute>()).
+                Select(x => x.Name).ToHashSet();
+            foreach (var (key, value) in value)
+            {
+                if (notEntity || value is null || value.GetType().IsCommonType() || include.Contains(key))
+                    yield return (key, value);
+            }
+            /*上面这段代码的意思是：
+              如果value是实体类，则只序列化数字，布尔，时间，枚举，Guid类型，除非它具有JsonInclude特性，
+              这是为了避免序列化实体类的外键属性，浪费性能以及产生不必要的bug*/
+        }
+        #endregion
+        var dictionary = Fun().ToDictionary(x => x.Key, x => x.Value);
+        JsonSerializer.Serialize(writer, dictionary, options);
     }
     #endregion 
 }

@@ -1,4 +1,5 @@
 ﻿using System.Geography.Weather;
+using System.Maths;
 
 namespace System.Geography;
 
@@ -42,13 +43,43 @@ public static class CreateGeography
     /// </summary>
     /// <param name="longitude">经度，正值表示东经，负值表示西经</param>
     /// <param name="latitude">纬度，正值表示北纬，负值表示南纬</param>
+    /// <param name="description">对位置的描述</param>
     /// <param name="accuracy">定位的精度，以米为单位</param>
-    public static ILocation Location(decimal longitude, decimal latitude, decimal accuracy = 50)
+    public static ILocation Location(decimal longitude, decimal latitude, string? description = null, decimal accuracy = 50)
         => new Location
         {
             Longitude = longitude,
             Latitude = latitude,
-            Accuracy = accuracy
+            Accuracy = accuracy,
+            Description = description
         };
+    #endregion
+    #region 创建地理范围
+    #region 标准方法
+    /// <summary>
+    /// 创建一个圆形的地理范围
+    /// </summary>
+    /// <param name="position">地理范围的圆心位置</param>
+    /// <param name="radius">地理范围的半径</param>
+    /// <returns></returns>
+    public static ILocationRangeCircle LocationRangeCircle(ILocation position, IUnit<IUTLength> radius)
+        => new LocationRangeCircle()
+        {
+            Position = position,
+            Radius = radius
+        };
+    #endregion
+    #region 直接创建
+    /// <param name="radius">地理位置的半径，以米为单位</param>
+    /// <inheritdoc cref="Location(decimal, decimal, string?, decimal)"/>
+    public static ILocationRangeCircle LocationRangeCircle(decimal longitude, decimal latitude,
+        decimal radius, string? description = null, decimal accuracy = 50)
+    {
+        ExceptionIntervalOut.Check(0M, null, radius);
+        var position = Location(longitude, latitude, description, accuracy);
+        var length = CreateBaseMath.Unit(radius, IUTLength.MetersMetric);
+        return LocationRangeCircle(position, length);
+    }
+    #endregion
     #endregion
 }

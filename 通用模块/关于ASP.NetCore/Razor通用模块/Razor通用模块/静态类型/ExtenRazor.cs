@@ -3,13 +3,6 @@ using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Reflection;
 
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.JSInterop;
-
 namespace System;
 
 /// <summary>

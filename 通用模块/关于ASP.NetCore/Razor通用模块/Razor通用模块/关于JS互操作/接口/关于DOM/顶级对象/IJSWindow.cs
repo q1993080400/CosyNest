@@ -1,4 +1,7 @@
-﻿namespace Microsoft.JSInterop;
+﻿using System.NetFrancis.Http;
+using System.Text.Json;
+
+namespace Microsoft.JSInterop;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -121,5 +124,34 @@ public interface IJSWindow : IJSRuntime
     /// <param name="cancellation">用来取消异步任务的令牌</param>
     /// <returns></returns>
     ValueTask Print(CancellationToken cancellation = default);
+    #endregion
+    #region 使用JS发起Http请求
+    #region 说明文档
+    /*说明文档
+      问：Net中已经有了非常完善的HttpClient，为什么需要这个方法？
+      答：首先强调，本方法在Blazor WebAssembly托管模型下没有意义，
+      因为在这种情况下，HttpClient本身就是通过JS实现的，但是在Blazor Server模型下，
+      本方法和直接使用HttpClient具有以下区别：
+    
+      #HttpClient实际是在服务端执行的，而本方法在客户端执行，
+      这一点是最重要的区别，如果你需要在控制器中获取客户端信息，例如IP，用户代理等，
+      不能使用HttpClient，因为你在服务端通过HttpClient发起请求，获取到的是服务端的IP
+    
+      #通过JS发起Http请求，可以自动携带和回写Cookie，
+      HttpClient与浏览器没有关系，除非经过特殊处理，它不会理会Cookie*/
+    #endregion
+    #region 发起Post请求
+    /// <summary>
+    /// 通过JS中的Fetch方法发起Post请求，
+    /// 并返回请求结果
+    /// </summary>
+    /// <typeparam name="Ret">返回值类型</typeparam>
+    /// <param name="uri">请求的目标Uri</param>
+    /// <param name="parameter">Post请求参数，它会被封装到请求体中</param>
+    /// <param name="options">一个用于控制序列化和反序列化的对象</param>
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
+    /// <returns></returns>
+    ValueTask<Ret?> FetchPost<Ret>(UriComplete uri, object? parameter, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default);
+    #endregion
     #endregion
 }

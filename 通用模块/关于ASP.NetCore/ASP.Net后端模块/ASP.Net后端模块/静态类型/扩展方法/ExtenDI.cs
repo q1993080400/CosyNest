@@ -1,9 +1,7 @@
 ﻿using System.NetFrancis;
 using System.NetFrancis.Http;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace System;
 

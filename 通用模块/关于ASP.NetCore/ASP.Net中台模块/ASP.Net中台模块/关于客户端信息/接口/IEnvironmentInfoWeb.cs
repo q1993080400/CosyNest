@@ -14,4 +14,10 @@ public interface IEnvironmentInfoWeb : IEnvironmentInfo
     /// </summary>
     string UserAgent { get; }
     #endregion
+    #region 浏览器
+    /// <summary>
+    /// 获取用户使用的浏览器
+    /// </summary>
+    Browser Browser { get; }
+    #endregion
 }

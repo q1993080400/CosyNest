@@ -102,6 +102,10 @@ public static class ExtenDesign
         builder.Services.AddSingleton<ILoggerProvider>(x => new LoggerProviderFunction(setLog, x));
         return builder;
     }
+
+    /*注意：这个服务只能以单例模式注入，
+      这是因为ILoggerProviderFactory是一个单例服务，
+      它只能请求单例服务*/
     #endregion
     #endregion
 }

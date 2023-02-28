@@ -6,18 +6,13 @@
 /// </summary>
 public interface IElementBrowser : IElementBase
 {
-    #region 获取浏览器标签
-    /// <summary>
-    /// 获取元素所在的浏览器标签
-    /// </summary>
-    ITab Tab { get; }
-    #endregion
     #region 输入字符串
     /// <summary>
     /// 向元素中输入字符串，只对部分元素有效
     /// </summary>
     /// <param name="input">输入的字符串</param>
-    void Input(string input);
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
+    ValueTask Input(string input, CancellationToken cancellationToken = default);
     #endregion
     #region 提交表单
     /// <summary>

@@ -17,12 +17,29 @@ public static class FileTypeCom
       因此不如将它们全部放在这里更加保险*/
     #endregion
     #region 文件类型预设值
-    #region 返回代表程序集的文件类型
+    #region 程序集
     /// <summary>
     /// 返回代表类库和可执行文件的文件类型
     /// </summary>
     public static IFileType FileAssembly { get; }
         = CreateIO.FileType("类库和可执行文件", "exe", "dll");
+    #endregion
+    #region Web图片文件
+    /// <summary>
+    /// 返回代表Web图片文件的文件类型，
+    /// 它被各大浏览器广泛支持
+    /// </summary>
+    public static IFileType WebImage { get; }
+        = CreateIO.FileType("Web图片文件", "apng", "bmp", "gif", "ico",
+            "cur", "jpg", "jpeg", "jfif", "pjpeg", "pjp", "png", "svg", "webp");
+    #endregion
+    #region 视频文件
+    /// <summary>
+    /// 返回代表Web视频文件的文件类型，
+    /// 它被各大浏览器广泛支持
+    /// </summary>
+    public static IFileType WebVideo { get; }
+        = CreateIO.FileType("Web视频文件", "webm", "mp4");
     #endregion
     #endregion
 }

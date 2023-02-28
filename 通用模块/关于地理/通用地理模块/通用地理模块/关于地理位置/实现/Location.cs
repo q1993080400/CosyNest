@@ -5,7 +5,10 @@
 /// </summary>
 sealed class Location : ILocation
 {
-    #region 精度
+    #region 对位置的描述
+    public required string? Description { get; init; }
+    #endregion
+    #region 经度
     public required decimal Longitude { get; init; }
     #endregion
     #region 纬度

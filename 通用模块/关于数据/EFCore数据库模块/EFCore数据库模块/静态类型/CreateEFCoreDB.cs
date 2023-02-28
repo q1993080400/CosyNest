@@ -1,8 +1,13 @@
 ﻿using Microsoft.Data.SqlClient;
 
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
+
 using System.DataFrancis.DB;
 using System.DataFrancis.DB.EF;
 using System.Reflection;
+using System.Text.Json.Serialization;
+using System.TreeObject.Json;
 
 namespace System.DataFrancis;
 
@@ -11,6 +16,40 @@ namespace System.DataFrancis;
 /// </summary>
 public static class CreateEFCoreDB
 {
+    #region 有关空间数据
+    #region SRID常量
+    /// <summary>
+    /// 获取空间标识符常量，
+    /// 按照规范，项目中所有<see cref="Point"/>都使用这个空间标识符
+    /// </summary>
+    private const int SRID = 4326;
+    #endregion
+    #region 返回几何工厂
+    /// <summary>
+    /// 获取一个用来创建几何图形的工厂
+    /// </summary>
+    public static GeometryFactory GeometryFactory { get; } = NtsGeometryServices.Instance.CreateGeometryFactory(SRID);
+    #endregion
+    #region 返回用来转换Point的转换器
+    /// <summary>
+    /// 返回用来转换<see cref="Point"/>的Json转换器
+    /// </summary>
+    public static JsonConverter<Point> JsonPoint { get; }
+        = CreateJson.JsonMap<Point, PointMap>(x => new PointMap()
+        {
+            X = x.X,
+            Y = x.Y,
+            Z = x.Z is double.NaN ? null : x.Z,
+            SRID = x.SRID
+        },
+            x => x.SRID is SRID ?
+            GeometryFactory.CreatePoint(new Coordinate(x.X, x.Y)) :
+            new Point(x.X, x.Y, x.Z ?? double.NaN)
+            {
+                SRID = x.SRID
+            });
+    #endregion
+    #endregion
     #region 有关数据管道
     #region 获取本地连接字符串
     /// <summary>
@@ -73,3 +112,13 @@ public static class CreateEFCoreDB
     #endregion
     #endregion
 }
+
+#region Json投影类型
+file class PointMap
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double? Z { get; set; }
+    public int SRID { get; set; }
+}
+#endregion

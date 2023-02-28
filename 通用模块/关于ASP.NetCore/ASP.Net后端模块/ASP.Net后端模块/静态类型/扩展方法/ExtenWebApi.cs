@@ -2,10 +2,6 @@
 using System.IOFrancis;
 using System.IOFrancis.FileSystem;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
-
 namespace System;
 
 /// <summary>

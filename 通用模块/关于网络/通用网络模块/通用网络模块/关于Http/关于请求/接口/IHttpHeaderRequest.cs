@@ -21,4 +21,11 @@ public interface IHttpHeaderRequest : IHttpHeader
     /// </summary>
     string? Cookie { get; }
     #endregion
+    #region User-Agent标头
+    /// <summary>
+    /// 获取User-Agent标头，
+    /// 它控制用户代理
+    /// </summary>
+    string? UserAgent { get; }
+    #endregion
 }

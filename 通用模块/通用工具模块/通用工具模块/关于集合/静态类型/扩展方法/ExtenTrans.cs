@@ -18,7 +18,7 @@ public static partial class ExtenIEnumerable
     /// <inheritdoc cref="Sort{Obj}(IEnumerable{Obj}, IComparer{Obj}, bool)"/>
     public static Obj[] Sort<Obj>(this IEnumerable<Obj> collections, bool isAscending = true)
         where Obj : IComparable<Obj>
-        => Sort(collections, null!, isAscending);
+        => (isAscending ? collections.Order() : collections.OrderDescending()).ToArray();
     #endregion
     #region 指定比较器
     /// <summary>
