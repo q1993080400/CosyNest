@@ -1,0 +1,11 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits Component
+@typeparam Element
+@inject IJSWindow JSWindow
+
+@if (Initializationed)
+{
+    @RenderComponent(GetRenderInfo())
+}
+
+

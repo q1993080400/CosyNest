@@ -1,0 +1,77 @@
+﻿
+/*PC平台*/
+@media only screen and (min-width : 1224px)
+{
+    /*图片封面的样式*/
+    .cover
+    {
+        max-width: 24em;
+        max-height: 24em;
+    }
+
+    /*播放按钮样式*/
+    .playButton
+    {
+        width: 6em;
+    }
+}
+
+/*平板平台*/
+@media only screen and (min-width : 667px) and (max-width : 1224px)
+{
+    /*图片封面的样式*/
+    .cover
+    {
+        max-width: 16em;
+        max-height: 16em;
+    }
+
+    /*播放按钮样式*/
+    .playButton
+    {
+        width: 4.5em;
+    }
+}
+
+/*手机平台*/
+@media only screen and (max-width : 667px)
+{
+    /*图片封面的样式*/
+    .cover
+    {
+        max-width: 8em;
+        max-height: 8em;
+    }
+
+    /*播放按钮样式*/
+    .playButton
+    {
+        width: 3em;
+    }
+}
+
+/*封面的公共样式*/
+.coverShare
+{
+    cursor: pointer;
+    grid-area: 1/1/-1/-1;
+}
+
+/*播放按钮的公共样式*/
+.playButtonShare
+{
+    grid-area: 2/2;
+    background-color: rgba(128,128,128,0.5);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/*容器的样式*/
+.mediaViewerContainer
+{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5ch;
+    background-color: white
+}

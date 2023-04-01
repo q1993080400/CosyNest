@@ -57,12 +57,12 @@ public static class ExtenSignalR
     /// <param name="invoke">该表达式用于确定调用Hub中心的哪一个方法，以及传入什么参数</param>
     /// <param name="cancellation">一个用于取消操作的令牌</param>
     /// <returns></returns>
-    public static Task<Ret> InvokeAsync<Ret, Hub>(this HubConnection hub, Expression<Func<Hub, Task<Ret>>> invoke, CancellationToken cancellation = default)
+    public static Task<Ret> InvokeAsync<Hub, Ret>(this HubConnection hub, Expression<Func<Hub, Task<Ret>>> invoke, CancellationToken cancellation = default)
         => InvokeBase<Ret>(hub, invoke, cancellation);
     #endregion
     #region 为同步方法优化
-    /// <inheritdoc cref="InvokeAsync{Ret, Hub}(HubConnection, Expression{Func{Hub, Task{Ret}}}, CancellationToken)"/>
-    public static Task<Ret> InvokeAsync<Ret, Hub>(this HubConnection hub, Expression<Func<Hub, Ret>> invoke, CancellationToken cancellation = default)
+    /// <inheritdoc cref="InvokeAsync{Hub,Ret}(HubConnection, Expression{Func{Hub, Task{Ret}}}, CancellationToken)"/>
+    public static Task<Ret> InvokeAsync<Hub, Ret>(this HubConnection hub, Expression<Func<Hub, Ret>> invoke, CancellationToken cancellation = default)
         => InvokeBase<Ret>(hub, invoke, cancellation);
     #endregion
     #endregion
@@ -71,7 +71,7 @@ public static class ExtenSignalR
     /// <summary>
     /// 以强类型的方式，在客户端调用Hub中心的方法，不返回值
     /// </summary>
-    /// <inheritdoc cref="InvokeAsync{Ret, Hub}(HubConnection, Expression{Func{Hub, Task{Ret}}}, CancellationToken)"/>
+    /// <inheritdoc cref="InvokeAsync{Hub,Ret}(HubConnection, Expression{Func{Hub, Task{Ret}}}, CancellationToken)"/>
     public static Task InvokeCoreAsync<Hub>(this HubConnection hub, Expression<Func<Hub, Task>> invoke, CancellationToken cancellation = default)
         => InvokeBase<object>(hub, invoke, cancellation);
     #endregion

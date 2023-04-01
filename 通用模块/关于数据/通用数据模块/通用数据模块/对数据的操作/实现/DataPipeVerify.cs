@@ -17,8 +17,8 @@ sealed class DataPipeVerify : IDataPipe
         datas = datas.ToArray();
         foreach (var item in datas)
         {
-            if (Verify(item) is (false, var message))
-                throw new BusinessException("数据验证失败" + Environment.NewLine + message.Join(Environment.NewLine));
+            if (Verify(item) is { Count: > 0 } message)
+                throw new ValidationException("数据验证失败" + Environment.NewLine + message.Join(Environment.NewLine));
         }
         await Pipe.AddOrUpdate(datas, cancellation);
         return datas;

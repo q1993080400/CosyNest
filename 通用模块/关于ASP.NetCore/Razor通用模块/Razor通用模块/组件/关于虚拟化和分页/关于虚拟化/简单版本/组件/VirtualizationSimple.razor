@@ -1,0 +1,31 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Element
+
+<Virtualization Elements="Elements" Initial="Initial" IsReverse=IsReverse Jump="Jump"
+                Plus="Plus" RenderElement="RenderElement">
+    <RenderComponent>
+        @{
+            var renderContainer = context.RenderContainer;
+            var renderElement = context.RenderElement;
+        }
+        <div class="@renderContainer.CSS" id="@renderContainer.ID" onscroll="@renderContainer.OnScrollScript" @attributes=ContainerAttributes>
+            @if (RenderComponent is { })
+            {
+                var renderComponent = new RenderVirtualizationSimpleInfo<Element>()
+                    {
+                        RenderElement = renderElement,
+                        GoTop = context.RenderContainer.GoTop
+                    };
+                @RenderComponent(renderComponent)
+            }
+            else
+            {
+                @foreach (var item in renderElement)
+                {
+                    @item
+                }
+            }
+        </div>
+    </RenderComponent>
+</Virtualization>

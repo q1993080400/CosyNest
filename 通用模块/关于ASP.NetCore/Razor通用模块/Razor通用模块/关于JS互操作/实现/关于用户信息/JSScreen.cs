@@ -8,10 +8,13 @@ namespace Microsoft.JSInterop;
 sealed class JSScreen : IJSScreen
 {
     #region 设备像素比
-    public Num DevicePixelRatio { get; init; }
+    public required Num DevicePixelRatio { get; init; }
     #endregion
     #region 物理分辨率
-    public ISizePixel Resolution { get; init; }
+    public ISizePixel Resolution => throw new NotImplementedException();
+    #endregion
+    #region 逻辑分辨率
+    public required ISizePixel LogicalResolution { get; init; }
     #endregion
     #region X轴DPI
     public int DPIX => throw new NotImplementedException();

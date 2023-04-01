@@ -1,0 +1,11 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Condition
+
+@{
+    var type = GetComponentType(RenderCondition, Assembly) ??
+        throw new NullReferenceException($"在程序集{Assembly}中，没有找到符合条件{RenderCondition}的组件类型");
+    if (!typeof(IComponent).IsAssignableFrom(type))
+        throw new NotSupportedException($"类型{type}没有实现{nameof(IComponent)}，它不是组件");
+}
+<DynamicComponent Type=type Parameters=Parameters />

@@ -20,7 +20,7 @@ sealed class JsonConvertMap<ConvertTo, Map> : JsonConverter<ConvertTo>
     #region 序列化
     public override void Write(Utf8JsonWriter writer, ConvertTo value, JsonSerializerOptions options)
     {
-        JsonSerializer.Serialize(writer, value is null ? default : ToMap(value));
+        JsonSerializer.Serialize(writer, value is null ? default : ToMap(value), options);
     }
     #endregion 
     #endregion

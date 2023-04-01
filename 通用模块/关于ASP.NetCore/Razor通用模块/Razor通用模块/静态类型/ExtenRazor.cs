@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.NetFrancis;
 using System.NetFrancis.Http;
-using System.Reflection;
 
 namespace System;
 
@@ -40,7 +39,7 @@ public static class ExtenRazor
     /// <param name="cancellation">用于取消异步任务的令牌</param>
     /// <returns></returns>
     public static ValueTask InvokeCodeVoidAsync(this IJSRuntime js, string jsCode, bool isAsynchronous = false, CancellationToken cancellation = default)
-        => js.InvokeVoidAsync("eval", cancellation, ToAsynchronous(jsCode, isAsynchronous));
+        => js.InvokeVoidAsync("InvokeCode", cancellation, ToAsynchronous(jsCode, isAsynchronous));
     #endregion
     #region 有返回值
     /// <summary>
@@ -51,7 +50,20 @@ public static class ExtenRazor
     /// <returns></returns>
     /// <inheritdoc cref="InvokeCodeVoidAsync(IJSRuntime, string,bool, CancellationToken)"/>
     public static ValueTask<Ret> InvokeCodeAsync<Ret>(this IJSRuntime js, string jsCode, bool isAsynchronous = false, CancellationToken cancellation = default)
-        => js.InvokeAsync<Ret>("eval", cancellation, ToAsynchronous(jsCode, isAsynchronous), jsCode);
+    {
+        var code = ToAsynchronous(jsCode, isAsynchronous);
+        #region 用来确定代码是否只有一行的本地函数
+        static bool Fun(string code)
+        {
+            var pos = code.IndexOf(';');
+            if (pos is -1)
+                return true;
+            return code.IndexOf(';', pos) is -1;
+        }
+        #endregion
+        var finalCode = (Fun(code) ? "return " : "") + code;
+        return js.InvokeAsync<Ret>("InvokeCode", cancellation, finalCode);
+    }
     #endregion
     #region 将字符串转换为JS安全形式
     /// <summary>
@@ -155,19 +167,34 @@ public static class ExtenRazor
             return CreateNet.UriManager(navigationManager.Uri);
         });
     #endregion
+    #region 注入携带Cookie的SignalRProvide对象
+    /// <summary>
+    /// 以瞬时模式注入一个<see cref="ISignalRProvide"/>，
+    /// 它可以自动携带浏览器Cookie，
+    /// 本服务依赖于<see cref="IUriManager"/>以及<see cref="IJSWindow"/>
+    /// </summary>
+    /// <param name="services">要添加服务的容器</param>
+    /// <returns></returns>
+    public static IServiceCollection AddSignalRProvideWithCookie(this IServiceCollection services)
+        => services.AddSignalRProvide(async (uri, server) =>
+        {
+            var cookie = await server.GetRequiredService<IJSWindow>().Document.Cookie.ToListAsync();
+            var connection = new HubConnectionBuilder().
+             WithUrl(uri, op =>
+             {
+                 var host = server.GetRequiredService<IUriManager>().Uri.UriHost!.DomainName;
+                 foreach (var (key, value) in cookie)
+                 {
+                     op.Cookies.Add(new Net.Cookie(Uri.EscapeDataString(key), Uri.EscapeDataString(value), "/", host));
+                 }
+             }).
+             AddJsonProtocol(x => x.AddFormatterJson()).
+             Build();
+            return connection;
+        });
+    #endregion
     #endregion
     #region 有关组件
-    #region 公开StateHasChanged方法
-    private static MethodInfo StateHasChangedMethod { get; }
-    = typeof(ComponentBase).GetTypeData().FindMethod("StateHasChanged");
-
-    /// <summary>
-    /// 调用一个<see cref="ComponentBase"/>的StateHasChanged方法
-    /// </summary>
-    /// <param name="component">要调用方法的<see cref="ComponentBase"/></param>
-    public static void StateHasChanged(this ComponentBase component)
-        => StateHasChangedMethod.Invoke<object>(component);
-    #endregion
     #region 将IBrowserFile集合转换为一个MultipartFormDataContent
     /// <summary>
     /// 将<see cref="IBrowserFile"/>集合转换为一个<see cref="MultipartFormDataContent"/>，
@@ -191,6 +218,20 @@ public static class ExtenRazor
             content.Add(fileContent, "\"files\"", file.Name);
         }
         return content;
+    }
+    #endregion
+    #region 返回组件参数
+    /// <summary>
+    /// 读取一个组件的参数，然后返回
+    /// </summary>
+    /// <param name="component">要读取参数的组件</param>
+    /// <returns></returns>
+    public static IDictionary<string, object> GetParameters(this IComponent component)
+    {
+        var parameters = component.GetType().GetProperties().
+            Where(x => x.HasAttributes<ParameterAttribute>()).
+            Select(x => (x.Name, x.GetValue(component))).ToArray();
+        return parameters.Where(x => x.Item2 is { }).ToDictionary(true)!;
     }
     #endregion
     #endregion

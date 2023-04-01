@@ -57,6 +57,17 @@ public static partial class ExtenTool
     }
     #endregion
     #endregion
+    #region 返回一个可空值类型是否为null或默认值
+    /// <summary>
+    /// 返回一个可空值类型是否为<see langword="null"/>或默认值
+    /// </summary>
+    /// <typeparam name="Obj">值类型的类型</typeparam>
+    /// <param name="obj">要检查的可空值类型对象</param>
+    /// <returns></returns>
+    public static bool IsNullOrDefault<Obj>(this Obj? obj)
+        where Obj : struct
+        => obj is null || obj.Value.Equals(default(Obj));
+    #endregion
     #region 返回一个IComparer的取反
     /// <summary>
     /// 返回一个<see cref="IComparer{T}"/>的取反，

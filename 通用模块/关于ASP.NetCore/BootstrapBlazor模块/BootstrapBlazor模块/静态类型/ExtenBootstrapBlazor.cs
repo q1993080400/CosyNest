@@ -1,5 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 
+using Microsoft.AspNetCore;
+
 namespace System;
 
 /// <summary>
@@ -39,6 +41,21 @@ public static class ExtenBootstrapBlazor
             Title = title,
             Category = category
         });
+    #endregion
+    #region 如果一个API响应失败，则弹出信息
+    /// <summary>
+    /// 如果一个API响应失败，
+    /// 则弹出一个信息说明失败原因
+    /// </summary>
+    /// <param name="swalService">消息确认框服务</param>
+    /// <param name="apiPack">API响应对象</param>
+    /// <returns>API是否响应成功</returns>
+    public static async Task<bool> ShowIfFailure(this SwalService swalService, APIPack apiPack)
+    {
+        if (!apiPack.IsSuccess)
+            await swalService.Show(apiPack.FailureReason!);
+        return apiPack.IsSuccess;
+    }
     #endregion
     #endregion
 }

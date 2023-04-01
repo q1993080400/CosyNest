@@ -18,7 +18,7 @@ public sealed class LazyPro<Values>
     public static implicit operator LazyPro<Values>(Func<Values> @delegate)
         => new(@delegate);
 
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static implicit operator LazyPro<Values>?(Values? value)
         => value is null ? null : new(value);
 

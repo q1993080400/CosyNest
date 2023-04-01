@@ -91,7 +91,7 @@ public interface IJSWindow : IJSRuntime
     /// <param name="strWindowFeatures">新窗口的一些特性</param>
     /// <param name="cancellation">用于取消异步操作的令牌</param>
     /// <returns></returns>
-    ValueTask Open(string strUrl, string strWindowName = "_blank", string? strWindowFeatures = "noopener", CancellationToken cancellation = default);
+    ValueTask Open(string strUrl, string strWindowName = "_blank", string? strWindowFeatures = null, CancellationToken cancellation = default);
 
     /*问：为什么要将strWindowFeatures参数默认传入noopener？
       答：这是为了强制在不同的进程打开新窗口，这可以避免旧窗口卡死的问题，

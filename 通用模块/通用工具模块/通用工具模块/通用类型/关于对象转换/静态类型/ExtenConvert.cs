@@ -26,7 +26,7 @@ public static partial class ExtenTool
     #region 正式方法
     /// <param name="targetType">要转换的对象的类型</param>
     /// <inheritdoc cref="To{Ret}(object?, bool, LazyPro{Ret}?)"/>
-    [return: NotNullIfNotNull("obj")]
+    [return: NotNullIfNotNull(nameof(obj))]
     public static object? To(this object? obj, Type targetType, bool @throw = true)
         => ToMethod.MakeGenericMethod(targetType).Invoke<object>(null, obj, @throw, null);
     #endregion
@@ -68,7 +68,7 @@ public static partial class ExtenTool
     /// <param name="throw">如果这个值为<see langword="true"/>，在转换失败时会抛出异常</param>
     /// <param name="notConvert">如果转换失败，而且不抛出异常，则返回这个值，默认为类型默认值</param>
     /// <returns></returns>
-    [return: NotNullIfNotNull("obj")]
+    [return: NotNullIfNotNull(nameof(obj))]
     public static Ret? To<Ret>(this object? obj, bool @throw = true, LazyPro<Ret>? notConvert = default)
     {
         var type = typeof(Ret);

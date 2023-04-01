@@ -8,7 +8,7 @@
 		<RootNamespace>System.Geography</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="IP2Location.IPGeolocation" Version="8.10.1" PrivateAssets="compile" />
+		<PackageReference Include="IP2Location.IPGeolocation" Version="8.11.0" PrivateAssets="compile" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />

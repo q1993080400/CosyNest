@@ -10,8 +10,11 @@ namespace System.Underlying.PC;
 /// </summary>
 sealed class ScreenPC : IScreen
 {
-    #region 获取屏幕的分辨率
+    #region 获取物理分辨率
     public ISizePixel Resolution { get; }
+    #endregion
+    #region 逻辑分辨率
+    public ISizePixel LogicalResolution => Resolution;
     #endregion
     #region 获取DPI
     #region X轴DPI

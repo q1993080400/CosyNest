@@ -32,9 +32,7 @@ public sealed record UriExtend : UriBase
     /// <param name="extend">扩展地址，它包括资源地址等</param>
     public UriExtend(string extend)
     {
-        var match = Regex.MatcheSingle(extend);
-        if (match is null)
-            throw new ArgumentException($"{extend}不是合法的扩展地址");
+        var match = Regex.MatcheSingle(extend) ?? throw new ArgumentException($"{extend}不是合法的扩展地址");
         Text = match.Match.TrimEnd('/');
     }
     #endregion

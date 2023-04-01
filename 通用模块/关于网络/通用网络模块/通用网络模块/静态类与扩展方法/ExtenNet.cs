@@ -314,13 +314,16 @@ public static class ExtenNet
     /// 它依赖于<see cref="IUriManager"/>服务
     /// </summary>
     /// <param name="services">待注入的容器</param>
+    /// <param name="create">该委托传入中心的绝对Uri，以及一个用来提供服务的对象，
+    /// 然后创建一个新的<see cref="HubConnection"/>，如果为<see langword="null"/>，则使用默认方法</param>
     /// <returns></returns>
-    /// <inheritdoc cref="CreateNet.SignalRProvide(Func{string, HubConnection}?, Func{string, string}?)"/>
-    public static IServiceCollection AddISignalRProvide(this IServiceCollection services, Func<string, HubConnection>? create = null)
+    /// <inheritdoc cref="CreateNet.SignalRProvide(Func{string, Task{HubConnection}}?, Func{string, string}?)"/>
+    public static IServiceCollection AddSignalRProvide(this IServiceCollection services, Func<string, IServiceProvider, Task<HubConnection>>? create = null)
         => services.AddTransient(server =>
         {
             var navigation = server.GetRequiredService<IUriManager>();
-            return CreateNet.SignalRProvide(create, uri => navigation.Convert(uri, true));
+            return CreateNet.SignalRProvide(create is null ? null : uri => create(uri, server),
+                uri => navigation.Convert(uri, true));
         });
     #endregion
     #region 注入HttpRequestTransformation

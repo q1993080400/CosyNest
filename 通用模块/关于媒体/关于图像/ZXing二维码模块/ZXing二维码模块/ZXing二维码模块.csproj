@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ZXing.Net" Version="0.16.8" PrivateAssets="compile" />
+    <PackageReference Include="ZXing.Net" Version="0.16.9" PrivateAssets="compile" />
   </ItemGroup>
 
   <ItemGroup>

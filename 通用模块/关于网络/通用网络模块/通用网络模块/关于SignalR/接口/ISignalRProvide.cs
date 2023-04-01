@@ -7,6 +7,7 @@
 public interface ISignalRProvide : IAsyncDisposable
 {
     #region 获取SignalR连接
+    #region 直接指定Uri
     /// <summary>
     /// 获取连接到指定Uri的SignalR连接，
     /// 当<see cref="Task{TResult}"/>被等待完毕时，
@@ -16,6 +17,18 @@ public interface ISignalRProvide : IAsyncDisposable
     /// 它可以是相对的，也可以是绝对的</param>
     /// <returns></returns>
     Task<HubConnection> GetConnection(string uri);
+    #endregion
+    #region 通过业务接口自动获取Uri
+    /// <typeparam name="BusinessInterface">Hub中心实现的业务接口，
+    /// 如果在注册中心的时候使用默认路由，函数可以通过它推断出中心的Uri</typeparam>
+    /// <inheritdoc cref="GetConnection(string)"/>
+    Task<HubConnection> GetConnection<BusinessInterface>()
+        where BusinessInterface : class
+    {
+        var uri = "Hub/" + typeof(BusinessInterface).Name.TrimStart('I');
+        return GetConnection(uri);
+    }
+    #endregion
     #endregion
     #region 设置用于配置SignalR连接的委托
     /// <summary>

@@ -3,7 +3,7 @@
 
 @if (@ChildContent is { })
 {
-    <div class="@(IsAbsolute?"centerMiddAbsolute":"centerMiddRelatively") @(IsAbsolute&&CanHorizontalScreen?"horizontalScreen":"")"
+    <div class="@(IsAbsolute?"centerMiddAbsolute":"centerMiddRelatively") @(IsAbsolute&&CanHorizontalScreen?"horizontalScreen":"") @ExtraCSS"
      @attributes="ContainerAttributes">
         <div style="grid-row:@Row;grid-column:@Column" class="@ChildContentCSS">
             @ChildContent

@@ -1,7 +1,4 @@
-﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-
-using System.Maths.Plane;
+﻿using System.Maths.Plane;
 
 using BottomLayerImage = SixLabors.ImageSharp.Image;
 

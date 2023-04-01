@@ -17,9 +17,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="7.3.0" />
-		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
+		<PackageReference Include="BootstrapBlazor" Version="7.4.5" />
+		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -35,5 +35,4 @@
 		<ProjectReference Include="..\..\ASP.Net中台模块\ASP.Net中台模块\ASP.Net中台模块.csproj" />
 		<ProjectReference Include="..\..\Razor通用模块\Razor通用模块\Razor通用模块.csproj" />
 	</ItemGroup>
-
 </Project>

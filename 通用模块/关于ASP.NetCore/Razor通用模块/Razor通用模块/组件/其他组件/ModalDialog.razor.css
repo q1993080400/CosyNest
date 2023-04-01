@@ -3,4 +3,6 @@
 {
     position: fixed;
     z-index: 2147483646;
+    opacity: 0.75;
+    background-color: grey
 }

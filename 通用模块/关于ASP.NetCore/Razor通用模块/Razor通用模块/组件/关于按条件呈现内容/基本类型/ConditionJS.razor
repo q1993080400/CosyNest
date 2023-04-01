@@ -1,0 +1,11 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ConditionRender<Condition>
+@typeparam Condition
+@using System.Underlying
+
+@if ((ChildContent, GetCondition) is ({ }, { }))
+{
+    <CascadingValue Value="GetCondition" IsFixed=@IsFixed()>
+        @ChildContent(GetCondition)
+    </CascadingValue>
+}

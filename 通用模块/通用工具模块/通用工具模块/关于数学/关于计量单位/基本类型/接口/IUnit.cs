@@ -34,7 +34,7 @@ public interface IUnit<Template> : IComparable<IUnit<Template>>, IEquatable<IUni
     #endregion
     #region 运算符重载
     #region 重载一元运算符
-    [return: NotNullIfNotNull("u")]
+    [return: NotNullIfNotNull(nameof(u))]
     public static IUnit<Template>? operator -(IUnit<Template>? u)
         => u?.With(-u.ValueMetric);
     #endregion

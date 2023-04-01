@@ -19,19 +19,17 @@ static class MediaPathProtocol
     public static IEnumerable<MediaServerPosition> Generate(IEnumerable<MediaPathGenerateParameters> generateParameters)
         => generateParameters.Select(parameter =>
         {
+            var ex = parameter.Extension;
+            if (!FileTypeCom.WebImage.IsCompatible(ex) && !FileTypeCom.WebVideo.IsCompatible(ex))
+                throw new ArgumentException($"{ex}既不是图片也不是视频");
             var id = Guid.NewGuid().ToString();
-            var isImage = parameter.Extension switch
-            {
-                var uri when FileTypeCom.WebImage.IsCompatible(uri) => true,
-                var uri when FileTypeCom.WebVideo.IsCompatible(uri) => false,
-                var uri => throw new ArgumentException($"{uri}既不是图片也不是视频")
-            };
-            var cover = $"{(isImage ? ImageCover : VideoCover)}{parameter.Sort}{id}.{parameter.Extension}";
-            var media = $"{(isImage ? Image : Video)}{parameter.Sort}{id}.{parameter.Extension}";
+            var cover = $"{Cover}{parameter.Sort}A{id}.{parameter.CoverExtension}";
+            var media = $"{Media}{parameter.Sort}A{id}.{parameter.Extension}";
+            var @base = parameter.Path;
             return new MediaServerPosition()
             {
-                CoverPath = cover,
-                MediaPath = media
+                CoverPath = Path.Combine(@base, cover),
+                MediaPath = Path.Combine(@base, media)
             };
         }).ToArray();
     #endregion
@@ -41,7 +39,7 @@ static class MediaPathProtocol
     /// 这个正则表达式可以用来解析路径
     /// </summary>
     private static IRegex Regex { get; }
-        = /*language=regex*/@"(?<type>ImageCover|Image|VideoCover|Video)(?<sort>\d+)(?<body>[A-Za-z0-9-]{36})".Op().Regex();
+        = /*language=regex*/@"(?<type>Media|Cover)(?<sort>\d+)A(?<body>[A-Za-z0-9-]{36})".Op().Regex();
     #endregion
     #region 正式方法
     /// <summary>
@@ -62,44 +60,32 @@ static class MediaPathProtocol
                 Body = match["body"].Match,
                 Path = x
             };
-        }).OrderBy(x => x.Sort).GroupBy(x => x.Body).ToArray();
+        }).ToArray().OrderBy(x => x.Sort).GroupBy(x => x.Body).ToArray();
         foreach (var item in bodys)
         {
-            var (covers, medias) = item.Split(x => x.Type.EndsWith("Cover"));
+            var (covers, medias) = item.Split(x => x.Type is Cover);
             yield return new()
             {
-                CoverUri = covers.Single().Path.Op().ToUriPath(),
-                MediaUri = medias.Single().Path.Op().ToUriPath()
+                CoverUri = covers.Single().Path,
+                MediaUri = medias.Single().Path
             };
         }
     }
-    #endregion 
+    #endregion
     #endregion
     #endregion
     #region 内部成员
-    #region 图片封面
+    #region 获取媒体前缀
     /// <summary>
-    /// 获取图片封面的前缀
+    /// 获取媒体的前缀
     /// </summary>
-    private static string ImageCover { get; } = "ImageCover";
+    private const string Media = "Media";
     #endregion
-    #region 图片
+    #region 获取封面前缀
     /// <summary>
-    /// 获取图片的前缀
+    /// 获取封面的前缀
     /// </summary>
-    private static string Image { get; } = "Image";
-    #endregion
-    #region 视频封面
-    /// <summary>
-    /// 获取视频封面的前缀
-    /// </summary>
-    private static string VideoCover { get; } = "VideoCover";
-    #endregion
-    #region 视频
-    /// <summary>
-    /// 获取视频的前缀
-    /// </summary>
-    private static string Video { get; } = "Video";
+    private const string Cover = "Cover";
     #endregion
     #endregion
 }

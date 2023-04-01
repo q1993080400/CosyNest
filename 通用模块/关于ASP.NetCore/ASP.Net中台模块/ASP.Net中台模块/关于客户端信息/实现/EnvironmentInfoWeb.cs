@@ -12,7 +12,7 @@ sealed class EnvironmentInfoWeb : IEnvironmentInfoWeb
     #region 用户代理字符串
     public string UserAgent { get; }
     #endregion
-    #region 操作系统的名称
+    #region 操作系统
     public OS OS
     {
         get

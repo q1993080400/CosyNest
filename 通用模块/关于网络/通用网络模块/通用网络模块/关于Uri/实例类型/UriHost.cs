@@ -62,9 +62,7 @@ public sealed record UriHost : UriBase
     /// 它包括协议，域名，端口号等</param>
     public UriHost(string host)
     {
-        var match = Regex.MatcheSingle(host);
-        if (match is null)
-            throw new ArgumentException($"{host}不是合法的主机字符串");
+        var match = Regex.MatcheSingle(host) ?? throw new ArgumentException($"{host}不是合法的主机字符串");
         Agreement = match["agreement"].Match;
         DomainName = match["domainName"].Match;
         if (match.GroupsNamed.TryGetValue("port", out var port))

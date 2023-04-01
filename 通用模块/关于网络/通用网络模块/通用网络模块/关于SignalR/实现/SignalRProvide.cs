@@ -12,14 +12,14 @@ sealed class SignalRProvide : ISignalRProvide
     /// <summary>
     /// 该属性按照Uri缓存已经创建的连接
     /// </summary>
-    private Dictionary<string, HubConnection> Cache { get; } = new();
+    private Dictionary<string, Task<HubConnection>> Cache { get; } = new();
     #endregion
     #region 用于创建连接的委托
     /// <summary>
     /// 该委托传入中心的绝对Uri，
     /// 然后创建一个新的<see cref="HubConnection"/>
     /// </summary>
-    private Func<string, HubConnection> Create { get; }
+    private Func<string, Task<HubConnection>> Create { get; }
     #endregion
     #region 用于转换Uri的对象
     /// <summary>
@@ -31,7 +31,8 @@ sealed class SignalRProvide : ISignalRProvide
     public async Task<HubConnection> GetConnection(string uri)
     {
         var newUuri = ToAbs(uri);
-        var (exist, value) = Cache.TrySetValue(newUuri, Create);
+        var (exist, task) = Cache.TrySetValue(newUuri, Create);
+        var value = await task;
         if (!exist)
         {
             Configuration?.Invoke(value, newUuri);
@@ -54,7 +55,8 @@ sealed class SignalRProvide : ISignalRProvide
     {
         foreach (var item in Cache.Values)
         {
-            await item.DisposeAsync();
+            var value = await item;
+            await value.DisposeAsync();
         }
     }
     #endregion
@@ -66,12 +68,16 @@ sealed class SignalRProvide : ISignalRProvide
     /// 然后创建一个新的<see cref="HubConnection"/>，如果为<see langword="null"/>，则使用默认方法</param>
     /// <param name="toAbs">这个对象可以将相对Uri转换为绝对Uri，
     /// 如果为<see langword="null"/>，则不进行转换</param>
-    public SignalRProvide(Func<string, HubConnection>? create, Func<string, string>? toAbs)
+    public SignalRProvide(Func<string, Task<HubConnection>>? create, Func<string, string>? toAbs)
     {
-        this.Create = create ??= x => new HubConnectionBuilder().
+        this.Create = create ??= x =>
+        {
+            var connection = new HubConnectionBuilder().
              WithUrl(x).
              AddJsonProtocol(x => x.AddFormatterJson()).
              Build();
+            return Task.FromResult(connection);
+        };
         this.ToAbs = toAbs ??= x => x;
     }
     #endregion

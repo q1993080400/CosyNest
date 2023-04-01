@@ -4,9 +4,6 @@ using System.Maths;
 using System.Maths.Plane;
 using System.Media.Drawing.Graphics;
 
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-
 using static System.Net.Mime.MediaTypeNames;
 
 using BottomLayerImage = SixLabors.ImageSharp.Image;

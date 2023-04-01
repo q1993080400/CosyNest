@@ -140,6 +140,30 @@ public static class CreateSafety
     #endregion
     #endregion
     #region 关于对称加密管道
+    #region 创建向量和密钥
+    #region 字节数组形式
+    /// <summary>
+    /// 创建一个AES加密算法的向量和密钥
+    /// </summary>
+    /// <returns></returns>
+    public static (byte[] IV, byte[] Key) AesKey()
+    {
+        using var aes = Aes.Create();
+        return (aes.IV, aes.Key);
+    }
+    #endregion
+    #region 字符串形式
+    /// <param name="encoded">用来将字节数组形式的向量和密钥，
+    /// 转换为字符串形式的委托，如果为<see langword="null"/>，使用Base64转换</param>
+    /// <inheritdoc cref="AesKey"/>
+    public static (string IV, string Key) AesKeyText(Func<byte[], string>? encoded = null)
+    {
+        var (iv, key) = AesKey();
+        encoded ??= Convert.ToBase64String;
+        return (encoded(iv), encoded(key));
+    }
+    #endregion
+    #endregion
     #region 创建对称加密算法工厂
     #region 使用字节数组
     /// <summary>

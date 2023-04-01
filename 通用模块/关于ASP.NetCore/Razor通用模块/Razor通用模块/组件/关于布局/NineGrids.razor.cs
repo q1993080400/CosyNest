@@ -25,13 +25,6 @@ public sealed partial class NineGrids : ComponentBase, IContentComponent<RenderF
     public string Column { get; set; } = "2";
     #endregion
     #endregion
-    #region 参数展开
-    /// <summary>
-    /// 该字典指示封装九宫格的容器的特性
-    /// </summary>
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object>? ContainerAttributes { get; set; }
-    #endregion
     #region 是否允许横屏
     /// <summary>
     /// 如果<see cref="IsAbsolute"/>和本属性均为<see langword="true"/>，
@@ -48,6 +41,14 @@ public sealed partial class NineGrids : ComponentBase, IContentComponent<RenderF
     [Parameter]
     public bool IsAbsolute { get; set; }
     #endregion
+    #region 额外CSS
+    /// <summary>
+    /// 获取额外的CSS类名，
+    /// 它会被添加到父容器的CSS类名中
+    /// </summary>
+    [Parameter]
+    public string? ExtraCSS { get; set; }
+    #endregion
     #region 子内容
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
@@ -58,6 +59,13 @@ public sealed partial class NineGrids : ComponentBase, IContentComponent<RenderF
     /// </summary>
     [Parameter]
     public string? ChildContentCSS { get; set; }
+    #endregion
+    #region 参数展开
+    /// <summary>
+    /// 该字典指示封装九宫格的容器的特性
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object>? ContainerAttributes { get; set; }
     #endregion
     #endregion
 }

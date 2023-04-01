@@ -1,0 +1,72 @@
+﻿@namespace BootstrapBlazor.Components
+@using Microsoft.AspNetCore;
+@inherits ComponentBase
+
+<MediaViewer MediaSource="MediaSource">
+    <RenderComponent>
+        <div class="mediaViewerContainer">
+            @foreach (var item in context.RenderElement)
+            {
+                @item
+            }
+        </div>
+        @{
+            var isOpen = context.PreviewMediaIndex >= 0;
+        }
+        <Modal @ref="Modal" hidden="@(!isOpen)">
+            <BootstrapBlazor.Components.ModalDialog IsCentered=true Size="Size.Medium" ShowCloseButton=false ShowHeader=false>
+                <BodyTemplate>
+                    @if (isOpen)
+                    {
+                        <Carousel ShowIndicators=false>
+                            @foreach (var item in Medias(context))
+                            {
+                                <CarouselItem Interval="int.MaxValue">
+                                    <NineGrids>
+                                        @if (item.IsImage)
+                                        {
+                                            <img src="@item.MediaUri" style="object-fit:contain;object-position:center" />
+                                        }
+                                        else
+                                        {
+                                            var id = ToolASP.CreateJSObjectName();
+                                            <Media IsVideo=true CloseMemoryProgress=true ID="@id" OnTimeUpDate="@OnTimeUpDate(id)" OnLoadedMetaData="@OnLoadedMetaData(id)"
+                                                   src="@item.MediaUri" width="350" muted controls autoplay loop />
+                                        }
+                                    </NineGrids>
+                                </CarouselItem>
+                            }
+                        </Carousel>
+                    }
+                </BodyTemplate>
+                <FooterTemplate>
+                    @if (isOpen)
+                    {
+                        <CompactCentered>
+                            <Button OnClickWithoutRender="()=>context.QuitPreview.InvokeAsync()">关闭</Button>
+                        </CompactCentered>
+                    }
+                </FooterTemplate>
+            </BootstrapBlazor.Components.ModalDialog>
+        </Modal>
+        @if (Modal is { })
+        {
+            if (isOpen)
+                Modal.Show();
+            else
+                Modal.Close();
+        }
+    </RenderComponent>
+    <RenderCover>
+        @{
+            var media = context.MediaSource;
+        }
+        <div style="display:grid;grid-template:1fr auto 1fr/1fr auto 1fr" @onclick=@context.PreviewEvent>
+            <img src="@media.CoverUri" class="cover coverShare" />
+            @if (!media.IsImage)
+            {
+                <img src="_content/ToolBootstrapBlazor/icon/playButton.svg" class="playButton playButtonShare" />
+            }
+        </div>
+    </RenderCover>
+</MediaViewer>

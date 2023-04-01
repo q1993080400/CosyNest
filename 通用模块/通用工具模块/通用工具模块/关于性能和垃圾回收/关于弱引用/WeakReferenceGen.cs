@@ -27,7 +27,7 @@ sealed class WeakReferenceGen<Obj> : WeakReference
     public static implicit operator Obj?(WeakReferenceGen<Obj>? a)
         => a?.Target;
 
-    [return: NotNullIfNotNull("a")]
+    [return: NotNullIfNotNull(nameof(a))]
     public static implicit operator WeakReferenceGen<Obj>?(Obj? a)
         => a is null ? null : new WeakReferenceGen<Obj>(a);
     #endregion

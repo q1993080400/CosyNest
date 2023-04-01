@@ -78,8 +78,8 @@ sealed class EFDataPipe : IDataPipe
     public async Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
         where Data : class, IData
     {
-        var delete = Query<Data>().Where(expression).ToArray();
-        await Delete(delete, cancellation);
+        var data = Query<Data>().Where(expression).ToArray();       //不使用ExecuteDelete的目的，是为了支持级联删除
+        await Delete(data, cancellation);
     }
     #endregion
     #endregion

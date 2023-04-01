@@ -85,9 +85,7 @@ public sealed record UriComplete : UriBase
     /// <param name="uri">完整的Uri</param>
     public UriComplete(string uri)
     {
-        var match = Regex.MatcheSingle(uri);
-        if (match is null)
-            throw new ArgumentException($"{uri}不是合法的Uri");
+        var match = Regex.MatcheSingle(uri) ?? throw new ArgumentException($"{uri}不是合法的Uri");
         if (match.GroupsNamed.TryGetValue("host", out var host))
             UriHost = new(host.Match);
         if (match.GroupsNamed.TryGetValue("extend", out var extend))

@@ -206,26 +206,26 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
     #endregion
     #region 将Net方法注册为JS方法
     #region 正式类型
-    public ValueTask<(string MethodName, IDisposable Freed)> PackNetMethod<Obj>(Action<Obj> action, string? methodName = null, CancellationToken cancellation = default)
+    public ValueTask<(string MethodName, IDisposable Freed)> PackNetMethod<Obj>(Action<Obj> action, string? jsMethodName = null, CancellationToken cancellation = default)
         => action switch
         {
-            Action<JsonElement> a => PackNetMethodJson(a, methodName, cancellation),
-            Action<IJSStreamReference> a => PackNetMethodStream(a, methodName, cancellation),
+            Action<JsonElement> a => PackNetMethodJson(a, jsMethodName, cancellation),
+            Action<IJSStreamReference> a => PackNetMethodStream(a, jsMethodName, cancellation),
             null => throw new ArgumentNullException(nameof(action)),
             _ => throw new NotSupportedException($"本方法的的泛型参数只支持{nameof(JsonElement)}或{nameof(IJSStreamReference)}")
         };
     #endregion
     #region 方法参数为JsonElement
     /// <inheritdoc cref="IJSDocument.PackNetMethod{Obj}(Action{Obj}, string?, CancellationToken)"/>
-    private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodJson(Action<JsonElement> action, string? methodName = null, CancellationToken cancellation = default)
+    private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodJson(Action<JsonElement> action, string? jsMethodName = null, CancellationToken cancellation = default)
     {
         var springboard = ToolASP.CreateJSObjectName();
-        methodName ??= ToolASP.CreateJSObjectName();
+        jsMethodName ??= ToolASP.CreateJSObjectName();
         var script = $$"""
             window.{{springboard}}=
             function(net)
             {
-                window.{{methodName}}=function(parameter)
+                window.{{jsMethodName}}=function(parameter)
                 {
                     net.invokeMethodAsync('{{nameof(NetMethodPack<JsonElement>.Invoke)}}',parameter);
                 }
@@ -234,21 +234,21 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         var netMethodPack = DotNetObjectReference.Create(new NetMethodPack<JsonElement>(action));
         await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
         await JSRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
-        return (methodName, netMethodPack);
+        return (jsMethodName, netMethodPack);
     }
     #endregion
-    #region 
+    #region 方法参数为Stream
     /// <inheritdoc cref="IJSDocument.PackNetMethod{Obj}(Action{Obj}, string?, CancellationToken)"/>
-    private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodStream(Action<IJSStreamReference> action, string? methodName = null, CancellationToken cancellation = default)
+    private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodStream(Action<IJSStreamReference> action, string? jsMethodName = null, CancellationToken cancellation = default)
     {
         var streamName = ToolASP.CreateJSObjectName();
         var springboard = ToolASP.CreateJSObjectName();
-        methodName ??= ToolASP.CreateJSObjectName();
+        jsMethodName ??= ToolASP.CreateJSObjectName();
         var script = $$"""
             window.{{springboard}}=
             function(net)
             {
-                window.{{methodName}}=function(parameter)
+                window.{{jsMethodName}}=function(parameter)
                 {
                     window.{{streamName}}=parameter;
                     net.invokeMethodAsync('{{nameof(NetMethodPack<JsonElement>.Invoke)}}',null);
@@ -262,7 +262,7 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         }));
         await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
         await JSRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
-        return (methodName, netMethodPack);
+        return (jsMethodName, netMethodPack);
     }
     #endregion
     #endregion

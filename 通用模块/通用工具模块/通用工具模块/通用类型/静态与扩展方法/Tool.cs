@@ -16,7 +16,7 @@ public static class Tool
     /// <param name="isShallow">如果这个值为真，则执行浅拷贝，否则执行深拷贝</param>
     /// <param name="exception">出现在这个集合中的字段或自动属性名将作为例外，不会被拷贝</param>
     /// <returns></returns>
-    [return: NotNullIfNotNull("obj")]
+    [return: NotNullIfNotNull(nameof(obj))]
     public static Ret? Copy<Ret>(Ret? obj, bool isShallow = true, params string[] exception)
     {
         if (obj is null)

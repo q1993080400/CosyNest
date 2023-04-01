@@ -98,8 +98,8 @@ public interface IFileType
     /// 如果它是扩展名，则不带点号</param>
     bool IsCompatible(string extensionNameOrPath)
     {
-        var extensionName = ToolPath.SplitPathFile(extensionNameOrPath).Extended;
-        return this.ExtensionName.Contains(extensionName is "" ? extensionNameOrPath : extensionName);
+        var extensionName = ToolPath.SplitPathFile(extensionNameOrPath).Extended ?? extensionNameOrPath;
+        return this.ExtensionName.Contains(extensionName);
     }
     #endregion
     #region 传入文件对象

@@ -40,6 +40,14 @@
     grid-area: 2/2
 }
 
+/*虚拟化容器的CSS样式*/
+.containerFrancis
+{
+    overflow-y: auto;
+    max-height: 100vh;
+}
+
+
 /*横向屏幕，即宽大于高，一般用于电脑*/
 @media (orientation: landscape)
 {

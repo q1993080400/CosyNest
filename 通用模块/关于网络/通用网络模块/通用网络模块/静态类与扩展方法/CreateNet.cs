@@ -42,8 +42,8 @@ public static class CreateNet
     /// 创建一个<see cref="ISignalRProvide"/>，
     /// 它可以用来提供SignalR连接
     /// </summary>
-    /// <inheritdoc cref="SignalRProvide.SignalRProvide(Func{string, HubConnection}?, Func{string, string}?)"/>
-    public static ISignalRProvide SignalRProvide(Func<string, HubConnection>? create = null, Func<string, string>? toAbs = null)
+    /// <inheritdoc cref="SignalRProvide.SignalRProvide(Func{string, Task{HubConnection}}?, Func{string, string}?)"/>
+    public static ISignalRProvide SignalRProvide(Func<string, Task<HubConnection>>? create = null, Func<string, string>? toAbs = null)
         => new SignalRProvide(create, toAbs);
     #endregion
     #region 创建IUriManager

@@ -21,11 +21,11 @@ public sealed record PathText
     #endregion
     #region 静态部分
     #region 隐式类型转换
-    [return: NotNullIfNotNull("a")]
+    [return: NotNullIfNotNull(nameof(a))]
     public static implicit operator string?(PathText? a)
         => a?.Path;
 
-    [return: NotNullIfNotNull("a")]
+    [return: NotNullIfNotNull(nameof(a))]
     public static implicit operator PathText?(string? a)
         => a is null ? null : new(a);
     #endregion

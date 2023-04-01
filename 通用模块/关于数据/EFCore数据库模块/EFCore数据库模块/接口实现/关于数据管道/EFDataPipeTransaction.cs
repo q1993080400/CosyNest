@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace System.DataFrancis.DB.EF;
 
@@ -25,14 +26,31 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
     /// <returns></returns>
     public async Task Save()
     {
-        var task = DbContext?.SaveChangesAsync();
-        if (task is { })
-            await task;
+        if ((DbContext, DBTransaction) is ({ }, { }))
+        {
+            try
+            {
+                await DbContext.SaveChangesAsync();
+                await DBTransaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await DBTransaction.RollbackAsync();
+                throw;
+            }
+            finally
+            {
+                Dispose();
+            }
+        }
     }
     #endregion
     #region 释放对象
     public void Dispose()
-        => DbContext?.Dispose();
+    {
+        DBTransaction?.Dispose();
+        DbContext?.Dispose();
+    }
     #endregion
     #region 执行查询
     public IQueryable<Data> Query<Data>()
@@ -65,10 +83,10 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
     public async Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
          where Data : class, IData
     {
-        var delete = Query<Data>().Where(expression).ToArray();
-        await Delete(delete, cancellation);
+        var data = Query<Data>().Where(expression).ToArray();           //不使用ExecuteDelete的目的，是为了支持级联删除
+        await Delete(data, cancellation);
     }
-    #endregion 
+    #endregion
     #endregion
     #endregion
     #region 内部成员
@@ -78,6 +96,12 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
     /// 它的参数就是请求的实体类的类型
     /// </summary>
     private Func<Type, DbContextFrancis> CreateDbContext { get; }
+    #endregion
+    #region 事务对象
+    /// <summary>
+    /// 获取数据库事务对象
+    /// </summary>
+    private IDbContextTransaction? DBTransaction { get; set; }
     #endregion
     #region 根据实体类型创建数据上下文
     /// <summary>
@@ -91,7 +115,13 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
     /// <param name="entityType">实体类的类型</param>
     /// <returns></returns>
     private DbContext CreateDbContextFromEntityType(Type entityType)
-        => DbContext ??= CreateDbContext(entityType);
+    {
+        if (DbContext is { })
+            return DbContext;
+        DbContext = CreateDbContext(entityType);
+        DBTransaction = DbContext.Database.BeginTransaction();
+        return DbContext;
+    }
     #endregion
     #endregion
     #region 构造函数

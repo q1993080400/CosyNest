@@ -18,6 +18,8 @@ sealed class JsonConvertCollection<CollectionType, ElementType> : JsonConverter<
             reader.Read();
             if (reader.TokenType is JsonTokenType.EndArray)
                 break;
+            if (reader.TokenType is JsonTokenType.Null)
+                return default;
             var element = JsonSerializer.Deserialize<ElementType>(ref reader, options);
             cache.Add(element);
         }
