@@ -59,7 +59,7 @@ public sealed record UriComplete : UriBase
         {
             var uri = UriHost?.ToString();
             if (UriExtend is { })
-                uri += $"/{UriExtend}";
+                uri += UriExtend;
             if (UriParameter is { })
                 uri += $"?{UriParameter}";
             if (UriAnchor is { })
@@ -99,6 +99,7 @@ public sealed record UriComplete : UriBase
 
     }
     #endregion
+    #endregion 
     #region 无参数构造函数
     /// <summary>
     /// 无参数构造函数
@@ -107,7 +108,6 @@ public sealed record UriComplete : UriBase
     {
 
     }
-    #endregion
     #endregion
     #endregion
 }

@@ -40,7 +40,7 @@ public sealed class ExplicitTask<T>
             Task.Run(async () =>
             {
                 await Task.Delay(@out);
-                if (!this.IsCompleted)
+                if (!IsCompleted)
                     throw new TimeoutException($"显式等待的执行时间超过了{@out}上限");
             });
         return Awaiter;

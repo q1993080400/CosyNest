@@ -30,9 +30,9 @@ sealed class TextStyleVar : ITextStyleVar
     /// <param name="color">文本的颜色</param>
     public TextStyleVar(string fontName, IUnit<IUTFontSize> size, IColor color)
     {
-        this.FontName = fontName;
-        this.Size = size;
-        this.TextColor = color;
+        FontName = fontName;
+        Size = size;
+        TextColor = color;
     }
     #endregion
 }

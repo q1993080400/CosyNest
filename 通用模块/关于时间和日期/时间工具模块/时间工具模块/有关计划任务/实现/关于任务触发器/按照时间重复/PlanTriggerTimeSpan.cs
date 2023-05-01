@@ -38,16 +38,16 @@ sealed class PlanTriggerTimeSpan : PlanTriggerTiming, IPlanTriggerTimeSpan
     {
         if (count is { } && count.Value is 1)
         {
-            this.Interval = null;
+            Interval = null;
         }
         else
         {
             ArgumentNullException.ThrowIfNull(interval);
             if (interval.Value <= TimeSpan.Zero)
                 throw new ArgumentException("时间间隔不能为负或者零");
-            this.Interval = interval;
+            Interval = interval;
         }
-        this.Begin = begin;
+        Begin = begin;
     }
     #endregion
 }

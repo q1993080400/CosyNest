@@ -37,14 +37,33 @@ public static class CreateNet
         => JsonContent.Create(obj, options: options).ToHttpContent()!;
     #endregion
     #endregion
-    #region 创建ISignalRProvide
+    #region 有关创建ISignalRProvide
+    #region 直接创建ISignalRProvide
     /// <summary>
     /// 创建一个<see cref="ISignalRProvide"/>，
     /// 它可以用来提供SignalR连接
     /// </summary>
-    /// <inheritdoc cref="SignalRProvide.SignalRProvide(Func{string, Task{HubConnection}}?, Func{string, string}?)"/>
+    /// <inheritdoc cref="SignalRProvide.SignalRProvide(Func{string, Task{HubConnection}}, Func{string, string}?)"/>
     public static ISignalRProvide SignalRProvide(Func<string, Task<HubConnection>>? create = null, Func<string, string>? toAbs = null)
-        => new SignalRProvide(create, toAbs);
+        => new SignalRProvide(create ?? ConfigureSignalRProvide(), toAbs);
+    #endregion
+    #region 创建ISignalRProvide的工厂
+    /// <summary>
+    /// 创建一个根据中心的绝对Uri返回<see cref="HubConnection"/>的工厂
+    /// </summary>
+    /// <param name="configure">这个委托被用于进一步配置<see cref="IHubConnectionBuilder"/>，
+    /// 它的参数是预配置的<see cref="IHubConnectionBuilder"/>，返回值是<see cref="IHubConnectionBuilder"/>的最终成品，
+    /// 如果为<see langword="null"/>，表示直接使用预配置版本</param>
+    /// <returns></returns>
+    public static Func<string, Task<HubConnection>> ConfigureSignalRProvide(Func<IHubConnectionBuilder, Task<IHubConnectionBuilder>>? configure = null)
+        => async (uri) =>
+        {
+            var build = new HubConnectionBuilder().
+             WithUrl(uri).
+             AddJsonProtocol(x => x.AddFormatterJson());
+            return (configure is null ? build : await configure(build)).Build();
+        };
+    #endregion
     #endregion
     #region 创建IUriManager
     /// <summary>

@@ -84,7 +84,7 @@ abstract class CompressionDirectoryBase : CompressionItem, ICompressionDirectory
     public CompressionDirectoryBase(INode father, ZipArchive zip)
         : base(father)
     {
-        this.Zip = zip;
+        Zip = zip;
     }
     #endregion
 }

@@ -83,12 +83,20 @@ public static class CreateSafety
     /// 如果为<see langword="null"/>，则使用默认方法</param>
     /// <param name="coding">该委托传入待计算哈希值的字符串，
     /// 返回读取该字符串二进制形式的管道，如果为<see langword="null"/>，默认使用UTF16编码</param>
+    /// <param name="decode">该委托传入哈希值的字节数组，返回它的字符串形式，
+    /// 如果为<see langword="null"/>，默认为Hex十六进制字符串模式</param>
     /// <returns></returns>
-    public static Func<string, Task<byte[]>> HashText(BitMapping? hash = null, Func<string, IBitRead>? coding = null)
+    public static Func<string, Task<string>> HashText(BitMapping? hash = null,
+        Func<string, IBitRead>? coding = null, Func<byte[], string>? decode = null)
     {
         coding ??= Coding;
         hash ??= Hash();
-        return x => hash(coding(x)).ReadComplete();
+        decode ??= Convert.ToHexString;
+        return async x =>
+        {
+            var hashByte = await hash(coding(x)).ReadComplete();
+            return decode(hashByte);
+        };
     }
     #endregion
     #endregion
@@ -100,7 +108,7 @@ public static class CreateSafety
     /// <param name="compared">用来作为对比的哈希值，
     /// 如果它的校验和与计算出来的哈希值一致，则验证通过</param>
     /// <returns></returns>
-    /// <inheritdoc cref="HashText(BitMapping?, Func{string, IBitRead}?)"/>
+    /// <inheritdoc cref="HashText(BitMapping?, Func{string, IBitRead}?, Func{byte[], string}?)"/>
     public static BitVerify HashVerify(byte[] compared, BitMapping? hash = null)
     {
         var sum = compared.Checksum();
@@ -119,7 +127,7 @@ public static class CreateSafety
     /// </summary>
     /// <param name="verify">用来验证管道的委托</param>
     /// <returns></returns>
-    /// <inheritdoc cref="HashText(BitMapping, Func{string, IBitRead})"/>
+    /// <inheritdoc cref="HashText(BitMapping?, Func{string, IBitRead}?, Func{byte[], string}?)"/>
     public static Func<string, Task<bool>> HashVerifyText(BitVerify verify, Func<string, IBitRead>? coding = null)
     {
         coding ??= Coding;

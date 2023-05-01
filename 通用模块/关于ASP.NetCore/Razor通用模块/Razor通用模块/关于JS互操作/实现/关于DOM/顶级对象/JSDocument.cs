@@ -127,7 +127,7 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         /// <param name="action">事件中执行的Net方法</param>
         public NetMethodPack(Action<Obj> action)
         {
-            this.Action = action;
+            Action = action;
         }
         #endregion
     }

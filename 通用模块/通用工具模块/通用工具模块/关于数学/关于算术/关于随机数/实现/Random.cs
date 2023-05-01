@@ -44,7 +44,7 @@ sealed class Random : IRandom
     /// <param name="random">指定的随机数生成器</param>
     public Random(System.Random random)
     {
-        this.PackRandom = random;
+        PackRandom = random;
     }
     #endregion
     #endregion

@@ -34,8 +34,8 @@ sealed class EqualityComparer<Obj> : IEqualityComparer<Obj>
     /// <param name="getHashCode">这个委托用于计算哈希值</param>
     public EqualityComparer(Func<Obj, Obj, bool> equals, Func<Obj, int> getHashCode)
     {
-        this.EqualsDelegate = (x, y) => ToolEqual.JudgeNull(x, y) ?? equals(x!, y!);
-        this.GetHashCodeDelegate = x => x is null ? 0 : getHashCode(x);
+        EqualsDelegate = (x, y) => ToolEqual.JudgeNull(x, y) ?? equals(x!, y!);
+        GetHashCodeDelegate = x => x is null ? 0 : getHashCode(x);
     }
     #endregion
 }

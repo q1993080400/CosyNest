@@ -192,7 +192,7 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
                 if (element is { })
                     await element.ScrollFromPercentage(0, 0.02);
             }
-            this.StateHasChanged();
+            StateHasChanged();
         }
         await JSWindow.InvokeCodeVoidAsync($"{NotRender}=false");
     }
@@ -295,7 +295,7 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
             RenderElement = renderElement,
             RenderContainer = new()
             {
-                CSS = "containerFrancis",
+                CSS = "virtualizationContainer",
                 ID = ID,
                 OnScrollScript = OnScroll(),
                 GoTop = new(this, GoTop)

@@ -43,7 +43,7 @@ abstract class Signature : ISignature
     /// 则调用<see cref="object.GetType"/>将其转换为<see cref="Type"/></param>
     public Signature(params object[] parameters)
     {
-        this.Parameters = parameters.Select(x => x.GetTypeObj()).ToArray();
+        Parameters = parameters.Select(x => x.GetTypeObj()).ToArray();
     }
     #endregion
 }

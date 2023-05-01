@@ -38,8 +38,8 @@ public interface IInterval<Obj>
     /// <param name="max">用来接收区间上限的对象</param>
     void Deconstruct(out IComparable<Obj>? min, out IComparable<Obj>? max)
     {
-        min = this.Min;
-        max = this.Max;
+        min = Min;
+        max = Max;
     }
     #endregion
     #region 检查对象是否位于区间中

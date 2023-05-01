@@ -2,7 +2,9 @@
 
 /// <summary>
 /// 该组件可以根据不同的条件呈现不同的内容，
-/// 而条件通过JS互操作获得，并可以通过级联参数传递给子组件
+/// 而条件通过JS互操作获得，并可以通过级联参数传递给子组件，
+/// 注意：本组件假设该条件通过JS获得后就永远不变，
+/// 请不要使用本组件封装一个变量
 /// </summary>
 /// <inheritdoc cref="ConditionRender{Condition}"/>
 public abstract partial class ConditionJS<Condition> : ConditionRender<Condition>
@@ -28,18 +30,9 @@ public abstract partial class ConditionJS<Condition> : ConditionRender<Condition
     /// <returns></returns>
     protected abstract Task<Condition> GetConditionFromJS(IJSWindow jsWindow);
     #endregion
-    #region 返回呈现条件是否固定
-    /// <summary>
-    /// 返回呈现条件是否永不改变，
-    /// 返回<see langword="true"/>可以提高性能，
-    /// 但是不会刷新呈现条件
-    /// </summary>
-    /// <returns></returns>
-    protected virtual bool IsFixed() => false;
-    #endregion
     #endregion
     #region 获取呈现条件
-    protected override Condition? GetCondition => GetConditionField;
+    protected sealed override Condition? GetCondition => GetConditionField;
     #endregion
     #region 依赖注入的JS对象
     [Inject]

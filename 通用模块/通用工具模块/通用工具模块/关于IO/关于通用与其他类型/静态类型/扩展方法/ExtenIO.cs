@@ -52,6 +52,24 @@ public static class ExtenIO
         return memory;
     }
     #endregion
+    #region 将流保存到文件中
+    /// <summary>
+    /// 将流保存到文件中
+    /// </summary>
+    /// <param name="stream">要读取的流</param>
+    /// <param name="path">要保存到的文件路径</param>
+    /// <returns></returns>
+    public static async Task SaveFile(this Stream stream, PathText path)
+    {
+        if (!stream.CanRead)
+            throw new NotSupportedException("这个流不可读取");
+        stream.Reset();
+        if (File.Exists(path))
+            File.Delete(path);
+        using var fileStream = CreateIO.FileStream(path, FileMode.Create);
+        await stream.CopyToAsync(fileStream);
+    }
+    #endregion
     #region 重置流
     /// <summary>
     /// 将流重置到开始位置

@@ -82,10 +82,10 @@ public interface ISizePos : ISize, IBoundary, IEquatable<ISizePos>
     /// <param name="pos">位置</param>
     void Deconstruct(out Num width, out Num height, out IPoint pos)
     {
-        var (w, h) = this.Size;
+        var (w, h) = Size;
         width = w;
         height = h;
-        pos = this.Position;
+        pos = Position;
     }
     #endregion
 }

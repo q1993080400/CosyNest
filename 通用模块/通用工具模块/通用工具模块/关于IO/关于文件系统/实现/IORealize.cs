@@ -253,7 +253,7 @@ abstract class IORealize : IIO
     /// <param name="path">文件或目录所在的路径</param>
     public IORealize(string path)
     {
-        this.PathField = path;
+        PathField = path;
         GC.SuppressFinalize(this);
     }
     #endregion

@@ -39,7 +39,7 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
             else
             {
                 var v = NotExist(key);
-                Dictionary.Add(key, new UseValue(v));
+                Dictionary[key] = new UseValue(v);
                 GC();
                 return v;
             }
@@ -106,7 +106,7 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
     public CacheThresholds(Func<Key, Value> getValue, int threshold)
     {
         NotExist = getValue;
-        this.Threshold = Math.Max(75, threshold);                      //回收阈值最低为75
+        Threshold = Math.Max(75, threshold);                      //回收阈值最低为75
     }
     #endregion
     #region 辅助类型

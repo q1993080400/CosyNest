@@ -26,7 +26,7 @@ public static class Tool
         var field = type.Fields.Where(x => !x.IsStatic);               //不拷贝静态属性
         if (exception.Length > 0)
         {
-            var fieldName = exception.Union(exception.Select(x => $"<{x}>k__BackingField").ToArray()).ToHashSet();        //获取属性，以及该自动属性对应的字段名称
+            var fieldName = exception.Concat(exception.Select(x => $"<{x}>k__BackingField").ToArray()).ToHashSet();        //获取属性，以及该自动属性对应的字段名称
             field = field.Where(x => !fieldName.Contains(x.Name));
         }
         field.ForEach(x =>

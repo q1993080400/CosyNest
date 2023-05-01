@@ -15,7 +15,7 @@ sealed record AdministrativeArea : IAdministrativeArea
     /// <param name="area">行政区以及它的所有上级</param>
     public AdministrativeArea(IReadOnlyList<string> area)
     {
-        this.Area = area;
+        Area = area;
     }
     #endregion
 }

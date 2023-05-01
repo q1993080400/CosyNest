@@ -1,0 +1,24 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Event where Event:Delegate
+@using System.Design
+
+@if (ChildContent is { })
+{
+    @if (CascadingParameterName is { })
+    {
+        <CascadingValue Value="PackEvent" TValue="IEventSubscribe<Event>" IsFixed=true Name="@CascadingParameterName">
+            <CascadingValue Value="PackEvent" TValue="IEventInvoke" IsFixed=true Name="@CascadingParameterName">
+                @ChildContent(PackEvent)
+            </CascadingValue>
+        </CascadingValue>
+    }
+    else
+    {
+        <CascadingValue Value="PackEvent" TValue="IEventSubscribe<Event>" IsFixed=true>
+            <CascadingValue Value="PackEvent" TValue="IEventInvoke" IsFixed=true>
+                @ChildContent(PackEvent)
+            </CascadingValue>
+        </CascadingValue>
+    }
+}

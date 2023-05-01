@@ -18,8 +18,8 @@ sealed class IntervalSpecific<Obj> : Interval<Obj>, IIntervalSpecific<Obj>
     {
         if (min is { } && max is { } && min.Value.CompareTo(max.Value) > 0)
             (min, max) = (max, min);
-        this.Min = min;
-        this.Max = max;
+        Min = min;
+        Max = max;
     }
     #endregion
 }

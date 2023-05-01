@@ -25,8 +25,8 @@ sealed class FullDuplex : Release, IFullDuplex
     /// <inheritdoc cref="CreateIO.FullDuplex(IBitRead, IBitWrite)"/>
     public FullDuplex(IBitRead read, IBitWrite write)
     {
-        this.Read = read;
-        this.Write = write;
+        Read = read;
+        Write = write;
     }
     #endregion
 }

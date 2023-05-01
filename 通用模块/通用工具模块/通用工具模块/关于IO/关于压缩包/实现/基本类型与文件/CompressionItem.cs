@@ -60,7 +60,7 @@ abstract class CompressionItem : ICompressionItem
     /// <param name="father">父节点</param>
     public CompressionItem(INode father)
     {
-        this.FatherField = father;
+        FatherField = father;
     }
     #endregion
 }

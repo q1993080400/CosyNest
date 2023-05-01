@@ -25,7 +25,7 @@ public static class ToolPath
     /// 重构文件或目录的名字，
     /// 并返回重构后的新完整路径
     /// </summary>
-    /// <param name="path">待重构的路径</param>
+    /// <param name="path">待重构的路径，注意，它是路径，不是文件的名字</param>
     /// <param name="newSimple">文件或目录重构后的新名称，
     /// 不带扩展名，如果为<see langword="null"/>，代表不更改</param>
     /// <param name="newExtension">文件重构后的新扩展名，不带点号，

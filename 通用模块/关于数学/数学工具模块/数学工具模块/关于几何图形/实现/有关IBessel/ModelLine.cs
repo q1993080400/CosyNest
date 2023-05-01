@@ -23,7 +23,7 @@ sealed class ModelLine : IGeometricModel<IBessel>
     /// <param name="end">线段的终点，起点统一为(0,0)</param>
     public ModelLine(IPoint end)
     {
-        this.End = end;
+        End = end;
     }
     #endregion
 }

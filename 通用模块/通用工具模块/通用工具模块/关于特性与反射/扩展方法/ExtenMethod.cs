@@ -43,6 +43,18 @@ public static partial class ExtenReflection
         => typeof(Delegate).IsAssignableFrom(type);
     #endregion
     #endregion
+    #region 关于方法与构造函数
+    #region 
+    #region 获取方法所有参数类型
+    /// <summary>
+    /// 获取一个方法的所有参数类型
+    /// </summary>
+    /// <param name="method">要获取参数类型的方法</param>
+    /// <returns></returns>
+    public static Type[] GetParameterTypes(this MethodBase method)
+        => method.GetParameters().Select(p => p.ParameterType).ToArray();
+    #endregion
+    #endregion
     #region 关于方法
     #region 关于签名
     #region 返回参数的类型
@@ -184,6 +196,7 @@ public static partial class ExtenReflection
         => constructor.IsStatic ? throw new ArgumentException("无法通过静态构造函数构造对象") : (Ret)constructor.Invoke(parameters);
     #endregion
     #endregion
+    #endregion 
     #region 关于事件
     #region 根据布尔值，注册或注销事件
     /// <summary>

@@ -86,10 +86,10 @@ public abstract class UT : IUT
     /// 代表本单位为静态单位，否则为动态单位</param>
     public UT(string name, Func<Num, Num> toMetric, Func<Num, Num> fromMetric, bool isStatic = true)
     {
-        this.Name = name;
-        this.ToMetricDelegate = toMetric;
-        this.FromMetricDelegate = fromMetric;
-        this.IsStatic = isStatic;
+        Name = name;
+        ToMetricDelegate = toMetric;
+        FromMetricDelegate = fromMetric;
+        IsStatic = isStatic;
     }
     #endregion
     #region 指定名称与转换常数

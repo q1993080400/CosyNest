@@ -26,7 +26,8 @@ public interface IRandom
     /// 生成一个位于指定范围内的随机数
     /// </summary>
     /// <param name="min">随机数的最小值</param>
-    /// <param name="max">随机数的最大值</param>
+    /// <param name="max">随机数的最大值，注意：
+    /// 最后生成的随机数可能等于该最大值</param>
     /// <returns></returns>
     Num RandRange(Num min, Num max)
     {

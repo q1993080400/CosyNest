@@ -16,7 +16,7 @@ sealed class MethodSignature : Signature, IMethodSignature
     #region 重写Equals
     public override bool Equals(object? obj)
         => obj is IMethodSignature m &&
-        this.Parameters.Prepend(Return).
+        Parameters.Prepend(Return).
         SequenceEqual(m.Parameters.Prepend(m.Return));
     #endregion
     #region 重写ToString
@@ -40,7 +40,7 @@ sealed class MethodSignature : Signature, IMethodSignature
     public MethodSignature(Type? @return, params object[] parameters)
         : base(parameters)
     {
-        this.Return = @return ?? typeof(void);
+        Return = @return ?? typeof(void);
     }
     #endregion
 }

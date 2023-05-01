@@ -33,10 +33,10 @@ sealed class PlanTriggerMonth : PlanTriggerDate, IPlanTriggerMonth
         : base(time, count, createDate)
     {
         Check(1, null, intervalMonth);
-        this.IntervalMonth = intervalMonth;
-        this.Days = days.ToHashSet();
+        IntervalMonth = intervalMonth;
+        Days = days.ToHashSet();
         days.AnyCheck(nameof(days));
-        this.Days.ForEach(x => Check(1, 31, x));
+        Days.ForEach(x => Check(1, 31, x));
     }
     #endregion
 }

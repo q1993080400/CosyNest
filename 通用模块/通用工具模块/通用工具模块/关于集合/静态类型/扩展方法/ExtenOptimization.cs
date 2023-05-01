@@ -36,28 +36,26 @@ public static partial class ExtenIEnumerable
         };
     }
     #endregion
-    #endregion
-    #region 为ICollection<T>优化
-    #region 合并ICollection<T>
+    #region 合并数组
     /// <summary>
-    /// 取多个<see cref="ICollection{T}"/>的并集，
-    /// 不会去除重复的元素
+    /// 合并多个数组
     /// </summary>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="collection">原始集合</param>
-    /// <param name="collectionOther">要合并的其他集合</param>
+    /// <typeparam name="Obj">数组的元素类型</typeparam>
+    /// <param name="objs">要合并的第一个数组</param>
+    /// <param name="otherArray">要合并的其他数组</param>
     /// <returns></returns>
-    public static Obj[] Union<Obj>(this ICollection<Obj> collection, params ICollection<Obj>[] collectionOther)
+    public static Obj[] Concat<Obj>(this Obj[] objs, params Obj[][] otherArray)
     {
-        var len = collection.Count + collectionOther.Sum(x => x.Count);
-        var newArray = new Obj[len];
-        var pos = 0;
-        foreach (var item in collectionOther.Prepend(collection))
+        var sumArray = otherArray.Prepend(objs).ToArray();
+        var array = new Obj[sumArray.Sum(x => x.Length)];
+        var len = 0L;
+        foreach (var item in sumArray)
         {
-            item.CopyTo(newArray, pos);
-            pos += item.Count;
+            var itemLen = item.Length;
+            Array.Copy(item, 0, array, len, itemLen);
+            len += itemLen;
         }
-        return newArray;
+        return array;
     }
     #endregion
     #endregion

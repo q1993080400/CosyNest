@@ -51,7 +51,7 @@ public static class ToolArithmetic
     /// <param name="num">如果还有更多的整数，则在这里传入</param>
     /// <returns></returns>
     public static Num GCD(Num first, Num second, params Num[] num)
-        => num.Union(new[] { first, second }).Sort(false).Aggregate((a, b) =>
+        => num.Concat(new[] { first, second }).Sort(false).Aggregate((a, b) =>
              {
                  //注意：本方法使用的算法是辗转相除法
 
@@ -76,7 +76,7 @@ public static class ToolArithmetic
     /// <param name="num">如果还有更多的整数，则在这里传入</param>
     /// <returns></returns>
     public static Num LCM(Num first, Num second, params Num[] num)
-        => num.Union(new[] { first, second }).Aggregate(
+        => num.Concat(new[] { first, second }).Aggregate(
             (x, y) => x * y / GCD(x, y));
     #endregion
     #region 返回两个数字的比

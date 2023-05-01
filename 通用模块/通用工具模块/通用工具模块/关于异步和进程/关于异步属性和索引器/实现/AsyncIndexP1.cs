@@ -39,8 +39,8 @@ sealed class AsyncIndexP1<P1, Value> : IAsyncIndex<P1, Value>
     /// <param name="setDelegate">用于写入异步索引器的委托</param>
     public AsyncIndexP1(Func<P1, CancellationToken, Task<Value>> getDelegate, Func<P1, Value, CancellationToken, Task> setDelegate)
     {
-        this.GetDelegate = getDelegate;
-        this.SetDelegate = setDelegate;
+        GetDelegate = getDelegate;
+        SetDelegate = setDelegate;
     }
     #endregion
 }

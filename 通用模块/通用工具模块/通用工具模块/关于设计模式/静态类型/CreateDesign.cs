@@ -65,8 +65,13 @@ public static class CreateDesign
     /// <returns></returns>
     public static Obj Single<Obj>()
         where Obj : class
-        => (Obj)SingleCache.TrySetValue(typeof(Obj),
-            type => type.GetTypeData().ConstructorCreate<Obj>()).Value;
+    {
+        lock (SingleCache)
+        {
+            return (Obj)SingleCache.TrySetValue(typeof(Obj),
+             type => type.GetTypeData().ConstructorCreate<Obj>()).Value;
+        }
+    }
     #endregion
     #region 创建池化对象
     /// <summary>

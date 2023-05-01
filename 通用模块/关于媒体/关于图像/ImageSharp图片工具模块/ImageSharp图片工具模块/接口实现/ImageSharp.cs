@@ -78,8 +78,8 @@ class ImageSharp : FromIO, IImage
     protected ImageSharp(BottomLayerImage image, string format)
         : base(null, CreateImageSharp.Support)
     {
-        this.Image = image.CloneAs<Rgba32>();
-        this.FormatTemplate = format;
+        Image = image.CloneAs<Rgba32>();
+        FormatTemplate = format;
         image.Dispose();
     }
     #endregion
@@ -92,7 +92,7 @@ class ImageSharp : FromIO, IImage
         : base(null, CreateImageSharp.Support)
     {
         using var cacheImage = BottomLayerImage.Load(stream);
-        this.Image = cacheImage.CloneAs<Rgba32>();
+        Image = cacheImage.CloneAs<Rgba32>();
         stream.Reset();
         FormatTemplate = BottomLayerImage.DetectFormat(stream).FileExtensions.First();
     }

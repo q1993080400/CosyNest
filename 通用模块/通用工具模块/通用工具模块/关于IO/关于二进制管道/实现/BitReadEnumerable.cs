@@ -120,10 +120,10 @@ sealed class BitReadEnumerable<Byte> : IBitRead
     /// 代表这个管道的数据来自于这个可释放对象，它可以使本对象得到正确地释放</param>
     public BitReadEnumerable(IAsyncEnumerable<Byte> bytes, string? format, string? describe, IInstruct? source)
     {
-        this.Bytes = bytes;
-        this.Format = format;
-        this.Describe = describe;
-        this.Source = source;
+        Bytes = bytes;
+        Format = format;
+        Describe = describe;
+        Source = source;
         if (source is null)
             GC.SuppressFinalize(this);
     }

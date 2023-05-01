@@ -9,6 +9,34 @@ namespace System.DataFrancis;
 public interface IDataPipeTo
 {
     #region 关于添加与更新数据
+    #region 添加数据
+    #region 说明文档
+    /*问：既然已经有了添加或更新数据，
+      那么为什么还需要添加数据？
+      答：这是因为有的时候，数据在被添加之前需要指定自己的ID，
+      如果是添加或更新，那么ID会被自动赋值，无法满足这个需求*/
+    #endregion
+    #region 传入同步集合
+    /// <summary>
+    /// 添加一个数据，
+    /// 如果数据已经存在，会引发一个异常
+    /// </summary>
+    /// <typeparam name="Data">数据的类型</typeparam>
+    /// <param name="datas">待添加的数据</param>
+    /// <param name="cancellation">用于取消异步操作的令牌</param>
+    /// <returns></returns>
+    Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
+        where Data : class, IData;
+    #endregion
+    #region 传入单个数据
+    /// <param name="data">待添加的数据</param>
+    /// <inheritdoc cref="Add{Data}(IEnumerable{Data}, CancellationToken)"/>
+    Task Add<Data>(Data data, CancellationToken cancellation = default)
+        where Data : class, IData
+        => Add(new[] { data }, cancellation);
+    #endregion
+    #endregion
+    #region 添加或更新数据
     #region 传入同步集合
     /// <summary>
     /// 通过管道将数据添加到数据源，
@@ -17,29 +45,22 @@ public interface IDataPipeTo
     /// <typeparam name="Data">数据的类型</typeparam>
     /// <param name="datas">待添加或更新的数据</param>
     /// <param name="cancellation">用于取消异步操作的令牌</param>
-    /// <returns>添加或更新到数据源后的数据</returns>
-    Task<IEnumerable<Data>> AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
+    Task AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class, IData;
-
-    /*问：为什么需要将添加后的数据原路返回？
-      答：因为新添加的数据是没有ID的，但是将它们添加到数据源以后，
-      就会被赋予一个ID，将它们原路返回，可以使调用者能够获取到这个ID*/
     #endregion
     #region 传入异步集合
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, CancellationToken)"/>
-    async Task<IEnumerable<Data>> AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
+    async Task AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class, IData
         => await AddOrUpdate(await datas.ToListAsync(), cancellation);
     #endregion
     #region 传入单个数据
     /// <param name="data">待添加或更新的数据</param>
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, CancellationToken)"/>
-    async Task<Data> AddOrUpdate<Data>(Data data, CancellationToken cancellation = default)
-        where Data : class, IData
-    {
-        var datas = await AddOrUpdate(new[] { data }, cancellation);
-        return datas.Single();
-    }
+    Task AddOrUpdate<Data>(Data data, CancellationToken cancellation = default)
+       where Data : class, IData
+       => AddOrUpdate(new[] { data }, cancellation);
+    #endregion
     #endregion
     #endregion
     #region 关于删除数据

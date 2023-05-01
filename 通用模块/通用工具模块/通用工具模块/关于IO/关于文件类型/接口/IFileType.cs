@@ -99,7 +99,7 @@ public interface IFileType
     bool IsCompatible(string extensionNameOrPath)
     {
         var extensionName = ToolPath.SplitPathFile(extensionNameOrPath).Extended ?? extensionNameOrPath;
-        return this.ExtensionName.Contains(extensionName);
+        return ExtensionName.Contains(extensionName);
     }
     #endregion
     #region 传入文件对象

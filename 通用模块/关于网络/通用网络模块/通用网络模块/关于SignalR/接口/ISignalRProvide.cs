@@ -25,7 +25,7 @@ public interface ISignalRProvide : IAsyncDisposable
     Task<HubConnection> GetConnection<BusinessInterface>()
         where BusinessInterface : class
     {
-        var uri = "Hub/" + typeof(BusinessInterface).Name.TrimStart('I');
+        var uri = ToolSignalR.GetHubDefaultUri<BusinessInterface>();
         return GetConnection(uri);
     }
     #endregion
@@ -33,10 +33,11 @@ public interface ISignalRProvide : IAsyncDisposable
     #region 设置用于配置SignalR连接的委托
     /// <summary>
     /// 设置用于配置SignalR连接的委托，
-    /// 这个方法只能调用一次
+    /// 这个方法只能调用一次，
+    /// 第二次调用无效
     /// </summary>
     /// <param name="configuration">用于配置连接的委托，
-    /// 它的第一个参数是待配置的连接，第二个参数是中心的绝对Uri，该委托一般用来注册客户端方法</param>
+    /// 它的第一个参数是待配置的连接，第二个参数是中心的相对Uri，该委托一般用来注册客户端方法</param>
     void SetConfiguration(Action<HubConnection, string> configuration);
 
     /*问：配置客户端方法似乎不需要Hub中心的Uri，

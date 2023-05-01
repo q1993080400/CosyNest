@@ -74,7 +74,7 @@ sealed class BitPipeStream : AutoRelease, IBitRead, IBitWrite
                     yield break;
                 case var c when c < bufferSize:
                     yield return memory[0..c];
-                    break;
+                    yield break;
                 default:
                     yield return memory;
                     break;
@@ -112,9 +112,9 @@ sealed class BitPipeStream : AutoRelease, IBitRead, IBitWrite
     /// <inheritdoc cref="ExtenIO.ToBitPipe(Stream, string, string?)"/>
     public BitPipeStream(Stream stream, string? format, string? describe)
     {
-        this.Stream = stream;
-        this.Format = format;
-        this.Describe = describe;
+        Stream = stream;
+        Format = format;
+        Describe = describe;
     }
     #endregion
 }

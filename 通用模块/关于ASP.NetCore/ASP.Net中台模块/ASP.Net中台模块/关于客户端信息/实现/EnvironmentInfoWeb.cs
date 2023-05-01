@@ -13,42 +13,52 @@ sealed class EnvironmentInfoWeb : IEnvironmentInfoWeb
     public string UserAgent { get; }
     #endregion
     #region 操作系统
-    public OS OS
+    public OS OS { get; }
+
+
+    private OS GetOS()
     {
-        get
-        {
-            if (UserAgent.Contains("Windows NT"))
-                return OS.Windows;
-            if (UserAgent.Contains("Android"))
-                return OS.Android;
-            if (UserAgent.Contains("iPhone OS"))
-                return OS.IOS;
-            if (UserAgent.Contains("Mac OS"))
-                return OS.Mac;
-            return OS.Other;
-        }
+        if (UserAgent.Contains("Windows NT"))
+            return OS.Windows;
+        if (UserAgent.Contains("Android"))
+            return OS.Android;
+        if (UserAgent.Contains("iPhone OS"))
+            return OS.IOS;
+        if (UserAgent.Contains("Mac OS"))
+            return OS.Mac;
+        return OS.Other;
     }
     #endregion
     #region 硬件类型
-    public HardwareType HardwareType
+    public HardwareType HardwareType { get; }
+
+    private HardwareType GetHardwareType()
         => OS switch
         {
             OS.Windows or OS.Mac => HardwareType.PC,
             OS.Android or OS.IOS => HardwareType.Phone,
             _ => HardwareType.Other
         };
+
     #endregion
     #region 浏览器
-    public Browser Browser
+    public Browser Browser { get; }
+
+    private Browser GetBrowser()
     {
-        get
-        {
-            if (UserAgent.Contains("MicroMessenger"))
-                return Browser.WeChat;
-            if (UserAgent.Contains("QQ"))
-                return Browser.QQ;
-            return Browser.Other;
-        }
+        if (OS is OS.IOS or OS.Mac)
+            return Browser.Safari;
+        if (UserAgent.Contains("Firefox"))
+            return Browser.Firefox;
+        if (UserAgent.Contains("Edg"))
+            return Browser.Edge;
+        if (UserAgent.Contains("MicroMessenger"))
+            return Browser.WeChat;
+        if (UserAgent.Contains("QQ"))
+            return Browser.QQ;
+        if (UserAgent.Contains("Chrome"))
+            return Browser.Chrome;
+        return Browser.Other;
     }
     #endregion
     #region 构造函数
@@ -58,7 +68,10 @@ sealed class EnvironmentInfoWeb : IEnvironmentInfoWeb
     /// <param name="userAgent">用户代理字符串</param>
     public EnvironmentInfoWeb(string userAgent)
     {
-        this.UserAgent = userAgent;
+        UserAgent = userAgent;
+        OS = GetOS();
+        HardwareType = GetHardwareType();
+        Browser = GetBrowser();
     }
     #endregion
 }

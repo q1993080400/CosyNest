@@ -11,7 +11,7 @@ public record RenderVirtualizationSimpleInfo<Element>
     public required IReadOnlyCollection<RenderFragment> RenderElement { get; init; }
     #endregion
     #region 用来跳跃到容器顶端的方法
-    /// <inheritdoc cref="RenderContainerInfo.GoTop"/>
+    /// <inheritdoc cref="RenderVirtualizationContainerInfo.GoTop"/>
     public required EventCallback GoTop { get; init; }
     #endregion
 }

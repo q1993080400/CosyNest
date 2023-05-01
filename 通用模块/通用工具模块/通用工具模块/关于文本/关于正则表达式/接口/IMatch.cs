@@ -53,4 +53,16 @@ public interface IMatch
         => GroupsNamed[name];
     #endregion
     #endregion
+    #region 发现字符串的索引
+    /// <summary>
+    /// 获取发现这个字符串的索引
+    /// </summary>
+    int Index { get; }
+    #endregion
+    #region 字符串的长度
+    /// <summary>
+    /// 获取这个字符串的长度
+    /// </summary>
+    int Length { get; }
+    #endregion
 }

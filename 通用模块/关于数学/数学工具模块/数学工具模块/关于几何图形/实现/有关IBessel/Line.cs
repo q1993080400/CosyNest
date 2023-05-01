@@ -48,7 +48,7 @@ sealed class Line : IBessel
     /// <param name="end">线段的终点</param>
     public Line(IGeometricModel<IBessel> model, IPoint begin, IPoint end)
     {
-        this.Model = model;
+        Model = model;
         Node = new[] { begin, end };
     }
     #endregion

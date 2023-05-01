@@ -65,7 +65,7 @@ public interface IPoint : IEquatable<IPoint>
     /// <param name="top">向上方向的垂直偏移，如果为<see langword="null"/>，则数值和<see cref="Right"/>相同</param>
     /// <returns></returns>
     IPoint Move(Num right, Num? top = null)
-        => CreateMath.Point(this.Right + right, this.Top + top ?? right);
+        => CreateMath.Point(Right + right, Top + top ?? right);
     #endregion
     #region 转换为相对坐标
     /// <summary>
@@ -89,7 +89,7 @@ public interface IPoint : IEquatable<IPoint>
     IPoint ToAbs(IPoint? o = null)
     {
         var (or, ot) = o ?? Original;
-        return this.Move(or, ot);
+        return Move(or, ot);
     }
     #endregion
     #region 转换为极坐标
@@ -115,8 +115,8 @@ public interface IPoint : IEquatable<IPoint>
     /// <param name="top">坐标的垂直位置，越大代表越靠近顶部</param>
     void Deconstruct(out Num right, out Num top)
     {
-        right = this.Right;
-        top = this.Top;
+        right = Right;
+        top = Top;
     }
     #endregion
 }

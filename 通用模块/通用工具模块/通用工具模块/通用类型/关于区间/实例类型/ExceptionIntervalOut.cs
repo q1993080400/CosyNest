@@ -28,8 +28,8 @@ public sealed class ExceptionIntervalOut<Obj> : Exception
     public ExceptionIntervalOut(Obj exceptionObj, IInterval<Obj> interval)
         : base($"{exceptionObj}不在区间中，合法{interval}")
     {
-        this.ExceptionObj = exceptionObj;
-        this.Interval = interval;
+        ExceptionObj = exceptionObj;
+        Interval = interval;
     }
     #endregion
 }

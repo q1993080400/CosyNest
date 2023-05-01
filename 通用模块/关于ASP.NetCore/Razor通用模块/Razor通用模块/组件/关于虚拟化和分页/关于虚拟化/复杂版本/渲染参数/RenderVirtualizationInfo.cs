@@ -16,6 +16,6 @@ public sealed record RenderVirtualizationInfo<Obj>
     /// <summary>
     /// 用来渲染容器的参数
     /// </summary>
-    public required RenderContainerInfo RenderContainer { get; init; }
+    public required RenderVirtualizationContainerInfo RenderContainer { get; init; }
     #endregion
 }

@@ -1,4 +1,5 @@
 ﻿
+//这个方法是JS互操作的基础方法
 window.InvokeCode = (code) => Function(code)();
 
 //这是一个读写cookie的小框架
@@ -36,10 +37,15 @@ var docCookies = {
     },
     keys: /* optional method: you can safely remove it! */ function () {
         var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
-        for (var nIdx = 0; nIdx < aKeys.length; nIdx++)
-        {
+        for (var nIdx = 0; nIdx < aKeys.length; nIdx++) {
             aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]);
         }
         return aKeys;
+    },
+    clear: function (sPath, sDomain) {
+        var allKey = docCookies.keys();
+        for (var i = 0; i < allKey.length; i++) {
+            docCookies.removeItem(allKey[i], sPath, sDomain);
+        }
     }
 };

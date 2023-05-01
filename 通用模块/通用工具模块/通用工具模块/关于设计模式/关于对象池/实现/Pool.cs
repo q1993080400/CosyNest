@@ -35,7 +35,7 @@ sealed class Pool<Obj> : AutoRelease, IPool<Obj>
     /// <param name="create">该委托用于创建对象池中的对象</param>
     public Pool(Func<Obj> create)
     {
-        this.Create = create;
+        Create = create;
     }
     #endregion
 }

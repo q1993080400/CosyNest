@@ -23,7 +23,7 @@ public abstract class WebApi
     /// 如果为<see langword="null"/>，则使用<see cref="CreateNet.HttpClientShared"/></param>
     protected WebApi(Func<IHttpClient>? httpClientProvide)
     {
-        this.HttpClientProvide = httpClientProvide ??= () => CreateNet.HttpClientShared;
+        HttpClientProvide = httpClientProvide ??= () => CreateNet.HttpClientShared;
     }
     #endregion
 }

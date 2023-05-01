@@ -52,10 +52,7 @@ sealed class JSCookie : JSRuntimeBase, ICookie
     #region 全部删除
     public async Task ClearAsync(CancellationToken cancellation = default)
     {
-        foreach (var key in await this.ToListAsync())
-        {
-            await RemoveAsync(key, cancellation);
-        }
+        await JSRuntime.InvokeVoidAsync("docCookies.clear", cancellation, "/");
     }
     #endregion
     #region 添加键值对

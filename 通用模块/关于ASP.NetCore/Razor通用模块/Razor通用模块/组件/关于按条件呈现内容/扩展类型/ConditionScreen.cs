@@ -11,7 +11,4 @@ public sealed class ConditionScreen : ConditionJS<IJSScreen>
     protected override async Task<IJSScreen> GetConditionFromJS(IJSWindow jsWindow)
         => await jsWindow.Screen;
     #endregion
-    #region 返回呈现条件是否固定
-    protected override bool IsFixed() => true;
-    #endregion
 }

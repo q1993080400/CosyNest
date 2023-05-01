@@ -21,7 +21,7 @@ sealed class Comparer<Obj> : IComparer<Obj>
     /// <inheritdoc cref="FastRealize.Comparer{Obj}(Func{Obj, Obj, int})"/>
     public Comparer(Func<Obj?, Obj?, int> isGreater)
     {
-        this.IsGreater = isGreater;
+        IsGreater = isGreater;
     }
     #endregion
 }

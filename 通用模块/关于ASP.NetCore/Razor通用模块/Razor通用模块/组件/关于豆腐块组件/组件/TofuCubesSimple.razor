@@ -1,0 +1,11 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+<TofuCubes MaxRow="MaxRow" MaxRowLength="MaxRowLength" Text="@Text" Width="@Width">
+    <div class="@context.CSSContainer" @attributes=ContainerAttributes>
+        <div class="@context.CSSIcon">
+            @RenderIcon(Text)
+        </div>
+        <div class="@context.CSSText" style="@(context.WidthStyle)">@context.Text</div>
+    </div>
+</TofuCubes>

@@ -39,8 +39,8 @@ sealed class AsyncProperty<Value> : IAsyncProperty<Value>
     /// <param name="setDelegate">用于写入异步属性的委托</param>
     public AsyncProperty(Func<CancellationToken, Task<Value>> getDelegate, Func<Value, CancellationToken, Task> setDelegate)
     {
-        this.GetDelegate = getDelegate;
-        this.SetDelegate = setDelegate;
+        GetDelegate = getDelegate;
+        SetDelegate = setDelegate;
     }
     #endregion
 }

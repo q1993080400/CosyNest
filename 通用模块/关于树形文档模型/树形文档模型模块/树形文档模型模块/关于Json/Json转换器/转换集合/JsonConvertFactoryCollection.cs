@@ -7,8 +7,9 @@ sealed class JsonConvertFactoryCollection : JsonConverterFactory
 {
     #region 是否可执行转换
     public override bool CanConvert(Type typeToConvert)
-        => typeToConvert.IsGenericRealize(typeof(IEnumerable<>)) ||
-        typeToConvert.GetInterfaces().Any(x => x.IsGenericRealize(typeof(ICollection<>)));
+        => (typeToConvert.IsGenericRealize(typeof(IEnumerable<>)) ||
+        typeToConvert.GetInterfaces().Any(x => x.IsGenericRealize(typeof(ICollection<>)))) &&
+        typeToConvert.Namespace is not "System.Collections.Immutable";
     #endregion
     #region 返回转换器
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)

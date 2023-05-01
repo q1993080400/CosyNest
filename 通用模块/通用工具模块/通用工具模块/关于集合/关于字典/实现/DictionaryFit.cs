@@ -112,8 +112,8 @@ public sealed class DictionaryFit<Key, Value> :
     /// 注意：<see cref="IsReadOnly"/>为<see langword="true"/>时，它永远为<see langword="false"/></param>
     public DictionaryFit(IDictionary<Key, Value>? dictionary = null, bool canModify = true)
     {
-        this.Dictionary = dictionary ?? new Dictionary<Key, Value>();
-        this.CanModify = canModify && !IsReadOnly;
+        Dictionary = dictionary ?? new Dictionary<Key, Value>();
+        CanModify = canModify && !IsReadOnly;
     }
     #endregion
 }

@@ -1,0 +1,7 @@
+﻿@namespace Microsoft.AspNetCore.Components.Forms
+@inherits ComponentBase
+@inject IJSWindow JSWindow
+
+<div style="display:none" @onclick:stopPropagation>
+    <InputFile OnChange=OnChange @attributes=AdditionalAttributes />
+</div>

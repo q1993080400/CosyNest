@@ -11,18 +11,40 @@ namespace System.DataFrancis;
 sealed class DataPipeVerify : IDataPipe
 {
     #region 公开成员
+    #region 关于添加和更新数据
+    #region 添加数据
+    public async Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
+        where Data : class, IData
+    {
+        VerifyData(datas);
+        await Pipe.Add(datas, cancellation);
+    }
+    #endregion
     #region 添加和更新
-    async Task<IEnumerable<Data>> IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    async Task IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
     {
         datas = datas.ToArray();
+        VerifyData(datas);
+        await Pipe.AddOrUpdate(datas, cancellation);
+    }
+    #endregion
+    #region 辅助方法：验证数据
+    /// <summary>
+    /// 验证数据，如果有数据不通过验证，
+    /// 则引发一个异常
+    /// </summary>
+    /// <typeparam name="Data">待验证的数据类型</typeparam>
+    /// <param name="datas">待验证的数据</param>
+    private void VerifyData<Data>(IEnumerable<Data> datas)
+        where Data : class, IData
+    {
         foreach (var item in datas)
         {
             if (Verify(item) is { Count: > 0 } message)
                 throw new ValidationException("数据验证失败" + Environment.NewLine + message.Join(Environment.NewLine));
         }
-        await Pipe.AddOrUpdate(datas, cancellation);
-        return datas;
     }
+    #endregion
     #endregion
     #region 删除
     Task IDataPipeTo.Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)

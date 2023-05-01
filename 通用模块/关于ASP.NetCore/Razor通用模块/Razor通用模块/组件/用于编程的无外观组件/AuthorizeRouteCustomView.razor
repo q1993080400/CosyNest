@@ -1,0 +1,37 @@
+﻿@namespace Microsoft.AspNetCore.Components.Authorization
+@inherits ComponentBase
+@using System.Reflection;
+
+@{
+    var policy = Policy;
+    var roles = Roles;
+    if (policy is null || roles is null)
+    {
+        var authorizationAttribute = RouteData.PageType.GetCustomAttributes<AuthorizeAttribute>().ToArray();
+        policy ??= authorizationAttribute.Select(x => x.Policy!).Where(x => x != null).ToArray();
+        roles ??= authorizationAttribute.Select(x => x.Roles!).Where(x => x != null).ToArray();
+    }
+    var policyCount = policy.Length;
+    var rolesCount = roles.Length;
+}
+
+<AuthorizeView Policy="@(policyCount>0?policy[0]:null)" Resource="Resource" Roles="@(rolesCount>0?roles[0]:null)" Authorizing="Authorizing!" NotAuthorized="NotAuthorized!">
+    <Authorized>
+        @{
+            var morePolicy = policyCount > 1;
+            var moreRoles = rolesCount > 1;
+        }
+        @if (morePolicy || moreRoles)
+        {
+            <AuthorizeRouteCustomView Authorized="Authorized" RouteData="RouteData"
+                                  Authorizing="Authorizing" NotAuthorized="NotAuthorized"
+                                  Resource="Resource"
+                                  Policy="@(morePolicy? policy[1..]:Array.Empty<string>())"
+                                  Roles="@(moreRoles? roles[1..]:Array.Empty<string>())" />
+        }
+        else
+        {
+            @Authorized(RouteData)
+        }
+    </Authorized>
+</AuthorizeView>

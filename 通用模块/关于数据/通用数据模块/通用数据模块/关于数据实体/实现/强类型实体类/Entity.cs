@@ -41,7 +41,7 @@ public abstract class Entity : IData
     = CreatePerformance.CacheThreshold(type =>
     {
         var propertyTypes = type.GetProperties().
-        Where(x => x.IsAlmighty() && x.GetCustomAttribute<NotMappedAttribute>() is null && !x.IsIndexing()).
+        Where(x => x.IsAlmighty() && x.GetCustomAttribute<NotMappedAttribute>() is null).
         Select(x => (x.Name, x.PropertyType)).ToArray();
         return CreateDesign.Schema(propertyTypes);
     }, 100, SchemaCache);
@@ -95,7 +95,7 @@ public abstract class Entity : IData
     = CreatePerformance.CacheThreshold(type =>
     {
         var propertys = type.GetProperties().
-        Where(x => x.IsAlmighty() && x.GetCustomAttribute<NotMappedAttribute>() is null && !x.IsIndexing());
+        Where(x => x.IsAlmighty() && x.GetCustomAttribute<NotMappedAttribute>() is null);
         return propertys.ToDictionary(x => (x.Name, x), true);
     }, 100, CacheProperty);
     #endregion

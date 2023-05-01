@@ -45,9 +45,9 @@ sealed class PlanTriggerWeek : PlanTriggerDate, IPlanTriggerWeek
         : base(time, count, createDate)
     {
         ExceptionIntervalOut.Check(1, null, intervalWeek);
-        this.Weeks = weeks.ToHashSet();
+        Weeks = weeks.ToHashSet();
         weeks.AnyCheck(nameof(weeks));
-        this.IntervalWeek = intervalWeek;
+        IntervalWeek = intervalWeek;
     }
     #endregion
 }

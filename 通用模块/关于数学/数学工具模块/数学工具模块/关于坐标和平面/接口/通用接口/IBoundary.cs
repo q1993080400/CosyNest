@@ -50,7 +50,7 @@ public interface IBoundary
     {
         get
         {
-            var vertex = this.Vertex;
+            var vertex = Vertex;
             return (vertex[0], vertex[2]);
         }
     }

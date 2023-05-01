@@ -39,7 +39,7 @@ sealed class JsonOutputFormatterGeneral : TextOutputFormatter
     /// 它提供了将对象序列化为Json的功能</param>
     public JsonOutputFormatterGeneral(JsonSerializerOptions options)
     {
-        this.Options = options;
+        Options = options;
         SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.Json));
         SupportedEncodings.Add(Encoding.UTF8);
         SupportedEncodings.Add(Encoding.Unicode);

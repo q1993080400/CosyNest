@@ -41,7 +41,7 @@ sealed class JsonInputFormatterGeneral : TextInputFormatter
     /// 它提供了将Jons反序列化为对象的功能</param>
     public JsonInputFormatterGeneral(JsonSerializerOptions options)
     {
-        this.Options = options;
+        Options = options;
         SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.Json));
         SupportedEncodings.Add(Encoding.UTF8);
         SupportedEncodings.Add(Encoding.Unicode);

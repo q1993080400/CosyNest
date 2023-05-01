@@ -20,7 +20,7 @@ public static class ExtenSignalR
     /// 基础方法，它调用Hub中心方法，然后返回返回值
     /// </summary>
     /// <exception cref="ArgumentException">无法识别表达式</exception>
-    /// <inheritdoc cref="InvokeAsync{Ret, Hub}(HubConnection, Expression{Func{Hub, Task{Ret}}}, CancellationToken)"/>
+    /// <inheritdoc cref="InvokeAsync{Hub, Ret}(HubConnection, Expression{Func{Hub, Ret}}, CancellationToken)"/>
     private static async Task<Ret> InvokeBase<Ret>(HubConnection hub, LambdaExpression invoke, CancellationToken cancellation = default)
     {
         if (invoke is
@@ -72,12 +72,12 @@ public static class ExtenSignalR
     /// 以强类型的方式，在客户端调用Hub中心的方法，不返回值
     /// </summary>
     /// <inheritdoc cref="InvokeAsync{Hub,Ret}(HubConnection, Expression{Func{Hub, Task{Ret}}}, CancellationToken)"/>
-    public static Task InvokeCoreAsync<Hub>(this HubConnection hub, Expression<Func<Hub, Task>> invoke, CancellationToken cancellation = default)
+    public static Task InvokeViodAsync<Hub>(this HubConnection hub, Expression<Func<Hub, Task>> invoke, CancellationToken cancellation = default)
         => InvokeBase<object>(hub, invoke, cancellation);
     #endregion
     #region 为同步方法优化
-    /// <inheritdoc cref="InvokeCoreAsync{Hub}(HubConnection, Expression{Func{Hub, Task}}, CancellationToken)"/>
-    public static Task InvokeCoreAsync<Hub>(this HubConnection hub, Expression<Action<Hub>> invoke, CancellationToken cancellation = default)
+    /// <inheritdoc cref="InvokeViodAsync{Hub}(HubConnection, Expression{Func{Hub, Task}}, CancellationToken)"/>
+    public static Task InvokeViodAsync<Hub>(this HubConnection hub, Expression<Action<Hub>> invoke, CancellationToken cancellation = default)
         => InvokeBase<object>(hub, invoke, cancellation);
     #endregion
     #endregion
@@ -93,6 +93,29 @@ public static class ExtenSignalR
         options.PayloadSerializerOptions.
             Converters.Add(CreateDesign.JsonCommon);
         return options;
+    }
+    #endregion
+    #region 按接口注册客户端方法
+    /// <summary>
+    /// 将一个接口中的所有方法注册为Hub连接的客户端方法
+    /// </summary>
+    /// <typeparam name="Interface">待注册客户端方法的接口</typeparam>
+    /// <param name="connection">要注册客户端方法的Hub连接</param>
+    /// <param name="instance">接口的实例，函数会从这个实例调用它的方法</param>
+    public static void OnStrong<Interface>(this HubConnection connection, Interface instance)
+        where Interface : class
+    {
+        var methods = typeof(Interface).GetTypeData().Methods;
+        foreach (var method in methods)
+        {
+            connection.On(method.Name, method.GetParameterTypes(),
+                async (parameter, _) =>
+            {
+                var task = method.Invoke(instance, parameter);
+                if (task is Task t)
+                    await t;
+            }, new());
+        }
     }
     #endregion
 }

@@ -67,25 +67,31 @@ sealed class EnumerableStream : Stream
     public override int Read(byte[] buffer, int offset, int count)
     {
         #region 本地函数
-        byte[] Fun(IEnumerable<byte> old)
+        byte[] Fun(byte[] old)
         {
             #region 说明文档
             /*本函数会递归合并数组，
               以确保最终获取的数组元素数量不低于count，
               或遍历至Bytes的末尾*/
             #endregion
-            var oldArrya = old.ToArray();
-            if (oldArrya.Length >= count || !Bytes.MoveNext())
-                return oldArrya;
-            var sum = oldArrya.Union(Bytes.Current);
-            return Fun(sum);
+            if (old.Length >= count || !Bytes.MoveNext())
+                return old;
+            var arrays = new List<byte[]>();
+            var arraysLen = 0;
+            do
+            {
+                var current = Bytes.Current.ToArray();
+                arrays.Add(current);
+                arraysLen += current.Length;
+            } while (arraysLen <= 4096 && Bytes.MoveNext());
+            return Fun(old.Concat(arrays.ToArray()));
         }
         #endregion
         var arry = Fun(OldData);
         count = Math.Min(arry.Length, count);
         Array.Copy(arry, 0, buffer, offset, count);
         PositionField += count;
-        OldData = arry.Take(count..).ToArray();
+        OldData = arry[count..];
         return count;
     }
     #endregion
@@ -93,7 +99,7 @@ sealed class EnumerableStream : Stream
     #region 内部成员
     #region 枚举器
     /// <summary>
-    /// 获取一个枚举所有数据的异步枚举器，
+    /// 获取一个枚举所有数据的枚举器，
     /// 本对象的功能就是通过它实现的
     /// </summary>
     private IEnumerator<IEnumerable<byte>> Bytes { get; }
@@ -114,7 +120,7 @@ sealed class EnumerableStream : Stream
     /// <param name="bytes">一个枚举所有数据的枚举器，本对象的功能就是通过它实现的</param>
     public EnumerableStream(IEnumerator<IEnumerable<byte>> bytes)
     {
-        this.Bytes = bytes;
+        Bytes = bytes;
     }
     #endregion
 }

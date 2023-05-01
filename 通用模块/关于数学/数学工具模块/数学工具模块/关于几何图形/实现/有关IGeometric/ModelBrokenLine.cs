@@ -30,7 +30,7 @@ sealed class ModelBrokenLine : IGeometricModel<IGeometric>
     public ModelBrokenLine(bool close, IEnumerable<IPoint> points)
     {
         points = points.Prepend(IPoint.Original).Distinct();
-        this.Points = (close ? points.Append(IPoint.Original) : points).ToArray();
+        Points = (close ? points.Append(IPoint.Original) : points).ToArray();
     }
     #endregion
 }

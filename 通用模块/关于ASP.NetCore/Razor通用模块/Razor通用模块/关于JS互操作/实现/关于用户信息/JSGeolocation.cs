@@ -19,7 +19,7 @@ sealed class JSGeolocation : JSRuntimeBase, IPosition
         }, (successMethod, failMethod) =>
 $$"""
                 navigator.geolocation.getCurrentPosition(x=>{{successMethod}}([x.coords.longitude,x.coords.latitude,x.coords.accuracy]),{{failMethod}},{enableHighAccuracy:true});
-""", cancellationToken);
+""", null, cancellationToken);
     #endregion
     #region 构造函数
     /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>

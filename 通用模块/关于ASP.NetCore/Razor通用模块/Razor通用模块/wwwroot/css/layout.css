@@ -1,6 +1,24 @@
 ﻿
 /*本样式表储存了有关布局的样式*/
 
+/*横向屏幕，即宽大于高，一般用于电脑*/
+@media (orientation: landscape)
+{
+}
+
+/*竖向屏幕，即高大于宽，一般用于手机*/
+@media (orientation: portrait)
+{
+    /*横屏显示*/
+    .horizontalScreen
+    {
+        min-width: 100vh;
+        min-height: 100vw;
+        transform-origin: left top;
+        transform: translateX(100vw) rotate(90deg)
+    }
+}
+
 /*相对于父元素的中部居中布局，水平垂直方向皆居中*/
 .centerMiddRelatively
 {
@@ -41,27 +59,36 @@
 }
 
 /*虚拟化容器的CSS样式*/
-.containerFrancis
+.virtualizationContainer
 {
     overflow-y: auto;
     max-height: 100vh;
 }
 
-
-/*横向屏幕，即宽大于高，一般用于电脑*/
-@media (orientation: landscape)
+/*豆腐块组件容器的CSS样式*/
+.tofuCubesContainer
 {
+    display: grid;
+    grid-template: auto auto/1fr auto 1fr
 }
 
-/*竖向屏幕，即高大于宽，一般用于手机*/
-@media (orientation: portrait)
+/*豆腐块组件图标的CSS样式*/
+.tofuCubesIcon
 {
-    /*横屏显示*/
-    .horizontalScreen
-    {
-        min-width: 100vh;
-        min-height: 100vw;
-        transform-origin: left top;
-        transform: translateX(100vw) rotate(90deg)
-    }
+    grid-column: 2
+}
+
+/*豆腐块组件文本的CSS样式*/
+.tofuCubesText
+{
+    text-align: center;
+    grid-area: 2/1/-1/-1
+}
+
+/*文本渲染组件的容器样式*/
+.textRenderingContainer
+{
+    overflow-wrap: break-word;
+    white-space: pre-line;
+    margin: auto
 }

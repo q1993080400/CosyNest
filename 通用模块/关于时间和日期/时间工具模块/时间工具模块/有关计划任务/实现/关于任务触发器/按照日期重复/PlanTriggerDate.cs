@@ -38,8 +38,8 @@ abstract class PlanTriggerDate : PlanTriggerTiming, IPlanTriggerDate
     public PlanTriggerDate(TimeOnly time, int? count = null, DateTimeOffset? createDate = null)
         : base(count)
     {
-        this.Time = time;
-        this.CreateDate = createDate ?? DateTime.Now;
+        Time = time;
+        CreateDate = createDate ?? DateTime.Now;
     }
     #endregion
 }

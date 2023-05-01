@@ -59,7 +59,7 @@ sealed record SizePosPixel : SizePixel, ISizePosPixel
         : base(horizontal, vertical)
     {
         var (r, t) = firstPixel;
-        this.FirstPixel = CreateMath.Point(r.Rounding(), t.Rounding());
+        FirstPixel = CreateMath.Point(r.Rounding(), t.Rounding());
     }
     #endregion
 }

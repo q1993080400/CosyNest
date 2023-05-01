@@ -107,8 +107,8 @@ sealed class QueueTaskExclusive : IQueueTask
     /// 如果为<see langword="null"/>，则不执行</param>
     public QueueTaskExclusive(Action? inSynchronizationLocking, Func<Task>? inAsynchronousLocking)
     {
-        this.InSynchronizationLocking = inSynchronizationLocking;
-        this.InAsynchronousLocking = inAsynchronousLocking;
+        InSynchronizationLocking = inSynchronizationLocking;
+        InAsynchronousLocking = inAsynchronousLocking;
     }
     #endregion
 }

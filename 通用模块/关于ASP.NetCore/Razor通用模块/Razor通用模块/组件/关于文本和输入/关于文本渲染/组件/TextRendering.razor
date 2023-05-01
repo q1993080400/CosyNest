@@ -1,0 +1,7 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if ((Value?.ToString(), ChildContent) is ({ } t, { }))
+{
+    @ChildContent(GetRenderInfo())
+}

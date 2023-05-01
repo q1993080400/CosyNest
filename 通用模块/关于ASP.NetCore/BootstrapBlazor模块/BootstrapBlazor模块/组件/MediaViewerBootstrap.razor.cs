@@ -56,8 +56,7 @@ public sealed partial class MediaViewerBootstrap : ComponentBase
     private static string OnLoadedMetaData(string id)
         => $$"""
         var video=document.getElementById('{{id}}');
-        if(video!=null)
-            video.muted=true;
+        video.muted=true;
         """;
     #endregion
     #region 获取要渲染的媒体

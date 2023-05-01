@@ -37,7 +37,7 @@ sealed class SymmetricAlgorithmPipe : WithoutRelease, IBitRead
         }
     }
     #endregion
-    #region 读取解密管道
+    #region 读取加密管道
     /// <summary>
     /// 获取一个<see cref="Stream"/>，
     /// 它填充了加密后的数据

@@ -21,7 +21,7 @@ public abstract class ExceptionSchema : Exception
     public ExceptionSchema(string propertyName, string? message)
         : base(message)
     {
-        this.PropertyName = propertyName;
+        PropertyName = propertyName;
     }
     #endregion
 }

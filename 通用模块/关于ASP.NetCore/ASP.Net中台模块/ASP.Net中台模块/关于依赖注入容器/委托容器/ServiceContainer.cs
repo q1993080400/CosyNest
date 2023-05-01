@@ -13,7 +13,7 @@
 /// </summary>
 /// <typeparam name="Key">键的类型</typeparam>
 /// <typeparam name="Service">服务的类型</typeparam>
-/// <param name="key"></param>
+/// <param name="key">用来提取服务的键</param>
 /// <returns></returns>
 public delegate Service ServiceContainer<in Key, out Service>(Key key);
 #endregion

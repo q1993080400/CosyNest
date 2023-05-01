@@ -27,8 +27,8 @@ class NodeContent<Obj> : INodeContent<Obj>
     /// <param name="getSon">传入包含内容，获取所有直接子节点的委托</param>
     public NodeContent(INodeContent<Obj>? father, Obj content, Func<Obj, IEnumerable<Obj>> getSon)
     {
-        this.Content = content;
-        this.Father = father;
+        Content = content;
+        Father = father;
         Son = getSon(content).Select(x => new NodeContent<Obj>(this, x, getSon));
     }
     #endregion

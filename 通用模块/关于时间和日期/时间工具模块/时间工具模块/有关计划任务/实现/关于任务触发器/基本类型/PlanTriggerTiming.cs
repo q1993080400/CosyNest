@@ -21,7 +21,7 @@ abstract class PlanTriggerTiming : IPlanTriggerTiming
     {
         if (count is { })
             ExceptionIntervalOut.Check(1, null, count.Value);
-        this.Count = count;
+        Count = count;
     }
     #endregion
 }

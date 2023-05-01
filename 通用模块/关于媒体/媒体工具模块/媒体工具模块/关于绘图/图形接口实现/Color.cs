@@ -58,10 +58,10 @@ sealed record Color : IColor
     /// <param name="a">指定的透明度</param>
     public Color(byte r, byte g, byte b, byte a = 255)
     {
-        this.R = r;
-        this.G = g;
-        this.B = b;
-        this.A = a;
+        R = r;
+        G = g;
+        B = b;
+        A = a;
     }
     #endregion
 }

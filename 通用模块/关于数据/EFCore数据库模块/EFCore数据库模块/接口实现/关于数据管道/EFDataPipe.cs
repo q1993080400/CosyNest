@@ -45,8 +45,20 @@ sealed class EFDataPipe : IDataPipe
         return db.Set<Data>();
     }
     #endregion
+    #region 关于添加或更新
+    #region 添加实体
+    public async Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
+        where Data : class, IData
+    {
+        datas = datas.ToArray();
+        var db = CreateDbContext(typeof(Data));
+        var dbSet = db.Set<Data>();
+        await dbSet.AddRangeAsync(datas, cancellation);
+        await db.SaveChangesAsync(cancellation);
+    }
+    #endregion
     #region 添加或更新实体
-    public async Task<IEnumerable<Data>> AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
         where Data : class, IData
     {
         datas = datas.ToArray();
@@ -54,7 +66,6 @@ sealed class EFDataPipe : IDataPipe
         var dbSet = db.Set<Data>();
         dbSet.UpdateRange(datas);
         await db.SaveChangesAsync(cancellation);
-        return datas;
     }
 
     /*注意事项：
@@ -63,6 +74,7 @@ sealed class EFDataPipe : IDataPipe
       因此，在任何情况下都不要手动写入实体的ID，
       也不要使用除了Guid以外的其他类型作为ID*/
     #endregion
+    #endregion 
     #region 删除实体
     #region 按照实体
     public async Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)

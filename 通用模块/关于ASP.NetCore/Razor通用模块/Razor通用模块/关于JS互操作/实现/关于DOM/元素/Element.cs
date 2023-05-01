@@ -130,8 +130,8 @@ sealed class Element : JSRuntimeBase, IElementJS
     public Element(IJSRuntime jsRuntime, string id)
         : base(jsRuntime)
     {
-        this.ID = id;
-        this.Prefix = $"document.getElementById(\"{id}\")";
+        ID = id;
+        Prefix = $"document.getElementById(\"{id}\")";
     }
     #endregion
 }

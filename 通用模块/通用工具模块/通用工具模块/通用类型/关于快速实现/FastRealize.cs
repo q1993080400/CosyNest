@@ -30,12 +30,12 @@ public static class FastRealize
     /// <typeparam name="Obj">要比较的对象类型</typeparam>
     /// <param name="getKey">从<typeparamref name="Obj"/>对象中提取键的委托</param>
     /// <returns></returns>
-    public static IEqualityComparer<Obj> EqualityComparer<Obj>(params Func<Obj, object>[] getKey)
+    public static IEqualityComparer<Obj> EqualityComparer<Obj>(params Func<Obj, object?>[] getKey)
     {
         getKey.AnyCheck("用来获取键的委托");
         return EqualityComparer<Obj>(
             (x, y) => getKey.All(del => Equals(del(x), del(y))),
-            x => ToolEqual.CreateHash(getKey.Select(del => del(x)).ToArray()));
+            x => ToolEqual.CreateHash(getKey.Select(del => del(x) ?? 0).ToArray()));
     }
     #endregion
     #endregion

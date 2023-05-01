@@ -42,6 +42,7 @@ public static partial class ExtenExpressions
             LambdaExpression e => e.Body.CalValue(),    //仅对没有参数或不使用参数的表达式有效
             BinaryExpression e => e.CalValue(),
             UnaryExpression e => e.CalValue(),
+            NewArrayExpression e => e.CalValue(),
             var e => throw new NotSupportedException($"不支持解析{e.NodeType}类型的表达式"),
         };
     #endregion
@@ -144,5 +145,21 @@ public static partial class ExtenExpressions
     /// <returns>表达式的计算结果</returns>
     public static Obj CompileInvoke<Obj>(this LambdaExpression lambda, params object[] parameters)
         => (Obj)lambda.Compile().DynamicInvoke(parameters)!;
+    #endregion
+    #region 针对数组初始化表达式
+    /// <summary>
+    /// 计算一个数组初始化表达式的值
+    /// </summary>
+    /// <param name="expression">要计算的数组初始化表达式</param>
+    /// <returns></returns>
+    public static Array CalValue(this NewArrayExpression expression)
+    {
+        if (expression.NodeType is ExpressionType.NewArrayBounds)
+            throw new NotSupportedException($"暂不支持计算{nameof(Expression.NodeType)}为{nameof(ExpressionType.NewArrayBounds)}的表达式");
+        var array = expression.Expressions.Select(x => x.CalValue()).ToArray();
+        var @return = Array.CreateInstance(expression.Type.GetElementType()!, array.Length);
+        Array.Copy(array, @return, array.Length);
+        return @return;
+    }
     #endregion
 }

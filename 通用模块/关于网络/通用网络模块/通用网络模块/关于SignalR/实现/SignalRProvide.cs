@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.NetFrancis.Http;
 
 namespace Microsoft.AspNetCore.SignalR.Client;
 
@@ -35,7 +35,7 @@ sealed class SignalRProvide : ISignalRProvide
         var value = await task;
         if (!exist)
         {
-            Configuration?.Invoke(value, newUuri);
+            Configuration?.Invoke(value, new UriComplete(newUuri).UriExtend!);
             await value.StartAsync();
         }
         return value;
@@ -47,7 +47,7 @@ sealed class SignalRProvide : ISignalRProvide
 
     public void SetConfiguration(Action<HubConnection, string> configuration)
     {
-        this.Configuration ??= configuration;
+        Configuration ??= configuration;
     }
     #endregion
     #region 释放对象
@@ -58,6 +58,7 @@ sealed class SignalRProvide : ISignalRProvide
             var value = await item;
             await value.DisposeAsync();
         }
+        Cache.Clear();
     }
     #endregion
     #region 构造函数
@@ -68,17 +69,10 @@ sealed class SignalRProvide : ISignalRProvide
     /// 然后创建一个新的<see cref="HubConnection"/>，如果为<see langword="null"/>，则使用默认方法</param>
     /// <param name="toAbs">这个对象可以将相对Uri转换为绝对Uri，
     /// 如果为<see langword="null"/>，则不进行转换</param>
-    public SignalRProvide(Func<string, Task<HubConnection>>? create, Func<string, string>? toAbs)
+    public SignalRProvide(Func<string, Task<HubConnection>> create, Func<string, string>? toAbs)
     {
-        this.Create = create ??= x =>
-        {
-            var connection = new HubConnectionBuilder().
-             WithUrl(x).
-             AddJsonProtocol(x => x.AddFormatterJson()).
-             Build();
-            return Task.FromResult(connection);
-        };
-        this.ToAbs = toAbs ??= x => x;
+        Create = create;
+        ToAbs = toAbs ??= x => x;
     }
     #endregion
 }

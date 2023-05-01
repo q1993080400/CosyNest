@@ -87,12 +87,12 @@ public static partial class ExtenReflection
     #region 是否为全能属性
     /// <summary>
     /// 返回某一属性是否为全能属性，
-    /// 全能属性指的是可读，可写，公开，且非静态的属性
+    /// 全能属性指的是可读，可写，公开，且非静态，非索引器的属性
     /// </summary>
     /// <param name="property">待检查的属性</param>
     /// <returns></returns>
     public static bool IsAlmighty(this PropertyInfo property)
-        => property.GetPermissions() is null && property.IsPublic() && !property.IsStatic();
+        => property.GetPermissions() is null && property.IsPublic() && !property.IsStatic() && !property.IsIndexing();
     #endregion
     #region 获取自动属性的背景字段
     /// <summary>

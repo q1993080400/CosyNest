@@ -25,8 +25,8 @@ sealed class BrokenLine : IGeometric
     /// <param name="content">用来枚举几何图形每条折线的枚举器</param>
     public BrokenLine(IGeometricModel<IGeometric> model, IBessel[] content)
     {
-        this.Model = model;
-        this.Content = content;
+        Model = model;
+        Content = content;
     }
     #endregion
 }

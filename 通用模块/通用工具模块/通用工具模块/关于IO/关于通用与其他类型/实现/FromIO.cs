@@ -114,14 +114,14 @@ public abstract class FromIO : ReleaseAsync, IFromIO
     {
         if (IsFreed)
             return;
-        switch ((this.Path, path?.Path))
+        switch ((Path, path?.Path))
         {
             case (null, null):
                 break;                      //没有路径，则放弃保存
             case (string p, null):
                 await SaveRealize(p, this.To<IFromIO>().IsExist); break;
             case (null, string p):
-                this.Path = p;
+                Path = p;
                 await SaveRealize(p, false);
                 break;
             case (string selfPath, string p):
@@ -177,8 +177,8 @@ public abstract class FromIO : ReleaseAsync, IFromIO
     /// <param name="supported">这个对象所支持的文件类型</param>
     public FromIO(PathText? path, IFileType supported)
     {
-        this.Supported = supported;
-        this.Path = path;
+        Supported = supported;
+        Path = path;
     }
     #endregion
 }

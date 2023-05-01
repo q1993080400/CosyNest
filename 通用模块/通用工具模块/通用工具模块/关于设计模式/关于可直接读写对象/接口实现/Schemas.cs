@@ -16,7 +16,7 @@ sealed class Schemas : ISchema
     /// <param name="schema">指定的架构</param>
     public Schemas(IReadOnlyDictionary<string, Type> schema)
     {
-        this.Schema = schema;
+        Schema = schema;
     }
     #endregion
 }

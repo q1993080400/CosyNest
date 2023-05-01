@@ -8,7 +8,8 @@ public interface IMethodSignature : ISignature
 {
     #region 返回值类型
     /// <summary>
-    /// 获取方法的返回值类型
+    /// 获取方法的返回值类型，
+    /// 可能为<see cref="void"/>
     /// </summary>
     Type Return { get; }
     #endregion

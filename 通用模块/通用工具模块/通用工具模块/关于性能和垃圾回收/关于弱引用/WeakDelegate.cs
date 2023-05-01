@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Design;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace System;
 
@@ -6,7 +8,7 @@ namespace System;
 /// 表示一个对目标使用弱引用的委托，可以防止由于事件引起的内存泄露问题
 /// </summary>
 /// <typeparam name="Del">被封装的委托类型</typeparam>
-public sealed class WeakDelegate<Del>
+public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
     where Del : Delegate
 {
     #region 说明文档
@@ -34,8 +36,16 @@ public sealed class WeakDelegate<Del>
     /// 会自动删除掉所有已经失去目标引用，而且不是静态方法的委托
     /// </summary>
     /// <param name="parameters">方法调用的参数列表</param>
-    public void Invoke(params object?[] parameters)
+    public async void Invoke(params object?[] parameters)
     {
+        await InvokeAsync(parameters);
+    }
+    #endregion
+    #region 异步动态调用事件
+    public async Task InvokeAsync(params object?[] parameters)
+    {
+        if (DelegateCollections.Count is 0)
+            return;
         LinkedList<(WeakReference?, MethodInfo)>? failure = null;     //如果没有委托被回收，则不初始化这个对象，减轻GC压力
         foreach (var item in DelegateCollections)
         {
@@ -44,7 +54,12 @@ public sealed class WeakDelegate<Del>
                 failure ??= new();
                 failure.AddLast(item);
             }
-            else item.Met.Invoke(item.Target?.Target, parameters);
+            else
+            {
+                var task = item.Met.Invoke(item.Target?.Target, parameters);
+                if ((task, IsAsync) is ({ }, true))
+                    await (dynamic)task;
+            }
         }
         failure?.ForEach(x => DelegateCollections.Remove(x));                       //删除掉所有已经失去目标引用，而且不是静态方法的委托
     }
@@ -74,13 +89,28 @@ public sealed class WeakDelegate<Del>
     #endregion
     #endregion
     #region 内部成员
+    #region 是否异步
+    /// <summary>
+    /// 获取这个委托是否为异步委托
+    /// </summary>
+    private bool IsAsync { get; }
+    #endregion
+    #region 比较器
+    /// <summary>
+    /// 获取用来比较委托元组的比较器
+    /// </summary>
+    private static IEqualityComparer<(WeakReference? Target, MethodInfo Met)> DelegateEquatable { get; }
+    = FastRealize.EqualityComparer<(WeakReference? Target, MethodInfo Met)>
+        ((x, y) => Equals(x.Target?.Target, y.Target?.Target) && Equals(x.Met, y.Met),
+        x => x.Met.GetHashCode());
+    #endregion
     #region 用弱引用储存的委托
     /// <summary>
     /// 储存委托的集合，委托被简化为一个元组，
     /// 第一个项是方法的调用方，第二个项是方法的元数据
     /// </summary>
     private HashSet<(WeakReference? Target, MethodInfo Met)> DelegateCollections { get; }
-    = new HashSet<(WeakReference? Target, MethodInfo Met)>();
+    = new HashSet<(WeakReference? Target, MethodInfo Met)>(DelegateEquatable);
     #endregion
     #region 对委托进行一个弱引用封装
     /// <summary>
@@ -93,6 +123,13 @@ public sealed class WeakDelegate<Del>
         var method = @delegate.Method;
         return (method.IsStatic ? null : new WeakReference(@delegate.Target), method);      //如果是静态方法，就不封装弱引用，节约内存
     }
-    #endregion 
+    #endregion
+    #endregion
+    #region 构造函数
+    public WeakDelegate()
+    {
+        var signature = typeof(Del).GetSignature();
+        IsAsync = signature.Return.GetMethod("GetAwaiter") is { } m && typeof(ICriticalNotifyCompletion).IsAssignableFrom(m.ReturnType);
+    }
     #endregion
 }

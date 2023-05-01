@@ -48,8 +48,8 @@ sealed class Unit<Template> : IUnit<Template>
     /// <param name="metricValue">公制单位的数量</param>
     public Unit(Template template, Num metricValue)
     {
-        this.Value = (template, template.FromMetric(metricValue));
-        this.ValueMetric = metricValue;
+        Value = (template, template.FromMetric(metricValue));
+        ValueMetric = metricValue;
     }
     #endregion
 }

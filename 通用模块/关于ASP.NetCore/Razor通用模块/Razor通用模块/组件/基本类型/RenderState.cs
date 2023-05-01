@@ -75,8 +75,8 @@ public sealed record RenderState : IComparable<RenderState>
     /// <param name="describe">对渲染阶段的描述</param>
     public RenderState(int stage, string describe)
     {
-        this.Stage = stage;
-        this.Describe = describe;
+        Stage = stage;
+        Describe = describe;
     }
     #endregion
     #endregion

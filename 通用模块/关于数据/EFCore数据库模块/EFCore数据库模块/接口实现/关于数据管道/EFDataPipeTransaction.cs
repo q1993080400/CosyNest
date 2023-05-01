@@ -57,16 +57,28 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
         where Data : class, IData
          => CreateDbContextFromEntityType(typeof(Data)).Set<Data>();
     #endregion
+    #region 关于添加或更新
+    #region 添加数据
+    public async Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
+        where Data : class, IData
+    {
+        datas = datas.ToArray();
+        var db = CreateDbContext(typeof(Data));
+        var dbSet = db.Set<Data>();
+        await dbSet.AddRangeAsync(datas, cancellation);
+    }
+    #endregion
     #region 添加或更新数据
-    public Task<IEnumerable<Data>> AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    public Task AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
          where Data : class, IData
     {
         datas = datas.ToArray();
         var db = CreateDbContextFromEntityType(typeof(Data));
         var dbSet = db.Set<Data>();
         dbSet.UpdateRange(datas);
-        return Task.FromResult(datas);
+        return Task.CompletedTask;
     }
+    #endregion 
     #endregion
     #region 删除数据
     #region 按照实体

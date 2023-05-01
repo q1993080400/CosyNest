@@ -7,33 +7,24 @@
 public static class CreateHardwarePC
 {
     #region 获取IScreen对象
-    private static ScreenPC? ScreenField;
-
     /// <summary>
     /// 获取特定于PC平台的<see cref="IScreen"/>对象
     /// </summary>
-    public static IScreen Screen
-        => ScreenField ??= new();
+    public static IScreen Screen { get; } = new ScreenPC();
     #endregion
     #region 获取IPower对象
-    private static PowerPC? PowerField;
-
     /// <summary>
     /// 获取特定于PC平台的<see cref="IPower"/>对象
     /// </summary>
-    public static IPower Power
-        => PowerField ??= new();
+    public static IPower Power { get; } = new PowerPC();
     #endregion
     #region 获取IStartManagement对象
-    private static IStartManagement? StartManagementField;
-
     /// <summary>
     /// 获取一个<see cref="IStartManagement"/>对象，
     /// 它可以用来管理应用自动启动，注意：它对自启动的定义是：
     /// 位于程序/启动文件夹
     /// </summary>
-    public static IStartManagement StartManagement
-        => StartManagementField ??= new StartManagement();
+    public static IStartManagement StartManagement { get; } = new StartManagement();
     #endregion
     #region 获取IMouse对象
     /// <summary>
@@ -54,5 +45,12 @@ public static class CreateHardwarePC
     /// 它可以用来管理个性化设置
     /// </summary>
     public static IPersonalise Personalise { get; } = new Personalise();
+    #endregion
+    #region 获取IHardwareInfo对象
+    /// <summary>
+    /// 获取一个<see cref="IHardwareInfo"/>对象，
+    /// 它可以用来获取PC平台的硬件信息
+    /// </summary>
+    public static IHardwareInfo HardwareInfo { get; } = new HardwareInfoPC();
     #endregion
 }

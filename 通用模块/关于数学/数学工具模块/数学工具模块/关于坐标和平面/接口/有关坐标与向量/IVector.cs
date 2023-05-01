@@ -60,8 +60,8 @@ public interface IVector
     /// <param name="direction">向量的方向</param>
     void Deconstruct(out Num length, out IUnit<IUTAngle> direction)
     {
-        length = this.Length;
-        direction = this.Direction;
+        length = Length;
+        direction = Direction;
     }
     #endregion
 }

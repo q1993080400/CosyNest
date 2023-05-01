@@ -107,7 +107,7 @@ public sealed class IOExceptionFrancis : IOException
     public IOExceptionFrancis(string path, string message)
         : base(message)
     {
-        this.Path = path;
+        Path = path;
     }
     #endregion
 }

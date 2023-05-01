@@ -67,31 +67,33 @@ sealed class JsonConvertPolymorphic<Obj> : JsonConverter<Obj>
     public override void Write(Utf8JsonWriter writer, Obj value, JsonSerializerOptions options)
     {
         #region 写入对象
-        void WriteObj(object? value)
+        void WriteObj(object? setValue)
         {
-            if (value is null)
+            if (setValue is null)
             {
                 writer.WriteNullValue();
                 return;
             }
-            var type = value.GetType();
-            if (!typeof(Obj).IsAssignableFrom(type))
+            var type = setValue.GetType();
+            var trueType = type.Assembly.IsDynamic ? type.BaseType! : type;
+            if (!CanConvert(trueType))
             {
-                JsonSerializer.Serialize(writer, value, options);
+                JsonSerializer.Serialize(writer, setValue, trueType, options);
                 return;
             }
-            var propertie = type.GetProperties().Where(x => x.IsAlmighty()).ToArrayIfDeBug();
+            var propertie = trueType.GetProperties().Where(x => x.IsAlmighty()).ToArrayIfDeBug();
             writer.WriteStartObject();
             writer.WritePropertyName(TypeNameKey);
-            writer.WriteStringValue(type.Name);
+            writer.WriteStringValue(trueType.FullName);
             writer.WritePropertyName(AssemblyKey);
-            writer.WriteStringValue(type.Assembly.FullName);
+            var assembly = trueType.Assembly;
+            writer.WriteStringValue(assembly.FullName);
             writer.WritePropertyName(ValueKey);
             writer.WriteStartObject();
             foreach (var item in propertie)
             {
                 writer.WritePropertyName(item.Name);
-                WriteObj(item.GetValue(value));
+                WriteObj(item.GetValue(setValue));
             }
             writer.WriteEndObject();
             writer.WriteEndObject();
@@ -135,7 +137,7 @@ sealed class JsonConvertPolymorphic<Obj> : JsonConverter<Obj>
     /// <param name="assemblies">转换器会从这些程序集中搜索多态反序列化的类型</param>
     public JsonConvertPolymorphic(IEnumerable<Assembly> assemblies)
     {
-        Assemblies = assemblies.ToDictionary(x => x.FullName ?? 
+        Assemblies = assemblies.ToDictionary(x => x.FullName ??
         throw new NullReferenceException($"在创建多态Json转换器的时候，某个程序集的全名为null"), x => x);
     }
     #endregion

@@ -47,9 +47,9 @@ sealed record PlanTaskInfo : IPlanTaskInfo
     /// 要启动的进程路径，以及传递给进程的参数</param>
     public PlanTaskInfo(string name, IEnumerable<IPlanTrigger> triggers, IEnumerable<(PathText Path, string? Parameters)> start)
     {
-        this.Name = name;
-        this.Triggers = triggers.ToList();
-        this.Start = start.ToList();
+        Name = name;
+        Triggers = triggers.ToList();
+        Start = start.ToList();
     }
     #endregion
     #region 直接创建，且仅有一个触发器和启动操作

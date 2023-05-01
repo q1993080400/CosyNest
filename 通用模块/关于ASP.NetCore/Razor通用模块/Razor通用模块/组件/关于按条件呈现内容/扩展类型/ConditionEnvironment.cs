@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿using System.Underlying;
+
+namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 该组件允许根据不同平台呈现不同的内容，
@@ -10,8 +12,5 @@ public sealed class ConditionEnvironment : ConditionJS<IEnvironmentInfoWeb>
     #region 返回呈现条件
     protected override async Task<IEnvironmentInfoWeb> GetConditionFromJS(IJSWindow jsWindow)
         => await jsWindow.Navigator.EnvironmentInfo();
-    #endregion
-    #region 返回呈现条件是否固定
-    protected override bool IsFixed() => true;
     #endregion
 }

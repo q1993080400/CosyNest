@@ -37,8 +37,8 @@ sealed record WeatherInfo : IWeatherInfo
     /// <param name="period">天气的时间段</param>
     public WeatherInfo(IAdministrativeArea area, IIntervalSpecific<DateTimeOffset> period)
     {
-        this.Period = period;
-        this.Area = area;
+        Period = period;
+        Area = area;
     }
     #endregion
 }

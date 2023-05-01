@@ -29,8 +29,8 @@ sealed class PlanTriggerYears : PlanTriggerDate, IPlanTriggerYears
     public PlanTriggerYears(TimeOnly time, IEnumerable<Month> months, IEnumerable<int> days, int? count = null, DateTimeOffset? createDate = null)
         : base(time, count, createDate)
     {
-        this.Months = months.ToHashSet();
-        this.Days = days.ToHashSet();
+        Months = months.ToHashSet();
+        Days = days.ToHashSet();
         days.AnyCheck(nameof(days));
         months.AnyCheck(nameof(months));
         days.ForEach(x => ExceptionIntervalOut.Check(1, 31, x));

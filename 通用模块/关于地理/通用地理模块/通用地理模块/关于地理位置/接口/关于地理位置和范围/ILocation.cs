@@ -43,9 +43,9 @@ public interface ILocation
     /// <param name="accuracy">精度</param>
     void Deconstruct(out decimal longitude, out decimal latitude, out decimal accuracy)
     {
-        longitude = this.Longitude;
-        latitude = this.Latitude;
-        accuracy = this.Accuracy;
+        longitude = Longitude;
+        latitude = Latitude;
+        accuracy = Accuracy;
     }
     #endregion
     #region 经纬度测距
@@ -61,8 +61,8 @@ public interface ILocation
         static double Rad(decimal d)
             => (double)d * Math.PI / 180D;
         #endregion
-        var radLat1 = Rad(this.Latitude);
-        var radLng1 = Rad(this.Longitude);
+        var radLat1 = Rad(Latitude);
+        var radLng1 = Rad(Longitude);
         var radLat2 = Rad(position.Latitude);
         var radLng2 = Rad(position.Longitude);
         var a = radLat1 - radLat2;

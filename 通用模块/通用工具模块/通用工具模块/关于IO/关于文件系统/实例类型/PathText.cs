@@ -73,7 +73,7 @@ public sealed record PathText
     /// <param name="path">指定的路径文本</param>
     public PathText(string path)
     {
-        this.Path = path.IsVoid() ?
+        Path = path.IsVoid() ?
                throw new ArgumentException("路径文本不能为null或空字符串") :
                Cache[path];
     }

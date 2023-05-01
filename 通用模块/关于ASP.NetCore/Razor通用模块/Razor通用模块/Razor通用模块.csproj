@@ -4,7 +4,7 @@
 		<TargetFramework>net7</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<AssemblyName>ToolRazor</AssemblyName>
-		<RootNamespace>Microsoft.AspNetCore</RootNamespace>
+		<RootNamespace>Microsoft.AspNetCore.Components</RootNamespace>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
@@ -23,8 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.5" />
 	</ItemGroup>
-
 </Project>

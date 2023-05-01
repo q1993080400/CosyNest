@@ -29,9 +29,14 @@
                                         }
                                         else
                                         {
-                                            var id = ToolASP.CreateJSObjectName();
-                                            <Media IsVideo=true CloseMemoryProgress=true ID="@id" OnTimeUpDate="@OnTimeUpDate(id)" OnLoadedMetaData="@OnLoadedMetaData(id)"
-                                                   src="@item.MediaUri" width="350" muted controls autoplay loop />
+                                            <Media CloseMemoryProgress=true Context="info">
+                                                <video id="@info.ID" width="350"
+                                                       ontimeupdate="@info.AppendScript(info.OnTimeUpDateScript,OnTimeUpDate)"
+                                                       onloadedmetadata="@info.AppendScript(info.OnLoadedMetaDataScript,OnLoadedMetaData)"
+                                                       onended="@info.OnEndedScript"
+                                                       onvolumechange="@info.OnVolumeChangeScript"
+                                                       src="@item.MediaUri" muted controls autoplay loop />
+                                            </Media>
                                         }
                                     </NineGrids>
                                 </CarouselItem>

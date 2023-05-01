@@ -63,9 +63,9 @@ sealed class RSAPack : AutoRelease
     /// 如果出现P，Q，D参数，则默认为私钥，否则为公钥</param>
     public RSAPack(string key)
     {
-        this.Algorithm = RSA.Create();
+        Algorithm = RSA.Create();
         Algorithm.FromXmlString(key);
-        this.HasPrivate = key.Contains("<P>") && key.Contains("<Q>") && key.Contains("<D>");
+        HasPrivate = key.Contains("<P>") && key.Contains("<Q>") && key.Contains("<D>");
     }
     #endregion
 }

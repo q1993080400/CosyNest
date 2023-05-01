@@ -5,7 +5,7 @@
 
 @if ((ChildContent, GetCondition) is ({ }, { }))
 {
-    <CascadingValue Value="GetCondition" IsFixed=@IsFixed()>
+    <CascadingValue Value="GetCondition" IsFixed=true>
         @ChildContent(GetCondition)
     </CascadingValue>
 }

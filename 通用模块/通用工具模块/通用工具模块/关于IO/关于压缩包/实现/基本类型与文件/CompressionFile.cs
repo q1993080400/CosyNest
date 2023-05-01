@@ -73,7 +73,7 @@ sealed class CompressionFile : CompressionItem, ICompressionFile
     public CompressionFile(ZipArchiveEntry zip, INode father)
         : base(father)
     {
-        this.ZipEntry = zip;
+        ZipEntry = zip;
     }
     #endregion
 }

@@ -52,10 +52,10 @@ public interface IColor
     /// <param name="a">这个对象接收颜色的A值</param>
     public void Deconstruct(out byte r, out byte g, out byte b, out byte a)
     {
-        r = this.R;
-        g = this.G;
-        b = this.B;
-        a = this.A;
+        r = R;
+        g = G;
+        b = B;
+        a = A;
     }
     #endregion
 }

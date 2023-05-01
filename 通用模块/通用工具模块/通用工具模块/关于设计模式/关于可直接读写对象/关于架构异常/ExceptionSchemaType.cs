@@ -33,8 +33,8 @@ sealed class ExceptionSchemaType : ExceptionSchema
     public ExceptionSchemaType(string propertyName, Type propertyType, Type legalType, string? message = null)
         : base(propertyName, message ?? $"属性{propertyName}的合法类型为{legalType}，但实际类型为{propertyType}，类型非法")
     {
-        this.PropertyType = propertyType;
-        this.LegalType = legalType;
+        PropertyType = propertyType;
+        LegalType = legalType;
     }
     #endregion
     #region 指定非法值

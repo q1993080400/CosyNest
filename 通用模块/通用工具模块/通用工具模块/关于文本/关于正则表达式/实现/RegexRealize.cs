@@ -62,8 +62,8 @@ sealed class RegexRealize : IRegex
     /// <param name="options">正则表达式的选项</param>
     public RegexRealize(string regexText, RegexOptions options)
     {
-        this.RegexText = regexText;
-        this.Options = options;
+        RegexText = regexText;
+        Options = options;
     }
     #endregion
     #region 静态构造函数

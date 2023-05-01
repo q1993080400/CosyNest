@@ -1,6 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using System.NetFrancis;
 using System.NetFrancis.Http;
+using System.Web;
+
+using Microsoft.AspNetCore.Http.Connections.Client;
 
 namespace System;
 
@@ -78,13 +81,23 @@ public static class ExtenRazor
     {
         if (text is null)
             return "null";
-        var base64 = Convert.ToBase64String(text.ToBytes());
-        return $"atob(\"{base64}\")";
+        var encode = Convert.ToBase64String(HttpUtility.UrlEncode(text).ToBytes());
+        return $"decodeURIComponent(atob(\"{encode}\"))";
     }
 
     /*本方法的目的在于：
       防止注入式攻击，或因为出现特殊字符，
       导致的JS语法错误*/
+    #endregion
+    #region 将布尔值转换为JS安全形式
+    /// <summary>
+    /// 将布尔值转换为JS安全形式，
+    /// 它通常在拼接JS代码时使用
+    /// </summary>
+    /// <param name="bool">待转换的布尔值</param>
+    /// <returns></returns>
+    public static string ToJSSecurity(this bool @bool)
+        => @bool ? "true" : "false";
     #endregion
     #endregion
     #region 有关JS属性
@@ -174,8 +187,13 @@ public static class ExtenRazor
     /// 本服务依赖于<see cref="IUriManager"/>以及<see cref="IJSWindow"/>
     /// </summary>
     /// <param name="services">要添加服务的容器</param>
+    /// <param name="withUri">这个委托被用来进一步执行Uri配置，
+    /// 如果为<see langword="null"/>，则不执行</param>
     /// <returns></returns>
-    public static IServiceCollection AddSignalRProvideWithCookie(this IServiceCollection services)
+    /// <inheritdoc cref="CreateNet.ConfigureSignalRProvide(Func{IHubConnectionBuilder, Task{IHubConnectionBuilder}}?)"/>
+    public static IServiceCollection AddSignalRProvideWithCookie(this IServiceCollection services,
+        Action<HttpConnectionOptions>? withUri = null,
+        Func<IHubConnectionBuilder, Task<IHubConnectionBuilder>>? configure = null)
         => services.AddSignalRProvide(async (uri, server) =>
         {
             var cookie = await server.GetRequiredService<IJSWindow>().Document.Cookie.ToListAsync();
@@ -183,14 +201,14 @@ public static class ExtenRazor
              WithUrl(uri, op =>
              {
                  var host = server.GetRequiredService<IUriManager>().Uri.UriHost!.DomainName;
-                 foreach (var (key, value) in cookie)
+                 foreach (var (key, value) in cookie.Where(x => !x.Key.IsVoid()))
                  {
-                     op.Cookies.Add(new Net.Cookie(Uri.EscapeDataString(key), Uri.EscapeDataString(value), "/", host));
+                     op.Cookies.Add(new Net.Cookie(HttpUtility.UrlEncode(key), HttpUtility.UrlEncode(value), "/", host));
                  }
+                 withUri?.Invoke(op);
              }).
-             AddJsonProtocol(x => x.AddFormatterJson()).
-             Build();
-            return connection;
+             AddJsonProtocol(x => x.AddFormatterJson());
+            return (configure is null ? connection : await configure(connection)).Build();
         });
     #endregion
     #endregion

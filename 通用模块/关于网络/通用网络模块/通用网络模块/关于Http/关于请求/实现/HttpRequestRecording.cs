@@ -59,7 +59,7 @@ public sealed record HttpRequestRecording
     [SetsRequiredMembers]
     public HttpRequestRecording(UriComplete uri)
     {
-        this.Uri = uri;
+        Uri = uri;
     }
     #endregion
     #region 指定Uri和参数
@@ -73,7 +73,7 @@ public sealed record HttpRequestRecording
     public HttpRequestRecording(string uri, (string Parameter, string Value)[]? parameters)
     {
         var uriComplete = new UriComplete(uri);
-        this.Uri = parameters.AnyAndNotNull() ?
+        Uri = parameters.AnyAndNotNull() ?
             uriComplete with
             {
                 UriParameter = new(parameters)

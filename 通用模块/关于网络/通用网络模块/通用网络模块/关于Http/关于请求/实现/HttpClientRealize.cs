@@ -204,7 +204,7 @@ sealed class HttpClientRealize : IHttpClient
     public HttpClientRealize(HttpClient httpClient, bool throwException)
     {
         HttpClient = httpClient;
-        this.ThrowException = throwException;
+        ThrowException = throwException;
     }
     #endregion
 }

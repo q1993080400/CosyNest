@@ -27,9 +27,9 @@ sealed class GraphicsPixel : IGraphicsPixel
     /// <param name="layer">像素点的图层</param>
     public GraphicsPixel(IColor color, IPoint position, int layer = 0)
     {
-        this.Color = color;
-        this.Position = position;
-        this.Layer = layer;
+        Color = color;
+        Position = position;
+        Layer = layer;
     }
     #endregion
 }

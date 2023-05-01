@@ -65,7 +65,7 @@ public interface ISizePosPixel : ISizePixel, IBoundary, IEquatable<ISizePosPixel
     /// <param name="size">新大小，如果为<see langword="null"/>，则不改变</param>
     /// <returns></returns>
     ISizePosPixel Transform(IPoint? position = null, ISizePixel? size = null)
-        => CreateMath.SizePosPixel(position ?? this.FirstPixel, size ?? this);
+        => CreateMath.SizePosPixel(position ?? FirstPixel, size ?? this);
     #endregion
     #endregion
     #region 解构ISizePosPixel
@@ -80,7 +80,7 @@ public interface ISizePosPixel : ISizePixel, IBoundary, IEquatable<ISizePosPixel
         var (h, v) = this;
         horizontal = h;
         vertical = v;
-        firstPixel = this.FirstPixel;
+        firstPixel = FirstPixel;
     }
     #endregion
 }

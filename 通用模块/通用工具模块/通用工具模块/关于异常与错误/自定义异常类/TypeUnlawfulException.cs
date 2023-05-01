@@ -54,8 +54,8 @@ public sealed class TypeUnlawfulException : InvalidCastException
               Join(Environment.NewLine))
     {
 
-        this.UnlawfulType = unlawfulType?.GetTypeObj() ?? typeof(object);
-        this.LegalType = legalType.Select(x => x.GetTypeObj());
+        UnlawfulType = unlawfulType?.GetTypeObj() ?? typeof(object);
+        LegalType = legalType.Select(x => x.GetTypeObj());
     }
     #endregion
 }

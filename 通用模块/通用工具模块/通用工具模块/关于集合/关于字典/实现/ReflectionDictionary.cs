@@ -77,8 +77,8 @@ sealed class ReflectionDictionary : IRestrictedDictionary<string, object?>
     /// <returns></returns>
     public ReflectionDictionary(object? target, IEnumerable<PropertyInfo> properties)
     {
-        this.Target = target;
-        this.Properties = properties.ToDictionary(x => (x.Name, x), true);
+        Target = target;
+        Properties = properties.ToDictionary(x => (x.Name, x), true);
     }
     #endregion
 }

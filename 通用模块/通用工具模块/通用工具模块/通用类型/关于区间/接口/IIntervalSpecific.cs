@@ -36,8 +36,8 @@ public interface IIntervalSpecific<Obj> : IInterval<Obj>
     /// <param name="max">用来接收区间上限的对象</param>
     void Deconstruct(out Obj? min, out Obj? max)
     {
-        min = this.Min;
-        max = this.Max;
+        min = Min;
+        max = Max;
     }
     #endregion
 }

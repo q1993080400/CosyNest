@@ -150,8 +150,13 @@ sealed class JsonConvertDirect<Obj> : JsonConverter<Obj>
               这是为了避免序列化实体类的外键属性，浪费性能以及产生不必要的bug*/
         }
         #endregion
-        var dictionary = Fun().ToDictionary(x => x.Key, x => x.Value);
-        JsonSerializer.Serialize(writer, dictionary, options);
+        writer.WriteStartObject();
+        foreach (var (k, v) in Fun())
+        {
+            writer.WritePropertyName(k);
+            JsonSerializer.Serialize(writer, v, options);
+        }
+        writer.WriteEndObject();
     }
     #endregion 
 }
