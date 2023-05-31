@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections.Immutable;
 
 namespace System.Performance;
 
@@ -16,8 +16,8 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
     /// <summary>
     /// 获取封装的字典，本对象的功能就是通过它实现的
     /// </summary>
-    private IDictionary<Key, UseValue> Dictionary { get; }
-    = new ConcurrentDictionary<Key, UseValue>();
+    private ImmutableDictionary<Key, UseValue> Dictionary { get; set; }
+        = ImmutableDictionary<Key, UseValue>.Empty;
     #endregion
     #region 键不存在时获取值的委托
     /// <summary>
@@ -39,7 +39,7 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
             else
             {
                 var v = NotExist(key);
-                Dictionary[key] = new UseValue(v);
+                Dictionary = Dictionary.SetItem(key, new UseValue(v));
                 GC();
                 return v;
             }
@@ -82,18 +82,17 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
         static int Fun(KeyValuePair<Key, UseValue> kv)
             => kv.Value.UseCount;
         #endregion
-        if (Dictionary.Count < Threshold)                      //如果元素数量没有达到阈值，则不进行回收
+        var cache = Dictionary;
+        if (cache.Count < Threshold)                      //如果元素数量没有达到阈值，则不进行回收
             return;
-        lock (Dictionary)
-        {
-            var needGC = (int)(Threshold * 0.75);                                     //计算出需要垃圾回收的元素数量
-            var list = Dictionary.Take(GCFront ? ..needGC : needGC..);           //只回收最先被添加到字典的四分之三元素
-            var avg = list.Average(Fun);                                                                                    //计算出键被使用的平均次数
-            list.Where(x => Fun(x) <= avg).
-                ForEach(x => Dictionary.Remove(x.Key));         //移除从未被使用，或使用次数低于平均值的元素
-            Dictionary.ForEach(x => x.Value.UseCount = 0);
-            GCFront = !GCFront;
-        }
+        var needGC = (int)(Threshold * 0.75);                                     //计算出需要垃圾回收的元素数量
+        var list = cache.Take(GCFront ? ..needGC : needGC..).ToArray();           //只回收最先被添加到字典的四分之三元素
+        var avg = list.Average(Fun);                                                                                    //计算出键被使用的平均次数
+        var removeKey = list.Where(x => Fun(x) <= avg).Select(x => x.Key).ToArray();         //移除从未被使用，或使用次数低于平均值的元素
+        cache = cache.RemoveRange(removeKey);
+        cache.ForEach(x => x.Value.UseCount = 0);
+        Dictionary = cache;
+        GCFront = !GCFront;
     }
     #endregion
     #endregion

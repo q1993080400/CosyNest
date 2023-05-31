@@ -35,7 +35,10 @@ public abstract class WithResource : Entity
     /// 在实体被删除后，可选执行这个操作
     /// </summary>
     public void DeleteResourceFolder()
-        => CreateIO.IO<IDirectory>(ResourceFolderPath)?.Delete();
+    {
+        var io = CreateIO.IO<IDirectory>(ResourceFolderPath);
+        io?.Delete();
+    }
     #endregion
     #region 初始化资源文件夹
     /// <summary>

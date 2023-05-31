@@ -155,15 +155,25 @@ public interface IJSWindow : IJSRuntime
     ValueTask<Ret?> FetchPost<Ret>(UriComplete uri, object? parameter, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default);
     #endregion
     #endregion
+    #region 关于通知
+    #region 请求通知权限
+    /// <summary>
+    /// 请求通知权限，
+    /// 并返回是否请求成功，
+    /// 一定要在手势事件中调用本方法，
+    /// 否则可能会被直接拒绝
+    /// </summary>
+    /// <returns></returns>
+    Task<bool> RequestNotifications();
+    #endregion
     #region 返回通知对象
     /// <summary>
     /// 返回一个可用于执行浏览器通知的对象，
     /// 如果不支持此功能，返回<see langword="null"/>
     /// </summary>
-    Task<INotifications?> Notifications { get; }
-
-    /*注意：Firefox浏览器要求通知功能授权只能在手势事件中执行，
-      为了适配不同的浏览器，在第一次获取本对象时，
-      请一定要将本属性放在手势事件（如单击）中执行*/
+    /// <param name="requestNotifications">如果这个值为<see langword="true"/>，
+    /// 则会自动请求通知权限</param>
+    Task<INotifications?> Notifications(bool requestNotifications);
+    #endregion
     #endregion
 }

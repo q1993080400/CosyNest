@@ -437,6 +437,38 @@ public static partial class ExtenIEnumerable
     public static bool AnyAndNotNull<Obj>([NotNullWhen(true)] this IEnumerable<Obj>? objs)
         => objs?.Any() ?? false;
     #endregion
+    #region 返回唯一符合条件的元素，或默认值
+    #region 无测试条件
+    /// <summary>
+    /// 返回集合中唯一的元素，
+    /// 如果集合为空，则返回默认值
+    /// </summary>
+    /// <typeparam name="Obj">集合的元素类型</typeparam>
+    /// <param name="objs">要返回唯一元素的集合</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="SingleOrDefaultSecure{Obj}(IEnumerable{Obj}, Func{Obj, bool})"/>
+    public static Obj? SingleOrDefaultSecure<Obj>(this IEnumerable<Obj> objs)
+    {
+        using var enumerator = objs.GetEnumerator();
+        if (!enumerator.MoveNext())
+            return default;
+        var current = enumerator.Current;
+        return enumerator.MoveNext() ? default : current;
+    }
+    #endregion
+    #region 具有测试条件
+    /// <summary>
+    /// 返回集合中唯一符合条件的元素，
+    /// 如果集合为空，或者存在多个符合条件的元素，
+    /// 则返回默认值
+    /// </summary>
+    /// <param name="func">用来测试集合中每个元素的委托</param>
+    /// <inheritdoc cref="SingleOrDefaultSecure{Obj}(IEnumerable{Obj})"/>
+    /// <returns></returns>
+    public static Obj? SingleOrDefaultSecure<Obj>(this IEnumerable<Obj> objs, Func<Obj, bool> func)
+        => objs.Where(func).SingleOrDefaultSecure();
+    #endregion
+    #endregion
 }
 #region 集合包含关系枚举
 /// <summary>

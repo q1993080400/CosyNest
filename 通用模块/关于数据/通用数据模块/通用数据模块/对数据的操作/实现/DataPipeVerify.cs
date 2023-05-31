@@ -12,20 +12,12 @@ sealed class DataPipeVerify : IDataPipe
 {
     #region 公开成员
     #region 关于添加和更新数据
-    #region 添加数据
-    public async Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
-        where Data : class, IData
-    {
-        VerifyData(datas);
-        await Pipe.Add(datas, cancellation);
-    }
-    #endregion
     #region 添加和更新
-    async Task IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    async Task IDataPipeTo.AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey, CancellationToken cancellation)
     {
         datas = datas.ToArray();
         VerifyData(datas);
-        await Pipe.AddOrUpdate(datas, cancellation);
+        await Pipe.AddOrUpdate(datas, specifyPrimaryKey, cancellation);
     }
     #endregion
     #region 辅助方法：验证数据

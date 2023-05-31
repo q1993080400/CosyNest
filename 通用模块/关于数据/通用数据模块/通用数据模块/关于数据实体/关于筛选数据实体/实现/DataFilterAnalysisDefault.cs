@@ -12,9 +12,11 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
 {
     #region 公开成员
     #region 解析为查询表达式
-    public IOrderedQueryable<Obj> Analysis<Obj>(IQueryable<Obj> dataSource, DataFilterDescription<Obj> description, Func<IQueryable<Obj>, IOrderedQueryable<Obj>>? sortFunction = null)
+    public IOrderedQueryable<Obj> Analysis<Obj>(IQueryable<Obj> dataSource, DataFilterDescription<Obj> description,
+        Func<IQueryable<Obj>, IOrderedQueryable<Obj>>? sortFunction = null,
+        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution = null)
     {
-        var query = GenerateQueryExpression(description, dataSource);
+        var query = GenerateQueryExpression(description, dataSource, reconsitution);
         var sort = sortFunction?.Invoke(query) ?? query.OrderBy(x => 0);
         return GenerateSortExpression(description, sort);
     }
@@ -27,13 +29,14 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// 生成一个用来查询的表达式
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(IQueryable{Obj}, DataFilterDescription{Obj}, Func{IQueryable{Obj}, IOrderedQueryable{Obj}}?)"/>
-    private static IQueryable<Obj> GenerateQueryExpression<Obj>(DataFilterDescription<Obj> description, IQueryable<Obj> dataSource)
+    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(IQueryable{Obj}, DataFilterDescription{Obj}, Func{IQueryable{Obj}, IOrderedQueryable{Obj}}?, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
+    private static IQueryable<Obj> GenerateQueryExpression<Obj>(DataFilterDescription<Obj> description, IQueryable<Obj> dataSource,
+        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
     {
         var condition = description.QueryCondition.ToArray();
         if (condition.Any())
         {
-            var where = GenerateWhereExpression(condition);
+            var where = GenerateWhereExpression(condition, reconsitution);
             return dataSource.Where(where);
         }
         return dataSource;
@@ -46,10 +49,11 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <typeparam name="Obj">实体类的类型</typeparam>
     /// <param name="condition">查询条件</param>
     /// <returns></returns>
-    private static Expression<Func<Obj, bool>> GenerateWhereExpression<Obj>(IEnumerable<QueryCondition<Obj>> condition)
+    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(IQueryable{Obj}, DataFilterDescription{Obj}, Func{IQueryable{Obj}, IOrderedQueryable{Obj}}?, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
+    private static Expression<Func<Obj, bool>> GenerateWhereExpression<Obj>(IEnumerable<QueryCondition<Obj>> condition, Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
     {
         var parameter = Parameter(typeof(Obj));
-        var body = GenerateWhereBodyExpression(condition, parameter);
+        var body = GenerateWhereBodyExpression(condition, parameter, reconsitution);
         return Lambda<Func<Obj, bool>>(body, new[] { parameter });
     }
     #endregion
@@ -59,9 +63,10 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// </summary>
     /// <param name="parameter">Where表达式树的参数</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateWhereExpression{Obj}(IEnumerable{QueryCondition{Obj}})"/>
-    private static Expression GenerateWhereBodyExpression<Obj>(IEnumerable<QueryCondition<Obj>> condition, ParameterExpression parameter)
-        => condition.Select(x => GenerateWhereBodySingleExpression(x, parameter)).
+    /// <inheritdoc cref="GenerateWhereExpression{Obj}(IEnumerable{QueryCondition{Obj}}, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
+    private static Expression GenerateWhereBodyExpression<Obj>(IEnumerable<QueryCondition<Obj>> condition, ParameterExpression parameter,
+        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
+        => condition.Select(x => GenerateWhereBodySingleExpression(x, parameter, reconsitution)).
         Aggregate((Expression?)null,
             (seed, expression) => seed is null ? expression : AndAlso(seed, expression))!;
     #endregion
@@ -71,12 +76,22 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// </summary>
     /// <param name="condition">要生成表达式树的单个查询条件</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateWhereBodyExpression{Obj}(IEnumerable{QueryCondition{Obj}}, ParameterExpression)"/>
-    private static Expression GenerateWhereBodySingleExpression<Obj>(QueryCondition<Obj> condition, ParameterExpression parameter)
+    /// <inheritdoc cref="GenerateWhereBodyExpression{Obj}(IEnumerable{QueryCondition{Obj}}, ParameterExpression, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
+    private static Expression GenerateWhereBodySingleExpression<Obj>(QueryCondition<Obj> condition, ParameterExpression parameter,
+        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
     {
         var propertyAccess = condition.PropertyAccess.Split('.');
         var single = GenerateWhereBodyPartExpression(parameter, propertyAccess, condition.LogicalOperator, condition.CompareValue);
-        return single;
+        if (reconsitution is null)
+            return single;
+        var info = new QueryConditionReconsitutionInfo<Obj>()
+        {
+            Expression = single,
+            QueryCondition = condition,
+            Parameter = parameter
+        };
+        var reconsitutionExpression = reconsitution(info);
+        return reconsitutionExpression;
     }
     #endregion
     #region 生成单个查询条件中每个部分的表达式
@@ -146,7 +161,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// </summary>
     private static MethodInfo MethodAny { get; }
         = typeof(Enumerable).GetTypeData().
-        MethodDictionary[nameof(Enumerable.Any)].SingleOrDefault(x => x.GetParameters().Length is 2) ??
+        MethodDictionary[nameof(Enumerable.Any)].SingleOrDefaultSecure(x => x.GetParameters().Length is 2) ??
         throw new NotSupportedException($"{nameof(Enumerable)}中存在多个名为{nameof(Enumerable.Any)}，且参数数量为2的方法，" +
             $"您可以检查下，是不是升级Net版本后新增了这个方法？如果是，请将这个属性重构");
     #endregion

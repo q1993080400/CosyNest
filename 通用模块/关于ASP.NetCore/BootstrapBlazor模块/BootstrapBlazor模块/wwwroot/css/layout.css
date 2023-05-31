@@ -1,0 +1,69 @@
+﻿
+/*PC平台*/
+@media only screen and (min-width : 1224px)
+{
+    /*媒体视图容器的样式*/
+    .mediaViewerContainer
+    {
+        /*封面大小基准*/
+        --coverSizeBase: 24em
+    }
+}
+
+/*平板平台*/
+@media only screen and (min-width : 667px) and (max-width : 1224px)
+{
+    /*媒体视图容器的样式*/
+    .mediaViewerContainer
+    {
+        /*封面大小基准*/
+        --coverSizeBase: 16em
+    }
+}
+
+/*手机平台*/
+@media only screen and (max-width : 667px)
+{
+    /*媒体视图容器的样式*/
+    .mediaViewerContainer
+    {
+        /*封面大小基准*/
+        --coverSizeBase: 8em
+    }
+}
+
+/*媒体视图容器的样式*/
+.mediaViewerContainer
+{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5ch;
+    background-color: white;
+    /*自动播放按钮大小*/
+    --coverPlayButtonSize: calc(var(--coverSizeBase) / 4)
+}
+
+/*播放按钮样式*/
+.coverPlayButton
+{
+    width: var(--coverPlayButtonSize);
+    height: var(--coverPlayButtonSize);
+}
+
+/*封面的样式*/
+.cover
+{
+    cursor: pointer;
+    max-width: var(--coverSizeBase);
+    max-height: var(--coverSizeBase);
+    object-fit: contain;
+    object-position: center;
+}
+
+/*媒体预览图片样式*/
+.mediaPreview
+{
+    object-fit: contain;
+    object-position: center;
+}

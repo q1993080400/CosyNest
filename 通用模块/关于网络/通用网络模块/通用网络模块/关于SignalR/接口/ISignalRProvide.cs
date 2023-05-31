@@ -15,18 +15,20 @@ public interface ISignalRProvide : IAsyncDisposable
     /// </summary>
     /// <param name="uri">SignalR中心的Uri，
     /// 它可以是相对的，也可以是绝对的</param>
+    /// <param name="newBuilt">如果这个值为<see langword="true"/>，
+    /// 则始终新建连接，不缓存连接，新建的连接需要调用者自己想办法释放</param>
     /// <returns></returns>
-    Task<HubConnection> GetConnection(string uri);
+    Task<HubConnection> GetConnection(string uri, bool newBuilt = false);
     #endregion
     #region 通过业务接口自动获取Uri
     /// <typeparam name="BusinessInterface">Hub中心实现的业务接口，
     /// 如果在注册中心的时候使用默认路由，函数可以通过它推断出中心的Uri</typeparam>
-    /// <inheritdoc cref="GetConnection(string)"/>
-    Task<HubConnection> GetConnection<BusinessInterface>()
+    /// <inheritdoc cref="GetConnection(string,bool)"/>
+    Task<HubConnection> GetConnection<BusinessInterface>(bool newBuilt = false)
         where BusinessInterface : class
     {
         var uri = ToolSignalR.GetHubDefaultUri<BusinessInterface>();
-        return GetConnection(uri);
+        return GetConnection(uri, newBuilt);
     }
     #endregion
     #endregion

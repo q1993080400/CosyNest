@@ -122,58 +122,68 @@ sealed class JSWindow : JSRuntimeBase, IJSWindow
                  }, null, cancellationToken);
     }
     #endregion
+    #region 关于通知
+    #region 请求通知权限
+    public Task<bool> RequestNotifications()
+        => AwaitPromise(x => true,
+            (success, fail) =>
+            $$"""
+            if(!("Notification" in window))
+            {
+                {{fail}}('浏览器不支持通知API');
+                return;
+            }
+            Notification.requestPermission().then(state=>
+            {
+                if(state=='granted')
+                    {{success}}(state);
+                else
+                    {{fail}}(state);
+            }).catch(error=>
+            {
+                {{fail}}(error);
+            });
+            """);
+    #endregion
     #region 返回通知对象
     #region 正式属性
-    public Task<INotifications?> Notifications
+    public async Task<INotifications?> Notifications(bool requestNotifications)
     {
-        get
-        {
-            #region 用来获取通知对象的本地函数
-            Task<INotifications?> GetNotifications()
-            {
-                if (CacheNotifications)
-                    return Task.FromResult(NotificationsFiled);
-                return AwaitPromise<INotifications?>(Success, (success, fail) =>
-                 $$"""
-                if(!window.Notification)
+        if (NotificationsFiled is { })
+            return NotificationsFiled;
+        return await AwaitPromise<INotifications?>(_ => NotificationsFiled = new Notifications(JSRuntime), (success, fail) =>
+         $$"""
+                if(!("Notification" in window))
                 {
                     {{fail}}('浏览器不支持通知API');
                     return;
                 }
-                Notification.requestPermission().then(state=>
+                if(Notification.permission=='granted')
                 {
-                    if(state=='granted')
-                        {{success}}(state);
+                    {{success}}(1);
+                }
+                else
+                {
+                    if({{(!requestNotifications).ToJSSecurity()}}||Notification.permission=='denied')
+                    {
+                        {{fail}}(1);
+                    }
                     else
-                        {{fail}}(state);
-                }).catch(error=>
-                {
-                    {{fail}}(error);
-                });
-                """,
-                e =>
-                {
-                    CacheNotifications = true;
-                    return null;
-                });
-            }
-            #endregion
-            #region 成功时的回调函数
-            INotifications? Success(JsonElement jsonElement)
-            {
-                CacheNotifications = true;
-                return NotificationsFiled = new Notifications(JSRuntime);
-            }
-            #endregion
-            return GetNotifications();
-        }
+                    {
+                        Notification.requestPermission().then(state=>
+                        {
+                            if(state=='granted')
+                                {{success}}(state);
+                            else
+                                {{fail}}(state);
+                        }).catch(error=>
+                        {
+                            {{fail}}(error);
+                        });
+                    }
+                }
+                """);
     }
-    #endregion
-    #region 是否缓存通知对象
-    /// <summary>
-    /// 获取是否成功缓存通知对象
-    /// </summary>
-    private bool CacheNotifications { get; set; }
     #endregion
     #region 缓存通知对象
     /// <summary>
@@ -181,6 +191,7 @@ sealed class JSWindow : JSRuntimeBase, IJSWindow
     /// </summary>
     private INotifications? NotificationsFiled { get; set; }
     #endregion
+    #endregion 
     #endregion
     #region 构造函数
     /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>

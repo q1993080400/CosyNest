@@ -95,6 +95,12 @@ public interface IJSDocument
     /// <returns></returns>
     ValueTask<IBitRead?> VideoScreenshot(string id, string format = "png", CancellationToken cancellation = default);
     #endregion
+    #region 返回页面的可见状态
+    /// <summary>
+    /// 返回页面的可见状态
+    /// </summary>
+    Task<VisibilityState> VisibilityState { get; }
+    #endregion
     #region 关于JS调用Net方法
     #region 为JS对象添加Net事件
     /// <summary>

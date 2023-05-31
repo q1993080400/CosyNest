@@ -282,4 +282,13 @@ public static class CreateIO
         => new CompressedPackage(stream);
     #endregion
     #endregion
+    #region 创建简单文件路径协议
+    /// <summary>
+    /// 返回一个简单文件路径协议，
+    /// 它可以将文件名加上一个<see cref="Guid"/>前缀，使其永不重名，
+    /// 或者解析文件路径，去掉<see cref="Guid"/>前缀，返回原始的文件名（不是文件路径）
+    /// </summary>
+    public static (GenerateFilePathProtocol<string, string> Generate, AnalysisFilePathProtocol<string, string> Analysis) SimpleFilePathProtocol { get; }
+    = (IOFrancis.SimpleFilePathProtocol.GenerateFilePathProtocol, IOFrancis.SimpleFilePathProtocol.AnalysisFilePathProtocol);
+    #endregion
 }

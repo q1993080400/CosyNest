@@ -21,8 +21,8 @@ public static class ConditionDynamicsRender
         {
             var screenType = screen.ScreenType;
             var types = assembly.GetTypes().Where(x => x.Name.StartsWith(prefix)).ToArray();
-            var match = types.SingleOrDefault(x => x.GetCustomAttributes<ConditionRenderMatchAttribute<ScreenType>>().Any(y => y.RenderCondition == screenType));
-            return match ?? types.SingleOrDefault(x => x.HasAttributes<ConditionRenderAllAttribute<ScreenType>>()) ??
+            var match = types.SingleOrDefaultSecure(x => x.GetCustomAttributes<ConditionRenderMatchAttribute<ScreenType>>().Any(y => y.RenderCondition == screenType));
+            return match ?? types.SingleOrDefaultSecure(x => x.HasAttributes<ConditionRenderAllAttribute<ScreenType>>()) ??
                 throw new NotSupportedException($"在程序集{assembly}中没有找到标记了{nameof(ConditionRenderMatchAttribute<ScreenType>)}或{nameof(ConditionRenderAllAttribute<ScreenType>)}特性，" +
                 $"且{nameof(ConditionRenderMatchAttribute<ScreenType?>.RenderCondition)}匹配null的组件，或找到了多个");
         };

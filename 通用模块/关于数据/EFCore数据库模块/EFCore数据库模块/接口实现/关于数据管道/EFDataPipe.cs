@@ -1,11 +1,13 @@
 ﻿using System.Linq.Expressions;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace System.DataFrancis.DB.EF;
 
 /// <summary>
 /// 这个类型是使用EFCore实现的数据管道
 /// </summary>
-sealed class EFDataPipe : IDataPipe
+sealed class EFDataPipe : IDataPipeDB
 {
     #region 说明文档
     /*问：使用本类型，而不是直接使用EFCore有什么好处？
@@ -45,36 +47,71 @@ sealed class EFDataPipe : IDataPipe
         return db.Set<Data>();
     }
     #endregion
-    #region 关于添加或更新
-    #region 添加实体
-    public async Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
-        where Data : class, IData
-    {
-        datas = datas.ToArray();
-        var db = CreateDbContext(typeof(Data));
-        var dbSet = db.Set<Data>();
-        await dbSet.AddRangeAsync(datas, cancellation);
-        await db.SaveChangesAsync(cancellation);
-    }
-    #endregion
     #region 添加或更新实体
-    public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
-        where Data : class, IData
-    {
-        datas = datas.ToArray();
-        var db = CreateDbContext(typeof(Data));
-        var dbSet = db.Set<Data>();
-        dbSet.UpdateRange(datas);
-        await db.SaveChangesAsync(cancellation);
-    }
-
+    #region 说明文档
     /*注意事项：
-      根据约定，存在ID的实体一律视为更新，
-      不存在ID的实体一律视为添加，而不管它们是不是真的存在于数据库中，
-      因此，在任何情况下都不要手动写入实体的ID，
+      根据约定，除非specifyPrimaryKey参数为true，
+      否则存在ID的实体一律视为更新，不存在ID的实体一律视为添加，而不管它们是不是真的存在于数据库中，
+      因此，在不要随便显式写入实体的ID，
       也不要使用除了Guid以外的其他类型作为ID*/
     #endregion
-    #endregion 
+    #region 正式方法
+    public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey, CancellationToken cancellation)
+        where Data : class, IData
+    {
+        datas = datas.ToArray();
+        var db = CreateDbContext(typeof(Data));
+        Track(db, datas, specifyPrimaryKey);
+        await db.SaveChangesAsync(cancellation);
+    }
+    #endregion
+    #region 辅助方法：跟踪数据
+    /// <summary>
+    /// 开始跟踪数据，它能够正确地识别添加和修改操作
+    /// </summary>
+    /// <typeparam name="Data">数据类型</typeparam>
+    /// <param name="dbContext">数据库对象</param>
+    /// <param name="datas">要跟踪的数据</param>
+    /// <param name="specifyPrimaryKey">用来确定主键是否为显式指定的委托</param>
+    /// <returns></returns>
+    public static void Track<Data>(DbContext dbContext, IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey)
+        where Data : class, IData
+    {
+        if (specifyPrimaryKey is null)
+        {
+            dbContext.UpdateRange(datas);
+            return;
+        }
+        var changeTracker = dbContext.ChangeTracker;
+        foreach (var item in datas)
+        {
+            changeTracker.TrackGraph(item, new HashSet<object>(), node =>
+            {
+                var entry = node.Entry;
+                if (entry.State is EntityState.Deleted or EntityState.Added)
+                    return false;
+                var entity = entry.Entity;
+                var state = node.NodeState;
+                if (state.Contains(entity))
+                    return false;
+                var idProperty = entry.Property("ID");
+                var id = idProperty.CurrentValue.To<Guid>();
+                var isDefault = id == default;
+                if (isDefault || specifyPrimaryKey(id))
+                {
+                    if (isDefault)
+                        idProperty.CurrentValue = Guid.NewGuid();
+                    entry.State = EntityState.Added;
+                }
+                else
+                    entry.State = EntityState.Modified;
+                state.Add(entity);
+                return true;
+            });
+        }
+    }
+    #endregion
+    #endregion
     #region 删除实体
     #region 按照实体
     public async Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
@@ -82,7 +119,7 @@ sealed class EFDataPipe : IDataPipe
     {
         var db = CreateDbContext(typeof(Data));
         var dbSet = db.Set<Data>();
-        dbSet.CascadingDelete(datas);
+        dbSet.RemoveRange(datas);
         await db.SaveChangesAsync(cancellation);
     }
     #endregion
@@ -90,8 +127,7 @@ sealed class EFDataPipe : IDataPipe
     public async Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
         where Data : class, IData
     {
-        var data = Query<Data>().Where(expression).ToArray();       //不使用ExecuteDelete的目的，是为了支持级联删除
-        await Delete(data, cancellation);
+        await Query<Data>().Where(expression).ExecuteDeleteAsync(cancellation);
     }
     #endregion
     #endregion

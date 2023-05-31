@@ -17,20 +17,20 @@ public sealed record MediaSource
     #endregion
     #region 媒体Uri
     /// <summary>
-    /// 获取媒体本体的Uri
+    /// 获取媒体本体的Uri，
+    /// 它可以是图片，视频，也可以是其他文件
     /// </summary>
     public required string MediaUri { get; init; }
     #endregion
-    #region 返回媒体是图片还是视频
+    #region 返回返回媒体的类型
     /// <summary>
-    /// 如果媒体本体是图片，返回<see langword="true"/>，
-    /// 是视频，返回<see langword="false"/>，都不是，则引发异常
+    /// 返回媒体的类型
     /// </summary>
-    public bool IsImage => MediaUri switch
+    public MediaSourceType MediaSourceType => MediaUri switch
     {
-        var uri when FileTypeCom.WebImage.IsCompatible(uri) => true,
-        var uri when FileTypeCom.WebVideo.IsCompatible(uri) => false,
-        var uri => throw new ArgumentException($"{uri}既不是图片也不是视频")
+        var uri when FileTypeCom.WebImage.IsCompatible(uri) => MediaSourceType.WebImage,
+        var uri when FileTypeCom.WebVideo.IsCompatible(uri) => MediaSourceType.WebVideo,
+        _ => MediaSourceType.File
     };
     #endregion
 }

@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Selenium.WebDriver" Version="4.8.2" PrivateAssets="compile" />
+	  <PackageReference Include="Selenium.WebDriver" Version="4.9.0" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

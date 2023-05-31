@@ -49,8 +49,12 @@ public sealed partial class MediaViewer : ComponentBase
     {
         var mediaSource = MediaSource.ToArray();
         #region 本地函数
-        EventCallback Fun(int index)
-            => EventCallback.Factory.Create(this, () => PreviewMediaIndex = index);
+        Func<Task> Fun(int index)
+            => () =>
+            {
+                PreviewMediaIndex = index;
+                return Task.CompletedTask;
+            };
         #endregion
         var renderCover = mediaSource.PackIndex().Select(x => new RenderCoverInfo()
         {

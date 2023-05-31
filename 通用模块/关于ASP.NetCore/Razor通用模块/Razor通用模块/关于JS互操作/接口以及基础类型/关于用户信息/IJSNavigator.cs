@@ -17,11 +17,11 @@ public interface IJSNavigator
     /// <returns></returns>
     Task<IEnvironmentInfoWeb> EnvironmentInfo(CancellationToken cancellation = default);
     #endregion
-    #region 获取或设置剪贴板文本
+    #region 剪切板对象
     /// <summary>
-    /// 获取或设置剪贴板文本
+    /// 获取一个可以用来读写剪切板的对象
     /// </summary>
-    IAsyncProperty<string?> ClipboardText { get; }
+    IJSClipboard Clipboard { get; }
     #endregion
     #region 获取定位对象
     /// <summary>

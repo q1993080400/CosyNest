@@ -43,10 +43,8 @@ public interface IJSLocation
     /// <summary>
     /// 刷新当前页面
     /// </summary>
-    /// <param name="forceGet">如果该参数为<see langword="true"/>，
-    /// 则绕过缓存，直接从服务器下载页面</param>
     /// <param name="cancellation">用于取消异步任务的令牌</param>
     /// <returns></returns>
-    ValueTask Reload(bool forceGet = false, CancellationToken cancellation = default);
+    ValueTask Reload(CancellationToken cancellation = default);
     #endregion
 }

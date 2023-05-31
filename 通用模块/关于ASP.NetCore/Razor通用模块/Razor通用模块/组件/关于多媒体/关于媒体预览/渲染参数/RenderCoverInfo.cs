@@ -15,6 +15,6 @@ public sealed record RenderCoverInfo
     /// <summary>
     /// 当执行预览媒体的时候，触发这个事件
     /// </summary>
-    public required EventCallback PreviewEvent { get; init; }
+    public required Func<Task> PreviewEvent { get; init; }
     #endregion
 }

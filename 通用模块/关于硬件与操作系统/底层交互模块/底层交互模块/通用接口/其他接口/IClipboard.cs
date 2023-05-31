@@ -6,10 +6,13 @@
 /// </summary>
 public interface IClipboard
 {
-    #region 获取或设置剪切板文本
+    #region 写入剪切板文本
     /// <summary>
-    /// 获取或设置剪切板文本
+    /// 写入剪切板文本，并返回是否写入成功
     /// </summary>
-    string? Text { get; set; }
+    /// <param name="text">要写入的文本</param>
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
+    /// <returns></returns>
+    Task<bool> SetText(string? text, CancellationToken cancellationToken = default);
     #endregion
 }

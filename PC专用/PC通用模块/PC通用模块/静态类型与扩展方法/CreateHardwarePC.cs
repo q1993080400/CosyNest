@@ -19,12 +19,14 @@ public static class CreateHardwarePC
     public static IPower Power { get; } = new PowerPC();
     #endregion
     #region 获取IStartManagement对象
+    private static StartManagement? StartManagementField { get; set; }
+
     /// <summary>
     /// 获取一个<see cref="IStartManagement"/>对象，
     /// 它可以用来管理应用自动启动，注意：它对自启动的定义是：
     /// 位于程序/启动文件夹
     /// </summary>
-    public static IStartManagement StartManagement { get; } = new StartManagement();
+    public static IStartManagement StartManagement => StartManagementField ??= new();
     #endregion
     #region 获取IMouse对象
     /// <summary>

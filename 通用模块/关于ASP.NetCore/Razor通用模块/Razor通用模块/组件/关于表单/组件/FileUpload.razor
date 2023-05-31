@@ -1,0 +1,10 @@
+﻿@namespace Microsoft.AspNetCore.Components.Forms
+@inherits ComponentBase
+
+@if (ChildContent is { })
+{
+    <label>
+        @ChildContent
+        <InputFile OnChange="OnChange" style="opacity:0;width:1px;height:1px;position:absolute" @attributes=AdditionalAttributes />
+    </label>
+}

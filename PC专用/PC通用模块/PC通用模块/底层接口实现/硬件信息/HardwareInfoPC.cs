@@ -39,7 +39,7 @@ sealed class HardwareInfoPC : IHardwareInfo
             {
                 Model = x["Product"].ToString() ?? "",
                 Number = x["SerialNumber"].ToString() ?? ""
-            }).SingleOrDefault() ?? new()
+            }).SingleOrDefaultSecure() ?? new()
             {
                 Model = "",
                 Number = ""

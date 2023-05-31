@@ -26,20 +26,19 @@ public static class ToolPath
     /// 并返回重构后的新完整路径
     /// </summary>
     /// <param name="path">待重构的路径，注意，它是路径，不是文件的名字</param>
-    /// <param name="newSimple">文件或目录重构后的新名称，
+    /// <param name="newSimple">这个委托传入旧名称，返回文件或目录重构后的新名称，
     /// 不带扩展名，如果为<see langword="null"/>，代表不更改</param>
-    /// <param name="newExtension">文件重构后的新扩展名，不带点号，
+    /// <param name="newExtension">这个委托传入旧扩展名，返回文件重构后的新扩展名，不带点号，
     /// 如果为<see langword="null"/>，代表该路径不是文件，或不更改扩展名</param>
     /// <returns></returns>
-    public static string RefactoringPath(PathText path, string? newSimple = null, string? newExtension = null)
+    public static string RefactoringPath(PathText path, Func<string, string>? newSimple = null, Func<string?, string>? newExtension = null)
     {
         var (simple, extended, _) = SplitPathFile(path);
         var father = Path.GetDirectoryName(path);
-        var name = GetFullName(newSimple ?? simple, newExtension ?? extended);
+        var name = GetFullName(newSimple?.Invoke(simple) ?? simple, newExtension?.Invoke(extended) ?? extended);
         return father switch
         {
-            null => name,
-            "" => Path.Combine(Environment.CurrentDirectory, name),
+            null or "" => name,
             var f => Path.Combine(f, name)
         };
     }

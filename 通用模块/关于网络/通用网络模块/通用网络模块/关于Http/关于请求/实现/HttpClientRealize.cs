@@ -155,7 +155,7 @@ sealed class HttpClientRealize : IHttpClient
     /// <inheritdoc cref="CreateRequest(Type, IEnumerable{Expression}, MethodInfo, JsonSerializerOptions?)"/>
     private static HttpRequestRecording CreateRequestPost(string callPath, IEnumerable<Expression> parameter, JsonSerializerOptions? options)
     {
-        var single = parameter.SingleOrDefault() ?? throw new NotSupportedException($"使用强类型模式调用Post方法的Http接口时，" +
+        var single = parameter.SingleOrDefaultSecure() ?? throw new NotSupportedException($"使用强类型模式调用Post方法的Http接口时，" +
                 $"参数数量不能大于一个");
         var value = single.CalValue();
         var json = JsonSerializer.Serialize(value, single.Type, options);

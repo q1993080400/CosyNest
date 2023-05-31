@@ -5,6 +5,7 @@
 /// </summary>
 public static class CreateRazor
 {
+    #region 关于不会刷新的EventCallback
     #region 创建IHandleEvent
     /// <summary>
     /// 返回一个<see cref="IHandleEvent"/>，
@@ -28,5 +29,29 @@ public static class CreateRazor
     
       这样一来，onclick执行完毕后，不会刷新整个界面，
       你可以在M中手动调用StateHasChanged来仅刷新菜单*/
+    #endregion
+    #region 创建不会刷新的EventCallback
+    #region 非泛型版本
+    /// <summary>
+    /// 创建一个不会刷新的<see cref="EventCallback"/>，
+    /// 它可以用于优化性能
+    /// </summary>
+    /// <param name="multicastDelegate">绑定到<see cref="EventCallback"/>中的委托</param>
+    /// <returns></returns>
+    public static EventCallback EventCallbackNotRefresh(MulticastDelegate multicastDelegate)
+        => new(HandleEventInvalid, multicastDelegate);
+    #endregion
+    #region 泛型版本
+    /// <summary>
+    /// 创建一个不会刷新的<see cref="EventCallback{TValue}"/>，
+    /// 它可以用于优化性能
+    /// </summary>
+    /// <typeparam name="TValue">参数的类型</typeparam>
+    /// <param name="multicastDelegate">绑定到<see cref="EventCallback{TValue}"/>中的委托</param>
+    /// <returns></returns>
+    public static EventCallback<TValue> EventCallbackNotRefresh<TValue>(MulticastDelegate multicastDelegate)
+        => new(HandleEventInvalid, multicastDelegate);
+    #endregion
+    #endregion
     #endregion
 }

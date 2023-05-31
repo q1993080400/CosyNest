@@ -1,4 +1,5 @@
-﻿using System.Underlying;
+﻿using System.IOFrancis;
+using System.Underlying;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
@@ -19,12 +20,12 @@ public static class CreateASP
     public static IEnvironmentInfoWeb EnvironmentInfo(string userAgent)
         => new EnvironmentInfoWeb(userAgent);
     #endregion
-    #region 创建文件路径协议
+    #region 创建媒体文件路径协议
     /// <summary>
-    /// 创建文件路径协议，它是一个委托元组，
-    /// 它的第一个项可以编码文件路径，第二个项可以解码文件路径
+    /// 创建媒体文件路径协议，
+    /// 它支持按照封面/本体分类路径，以及排序等功能
     /// </summary>
-    public static (Func<IEnumerable<MediaPathGenerateParameters>, IEnumerable<MediaServerPosition>> Generate, Func<IEnumerable<string>, IEnumerable<MediaSource>> Analysis) MediaPathProtocol { get; }
+    public static (GenerateFilePathProtocol<IEnumerable<MediaPathGenerateParameters>, IEnumerable<MediaServerPosition>> Generate, AnalysisFilePathProtocol<IEnumerable<string>, IEnumerable<MediaSource>> Analysis) MediaPathProtocol { get; }
         = (Components.MediaPathProtocol.Generate, Components.MediaPathProtocol.Analysis);
     #endregion
 }

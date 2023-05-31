@@ -52,7 +52,7 @@ public static partial class ExtenTool
         where Enum : struct, System.Enum
     {
         var description = typeof(Enum).GetField(@enum.ToString())?.
-            GetCustomAttributes<DescriptionAttribute>(true)?.SingleOrDefault();
+            GetCustomAttributes<DescriptionAttribute>(true)?.SingleOrDefaultSecure();
         return description is { Description: { } d } ? d : null;
     }
     #endregion

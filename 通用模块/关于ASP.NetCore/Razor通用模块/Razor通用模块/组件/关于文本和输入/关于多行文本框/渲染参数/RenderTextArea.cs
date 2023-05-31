@@ -15,10 +15,10 @@ public sealed record RenderTextArea
     #endregion
     #region 使用编程方式改变文本
     /// <summary>
-    /// 当使用编程方式改变多行文本框的文本时，
-    /// 如果需要自动改变文本框的大小，请调用这个委托，
-    /// 它的第一个参数是JS运行时对象，第二个参数是要写入的新文本
+    /// 这个委托的参数是要向文本框写入的新文本，
+    /// 返回值是一个脚本，它可以写入该文本，
+    /// 并自动调整文本框的大小
     /// </summary>
-    public required Func<IJSWindow, string?, Task> ChangeText { get; init; }
+    public required Func<string?, string> ChangeTextScript { get; init; }
     #endregion
 }

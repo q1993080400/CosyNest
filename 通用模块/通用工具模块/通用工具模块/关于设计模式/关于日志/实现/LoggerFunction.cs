@@ -9,11 +9,11 @@ sealed class LoggerFunction : ILogger
 {
     #region 公开成员
     #region 记录日志
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    public async void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         if (!IsEnabled(logLevel) || exception is null or BusinessException)
             return;
-        SetLog(ServiceProvider, exception, state).Wait();
+        await SetLog(ServiceProvider, exception.InnerException ?? exception, state);
     }
     #endregion
     #region 是否启用

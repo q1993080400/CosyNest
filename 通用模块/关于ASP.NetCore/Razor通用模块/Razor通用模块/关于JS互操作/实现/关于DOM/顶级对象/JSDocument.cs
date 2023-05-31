@@ -54,6 +54,28 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
     }
     #endregion
     #endregion
+    #region 返回页面的可见状态
+    public Task<VisibilityState> VisibilityState
+    {
+        get
+        {
+            #region 本地函数
+            async Task<VisibilityState> Fun()
+            {
+                var visibilityState = await JSRuntime.InvokeCodeAsync<string>("document.visibilityState");
+                return visibilityState switch
+                {
+                    "visible" => JSInterop.VisibilityState.Visible,
+                    "hidden" => JSInterop.VisibilityState.Hidden,
+                    "prerender" => JSInterop.VisibilityState.Prerender,
+                    var state => throw new NotSupportedException($"{state}是无法识别的页面可见性状态")
+                };
+            }
+            #endregion
+            return Fun();
+        }
+    }
+    #endregion
     #region video截图
     public async ValueTask<IBitRead?> VideoScreenshot(string id, string format = "png", CancellationToken cancellation = default)
     {

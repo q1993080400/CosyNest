@@ -58,8 +58,9 @@ public static class ExtenIO
     /// </summary>
     /// <param name="stream">要读取的流</param>
     /// <param name="path">要保存到的文件路径</param>
+    /// <param name="cancellationToken">一个用来取消异步操作的令牌</param>
     /// <returns></returns>
-    public static async Task SaveFile(this Stream stream, PathText path)
+    public static async Task SaveFile(this Stream stream, PathText path, CancellationToken cancellationToken = default)
     {
         if (!stream.CanRead)
             throw new NotSupportedException("这个流不可读取");
@@ -67,7 +68,7 @@ public static class ExtenIO
         if (File.Exists(path))
             File.Delete(path);
         using var fileStream = CreateIO.FileStream(path, FileMode.Create);
-        await stream.CopyToAsync(fileStream);
+        await stream.CopyToAsync(fileStream, cancellationToken);
     }
     #endregion
     #region 重置流

@@ -47,5 +47,16 @@ var docCookies = {
         for (var i = 0; i < allKey.length; i++) {
             docCookies.removeItem(allKey[i], sPath, sDomain);
         }
+    },
+    keyAndValue: function () {
+        var allKey = docCookies.keys();
+        for (var i = 0; i < allKey.length; i++) {
+            var key = allKey[i];
+            allKey[i] = {
+                Key: key,
+                Value: docCookies.getItem(key)
+            }
+        }
+        return allKey;
     }
 };

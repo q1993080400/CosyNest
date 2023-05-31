@@ -46,13 +46,11 @@ public sealed class LazyPro<Values>
     {
         get
         {
-            if (GetLazy is { })
+            if (GetLazy is { } lazy)
             {
-                lock (GetLazy)
-                {
-                    CacheValue = GetLazy();
-                    GetLazy = null;
-                }
+                var value = lazy();
+                GetLazy = null;
+                return CacheValue = value;
             }
             return CacheValue!;
         }

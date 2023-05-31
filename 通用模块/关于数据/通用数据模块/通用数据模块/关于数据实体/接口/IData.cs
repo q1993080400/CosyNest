@@ -39,6 +39,12 @@ public interface IData : IDirect
       但需要观望的是，作者有意支持MAUI，但就是不知道MAUI是否依赖这个接口，
       如果为是，在它正式发布后请为本接口实现INotifyPropertyChanged*/
     #endregion
+    #region 数据的ID
+    /// <summary>
+    /// 获取数据ID，它是数据的主键
+    /// </summary>
+    Guid ID { get; set; }
+    #endregion
     #region 数据的元数据
     /// <summary>
     /// 获取或写入数据的元数据，

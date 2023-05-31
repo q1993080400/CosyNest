@@ -5,7 +5,7 @@ namespace Microsoft.JSInterop;
 /// <summary>
 /// 这个类型是<see cref="INotifications"/>的浏览器实现，
 /// 它可以用来发送通知，警告：
-/// 本类型在安卓版谷歌浏览器，以及低版本IOS浏览器上无法正常工作
+/// 本类型在低版本IOS浏览器上无法正常工作
 /// </summary>
 sealed class Notifications : INotifications
 {
@@ -24,10 +24,30 @@ sealed class Notifications : INotifications
                 data:{{(options is NotificationsOptionsWeb web ? web.Uri : null).ToJSSecurity()}}
             };
             var title={{options.Title.ToJSSecurity()}};
-            var swUri='/_content/ToolRazor/js/sw.js';
+            var swUri='/js/sw.js';
             navigator.serviceWorker.register(swUri,{scope: swUri}).then(x=>x.update()).then(function(registration)
             {
                registration.showNotification(title,options);
+            });
+            """;
+        await JSRuntime.InvokeCodeVoidAsync(script);
+    }
+    #endregion
+    #region 关闭通知
+    public async Task Close(IEnumerable<string>? tags)
+    {
+        var script = $$"""
+            var tags={{(tags is null ? "null" : $"[{tags.Join(x => $"'{x}'", ",")}]")}};
+            var swUri='/js/sw.js';
+            navigator.serviceWorker.register(swUri,{scope: swUri}).
+            then(x=>x.update()).then(x=>x.getNotifications()).
+            then(function(notifications)
+            {
+                for (var notification of notifications)
+                {
+                    if(tags==null||tags.includes(notification.tag))
+                        notification.close();
+                }
             });
             """;
         await JSRuntime.InvokeCodeVoidAsync(script);

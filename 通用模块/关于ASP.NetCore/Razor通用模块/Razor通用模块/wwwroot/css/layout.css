@@ -90,5 +90,18 @@
 {
     overflow-wrap: break-word;
     white-space: pre-line;
-    margin: auto
+    margin: 0;
+}
+
+/*自动播放按钮容器样式*/
+.autoPlayButtonCntainer
+{
+    display: grid;
+    grid-template: 1fr auto 1fr/1fr auto 1fr
+}
+
+/*自动播放按钮容器的第一个元素样式*/
+div.autoPlayButtonCntainer > *:first-child
+{
+    grid-area: 1/1/-1/-1
 }

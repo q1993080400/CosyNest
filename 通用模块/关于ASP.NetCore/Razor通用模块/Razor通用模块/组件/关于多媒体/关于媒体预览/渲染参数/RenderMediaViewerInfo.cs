@@ -36,6 +36,6 @@ public sealed record RenderMediaViewerInfo
     /// <summary>
     /// 这个委托用于退出大图预览
     /// </summary>
-    public required EventCallback QuitPreview { get; init; }
+    public required Func<Task> QuitPreview { get; init; }
     #endregion
 }

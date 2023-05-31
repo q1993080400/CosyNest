@@ -1,77 +1,88 @@
 ﻿@namespace BootstrapBlazor.Components
 @using Microsoft.AspNetCore;
 @inherits ComponentBase
+@inject IJSWindow JSWindow
+@using System.IOFrancis.FileSystem
 
 <MediaViewer MediaSource="MediaSource">
     <RenderComponent>
-        <div class="mediaViewerContainer">
-            @foreach (var item in context.RenderElement)
-            {
-                @item
-            }
-        </div>
-        @{
-            var isOpen = context.PreviewMediaIndex >= 0;
+        @if (RenderComponent is { })
+        {
+            @RenderComponent(context.RenderElement)
         }
-        <Modal @ref="Modal" hidden="@(!isOpen)">
-            <BootstrapBlazor.Components.ModalDialog IsCentered=true Size="Size.Medium" ShowCloseButton=false ShowHeader=false>
+        else
+        {
+            <div class="mediaViewerContainer">
+                @foreach (var item in context.RenderElement)
+                {
+                    @item
+                }
+            </div>
+        }
+        <Modal @ref="Modal">
+            <BootstrapBlazor.Components.ModalDialog IsCentered=true Size="Size.Medium" IsScrolling="true" ShowCloseButton=false ShowHeader=false>
                 <BodyTemplate>
-                    @if (isOpen)
-                    {
+                    <div id="@CarouselID">
                         <Carousel ShowIndicators=false>
                             @foreach (var item in Medias(context))
                             {
-                                <CarouselItem Interval="int.MaxValue">
+                                var uri = item.MediaUri;
+                                <CarouselItem Interval="1000*600" @key=item>
                                     <NineGrids>
-                                        @if (item.IsImage)
+                                        @switch (item.MediaSourceType)
                                         {
-                                            <img src="@item.MediaUri" style="object-fit:contain;object-position:center" />
-                                        }
-                                        else
-                                        {
-                                            <Media CloseMemoryProgress=true Context="info">
-                                                <video id="@info.ID" width="350"
-                                                       ontimeupdate="@info.AppendScript(info.OnTimeUpDateScript,OnTimeUpDate)"
-                                                       onloadedmetadata="@info.AppendScript(info.OnLoadedMetaDataScript,OnLoadedMetaData)"
-                                                       onended="@info.OnEndedScript"
-                                                       onvolumechange="@info.OnVolumeChangeScript"
-                                                       src="@item.MediaUri" muted controls autoplay loop />
-                                            </Media>
+                                            case MediaSourceType.WebImage:
+                                                <img src="@uri" class="mediaPreview" />
+                                                break;
+                                            case MediaSourceType.WebVideo:
+                                                var format = ToolPath.SplitPathFile(uri).Extended switch
+                                                {
+                                                    "opus" or "ogv" => "video/ogg",
+                                                    "mkv" => "video/x-matroska",
+                                                    "m3u8" => "application/x-mpegURL",
+                                                    _ => "video/mp4"
+                                                };
+                                                <VideoPlayer Height="500" Url="@uri" MineType="@format" />
+                                                break;
                                         }
                                     </NineGrids>
                                 </CarouselItem>
                             }
                         </Carousel>
-                    }
+                    </div>
                 </BodyTemplate>
                 <FooterTemplate>
-                    @if (isOpen)
-                    {
-                        <CompactCentered>
-                            <Button OnClickWithoutRender="()=>context.QuitPreview.InvokeAsync()">关闭</Button>
-                        </CompactCentered>
+                    @{
+                        async Task OnClickWithoutRender()
+                        {
+                            await Modal!.Close();
+                            await Task.Delay(100);
+                            await context.QuitPreview();
+                        }
                     }
+                    <CompactCentered>
+                        <Button OnClick="OnClickWithoutRender">关闭</Button>
+                    </CompactCentered>
                 </FooterTemplate>
             </BootstrapBlazor.Components.ModalDialog>
         </Modal>
-        @if (Modal is { })
-        {
-            if (isOpen)
-                Modal.Show();
-            else
-                Modal.Close();
-        }
     </RenderComponent>
     <RenderCover>
         @{
-            var media = context.MediaSource;
+            var newContext = ConvertRenderCoverInfo(context);
         }
-        <div style="display:grid;grid-template:1fr auto 1fr/1fr auto 1fr" @onclick=@context.PreviewEvent>
-            <img src="@media.CoverUri" class="cover coverShare" />
-            @if (!media.IsImage)
-            {
-                <img src="_content/ToolBootstrapBlazor/icon/playButton.svg" class="playButton playButtonShare" />
-            }
-        </div>
+        @if (RenderCover is { })
+        {
+            @RenderCover(newContext)
+        }
+        else
+        {
+            var media = newContext.MediaSource;
+            <div @onclick=CreateRazor.EventCallbackNotRefresh(newContext.PreviewEvent)>
+                <AutoPlayButton AddPlayButton=@(media.MediaSourceType is MediaSourceType.WebVideo) ExtraCSSButton="coverPlayButton">
+                    <img src="@media.CoverUri" class="cover" />
+                </AutoPlayButton>
+            </div>
+        }
     </RenderCover>
 </MediaViewer>

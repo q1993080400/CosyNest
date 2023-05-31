@@ -28,16 +28,23 @@ sealed class SignalRProvide : ISignalRProvide
     private Func<string, string> ToAbs { get; }
     #endregion
     #region 正式方法
-    public async Task<HubConnection> GetConnection(string uri)
+    public async Task<HubConnection> GetConnection(string uri, bool newBuilt = false)
     {
-        var newUuri = ToAbs(uri);
-        var (exist, task) = Cache.TrySetValue(newUuri, Create);
+        var newUri = ToAbs(uri);
+        var uriExtend = new UriComplete(newUri).UriExtend!;
+        if (newBuilt)
+        {
+            var newConnection = await Create(newUri);
+            Configuration?.Invoke(newConnection, uriExtend);
+            await newConnection.StartAsync();
+            return newConnection;
+        }
+        var (exist, task) = Cache.TrySetValue(newUri, Create);
         var value = await task;
         if (!exist)
-        {
-            Configuration?.Invoke(value, new UriComplete(newUuri).UriExtend!);
+            Configuration?.Invoke(value, uriExtend);
+        if (value.State is HubConnectionState.Disconnected)
             await value.StartAsync();
-        }
         return value;
     }
     #endregion

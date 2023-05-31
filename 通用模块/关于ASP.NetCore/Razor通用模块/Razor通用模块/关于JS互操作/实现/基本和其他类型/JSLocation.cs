@@ -29,8 +29,8 @@ sealed class JSLocation : JSRuntimeBase, IJSLocation
     #endregion
     #endregion
     #region 刷新页面
-    public ValueTask Reload(bool forceGet = false, CancellationToken cancellation = default)
-        => JSRuntime.InvokeVoidAsync("location.reload", cancellation, forceGet);
+    public ValueTask Reload(CancellationToken cancellation = default)
+        => JSRuntime.InvokeVoidAsync("location.reload", cancellation);
     #endregion
     #region 构造函数
     /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>

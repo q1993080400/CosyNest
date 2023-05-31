@@ -7,6 +7,12 @@ namespace Microsoft.AspNetCore;
 /// </summary>
 public interface ICookie : IAsyncDictionary<string, string>
 {
+    #region 说明文档
+    /*实现本API请遵循以下规范：
+      应该将Cookie进行缓存，尽量减少对JS互操作的依赖，
+      这是因为这玩意非常不靠谱，尤其是使用HubConnection连接的情况下，
+      很容易出现问题*/
+    #endregion
     #region 有关写入Cookie
     #region 写入原始Cookie
     /// <summary>
@@ -36,6 +42,15 @@ public interface ICookie : IAsyncDictionary<string, string>
             }
         }
     }
+    #endregion
+    #region 刷新Cookie
+    /// <summary>
+    /// 如果您直接使用JS脚本，而不是本类型的API设置Cookie，
+    /// 请调用本方法刷新Cookie缓存
+    /// </summary>
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
+    /// <returns></returns>
+    Task Refresh(CancellationToken cancellationToken = default);
     #endregion
     #endregion
 }

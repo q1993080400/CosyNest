@@ -16,9 +16,6 @@ public abstract class Entity : IData
 {
     #region 公开成员
     #region 数据ID
-    /// <summary>
-    /// 获取数据ID，它是数据的主键
-    /// </summary>
     public Guid ID { get; set; }
     #endregion
     #region 数据的元数据

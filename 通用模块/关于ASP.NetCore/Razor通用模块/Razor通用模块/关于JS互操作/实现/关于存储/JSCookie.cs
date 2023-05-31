@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+
+using Microsoft.AspNetCore;
 
 namespace Microsoft.JSInterop;
 
@@ -10,8 +13,11 @@ sealed class JSCookie : JSRuntimeBase, ICookie
     #region 公开成员
     #region 关于读取和写入Cookie
     #region 写入原始Cookie
-    public ValueTask SetCookieOriginal(string cookie, CancellationToken cancellation = default)
-        => JSRuntime.SetProperty("document.cookie", cookie, cancellation);
+    public async ValueTask SetCookieOriginal(string cookie, CancellationToken cancellation = default)
+    {
+        await JSRuntime.SetProperty("document.cookie", cookie, cancellation);
+        await Refresh(cancellation);
+    }
     #endregion
     #region 读取或写入值（异步索引器）
     public IAsyncIndex<string, string> IndexAsync { get; }
@@ -19,46 +25,95 @@ sealed class JSCookie : JSRuntimeBase, ICookie
     #region 读取Cookie且不引发异常
     public async Task<(bool Exist, string? Value)> TryGetValueAsync(string key, CancellationToken cancellation = default)
     {
-        var value = await JSRuntime.InvokeAsync<string?>("docCookies.getItem", cancellation, key);
-        return (value is { }, value);
+        var exist = (await Cookie).TryGetValue(key, out var value);
+        return (exist, value);
     }
     #endregion
     #endregion
     #region 关于集合
-    #region 枚举所有键值对
-    public async IAsyncEnumerator<KeyValuePair<string, string>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    #region Cookie缓存
+    private ImmutableDictionary<string, string> CookieField { get; set; }
+
+    /// <summary>
+    /// 获取Cookie的缓存
+    /// </summary>
+    private Task<ImmutableDictionary<string, string>> Cookie
     {
-        var cookies = await JSRuntime.InvokeAsync<string[]>("docCookies.keys", cancellationToken);
-        foreach (var item in cookies)
+        get
         {
-            yield return new(item, await IndexAsync.Get(item, cancellationToken));
+            #region 本地函数
+            async Task<ImmutableDictionary<string, string>> Fun()
+            {
+                if (CookieField is null)
+                    await Refresh();
+                return CookieField;
+            }
+            #endregion
+            return Fun();
         }
     }
     #endregion
+    #region 枚举所有键值对
+    #region 正式属性
+    public async IAsyncEnumerator<KeyValuePair<string, string>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        var cookie = await Cookie;
+        foreach (var item in cookie)
+        {
+            yield return item;
+        }
+    }
+    #endregion
+    #region 辅助类型
+    private record KeyAndValue
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
+    }
+    #endregion
+    #endregion
     #region 检查键值对是否存在
     public async Task<bool> ContainsAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
-        => await JSRuntime.InvokeAsync<bool>("docCookies.hasItem", cancellation, item.Key);
+        => (await Cookie).ContainsKey(item.Key);
     #endregion
     #endregion
     #region 关于添加和删除键值对
     #region 删除指定的键
     public async Task<bool> RemoveAsync(string key, CancellationToken cancellation = default)
-        => await JSRuntime.InvokeAsync<bool>("docCookies.removeItem", cancellation, key, "/");
+    {
+        var remove = await JSRuntime.InvokeAsync<bool>("docCookies.removeItem", cancellation, key, "/");
+        CookieField = (await Cookie).Remove(key);
+        return remove;
+    }
     #endregion
     #region 删除指定的键值对
-    public Task<bool> RemoveAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
-        => RemoveAsync(item.Key, cancellation);
+    public async Task<bool> RemoveAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
+        => await RemoveAsync(item.Key, cancellation);
     #endregion
     #region 全部删除
     public async Task ClearAsync(CancellationToken cancellation = default)
     {
         await JSRuntime.InvokeVoidAsync("docCookies.clear", cancellation, "/");
+        CookieField = (await Cookie).Clear();
     }
     #endregion
     #region 添加键值对
-    public Task AddAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
-        => IndexAsync.Set(item.Key, item.Value, cancellation);
+    public async Task AddAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
+    {
+        await IndexAsync.Set(item.Key, item.Value, cancellation);
+    }
     #endregion
+    #endregion
+    #region 刷新Cookie
+    [MemberNotNull(nameof(CookieField))]
+    public async Task Refresh(CancellationToken cancellationToken = default)
+    {
+#pragma warning disable CS8774
+        var cookies = await JSRuntime.InvokeAsync<KeyAndValue[]>("docCookies.keyAndValue", cancellationToken);
+        var range = cookies.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).ToArrayIfDeBug();
+        CookieField = ImmutableDictionary<string, string>.Empty.AddRange(range);
+#pragma warning restore
+    }
     #endregion
     #endregion
     #region 构造函数
@@ -67,8 +122,16 @@ sealed class JSCookie : JSRuntimeBase, ICookie
         : base(jsRuntime)
     {
         IndexAsync = CreateTasks.AsyncIndex<string, string>(
-           async (key, cancellation) => await JSRuntime.InvokeAsync<string>("docCookies.getItem", cancellation, key),
-           async (key, value, cancellation) => await JSRuntime.InvokeVoidAsync("docCookies.setItem", cancellation, key, value, 3600 * 24 * 90, "/"));
+           async (key, cancellation) =>
+           {
+               var (_, value) = await TryGetValueAsync(key, cancellation);
+               return value ?? "";
+           },
+           async (key, value, cancellation) =>
+           {
+               await JSRuntime.InvokeVoidAsync("docCookies.setItem", cancellation, key, value, 3600 * 24 * 90, "/");
+               CookieField = (await Cookie).SetItem(key, value);
+           });
     }
     #endregion
 }

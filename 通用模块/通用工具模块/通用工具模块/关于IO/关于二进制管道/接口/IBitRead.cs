@@ -27,7 +27,7 @@ public interface IBitRead : IBitPipeBase
     async Task SaveToFile(PathText path, bool autoName = true, CancellationToken cancellation = default)
     {
         if (autoName && Format is { } f && !Path.HasExtension(path))        //如果具有扩展名，而且路径忘记加上扩展名
-            path = ToolPath.RefactoringPath(path, newExtension: f);         //则将扩展名重构
+            path = ToolPath.RefactoringPath(path, newExtension: _ => f);         //则将扩展名重构
         using var stream = CreateIO.FileStream(path);
         await CopyTo(stream, cancellation);
     }

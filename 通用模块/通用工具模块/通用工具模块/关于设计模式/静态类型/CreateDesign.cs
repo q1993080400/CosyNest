@@ -1,7 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Design.Direct;
+﻿using System.Design.Direct;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Performance;
 
 namespace System.Design;
 
@@ -54,7 +54,8 @@ public static class CreateDesign
         => new QueueTaskExclusive(inSynchronizationLocking, inAsynchronousLocking);
     #endregion
     #region 创建单例对象
-    private static ConcurrentDictionary<Type, object> SingleCache { get; } = new();
+    private static ICache<Type, object> SingleCache { get; }
+        = CreatePerformance.CacheThreshold<Type, object>(type => type.GetTypeData().ConstructorCreate<object>(), 200);
 
     /// <summary>
     /// 返回一个类型的实例，
@@ -65,13 +66,7 @@ public static class CreateDesign
     /// <returns></returns>
     public static Obj Single<Obj>()
         where Obj : class
-    {
-        lock (SingleCache)
-        {
-            return (Obj)SingleCache.TrySetValue(typeof(Obj),
-             type => type.GetTypeData().ConstructorCreate<Obj>()).Value;
-        }
-    }
+        => (Obj)SingleCache[typeof(Obj)];
     #endregion
     #region 创建池化对象
     /// <summary>

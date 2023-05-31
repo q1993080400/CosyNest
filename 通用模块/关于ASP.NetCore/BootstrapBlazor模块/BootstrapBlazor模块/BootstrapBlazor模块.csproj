@@ -17,8 +17,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="7.5.7" />
+		<PackageReference Include="BootstrapBlazor" Version="7.6.6" />
 		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.4.2" />
+		<PackageReference Include="BootstrapBlazor.VideoPlayer" Version="7.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.5" />
 	</ItemGroup>
 

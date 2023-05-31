@@ -9,33 +9,6 @@ namespace System.DataFrancis;
 public interface IDataPipeTo
 {
     #region 关于添加与更新数据
-    #region 添加数据
-    #region 说明文档
-    /*问：既然已经有了添加或更新数据，
-      那么为什么还需要添加数据？
-      答：这是因为有的时候，数据在被添加之前需要指定自己的ID，
-      如果是添加或更新，那么ID会被自动赋值，无法满足这个需求*/
-    #endregion
-    #region 传入同步集合
-    /// <summary>
-    /// 添加一个数据，
-    /// 如果数据已经存在，会引发一个异常
-    /// </summary>
-    /// <typeparam name="Data">数据的类型</typeparam>
-    /// <param name="datas">待添加的数据</param>
-    /// <param name="cancellation">用于取消异步操作的令牌</param>
-    /// <returns></returns>
-    Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
-        where Data : class, IData;
-    #endregion
-    #region 传入单个数据
-    /// <param name="data">待添加的数据</param>
-    /// <inheritdoc cref="Add{Data}(IEnumerable{Data}, CancellationToken)"/>
-    Task Add<Data>(Data data, CancellationToken cancellation = default)
-        where Data : class, IData
-        => Add(new[] { data }, cancellation);
-    #endregion
-    #endregion
     #region 添加或更新数据
     #region 传入同步集合
     /// <summary>
@@ -44,22 +17,25 @@ public interface IDataPipeTo
     /// </summary>
     /// <typeparam name="Data">数据的类型</typeparam>
     /// <param name="datas">待添加或更新的数据</param>
+    /// <param name="specifyPrimaryKey">这个委托指示主键是否为显式指定，
+    /// 如果一个实体需要被添加到数据库中，且显式指定了它的主键，
+    /// 则必须传入本参数，否则会产生异常</param>
     /// <param name="cancellation">用于取消异步操作的令牌</param>
-    Task AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
+    Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
         where Data : class, IData;
     #endregion
     #region 传入异步集合
-    /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, CancellationToken)"/>
-    async Task AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
+    /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, Func{Guid, bool}?, CancellationToken)"/>
+    async Task AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
         where Data : class, IData
-        => await AddOrUpdate(await datas.ToListAsync(), cancellation);
+        => await AddOrUpdate(await datas.ToListAsync(), specifyPrimaryKey, cancellation);
     #endregion
     #region 传入单个数据
     /// <param name="data">待添加或更新的数据</param>
-    /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, CancellationToken)"/>
-    Task AddOrUpdate<Data>(Data data, CancellationToken cancellation = default)
+    /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, Func{Guid, bool}?, CancellationToken)"/>
+    Task AddOrUpdate<Data>(Data data, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
        where Data : class, IData
-       => AddOrUpdate(new[] { data }, cancellation);
+       => AddOrUpdate(new[] { data }, specifyPrimaryKey, cancellation);
     #endregion
     #endregion
     #endregion
@@ -86,6 +62,13 @@ public interface IDataPipeTo
     async Task Delete<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class, IData
         => await Delete(await datas.ToListAsync(), cancellation);
+    #endregion
+    #region 传入单个数据
+    /// <param name="data">要删除的数据</param>
+    /// <inheritdoc cref="Delete{Data}(IEnumerable{Data}, CancellationToken)"/>
+    Task Delete<Data>(Data data, CancellationToken cancellation = default)
+        where Data : class, IData
+        => Delete(new[] { data }, cancellation);
     #endregion
     #region 按条件删除数据
     /// <summary>

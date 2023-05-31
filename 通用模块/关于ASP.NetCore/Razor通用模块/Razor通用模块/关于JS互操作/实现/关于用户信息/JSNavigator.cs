@@ -22,16 +22,11 @@ sealed class JSNavigator : JSRuntimeBase, IJSNavigator
         return EnvironmentInfoField = CreateASP.EnvironmentInfo(userAgent);
     }
     #endregion
-    #region 获取或设置剪贴板文本
-    private IAsyncProperty<string?>? ClipboardTextFiled;
-
-    public IAsyncProperty<string?> ClipboardText
-        => ClipboardTextFiled ??= CreateTasks.AsyncProperty
-        (token => JSRuntime.InvokeCodeAsync<string?>("navigator.clipboard.readText()", true, token).AsTask(),
-            (value, token) => JSRuntime.InvokeCodeVoidAsync($@"navigator.clipboard.writeText({value.ToJSSecurity()})", true, cancellation: token).AsTask());
-    #endregion
     #region 获取定位对象
     public IPosition Geolocation { get; }
+    #endregion
+    #region 剪切板对象
+    public IJSClipboard Clipboard { get; }
     #endregion
     #region 构造函数
     /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
@@ -39,6 +34,7 @@ sealed class JSNavigator : JSRuntimeBase, IJSNavigator
         : base(jsRuntime)
     {
         Geolocation = new JSGeolocation(JSRuntime);
+        Clipboard = new JSClipboard(JSRuntime);
     }
     #endregion
 }

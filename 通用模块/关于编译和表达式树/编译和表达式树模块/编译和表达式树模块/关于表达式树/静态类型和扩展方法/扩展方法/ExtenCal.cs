@@ -43,6 +43,7 @@ public static partial class ExtenExpressions
             BinaryExpression e => e.CalValue(),
             UnaryExpression e => e.CalValue(),
             NewArrayExpression e => e.CalValue(),
+            DefaultExpression e => e.CalValue(),
             var e => throw new NotSupportedException($"不支持解析{e.NodeType}类型的表达式"),
         };
     #endregion
@@ -160,6 +161,18 @@ public static partial class ExtenExpressions
         var @return = Array.CreateInstance(expression.Type.GetElementType()!, array.Length);
         Array.Copy(array, @return, array.Length);
         return @return;
+    }
+    #endregion
+    #region 针对默认值表达式
+    /// <summary>
+    /// 返回一个默认值表达式的值
+    /// </summary>
+    /// <param name="expression">要返回值的默认值表达式</param>
+    /// <returns></returns>
+    public static object? CalValue(this DefaultExpression expression)
+    {
+        var type = expression.Type;
+        return type.IsValueType ? type.GetTypeData().ConstructorCreate<object?>() : null;
     }
     #endregion
 }

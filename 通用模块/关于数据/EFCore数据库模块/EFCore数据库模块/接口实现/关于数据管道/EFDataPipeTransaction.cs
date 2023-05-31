@@ -9,7 +9,7 @@ namespace System.DataFrancis.DB.EF;
 /// 这个类型是支持事务的<see cref="IDataPipe"/>实现，
 /// 只要将它一直传递下去，就可以保证事务一致性
 /// </summary>
-sealed class EFDataPipeTransaction : IDataPipe, IDisposable
+sealed class EFDataPipeTransaction : IDataPipeDB, IDisposable
 {
     #region 公开成员
     #region 执行事务
@@ -57,29 +57,16 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
         where Data : class, IData
          => CreateDbContextFromEntityType(typeof(Data)).Set<Data>();
     #endregion
-    #region 关于添加或更新
-    #region 添加数据
-    public async Task Add<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
-        where Data : class, IData
-    {
-        datas = datas.ToArray();
-        var db = CreateDbContext(typeof(Data));
-        var dbSet = db.Set<Data>();
-        await dbSet.AddRangeAsync(datas, cancellation);
-    }
-    #endregion
     #region 添加或更新数据
-    public Task AddOrUpdate<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
+    public Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey, CancellationToken cancellation)
          where Data : class, IData
     {
         datas = datas.ToArray();
         var db = CreateDbContextFromEntityType(typeof(Data));
-        var dbSet = db.Set<Data>();
-        dbSet.UpdateRange(datas);
+        EFDataPipe.Track(db, datas, specifyPrimaryKey);
         return Task.CompletedTask;
     }
     #endregion 
-    #endregion
     #region 删除数据
     #region 按照实体
     public Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
@@ -87,7 +74,7 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
     {
         var db = CreateDbContextFromEntityType(typeof(Data));
         var dbSet = db.Set<Data>();
-        dbSet.CascadingDelete(datas);
+        dbSet.RemoveRange(datas);
         return Task.CompletedTask;
     }
     #endregion
@@ -95,8 +82,7 @@ sealed class EFDataPipeTransaction : IDataPipe, IDisposable
     public async Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
          where Data : class, IData
     {
-        var data = Query<Data>().Where(expression).ToArray();           //不使用ExecuteDelete的目的，是为了支持级联删除
-        await Delete(data, cancellation);
+        await Query<Data>().Where(expression).ExecuteDeleteAsync(cancellation);
     }
     #endregion
     #endregion

@@ -29,32 +29,29 @@ public sealed partial class TextAreaFrancis : ComponentBase, IContentComponent<R
     private string OnInput =>
         $$"""
         var element=document.getElementById('{{ID}}');
-        element.style.height='auto';
+        element.style.height='5px';
         element.style.height=element.scrollHeight+'px';
         """;
 
     /*提示：如果需要将值绑定到OnInput事件中，
       可以考虑将这个脚本放在@bind:after中执行*/
     #endregion
-    #region 用编程方式改变文本的方法
+    #region 用编程方式改变文本的脚本
     /// <summary>
-    /// 当使用编程方式改变多行文本框的文本时，
-    /// 如果需要自动改变文本框的大小，请调用这个方法
+    /// 返回一个脚本，它可以用编程方式改变文本框中的文本，
+    /// 并可以自动调整文本框的大小
     /// </summary>
-    /// <param name="jsWindow">JS运行时对象</param>
     /// <param name="newText">要写入的新文本</param>
     /// <returns></returns>
-    private async Task ChangeText(IJSWindow jsWindow, string? newText)
-    {
-        var script = $$"""
+    private string ChangeTextScript(string? newText)
+        => $$"""
             var element=document.getElementById('{{ID}}');
-            element.style.height='auto';
             element.value={{newText.ToJSSecurity()}};
+            element.style.height='5px';
+            element.style.height=element.scrollHeight+'px';
             """;
-        await jsWindow.InvokeCodeVoidAsync(script);
-    }
 
-    /*问：为什么需要这个方法？
+    /*问：为什么需要这个脚本？
       答：这是因为，在直接通过编程修改文本的时候，
       似乎不会触发OnInput事件，因此需要执行这个方法，来调整文本框的大小*/
     #endregion
@@ -68,7 +65,7 @@ public sealed partial class TextAreaFrancis : ComponentBase, IContentComponent<R
         {
             ID = ID,
             OnInput = OnInput,
-            ChangeText = ChangeText,
+            ChangeTextScript = ChangeTextScript,
         };
     #endregion
     #endregion

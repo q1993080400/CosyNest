@@ -46,8 +46,6 @@ sealed class EnvironmentInfoWeb : IEnvironmentInfoWeb
 
     private Browser GetBrowser()
     {
-        if (OS is OS.IOS or OS.Mac)
-            return Browser.Safari;
         if (UserAgent.Contains("Firefox"))
             return Browser.Firefox;
         if (UserAgent.Contains("Edg"))
@@ -58,6 +56,8 @@ sealed class EnvironmentInfoWeb : IEnvironmentInfoWeb
             return Browser.QQ;
         if (UserAgent.Contains("Chrome"))
             return Browser.Chrome;
+        if (OS is OS.IOS or OS.Mac)
+            return Browser.Safari;
         return Browser.Other;
     }
     #endregion

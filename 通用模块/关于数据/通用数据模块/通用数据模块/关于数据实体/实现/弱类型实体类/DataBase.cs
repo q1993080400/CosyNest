@@ -109,6 +109,9 @@ public abstract record DataBase : IData
     protected abstract IData CreateSelf();
     #endregion
     #endregion
+    #region 数据的ID
+    public abstract Guid ID { get; set; }
+    #endregion
     #region 数据ID的列名
     public abstract string? IDColumnName { get; }
     #endregion

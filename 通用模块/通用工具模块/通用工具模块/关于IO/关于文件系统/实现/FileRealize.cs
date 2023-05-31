@@ -32,7 +32,7 @@ sealed class FileRealize : IORealize, IFile
     {
         get => IO.Path.GetFileNameWithoutExtension(Path);
         set => Path = ToolPath.RefactoringPath(Path,
-            value ?? throw new ArgumentNullException($"{NameSimple}禁止写入null值"), null);
+            _ => value ?? throw new ArgumentNullException($"{NameSimple}禁止写入null值"), null);
     }
     #endregion
     #region 读写扩展名
@@ -40,7 +40,7 @@ sealed class FileRealize : IORealize, IFile
     {
         get => ToolPath.SplitPathFile(Path, false).Extended ?? "";
         set => Path = ToolPath.RefactoringPath(Path, null,
-            value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
+          _ => value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
     }
     #endregion
     #endregion

@@ -1,4 +1,5 @@
-﻿using System.NetFrancis.Api.Bing.Image;
+﻿using System.Net;
+using System.NetFrancis.Api.Bing.Image;
 using System.NetFrancis.Api.ShortMessage;
 using System.NetFrancis.Http;
 using System.Underlying.Phone;
@@ -47,5 +48,23 @@ public static class CreateAPI
     /// <inheritdoc cref="BingImageAPI(Func{IHttpClient}?)"/>
     public static IBingImageAPI ImageAPI(Func<IHttpClient>? httpClientProvide = null)
         => new BingImageAPI(httpClientProvide);
+    #endregion
+    #region 创建IP查询接口
+    /// <summary>
+    /// 创建一个可以用来查询公网IP的接口
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="BingImageAPI(Func{IHttpClient}?)"/>
+    public static Func<Task<IPAddress>> PublicNetworkIPAPI(Func<IHttpClient>? httpClientProvide = null)
+    {
+        httpClientProvide ??= () => CreateNet.HttpClientShared;
+        return async () =>
+        {
+            var uri = "https://api.ipify.org/?format=json";
+            var request = await httpClientProvide().Request(uri).Read(x => x.ToObject());
+            var ip = request["ip"]!.ToString()!;
+            return IPAddress.Parse(ip);
+        };
+    }
     #endregion
 }

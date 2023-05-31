@@ -22,6 +22,13 @@ sealed record DataRealize : DataBase, IData
     protected override IData CreateSelf()
         => new DataRealize(Array.Empty<KeyValuePair<string, object?>>(), false);
     #endregion
+    #region 数据的ID
+    public override Guid ID
+    {
+        get => default;
+        set => throw new NotSupportedException("不允许写入这个属性");
+    }
+    #endregion
     #region 数据ID
     public override string? IDColumnName => null;
     #endregion

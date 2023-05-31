@@ -3,6 +3,7 @@ using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Web;
 
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Http.Connections.Client;
 
 namespace System;
@@ -197,10 +198,10 @@ public static class ExtenRazor
         => services.AddSignalRProvide(async (uri, server) =>
         {
             var cookie = await server.GetRequiredService<IJSWindow>().Document.Cookie.ToListAsync();
+            var host = server.GetRequiredService<IUriManager>().Uri.UriHost!.DomainName;
             var connection = new HubConnectionBuilder().
              WithUrl(uri, op =>
              {
-                 var host = server.GetRequiredService<IUriManager>().Uri.UriHost!.DomainName;
                  foreach (var (key, value) in cookie.Where(x => !x.Key.IsVoid()))
                  {
                      op.Cookies.Add(new Net.Cookie(HttpUtility.UrlEncode(key), HttpUtility.UrlEncode(value), "/", host));
@@ -252,6 +253,22 @@ public static class ExtenRazor
         return parameters.Where(x => x.Item2 is { }).ToDictionary(true)!;
     }
     #endregion
+    #region 重构ParameterView 
+    /// <summary>
+    /// 重构一个<see cref="ParameterView"/>，
+    /// 将它的部分参数替换，然后返回一个新的<see cref="ParameterView"/>
+    /// </summary>
+    /// <param name="parameters">待重构的组件参数</param>
+    /// <param name="reconfiguration">用来重构的委托，
+    /// 它的参数是一个字典，复制了所有组件参数的名称和值</param>
+    /// <returns></returns>
+    public static ParameterView Reconfiguration(this ParameterView parameters, Action<IDictionary<string, object>> reconfiguration)
+    {
+        var dictionary = parameters.ToDictionary().ToDictionary(true);
+        reconfiguration(dictionary);
+        return ParameterView.FromDictionary(dictionary!);
+    }
+    #endregion
     #endregion
     #region 返回是否被验证
     /// <summary>
@@ -261,5 +278,18 @@ public static class ExtenRazor
     /// <returns></returns>
     public static async Task<bool> IsAuthenticated(this AuthenticationStateProvider authenticationStateProvider)
         => (await authenticationStateProvider.GetAuthenticationStateAsync()).User.IsAuthenticated();
+    #endregion
+    #region 一次性阻止导航
+    /// <summary>
+    /// 注册一个事件，它能够阻止用户进入其他导航，
+    /// 但是与原生方法不同的是，它不会持续地锁定新的导航
+    /// </summary>
+    /// <param name="navigation">用来执行导航的对象</param>
+    /// <param name="locationChangingHandler">当触发导航时的事件，
+    /// 它返回一个布尔值，指示是否应该阻止导航</param>
+    /// <returns></returns>
+    public static IDisposable RegisterLocationChangingHandlerDisposable(this NavigationManager navigation,
+        Func<LocationChangingContext, ValueTask<bool>> locationChangingHandler)
+        => new LocationChangingHandlerDisposable(navigation, locationChangingHandler);
     #endregion
 }

@@ -1,0 +1,9 @@
+﻿
+/*播放按钮的公共样式*/
+.playButton
+{
+    grid-area: 2/2;
+    background-color: rgba(128,128,128,0.5);
+    border-radius: 50%;
+    cursor: pointer;
+}

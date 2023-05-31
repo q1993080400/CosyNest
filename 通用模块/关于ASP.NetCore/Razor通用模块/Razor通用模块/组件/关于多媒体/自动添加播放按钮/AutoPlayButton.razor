@@ -1,0 +1,13 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if (ChildContent is { })
+{
+    <div class="autoPlayButtonCntainer">
+        @ChildContent
+        @if (AddPlayButton)
+        {
+            <img src="_content/ToolRazor/icon/playButton.svg" class="playButton @ExtraCSSButton" />
+        }
+    </div>
+}
