@@ -51,7 +51,7 @@ public sealed record BaidupanFile : BaidupanFD
     internal BaidupanFile(IDirect fileData, IDirect infoData, string accessToken, Func<IHttpClient> httpClientProvide)
         : base(fileData)
     {
-        this.HttpClientProvide = httpClientProvide;
+        HttpClientProvide = httpClientProvide;
         Download = infoData.GetValue<string>("dlink")! + $"&access_token={accessToken}";
     }
     #endregion 

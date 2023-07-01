@@ -7,7 +7,7 @@ namespace System.DataFrancis.DB.EF;
 /// <summary>
 /// 这个类型是使用EFCore实现的数据管道
 /// </summary>
-sealed class EFDataPipe : IDataPipeDB
+sealed class EFDataPipe : IDataPipeDBWithJoin
 {
     #region 说明文档
     /*问：使用本类型，而不是直接使用EFCore有什么好处？
@@ -21,7 +21,8 @@ sealed class EFDataPipe : IDataPipeDB
       3.能够根据实体类的类型自动查找DBSet，
       这可以让调用者不需要关心数据是从哪里来的，
       只需声明自己想要什么类型的数据就可以了，减轻心智负担，
-      修改和删除数据的时候也能够享受到这个好处，不需要考虑数据在哪个表中
+      修改和删除数据的时候也能够享受到这个好处，不需要考虑数据在哪个表中，
+      同时，它支持显式指定主键
     
       4.设计更加合理，使用AddOrUpdate替代Add和Update，
       使调用者不需要关心数据到底是添加还是修改
@@ -34,9 +35,7 @@ sealed class EFDataPipe : IDataPipeDB
       7.可以和其他管道连接起来，作为更进一步的抽象，例如，
       你可以在数据库管道的前面放置一个缓存管道，
       只有缓存中不存在的数据才会向数据库请求
-    
-      8.自动配置级联删除（以牺牲性能为代价），
-      删除实体时，自动删除依赖于它的实体*/
+      */
     #endregion
     #region 公开成员
     #region 查询实体
@@ -61,54 +60,8 @@ sealed class EFDataPipe : IDataPipeDB
     {
         datas = datas.ToArray();
         var db = CreateDbContext(typeof(Data));
-        Track(db, datas, specifyPrimaryKey);
+        ToolEFDataPipe.Track(db, datas, specifyPrimaryKey);
         await db.SaveChangesAsync(cancellation);
-    }
-    #endregion
-    #region 辅助方法：跟踪数据
-    /// <summary>
-    /// 开始跟踪数据，它能够正确地识别添加和修改操作
-    /// </summary>
-    /// <typeparam name="Data">数据类型</typeparam>
-    /// <param name="dbContext">数据库对象</param>
-    /// <param name="datas">要跟踪的数据</param>
-    /// <param name="specifyPrimaryKey">用来确定主键是否为显式指定的委托</param>
-    /// <returns></returns>
-    public static void Track<Data>(DbContext dbContext, IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey)
-        where Data : class, IData
-    {
-        if (specifyPrimaryKey is null)
-        {
-            dbContext.UpdateRange(datas);
-            return;
-        }
-        var changeTracker = dbContext.ChangeTracker;
-        foreach (var item in datas)
-        {
-            changeTracker.TrackGraph(item, new HashSet<object>(), node =>
-            {
-                var entry = node.Entry;
-                if (entry.State is EntityState.Deleted or EntityState.Added)
-                    return false;
-                var entity = entry.Entity;
-                var state = node.NodeState;
-                if (state.Contains(entity))
-                    return false;
-                var idProperty = entry.Property("ID");
-                var id = idProperty.CurrentValue.To<Guid>();
-                var isDefault = id == default;
-                if (isDefault || specifyPrimaryKey(id))
-                {
-                    if (isDefault)
-                        idProperty.CurrentValue = Guid.NewGuid();
-                    entry.State = EntityState.Added;
-                }
-                else
-                    entry.State = EntityState.Modified;
-                state.Add(entity);
-                return true;
-            });
-        }
     }
     #endregion
     #endregion

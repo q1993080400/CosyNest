@@ -43,7 +43,7 @@ sealed class JsonConvertPolymorphic<Obj> : JsonConverter<Obj>
                         var type = Assemblies.TryGetValue(assemblyName).Value?.GetType(typeName) ??
                             throw new ArgumentException($"在所有枚举的程序集中都未能找到类型{typeName}");
                         var obj = type.GetTypeData().ConstructorCreate<object>();
-                        var properties = type.GetProperties().Where(x => x.IsAlmighty()).ToArrayIfDeBug();
+                        var properties = type.GetTypeData().AlmightyPropertys;
                         foreach (var item in properties)
                         {
                             item.SetValue(obj, ReadObj(ref reader, item.PropertyType));
@@ -81,7 +81,7 @@ sealed class JsonConvertPolymorphic<Obj> : JsonConverter<Obj>
                 JsonSerializer.Serialize(writer, setValue, trueType, options);
                 return;
             }
-            var propertie = trueType.GetProperties().Where(x => x.IsAlmighty()).ToArrayIfDeBug();
+            var propertie = trueType.GetTypeData().AlmightyPropertys;
             writer.WriteStartObject();
             writer.WritePropertyName(TypeNameKey);
             writer.WriteStringValue(trueType.FullName);

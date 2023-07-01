@@ -6,8 +6,15 @@
                 Plus="Plus" RenderElement="RenderElement">
     <RenderComponent>
         @{
-            var renderContainer = context.RenderContainer;
-            var renderElement = context.RenderElement;
+            var newRenderInfo = context with
+                {
+                    RenderContainer = context.RenderContainer with
+                    {
+                        CSS = context.RenderContainer.CSS + " virtualizationSimpleContainer"
+                    }
+                };
+            var renderContainer = newRenderInfo.RenderContainer;
+            var renderElement = newRenderInfo.RenderElement;
         }
         <div class="@renderContainer.CSS" id="@renderContainer.ID" onscroll="@renderContainer.OnScrollScript" @attributes=ContainerAttributes>
             @if (RenderComponent is { })
@@ -15,7 +22,7 @@
                 var renderComponent = new RenderVirtualizationSimpleInfo<Element>()
                     {
                         RenderElement = renderElement,
-                        GoTop = context.RenderContainer.GoTop
+                        GoTop = newRenderInfo.RenderContainer.GoTop
                     };
                 @RenderComponent(renderComponent)
             }

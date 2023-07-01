@@ -33,8 +33,15 @@ public static class ToolASP
     /// <summary>
     /// 获取Web根文件夹
     /// </summary>
-    public static IDirectory WebRoot { get; }
-    = CreateIO.Directory(Path.Combine(Environment.CurrentDirectory, "wwwroot"), false);
+    public static IDirectory WebRoot
+        => CreateIO.Directory(WebRootPath, false);
+    #endregion
+    #region 获取Web根文件夹的路径
+    /// <summary>
+    /// 获取Web根文件夹的路径
+    /// </summary>
+    public static string WebRootPath { get; }
+    = Path.Combine(Environment.CurrentDirectory, "wwwroot");
     #endregion
     #region 有关JS互操作
     #region 获取前端基准超时时间

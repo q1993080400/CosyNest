@@ -69,7 +69,7 @@ sealed class ShortMessageShenYuanHengJi : WebApi, IShortMessageManage
     public ShortMessageShenYuanHengJi(string appCode, Func<IHttpClient>? httpClientProvide = null)
         : base(httpClientProvide)
     {
-        this.AppCode = appCode;
+        AppCode = appCode;
     }
     #endregion
 }

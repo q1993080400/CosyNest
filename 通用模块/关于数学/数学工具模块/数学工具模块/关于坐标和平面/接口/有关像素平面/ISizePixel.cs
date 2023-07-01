@@ -40,6 +40,19 @@ public interface ISizePixel
             _ => null
         };
     #endregion
+    #region 返回像素总数量
+    /// <summary>
+    /// 返回总像素数量
+    /// </summary>
+    int TotalPixelCount
+    {
+        get
+        {
+            var (w, h) = this;
+            return w * h;
+        }
+    }
+    #endregion
     #region 将像素平面转换为坐标平面
     /// <summary>
     /// 将像素平面转换为坐标平面
@@ -69,9 +82,27 @@ public interface ISizePixel
         return CreateMath.SizePixel(h + extendedHorizontal, v + extendedVertical);
     }
     #endregion
+    #region 降维像素平面
+    /// <summary>
+    /// 降维一个像素平面，在保持横纵比的前提下，
+    /// 将像素数量缩减到最大水平
+    /// </summary>
+    /// <param name="maxSize">降维后的最大平面，
+    /// 它的横纵比并不重要，重要的是像素总数量</param>
+    /// <returns></returns>
+    ISizePixel DimensionalityReduction(ISizePixel maxSize)
+    {
+        if (TotalPixelCount <= maxSize.TotalPixelCount)
+            return this;
+        var (mw, mh) = maxSize;
+        if (IsIsHorizontal != maxSize.IsIsHorizontal)
+            (mh, mw) = (mw, mh);
+        return CreateMath.SizePixel(mw, mh);
+    }
+    #endregion
     #region 解构像素平面
     /// <summary>
-    /// 解构像素平面
+    /// 将像素平面解构为水平和垂直大小
     /// </summary>
     /// <param name="horizontal">用来接收水平方向像素点数量的对象</param>
     /// <param name="vertical">用来接收垂直方向像素点数量的对象</param>

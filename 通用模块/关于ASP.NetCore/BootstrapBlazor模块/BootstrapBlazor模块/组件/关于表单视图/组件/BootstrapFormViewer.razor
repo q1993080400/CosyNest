@@ -1,0 +1,57 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+@typeparam Model
+
+<FormViewer FilterProperties=FilterProperties ToPropertyInfo=ToPropertyInfo
+            Verify=Verify InitializationModel="InitializationModel!"
+            ResetModel=ResetModel ExistingForms=ExistingForms>
+    <ChildContent>
+        @{
+            var newInfo = GetRenderInfo(context);
+            var existingForms = context.ExistingForms;
+        }
+        @if (ChildContent is null)
+        {
+            <div class="formViewerBootstrapContainer">
+                @context.RenderMain
+                <CompactCentered>
+                    <Button Text="@(existingForms?"修改":"提交")" OnClick="newInfo.Submit"></Button>
+                    <Button Text="重置" OnClick="newInfo.Resetting"></Button>
+                    @if (existingForms)
+                    {
+                        <Button Text="删除" OnClick="newInfo.Delete"></Button>
+                    }
+                </CompactCentered>
+            </div>
+        }
+        else
+        {
+            @ChildContent(newInfo)
+        }
+    </ChildContent>
+    <RenderMain>
+        @if (RenderMain is null)
+        {
+            <div class="formViewerBootstrapContainer">
+                @foreach (var item in context)
+                {
+                    @item.Render
+                }
+            </div>
+        }
+        else
+        {
+            @RenderMain(context)
+        }
+    </RenderMain>
+    <RenderProperty>
+        @if (RenderProperty is null)
+        {
+            <BootstrapFormViewerProperty RenderInfo="context" />
+        }
+        else
+        {
+            @RenderProperty(context)
+        }
+    </RenderProperty>
+</FormViewer>

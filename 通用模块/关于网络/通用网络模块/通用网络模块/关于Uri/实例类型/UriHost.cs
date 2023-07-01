@@ -27,11 +27,19 @@ public sealed record UriHost : UriBase
     #endregion
     #region 端口
     /// <summary>
-    /// 获取主机的端口，
-    /// 如果为<see langword="null"/>，
-    /// 表示使用默认端口
+    /// 获取主机的端口
     /// </summary>
-    public int? Port { get; init; }
+    public int Port
+        => PortExplicit switch
+        {
+            { } p => p,
+            null => Agreement switch
+            {
+                "http" => 80,
+                "https" => 443,
+                var agreement => throw new NotSupportedException($"协议{agreement}是未知的，不知道它的默认端口")
+            }
+        };
     #endregion
     #region 主机地址
     public override string Text
@@ -39,11 +47,20 @@ public sealed record UriHost : UriBase
         get
         {
             var text = $"{Agreement}://{DomainName}";
-            if (Port is { })
-                text += $":{Port}";
+            if (PortExplicit is { })
+                text += $":{PortExplicit}";
             return text;
         }
     }
+    #endregion
+    #endregion
+    #region 内部成员
+    #region 显式端口
+    /// <summary>
+    /// 获取主机显式指定的端口，
+    /// 它不包括默认端口
+    /// </summary>
+    private int? PortExplicit { get; init; }
     #endregion
     #endregion
     #region 构造函数
@@ -66,7 +83,7 @@ public sealed record UriHost : UriBase
         Agreement = match["agreement"].Match;
         DomainName = match["domainName"].Match;
         if (match.GroupsNamed.TryGetValue("port", out var port))
-            Port = port.Match.To<int>();
+            PortExplicit = port.Match.To<int>();
     }
     #endregion
     #endregion

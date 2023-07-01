@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using System.DataFrancis.Verify;
+using System.DataFrancis.EntityDescribe;
 using System.ComponentModel.DataAnnotations;
 
 namespace System.DataFrancis;
@@ -103,19 +103,26 @@ public static class CreateDataObj
     /// 但是也可以直接调用
     /// </summary>
     /// <inheritdoc cref="DataVerify"/>
-    public static IReadOnlyList<string> DataVerifyDefault(object obj)
+    public static VerificationResults DataVerifyDefault(object obj)
     {
-        var message = new List<string>();
-        var propertys = obj.GetTypeData().Propertys.
-            Where(x => x.IsAlmighty() && x.HasAttributes<VerifyAttribute>() && !x.HasAttributes<NotMappedAttribute>());
-        foreach (var item in propertys)
+        var propertys = obj.GetTypeData().AlmightyPropertys.
+            Where(x => x.HasAttributes<VerifyAttribute>() && !x.HasAttributes<NotMappedAttribute>()).ToArrayIfDeBug();
+        var verify = propertys.Select(x =>
         {
-            var describe = item.GetCustomAttribute<DisplayAttribute>()?.Description;
-            var attribute = item.GetCustomAttribute<VerifyAttribute>()!;
-            if (attribute.Verify(item.GetValue(obj), describe) is { } m)
-                message.Add(m);
-        }
-        return message;
+            var describe = x.GetCustomAttribute<DisplayAttribute>()?.Description;
+            var nullabilityInfo = x.GetNullabilityInfo();
+            var value = x.GetValue(obj);
+            if ((nullabilityInfo.ReadState, value) is (NullabilityState.NotNull, null or ""))
+                return (x, $"{describe ?? x.Name}不可为null");
+            var attribute = x.GetCustomAttribute<VerifyAttribute>()!;
+            var verify = attribute.Verify(value, describe);
+            return (x, verify);
+        }).Where(x => x.Item2 is { }).ToArray();
+        return new()
+        {
+            Data = obj,
+            FailureReason = verify!
+        };
     }
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿window.ObserverMediaViewer = function (id) {
+﻿function ObserverMediaViewer(id) {
     var css = `#${id} div.carousel-item`;
     const targetNode = document.querySelectorAll(css);
     const config = { attributes: true, attributeFilter: ['class'] };

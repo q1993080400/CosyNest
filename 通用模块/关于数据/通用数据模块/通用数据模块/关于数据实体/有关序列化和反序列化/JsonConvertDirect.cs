@@ -6,7 +6,7 @@ namespace System.Text.Json.Serialization;
 /// <summary>
 /// 这个类型执行对<see cref="IDirect"/>的Json转换逻辑
 /// </summary>
-/// <typeparam name="Obj"></typeparam>
+/// <typeparam name="Obj">要转换的实体类</typeparam>
 sealed class JsonConvertDirect<Obj> : JsonConverter<Obj>
     where Obj : IDirect
 {
@@ -133,30 +133,8 @@ sealed class JsonConvertDirect<Obj> : JsonConverter<Obj>
     #region 序列化
     public override void Write(Utf8JsonWriter writer, Obj value, JsonSerializerOptions options)
     {
-        #region 枚举待序列化的值的本地函数
-        IEnumerable<(string Key, object? Value)> Fun()
-        {
-            var objType = typeof(Obj);
-            var notEntity = !typeof(Entity).IsAssignableFrom(objType);
-            var include = objType.GetProperties().Where(x => x.HasAttributes<JsonIncludeAttribute>()).
-                Select(x => x.Name).ToHashSet();
-            foreach (var (key, value) in value)
-            {
-                if (notEntity || value is null || value.GetType().IsCommonType() || include.Contains(key))
-                    yield return (key, value);
-            }
-            /*上面这段代码的意思是：
-              如果value是实体类，则只序列化数字，布尔，时间，枚举，Guid类型，除非它具有JsonInclude特性，
-              这是为了避免序列化实体类的外键属性，浪费性能以及产生不必要的bug*/
-        }
-        #endregion
-        writer.WriteStartObject();
-        foreach (var (k, v) in Fun())
-        {
-            writer.WritePropertyName(k);
-            JsonSerializer.Serialize(writer, v, options);
-        }
-        writer.WriteEndObject();
+        var dictionary = value.ToDictionary(true);
+        JsonSerializer.Serialize(writer, dictionary, options);
     }
     #endregion 
 }

@@ -1,4 +1,4 @@
-﻿using System.DataFrancis.Verify;
+﻿using System.DataFrancis.EntityDescribe;
 using System.Linq.Expressions;
 
 namespace System.DataFrancis;
@@ -32,8 +32,8 @@ sealed class DataPipeVerify : IDataPipe
     {
         foreach (var item in datas)
         {
-            if (Verify(item) is { Count: > 0 } message)
-                throw new ValidationException("数据验证失败" + Environment.NewLine + message.Join(Environment.NewLine));
+            if (Verify(item) is { IsSuccess: false, FailureReason: { } reason })
+                throw new ValidationException("数据验证失败" + Environment.NewLine + reason.Select(x => x.Prompt).Join(Environment.NewLine));
         }
     }
     #endregion

@@ -6,7 +6,7 @@
 /// </summary>
 /// <typeparam name="Key">用来提取缓存的键类型</typeparam>
 /// <typeparam name="Value">被缓存的类型</typeparam>
-public interface ICache<in Key, out Value>
+public interface ICache<in Key, Value>
     where Key : notnull
 {
     #region 说明文档
@@ -36,5 +36,13 @@ public interface ICache<in Key, out Value>
     /// <param name="key">用来提取缓存的键</param>
     /// <returns>获取到的缓存数据，如果键不存在，不会引发异常</returns>
     Value this[Key key] { get; }
+    #endregion
+    #region 提取缓存数据，如果不存在，则将其添加
+    /// <summary>
+    /// 提取缓存数据，如果它不存在，则将其添加进来
+    /// </summary>
+    /// <param name="getValue">用来获取缓存数据的委托</param>
+    /// <inheritdoc cref="this[Key]"/>
+    Value TryAddValue(Key key, Func<Value> getValue);
     #endregion
 }

@@ -23,8 +23,8 @@ sealed class SymmetricAlgorithmPipe : WithoutRelease, IBitRead
     public string? Format => null;
     #endregion
     #region 管道的长度
-    public long Length
-        => throw new NotImplementedException("加解密后管道的长度无法被计算，不能读取这个属性");
+    public long? Length
+        => null;
     #endregion
     #region 读取管道
     #region 正式方法

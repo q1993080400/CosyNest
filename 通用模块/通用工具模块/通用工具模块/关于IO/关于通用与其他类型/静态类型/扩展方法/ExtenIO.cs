@@ -118,12 +118,12 @@ public static class ExtenIO
     #region 转换枚举字节集合的迭代器
     ///<inheritdoc cref="ToBitRead(IAsyncEnumerable{IEnumerable{byte}}, string, string?, IInstruct?)"/>
     public static IBitRead ToBitRead(this IEnumerable<IEnumerable<byte>> bytes, string? format = null, string? describe = null)
-        => new BitReadEnumerable<IEnumerable<byte>>(bytes.Fit(), format, describe, null);
+        => new BitReadEnumerable<IEnumerable<byte>>(bytes.ToAsyncEnumerable(), format, describe, null);
     #endregion
     #region 转换枚举字节的迭代器
     /// <inheritdoc cref="ToBitRead(IAsyncEnumerable{IEnumerable{byte}}, string, string?, IInstruct?)"/>
     public static IBitRead ToBitRead(this IEnumerable<byte> bytes, string? format = null, string? describe = null)
-        => new BitReadEnumerable<byte>(bytes.Fit(), format, describe, null);
+        => new BitReadEnumerable<byte>(bytes.ToAsyncEnumerable(), format, describe, null);
     #endregion
     #endregion
     #endregion

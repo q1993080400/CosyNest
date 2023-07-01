@@ -70,8 +70,8 @@ sealed class ShortMessageGuoYang : WebApi, IShortMessageManage
     public ShortMessageGuoYang(string appCode, string smsSignId, Func<IHttpClient>? httpClientProvide = null)
         : base(httpClientProvide)
     {
-        this.SMSSignId = smsSignId;
-        this.AppCode = appCode;
+        SMSSignId = smsSignId;
+        AppCode = appCode;
     }
     #endregion
 }

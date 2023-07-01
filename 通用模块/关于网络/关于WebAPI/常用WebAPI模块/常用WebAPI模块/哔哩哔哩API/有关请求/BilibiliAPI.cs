@@ -18,9 +18,7 @@ public sealed class BilibiliAPI : WebApi
     /// <returns></returns>
     public async Task<(string AID, string CID)> GetID(string uri, CancellationToken cancellationToken = default)
     {
-        var match =/*language=regex*/"video/(?<bv>BV[^/?]+)".Op().Regex().MatcheSingle(uri);
-        if (match is null)
-            throw new ArgumentException(@"这个地址不是B站视频地址");
+        var match =/*language=regex*/"video/(?<bv>BV[^/?]+)".Op().Regex().MatcheSingle(uri) ?? throw new ArgumentException(@"这个地址不是B站视频地址");
         var json = await (await HttpClientProvide().Request($"http://api.bilibili.com/x/web-interface/view?bvid={match["bv"].Match}", cancellationToken: cancellationToken)).Content.ToObject();
         var data = json!.GetValue<IDirect>("data")!;
         return (data["aid"]!.ToString()!, data["cid"]!.ToString()!);

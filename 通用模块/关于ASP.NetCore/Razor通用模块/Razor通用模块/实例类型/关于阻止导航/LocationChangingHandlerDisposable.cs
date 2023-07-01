@@ -27,7 +27,7 @@ sealed class LocationChangingHandlerDisposable : IDisposable
     /// 当导航触发时的事件，
     /// 它返回一个布尔值，指示是否应该阻止导航
     /// </summary>
-    private Func<LocationChangingContext, ValueTask<bool>> LocationChangingHandler { get; }
+    private Func<Task<bool>> LocationChangingHandler { get; }
     #endregion
     #region 用来释放事件的对象
     /// <summary>
@@ -43,7 +43,7 @@ sealed class LocationChangingHandlerDisposable : IDisposable
     /// <returns></returns>
     private async ValueTask OnBeforeInternalNavigation(LocationChangingContext context)
     {
-        if (!await LocationChangingHandler(context))
+        if (!await LocationChangingHandler())
             return;
         context.PreventNavigation();
         Dispose();
@@ -58,7 +58,7 @@ sealed class LocationChangingHandlerDisposable : IDisposable
     /// <param name="navigationManager">用来执行导航的对象</param>
     /// <param name="locationChangingHandler">当导航触发时的事件，
     /// 它返回一个布尔值，指示是否应该阻止导航</param>
-    public LocationChangingHandlerDisposable(NavigationManager navigationManager, Func<LocationChangingContext, ValueTask<bool>> locationChangingHandler)
+    public LocationChangingHandlerDisposable(NavigationManager navigationManager, Func<Task<bool>> locationChangingHandler)
     {
         NavigationManager = navigationManager;
         LocationChangingHandler = locationChangingHandler;

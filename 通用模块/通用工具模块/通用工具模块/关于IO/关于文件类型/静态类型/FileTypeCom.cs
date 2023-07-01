@@ -39,7 +39,7 @@ public static class FileTypeCom
     /// 它被各大浏览器广泛支持
     /// </summary>
     public static IFileType WebVideo { get; }
-        = CreateIO.FileType("Web视频文件", "webm", "mp4");
+        = CreateIO.FileType("Web视频文件", "webm", "mp4", "mov");
     #endregion
     #endregion
 }

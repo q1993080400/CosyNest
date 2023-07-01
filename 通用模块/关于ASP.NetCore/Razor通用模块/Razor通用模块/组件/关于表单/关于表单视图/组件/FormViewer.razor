@@ -1,0 +1,8 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Model
+
+@if ((ChildContent, FormModel) is ({ }, { }))
+{
+    @ChildContent(GetRenderInfo())
+}

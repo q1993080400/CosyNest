@@ -16,11 +16,16 @@ public static partial class ExtenReflection
     /// 返回一个字段的值，返回值已经经过类型转换
     /// </summary>
     /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <param name="fiel">要返回值的字段</param>
-    /// <param name="obj">字段所依附的对象，如果是静态字段，直接忽略</param>
+    /// <param name="field">要返回值的字段</param>
+    /// <param name="obj">字段所依附的对象，如果是静态字段或枚举，直接忽略</param>
     /// <returns></returns>
-    public static Ret? GetValue<Ret>(this FieldInfo fiel, object? obj = null)
-        => (Ret?)fiel.GetValue(obj);
+    public static Ret? GetValue<Ret>(this FieldInfo field, object? obj = null)
+    {
+        var declaringType = field.DeclaringType;
+        var value = declaringType is { IsEnum: true } ?
+            Enum.Parse(declaringType, field.Name) : field.GetValue(obj);
+        return (Ret?)value;
+    }
     #endregion
     #endregion
     #region 关于属性
@@ -87,12 +92,17 @@ public static partial class ExtenReflection
     #region 是否为全能属性
     /// <summary>
     /// 返回某一属性是否为全能属性，
-    /// 全能属性指的是可读，可写，公开，且非静态，非索引器的属性
+    /// 全能属性指的是可读，可写，公开，且非静态，非索引器的属性，
+    /// 注意：init属性不是全能属性
     /// </summary>
     /// <param name="property">待检查的属性</param>
     /// <returns></returns>
     public static bool IsAlmighty(this PropertyInfo property)
-        => property.GetPermissions() is null && property.IsPublic() && !property.IsStatic() && !property.IsIndexing();
+        => property.GetPermissions() is null &&
+        property.IsPublic() &&
+        !property.IsStatic() &&
+        !property.IsIndexing() &&
+        property.BackingField() is not { IsInitOnly: true };
     #endregion
     #region 获取自动属性的背景字段
     /// <summary>
@@ -114,6 +124,15 @@ public static partial class ExtenReflection
             _ => throw new NotSupportedException($"由于派生类隐藏基类的字段，找到了多个字段，无法判断谁是该属性的背景字段")
         };
     }
+    #endregion
+    #region 返回属性的可为空信息
+    /// <summary>
+    /// 返回属性的可为空信息
+    /// </summary>
+    /// <param name="property">要检查的属性</param>
+    /// <returns></returns>
+    public static NullabilityInfo GetNullabilityInfo(this PropertyInfo property)
+        => new NullabilityInfoContext().Create(property);
     #endregion
     #endregion
     #region 关于属性的值

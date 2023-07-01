@@ -27,24 +27,37 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
     private Func<Key, Value> NotExist { get; }
     #endregion
     #region 提取缓存数据
+    #region 隐式提取
     public Value this[Key key]
+        => GetValue(key, NotExist);
+    #endregion
+    #region 显式提取
+    #region 提取缓存数据，如果不存在，则将其添加
+    public Value TryAddValue(Key key, Func<Value> getValue)
+        => GetValue(key, _ => getValue());
+    #endregion
+    #region 基础方法
+    /// <summary>
+    /// 获取缓存数据的基础方法
+    /// </summary>
+    /// <inheritdoc cref="ICache{Key, Value}.TryAddValue(Key, Func{Value})"/>
+    private Value GetValue(Key key, Func<Key, Value> getValue)
     {
-        get
+        if (Dictionary.TryGetValue(key, out var value))
         {
-            if (Dictionary.TryGetValue(key, out var value))
-            {
-                value.UseCount++;
-                return value.Value;
-            }
-            else
-            {
-                var v = NotExist(key);
-                Dictionary = Dictionary.SetItem(key, new UseValue(v));
-                GC();
-                return v;
-            }
+            value.UseCount++;
+            return value.Value;
+        }
+        else
+        {
+            var v = getValue(key);
+            Dictionary = Dictionary.SetItem(key, new UseValue(v));
+            GC();
+            return v;
         }
     }
+    #endregion
+    #endregion
     #endregion
     #endregion
     #region 关于垃圾回收

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace System.DataFrancis.Verify;
+namespace System.DataFrancis.EntityDescribe;
 
 /// <summary>
 /// 这个类型表示由于数据验证失败所导致的异常

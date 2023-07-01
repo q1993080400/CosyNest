@@ -1,0 +1,24 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+
+@{
+    var info = RenderCoverInfo.RenderCoverInfo;
+    var file = info.FileSource;
+    var path = file.FilePath;
+    var size = RenderCoverInfo.CoverSize;
+    var style = size is { } ? $"width:{size};height:{size}" : "";
+    var onClick = CreateRazor.EventCallbackNotRefresh(() => ClickEvent.InvokeAsync(file));
+}
+@switch (file)
+{
+    case MediaSource mediaSource:
+        <AutoPlayButton @onclick=onClick AddPlayButton=@(mediaSource.MediaSourceType is FileSourceType.WebVideo) style="@style" class="mediaCover autoPlayButtonCntainer">
+            <img src="@mediaSource.CoverPath" class="imageCover" />
+        </AutoPlayButton>
+        break;
+    case var fileSource:
+        <div @onclick=onClick>
+            <FileRendering Width="auto" Uri="@path" GetFileName="@(_=>fileSource.TrueName)" style="@style" @onclick:preventDefault />
+        </div>
+        break;
+}

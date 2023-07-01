@@ -25,7 +25,7 @@ public static class CreateASP
     /// 创建媒体文件路径协议，
     /// 它支持按照封面/本体分类路径，以及排序等功能
     /// </summary>
-    public static (GenerateFilePathProtocol<IEnumerable<MediaPathGenerateParameters>, IEnumerable<MediaServerPosition>> Generate, AnalysisFilePathProtocol<IEnumerable<string>, IEnumerable<MediaSource>> Analysis) MediaPathProtocol { get; }
-        = (Components.MediaPathProtocol.Generate, Components.MediaPathProtocol.Analysis);
+    public static (GenerateFilePathProtocol<FilePathGenerateParameters, FileSource> Generate, AnalysisFilePathProtocol<IEnumerable<string>, IEnumerable<FileSource>> Analysis) MediaPathProtocol { get; }
+        = (FilePathProtocol.Generate, FilePathProtocol.Analysis);
     #endregion
 }

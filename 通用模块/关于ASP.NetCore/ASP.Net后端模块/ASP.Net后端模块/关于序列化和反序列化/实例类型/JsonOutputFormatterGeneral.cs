@@ -1,6 +1,7 @@
 ﻿using System.NetFrancis;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Net.Http.Headers;
@@ -40,6 +41,7 @@ sealed class JsonOutputFormatterGeneral : TextOutputFormatter
     public JsonOutputFormatterGeneral(JsonSerializerOptions options)
     {
         Options = options;
+        Options.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.Json));
         SupportedEncodings.Add(Encoding.UTF8);
         SupportedEncodings.Add(Encoding.Unicode);

@@ -1,0 +1,7 @@
+﻿
+/*媒体预览图片样式*/
+.mediaPreview
+{
+    object-fit: contain;
+    object-position: center;
+}

@@ -1,0 +1,100 @@
+﻿@namespace BootstrapBlazor.Components
+@using Microsoft.AspNetCore;
+@inherits ComponentBase
+@inject IJSWindow JSWindow
+@using System.IOFrancis.FileSystem
+
+<FileViewer FileSource="FileSource">
+    <RenderComponent>
+        @if (RenderComponent is { })
+        {
+            @RenderComponent(context.RenderElement)
+        }
+        else
+        {
+            <div class="mediaViewerContainer">
+                @foreach (var item in context.RenderElement)
+                {
+                    @item
+                }
+            </div>
+        }
+        @if (IsOpen)
+        {
+            <Modal FirstAfterRenderCallbackAsync="@(x=>x.Show())">
+                <BootstrapBlazor.Components.ModalDialog IsCentered=true Size="Size.Medium" IsScrolling="true" ShowCloseButton=false ShowHeader=false>
+                    <BodyTemplate>
+                        <div id="@CarouselID">
+                            <Carousel ShowIndicators=false>
+                                @foreach (var item in Files(context))
+                                {
+                                    var uri = item.FilePath;
+                                    <CarouselItem Interval="1000*600" @key=item>
+                                        <NineGrids>
+                                            @switch (item)
+                                            {
+                                                case MediaSource { MediaSourceType: FileSourceType.WebImage }:
+                                                    <img src="@uri" class="mediaPreview" />
+                                                    break;
+                                                case MediaSource { MediaSourceType: FileSourceType.WebVideo }:
+                                                    var format = ToolPath.SplitPathFile(uri).Extended switch
+                                                    {
+                                                        "opus" or "ogv" => "video/ogg",
+                                                        "mkv" => "video/x-matroska",
+                                                        "m3u8" => "application/x-mpegURL",
+                                                        _ => "video/mp4"
+                                                    };
+                                                    <VideoPlayer Url="@uri" MineType="@format" Height="500" Width="300" Autoplay=true Controls=true />
+                                                    break;
+                                            }
+                                        </NineGrids>
+                                    </CarouselItem>
+                                }
+                            </Carousel>
+                        </div>
+                    </BodyTemplate>
+                    <FooterTemplate>
+                        @{
+                            async Task OnClickWithoutRender()
+                            {
+                                IsOpen = false;
+                                await context.QuitPreview();
+                            }
+                        }
+                        <CompactCentered>
+                            <Button OnClick="OnClickWithoutRender">关闭</Button>
+                        </CompactCentered>
+                    </FooterTemplate>
+                </BootstrapBlazor.Components.ModalDialog>
+            </Modal>
+        }
+    </RenderComponent>
+    <RenderCover>
+        @{
+            var newContext = ConvertRenderCoverInfo(context);
+        }
+        @if (RenderCover is { })
+        {
+            @RenderCover(newContext)
+        }
+        else
+        {
+            var info = newContext.RenderCoverInfo;
+            var file = info.FileSource;
+            var path = file.FilePath;
+            var size = newContext.CoverSize;
+            var style = size is { } ? $"width:{size};height:{size}" : "";
+            @switch (file)
+            {
+                case MediaSource mediaSource:
+                    <AutoPlayButton @onclick=info.PreviewEvent AddPlayButton=@(mediaSource.MediaSourceType is FileSourceType.WebVideo) style="@style" class="mediaCover autoPlayButtonCntainer">
+                        <img src="@mediaSource.CoverPath" class="imageCover" />
+                    </AutoPlayButton>
+                    break;
+                case var fileSource:
+                    <FileRendering Width="auto" Uri="@path" GetFileName="@(_=>fileSource.TrueName)" style="@style" />
+                    break;
+            }
+        }
+    </RenderCover>
+</FileViewer>

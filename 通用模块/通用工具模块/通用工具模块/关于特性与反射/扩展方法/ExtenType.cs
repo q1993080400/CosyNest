@@ -73,7 +73,7 @@ public static partial class ExtenReflection
     /// <param name="type">待检查的类型</param>
     /// <returns></returns>
     public static bool IsNum(this Type type)
-        => Type.GetTypeCode(type) is not (TypeCode.Object or TypeCode.DBNull or
+        => !type.IsEnum && Type.GetTypeCode(type) is not (TypeCode.Object or TypeCode.DBNull or
         TypeCode.Empty or TypeCode.DateTime or
         TypeCode.Char or TypeCode.String or TypeCode.Boolean);
     #endregion

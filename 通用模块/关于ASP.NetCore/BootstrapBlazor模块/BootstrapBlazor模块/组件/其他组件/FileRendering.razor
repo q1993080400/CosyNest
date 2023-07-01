@@ -1,0 +1,16 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+
+@{
+    var fileName = Path.GetFileName(Uri);
+    var trueFileName = GetFileName?.Invoke(fileName) ?? fileName;
+}
+<a href="@Uri" download="@trueFileName" target="_blank" @attributes=Attributes>
+    <NineGrids>
+        <TofuCubesSimple Text="@trueFileName" Width="@Width">
+            <RenderIcon>
+                <FileIcon Extension="@Path.GetExtension(Uri)" />
+            </RenderIcon>
+        </TofuCubesSimple>
+    </NineGrids>
+</a>

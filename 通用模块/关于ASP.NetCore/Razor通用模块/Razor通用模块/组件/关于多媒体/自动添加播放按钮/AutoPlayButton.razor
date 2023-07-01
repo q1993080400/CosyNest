@@ -3,7 +3,7 @@
 
 @if (ChildContent is { })
 {
-    <div class="autoPlayButtonCntainer">
+    <div class="autoPlayButtonCntainer" @attributes=ContainerAttributes>
         @ChildContent
         @if (AddPlayButton)
         {

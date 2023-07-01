@@ -134,6 +134,13 @@ public interface ITypeData
     /// </summary>
     ILookup<Type, PropertyInfo> PropertyDictionaryType { get; }
     #endregion
+    #region 枚举所有全能属性
+    /// <summary>
+    /// 返回这个类型的所有全能属性，
+    /// 全能属性指的是可读，可写，公开，非静态，非索引器的属性
+    /// </summary>
+    IEnumerable<PropertyInfo> AlmightyPropertys { get; }
+    #endregion
     #region 筛选属性
     /// <summary>
     /// 根据名称和声明类型筛选属性

@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Generic;
+﻿using System.Runtime.CompilerServices;
+
+namespace System.Collections.Generic;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -15,16 +17,26 @@ public interface IAsyncDictionary<Key, Value> : IAsyncCollection<KeyValuePair<Ke
     /// 获取异步字典的所有键
     /// </summary>
     /// <param name="cancellation">用于取消异步任务的令牌</param>
-    IAsyncEnumerable<Key> KeysAsync(CancellationToken cancellation = default)
-        => this.Fit().Select(x => x.Key).Fit();
+    async IAsyncEnumerable<Key> KeysAsync([EnumeratorCancellation] CancellationToken cancellation = default)
+    {
+        foreach (var item in await this.ToListAsync())
+        {
+            yield return item.Key;
+        }
+    }
     #endregion
     #region 获取值集合
     /// <summary>
     /// 获取异步字典的所有值
     /// </summary>
     /// <param name="cancellation">用于取消异步任务的令牌</param>
-    IAsyncEnumerable<Value> ValuesAsync(CancellationToken cancellation = default)
-        => this.Fit().Select(x => x.Value).Fit();
+    async IAsyncEnumerable<Value> ValuesAsync([EnumeratorCancellation] CancellationToken cancellation = default)
+    {
+        foreach (var item in await this.ToListAsync())
+        {
+            yield return item.Value;
+        }
+    }
     #endregion
     #endregion
     #region 关于添加，移除和检查键值对

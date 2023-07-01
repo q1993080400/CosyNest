@@ -51,6 +51,12 @@ partial class TypeData
     public PropertyInfo FindProperty(string name, Type? declaringType = null)
         => Find(PropertyDictionary, name, declaringType);
     #endregion
+    #region 枚举所有全能属性
+    private IEnumerable<PropertyInfo>? AlmightyPropertysField;
+
+    public IEnumerable<PropertyInfo> AlmightyPropertys
+        => AlmightyPropertysField ??= Propertys.Where(x => x.IsAlmighty()).ToArray();
+    #endregion
     #endregion
     #region 关于索引器
     #region 枚举所有索引器

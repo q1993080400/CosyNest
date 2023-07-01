@@ -9,7 +9,7 @@ namespace System.DataFrancis.DB.EF;
 /// 这个类型是支持事务的<see cref="IDataPipe"/>实现，
 /// 只要将它一直传递下去，就可以保证事务一致性
 /// </summary>
-sealed class EFDataPipeTransaction : IDataPipeDB, IDisposable
+sealed class EFDataPipeTransaction : IDataPipeDBWithJoin, IDisposable
 {
     #region 公开成员
     #region 执行事务
@@ -63,7 +63,7 @@ sealed class EFDataPipeTransaction : IDataPipeDB, IDisposable
     {
         datas = datas.ToArray();
         var db = CreateDbContextFromEntityType(typeof(Data));
-        EFDataPipe.Track(db, datas, specifyPrimaryKey);
+        ToolEFDataPipe.Track(db, datas, specifyPrimaryKey);
         return Task.CompletedTask;
     }
     #endregion 

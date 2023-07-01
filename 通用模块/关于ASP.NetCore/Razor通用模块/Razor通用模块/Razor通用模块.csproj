@@ -14,6 +14,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
 		<ProjectReference Include="..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
 		<ProjectReference Include="..\..\..\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
 		<ProjectReference Include="..\..\..\关于编译和表达式树\编译和表达式树模块\编译和表达式树模块\编译和表达式树模块.csproj" />
@@ -23,7 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="7.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.8" />
 	</ItemGroup>
 </Project>

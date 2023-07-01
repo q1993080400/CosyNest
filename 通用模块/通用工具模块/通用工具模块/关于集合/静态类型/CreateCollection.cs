@@ -101,6 +101,30 @@ public static class CreateCollection
     }
     #endregion
     #endregion
+    #region 创建异步迭代器
+    #region 创建合页迭代器
+    /// <summary>
+    /// 创建一个合页异步迭代器，
+    /// 它是分页的逆操作，将被分页的集合重新还原为一个完整的集合
+    /// </summary>
+    /// <typeparam name="Obj">集合元素的类型</typeparam>
+    /// <param name="fun">这个委托传入页码，返回该页元素</param>
+    /// <returns></returns>
+    public static async IAsyncEnumerable<Obj> MergePage<Obj>(Func<int, IAsyncEnumerable<Obj>> fun)
+    {
+        for (int i = 0; true; i++)
+        {
+            var list = await fun(i).ToListAsync();
+            if (!list.Any())
+                yield break;
+            foreach (var item in list)
+            {
+                yield return item;
+            }
+        }
+    }
+    #endregion
+    #endregion
     #region 创建字典
     #region 创建空字典
 #pragma warning disable IDE0060

@@ -1,5 +1,5 @@
 ﻿using System.DataFrancis;
-using System.DataFrancis.Verify;
+using System.DataFrancis.EntityDescribe;
 
 namespace System;
 

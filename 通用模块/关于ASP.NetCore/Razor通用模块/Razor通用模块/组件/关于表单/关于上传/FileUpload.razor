@@ -1,0 +1,12 @@
+﻿@namespace Microsoft.AspNetCore.Components.Forms
+@inherits ComponentBase
+@using System.NetFrancis
+
+@if (ChildContent is { })
+{
+    <label>
+        @ChildContent
+        <BlockNavigation IsBlock="@(()=>BlockNavigation(UploadStatus is UploadStatus.Uploading))" />
+        <InputFile OnChange="OnChange" style="opacity:0;width:1px;height:1px;position:absolute" @attributes=AdditionalAttributes />
+    </label>
+}

@@ -9,7 +9,7 @@ public sealed record RenderCoverInfo
     /// <summary>
     /// 获取要渲染的媒体
     /// </summary>
-    public required MediaSource MediaSource { get; init; }
+    public required FileSource FileSource { get; init; }
     #endregion
     #region 预览媒体所发生的事件
     /// <summary>

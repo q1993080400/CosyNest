@@ -1,69 +1,39 @@
 ﻿
-/*PC平台*/
-@media only screen and (min-width : 1224px)
+:root
 {
-    /*媒体视图容器的样式*/
-    .mediaViewerContainer
-    {
-        /*封面大小基准*/
-        --coverSizeBase: 24em
-    }
-}
-
-/*平板平台*/
-@media only screen and (min-width : 667px) and (max-width : 1224px)
-{
-    /*媒体视图容器的样式*/
-    .mediaViewerContainer
-    {
-        /*封面大小基准*/
-        --coverSizeBase: 16em
-    }
-}
-
-/*手机平台*/
-@media only screen and (max-width : 667px)
-{
-    /*媒体视图容器的样式*/
-    .mediaViewerContainer
-    {
-        /*封面大小基准*/
-        --coverSizeBase: 8em
-    }
+    --mediaViewerContainerGap: 0.5ch;
 }
 
 /*媒体视图容器的样式*/
 .mediaViewerContainer
 {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
-    gap: 0.5ch;
     background-color: white;
-    /*自动播放按钮大小*/
-    --coverPlayButtonSize: calc(var(--coverSizeBase) / 4)
+    gap: var(--mediaViewerContainerGap);
 }
 
-/*播放按钮样式*/
-.coverPlayButton
-{
-    width: var(--coverPlayButtonSize);
-    height: var(--coverPlayButtonSize);
-}
-
-/*封面的样式*/
-.cover
+/*媒体封面样式*/
+.mediaCover
 {
     cursor: pointer;
-    max-width: var(--coverSizeBase);
-    max-height: var(--coverSizeBase);
-    object-fit: contain;
+    flex-grow: 1;
+}
+
+/*图片封面样式*/
+.imageCover
+{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     object-position: center;
 }
 
-/*媒体预览图片样式*/
-.mediaPreview
+/*表单视图容器样式*/
+.formViewerBootstrapContainer
 {
-    object-fit: contain;
-    object-position: center;
+    display: flex;
+    gap: var(--gapMedium);
+    flex-wrap: nowrap;
+    flex-direction: column;
 }

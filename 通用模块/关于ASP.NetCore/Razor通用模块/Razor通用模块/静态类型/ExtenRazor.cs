@@ -1,10 +1,12 @@
-﻿using System.Net.Http.Headers;
+﻿using System.IOFrancis;
+using System.Media.Play;
+using System.Net.Http.Headers;
 using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Web;
 
-using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Http.Connections.Client;
+using Microsoft.Extensions.Logging;
 
 namespace System;
 
@@ -212,6 +214,25 @@ public static class ExtenRazor
             return (configure is null ? connection : await configure(connection)).Build();
         });
     #endregion
+    #region 注入上传任务工厂
+    /// <summary>
+    /// 以单例模式注入一个<see cref="UploadTaskFactory{Progress}"/>，
+    /// 它可以创建一个用于上传文件的任务，
+    /// 本服务依赖于<see cref="ILoggerProvider"/>，<see cref="GenerateFilePathProtocol{Input, Output}"/>和<see cref="IVideoProcessing"/>
+    /// </summary>
+    /// <param name="services">要添加的服务容器</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="UploadTaskFactory(ILoggerProvider, GenerateFilePathProtocol{FilePathGenerateParameters, FileSource}, IVideoProcessing, UploadTaskFactoryInfo)"/>
+    public static IServiceCollection AddUploadTaskFactory(this IServiceCollection services, UploadTaskFactoryInfo uploadTaskFactoryInfo)
+        => services.AddSingleton<UploadTaskFactory<decimal>>(x =>
+        {
+            var uploadTaskFactory = new UploadTaskFactory(x.GetRequiredService<ILoggerProvider>(),
+                x.GetRequiredService<GenerateFilePathProtocol<FilePathGenerateParameters, FileSource>>(),
+                x.GetRequiredService<IVideoProcessing>(),
+                uploadTaskFactoryInfo);
+            return uploadTaskFactory.CreateUploadTask;
+        });
+    #endregion
     #endregion
     #region 有关组件
     #region 将IBrowserFile集合转换为一个MultipartFormDataContent
@@ -287,9 +308,9 @@ public static class ExtenRazor
     /// <param name="navigation">用来执行导航的对象</param>
     /// <param name="locationChangingHandler">当触发导航时的事件，
     /// 它返回一个布尔值，指示是否应该阻止导航</param>
-    /// <returns></returns>
+    /// <returns>一个<see cref="IDisposable"/>，释放它可以停止阻止导航</returns>
     public static IDisposable RegisterLocationChangingHandlerDisposable(this NavigationManager navigation,
-        Func<LocationChangingContext, ValueTask<bool>> locationChangingHandler)
+        Func<Task<bool>> locationChangingHandler)
         => new LocationChangingHandlerDisposable(navigation, locationChangingHandler);
     #endregion
 }

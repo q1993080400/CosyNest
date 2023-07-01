@@ -62,15 +62,17 @@ public interface IBitPipeBase : IInstruct, IDisposable
     #region 数据的总长度
     #region 返回字节数量
     /// <summary>
-    /// 返回二进制数据的总长度（以字节为单位）
+    /// 返回二进制数据的总长度（以字节为单位），
+    /// 如果长度未知或者没有确定长度，则为<see langword="null"/>
     /// </summary>
-    long Length { get; }
+    long? Length { get; }
     #endregion
     #region 返回IUnit
     /// <summary>
-    /// 返回二进制数据的总长度
+    /// 返回二进制数据的总长度，
+    /// 如果长度未知或者没有确定长度，则为<see langword="null"/>
     /// </summary>
-    IUnit<IUTStorage> LengthUnit => CreateBaseMath.Unit(Length, IUTStorage.ByteMetric);
+    IUnit<IUTStorage>? LengthUnit => Length is null ? null : CreateBaseMath.Unit(Length.Value, IUTStorage.ByteMetric);
     #endregion
     #endregion
 }

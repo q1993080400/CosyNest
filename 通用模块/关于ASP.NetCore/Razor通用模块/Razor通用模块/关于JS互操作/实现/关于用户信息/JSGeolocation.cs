@@ -18,7 +18,13 @@ sealed class JSGeolocation : JSRuntimeBase, IPosition
             return CreateGeography.Location(array[0], array[1], accuracy: array[2]);
         }, (successMethod, failMethod) =>
 $$"""
-                navigator.geolocation.getCurrentPosition(x=>{{successMethod}}([x.coords.longitude,x.coords.latitude,x.coords.accuracy]),{{failMethod}},{enableHighAccuracy:true});
+                navigator.geolocation.getCurrentPosition(
+                x=>{{successMethod}}([x.coords.longitude,x.coords.latitude,x.coords.accuracy]),
+                {{failMethod}},
+                {
+                    enableHighAccuracy:true,
+                    timeout: 5000
+                });
 """, null, cancellationToken);
     #endregion
     #region 构造函数

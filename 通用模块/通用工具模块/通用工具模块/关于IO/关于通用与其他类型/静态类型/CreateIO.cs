@@ -108,6 +108,16 @@ public static class CreateIO
         return new FileStream(path, mod).ToBitPipe(extended);
     }
     #endregion
+    #region 创建临时文件管道
+    /// <summary>
+    /// 创建一个能够读取且仅能读取临时文件的管道，
+    /// 当它被释放掉以后，这个临时文件会被删除
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="BitReadTemporaryFile.BitReadTemporaryFile(PathText)"/>
+    public static IBitRead BitReadTemporaryFile(PathText path)
+        => new BitReadTemporaryFile(path);
+    #endregion
     #region 创建读写内存的管道
     /// <summary>
     /// 创建一个管道，它可以从内存中读写数据
@@ -203,12 +213,12 @@ public static class CreateIO
     #region 适配枚举字节集合的迭代器
     /// <inheritdoc cref="StreamEnumerable(IEnumerable{IEnumerable{byte}})"/>
     public static Stream StreamEnumerable(IAsyncEnumerable<IEnumerable<byte>> datas)
-        => new EnumerableStream(datas.Fit().GetEnumerator());
+        => new EnumerableStream(datas.ToBlockingEnumerable().GetEnumerator());
     #endregion
     #region 适配枚举字节的迭代器
     /// <inheritdoc cref="StreamEnumerable(IEnumerable{IEnumerable{byte}})"/>
     public static Stream StreamEnumerable(IAsyncEnumerable<byte> datas)
-        => new EnumerableStream(datas.Fit().Chunk(1024).GetEnumerator());
+        => new EnumerableStream(datas.ToBlockingEnumerable().Chunk(1024).GetEnumerator());
     #endregion
     #endregion
     #endregion

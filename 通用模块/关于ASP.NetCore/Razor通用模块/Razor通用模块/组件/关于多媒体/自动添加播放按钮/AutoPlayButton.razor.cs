@@ -26,5 +26,12 @@ public sealed partial class AutoPlayButton : ComponentBase, IContentComponent<Re
     [Parameter]
     public string? ExtraCSSButton { get; set; }
     #endregion
+    #region 参数展开
+    /// <summary>
+    /// 获取容器的参数展开
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? ContainerAttributes { get; set; }
+    #endregion
     #endregion
 }

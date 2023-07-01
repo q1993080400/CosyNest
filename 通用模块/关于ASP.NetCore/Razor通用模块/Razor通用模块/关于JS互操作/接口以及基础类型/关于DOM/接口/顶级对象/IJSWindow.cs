@@ -78,7 +78,7 @@ public interface IJSWindow : IJSRuntime
     /// <param name="cancellation">用来取消异步任务的令牌</param>
     /// <returns>用户输入的字符串，如果尚未输入，
     /// 则为<see langword="null"/></returns>
-    ValueTask<string?> Prompt(string? text = null, string? value = null, CancellationToken cancellation = default);
+    ValueTask<string?> Prompt(string? text = null, string? value = "", CancellationToken cancellation = default);
     #endregion
     #endregion
     #region 关于打开与关闭窗口

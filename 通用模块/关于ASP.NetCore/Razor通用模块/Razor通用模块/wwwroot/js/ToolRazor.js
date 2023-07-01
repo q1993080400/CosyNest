@@ -1,6 +1,8 @@
 ﻿
 //这个方法是JS互操作的基础方法
-window.InvokeCode = (code) => Function(code)();
+function InvokeCode(code) {
+    return Function(code)();
+}
 
 //这是一个读写cookie的小框架
 

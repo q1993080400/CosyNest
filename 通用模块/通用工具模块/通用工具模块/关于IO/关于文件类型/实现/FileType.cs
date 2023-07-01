@@ -25,7 +25,7 @@ sealed class FileType : IFileType
     public FileType(string description, params string[] extension)
     {
         var registered = IFileType.RegisteredFileTypePR;
-        ExtensionName = new HashSet<string>(extension);
+        ExtensionName = new HashSet<string>(extension, StringComparer.OrdinalIgnoreCase);
         Description = description;
         foreach (var item in ExtensionName)                     //注册所有扩展名
         {

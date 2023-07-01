@@ -1,0 +1,133 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+@typeparam Model
+@using System.Reflection
+@using System.DataFrancis.EntityDescribe;
+@using System.ComponentModel.DataAnnotations;
+@using System.ComponentModel.DataAnnotations.Schema;
+
+@{
+    var name = RenderInfo.PropertyName;
+    var property = RenderInfo.Property;
+    var propertyType = property.PropertyType;
+    #region 获取渲染特性
+    Obj? GetRenderAttribute<Obj>()
+    where Obj : Attribute
+    => property!.GetCustomAttribute<Obj>();
+    #endregion
+    #region 抛出异常
+    NotSupportedException Throw(Enum renderMode)
+    => new($"无法识别属性{name}的类型{propertyType}的渲染模式{renderMode}");
+    #endregion
+}
+
+<div style="flex-grow:1">
+    @switch (propertyType)
+    {
+        case var t when t == typeof(string):
+            var valueText = RenderInfo.Value<string>();
+            var stringRender = GetRenderAttribute<FormRenderStringAttribute>();
+            @switch (stringRender?.Render ?? FormStringRender.SingleLineText)
+            {
+                case FormStringRender.SingleLineText:
+                    <BootstrapInput TValue="string" ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value />
+                    break;
+                case FormStringRender.LongText:
+                    <Textarea ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value rows="@(stringRender?.Rows??4)" />
+                    break;
+                case var r:
+                    throw Throw(r);
+            }
+            break;
+        case var t when t.IsNum():
+            var numRender = GetRenderAttribute<FormRenderNumAttribute>();
+            var renderMode = numRender?.Render ?? FormNumRender.Num;
+            #region 渲染字段
+            void Render<T>()
+            {
+                @switch (renderMode)
+                {
+                    case FormNumRender.Num:
+                        var value = RenderInfo.Value<T>();
+                        <BootstrapInputNumber TValue="T" ShowLabel="true" DisplayText="@name" @bind-Value=value.Value />
+                        break;
+                    case FormNumRender.Grade when typeof(T) == typeof(double):
+                        var v = RenderInfo.Value<double>();
+                        <div>
+                            <div class="form-label">@name</div>
+                            <Rate @bind-Value=v.Value />
+                        </div>
+                        break;
+                    case var r:
+                        throw Throw(r);
+                }
+            }
+            #endregion
+            switch (t)
+            {
+                case var type when type == typeof(int):
+                    Render<int>();
+                    break;
+                case var type when type == typeof(long):
+                    Render<long>();
+                    break;
+                case var type when type == typeof(double):
+                    Render<double>();
+                    break;
+                case var type when type == typeof(decimal):
+                    Render<decimal>();
+                    break;
+                case var _:
+                    throw Throw(renderMode);
+            }
+            break;
+        case var t when t == typeof(bool):
+            var boolDescribe = GetRenderAttribute<FormRenderBoolAttribute>();
+            var trueDescribe = boolDescribe?.DescribeTrue ?? "打开";
+            var flaseDescribe = boolDescribe?.DescribeFalse ?? "关闭";
+            var boolRender = boolDescribe?.Render ?? FormBoolRender.Radio;
+            var valueBool = RenderInfo.Value<bool>();
+            var boolSelect = new SelectedItem[]
+            {
+    new ()
+    {
+    Text=trueDescribe,
+    Value=bool.TrueString,
+    },
+    new()
+    {
+    Text=flaseDescribe,
+    Value=bool.FalseString,
+    }
+            };
+            switch (boolRender)
+            {
+                case FormBoolRender.Radio:
+                    <RadioList Items="boolSelect" TValue="bool" ShowLabel="true" DisplayText="@name" @bind-Value=valueBool.Value />
+                    break;
+                case var r:
+                    throw Throw(r);
+            }
+            break;
+        case { IsEnum: true } t:
+            var enumSelect = Enum.GetNames(t).
+            Select(x => t.GetField(x)!).
+            Where(x => x.Name is not "value__" && !x.HasAttributes<NotMappedAttribute>()).
+            Select(x =>
+            {
+                var attribute = x.GetCustomAttribute<DisplayAttribute>();
+                return (x.GetValue<int>(), attribute?.Name ?? x.Name, attribute?.Order ?? 0);
+            }).
+            OrderBy(x => x.Item3).
+            Select(x => new SelectedItem()
+                    {
+                        Text = x.Item2,
+                        Value = x.Item1.ToString()
+                    }).ToArray();
+            var valueEnum = RenderInfo.Value<int>();
+            <RadioList Items="enumSelect" TValue="int" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value />
+            break;
+        case var t:
+            throw new NotSupportedException($"无法识别属性{name}的类型{t}，不能生成表单");
+    }
+</div>

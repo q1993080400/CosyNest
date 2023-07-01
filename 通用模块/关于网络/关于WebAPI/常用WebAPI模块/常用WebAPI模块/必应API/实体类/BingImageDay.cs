@@ -22,7 +22,7 @@ sealed record BingImageDay : IBingImageDay
     public BingImageDay(IDirect data)
     {
         var uri = data.GetValueRecursion<string>("images[0].url");
-        this.Uri = "https://www.bing.com/" + uri;
+        Uri = "https://www.bing.com/" + uri;
     }
     #endregion
     #region 无参数构造函数

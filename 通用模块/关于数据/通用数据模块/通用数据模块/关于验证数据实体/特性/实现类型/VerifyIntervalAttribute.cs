@@ -1,4 +1,4 @@
-﻿namespace System.DataFrancis.Verify;
+﻿namespace System.DataFrancis.EntityDescribe;
 
 /// <summary>
 /// 这个特性是一个区间验证，
