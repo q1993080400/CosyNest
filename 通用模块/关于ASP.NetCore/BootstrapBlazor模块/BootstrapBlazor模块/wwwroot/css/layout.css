@@ -1,6 +1,7 @@
 ﻿
 :root
 {
+    /*媒体视图容器的gap*/
     --mediaViewerContainerGap: 0.5ch;
 }
 
@@ -30,10 +31,49 @@
 }
 
 /*表单视图容器样式*/
-.formViewerBootstrapContainer
+.bootstrapFormViewerContainer
 {
     display: flex;
     gap: var(--gapMedium);
     flex-wrap: nowrap;
     flex-direction: column;
+}
+
+    /*表单视图容器的第一个元素样式*/
+    .bootstrapFormViewerContainer > :first-child
+    {
+        margin-top: var(--gapMedium);
+    }
+
+/*属性渲染容器样式*/
+.bootstrapFormViewerPropertyContainer
+{
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    gap: var(--gapMedium);
+}
+
+/*属性渲染容器元素样式*/
+.bootstrapFormViewerPropertyItem
+{
+    flex-grow: 1;
+}
+
+/*属性渲染容器元素说明样式*/
+.bootstrapFormViewerPropertyDescription
+{
+    font-style: italic;
+}
+
+/*替换的弹窗提示框样式*/
+.swal2-content
+{
+    white-space: pre-wrap;
+}
+
+/*替换的警告框样式*/
+.alert
+{
+    margin-bottom: 0;
 }

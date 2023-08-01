@@ -1,4 +1,6 @@
-﻿using System.IOFrancis;
+﻿using System.DataFrancis;
+using System.DataFrancis.EntityDescribe;
+using System.IOFrancis;
 using System.IOFrancis.FileSystem;
 
 namespace Microsoft.AspNetCore;
@@ -29,6 +31,7 @@ public static class ToolASP
       IServiceProvider实际上可以也应该静态化，
       它比较方便，而且可以让静态对象也能够请求服务*/
     #endregion
+    #region 关于Web根文件夹
     #region 获取Web根文件夹
     /// <summary>
     /// 获取Web根文件夹
@@ -42,6 +45,31 @@ public static class ToolASP
     /// </summary>
     public static string WebRootPath { get; }
     = Path.Combine(Environment.CurrentDirectory, "wwwroot");
+    #endregion
+    #endregion
+    #region 验证WebApi的参数
+    /// <summary>
+    /// 验证WebApi的参数，
+    /// 如果验证通过，返回<see langword="null"/>，
+    /// 否则返回一个返回值，它告知验证不通过的原因
+    /// </summary>
+    /// <typeparam name="Return">WebApi的返回值</typeparam>
+    /// <param name="parameter">WebApi的参数</param>
+    /// <param name="verify">用于验证的委托，
+    /// 如果为<see langword="null"/>，则使用默认方法</param>
+    /// <returns></returns>
+    public static Return? VerifyParameter<Return>(object parameter, DataVerify? verify = null)
+        where Return : APIPack, new()
+    {
+        verify ??= CreateDataObj.DataVerifyDefault();
+        var verificationResults = verify(parameter);
+        return verificationResults.IsSuccess ?
+            null :
+            new()
+            {
+                FailureReason = verificationResults.FailureReason.Join(x => x.Prompt, Environment.NewLine)
+            };
+    }
     #endregion
     #region 有关JS互操作
     #region 获取前端基准超时时间

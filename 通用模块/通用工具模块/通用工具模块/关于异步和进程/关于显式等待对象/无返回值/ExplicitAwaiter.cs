@@ -24,7 +24,7 @@ public sealed class ExplicitAwaiter : INotifyCompletion
     #region 正式方法
     public void OnCompleted(Action continuation)
     {
-        Continuation = continuation;
+        Continuation ??= continuation;
     }
     #endregion 
     #endregion
@@ -34,23 +34,32 @@ public sealed class ExplicitAwaiter : INotifyCompletion
     /// </summary>
     public void GetResult()
     {
-        if (!IsCompleted)
-            throw new NotSupportedException("任务尚未完成，无法获取结果");
+        if (IsTimeOut)
+            throw new TimeoutException("任务超时");
+        if (IsCompleted)
+            return;
+        throw new NotSupportedException("任务尚未完成，无法获取结果");
     }
     #endregion
     #endregion
     #region 内部成员
+    #region 是否超时
+    private bool IsTimeOut { get; set; }
+    #endregion
     #region 完成任务
     /// <summary>
     /// 调用本方法以完成任务
     /// </summary>
-    internal void Completed()
+    /// <param name="isTimeOut">指示任务是否超时</param>
+    internal void Completed(bool isTimeOut)
     {
         if (IsCompleted)
             return;
+        IsTimeOut = isTimeOut;
         IsCompleted = true;
-        Continuation?.Invoke();
+        var continuation = Continuation;
         Continuation = null;
+        continuation?.Invoke();
     }
     #endregion
     #endregion

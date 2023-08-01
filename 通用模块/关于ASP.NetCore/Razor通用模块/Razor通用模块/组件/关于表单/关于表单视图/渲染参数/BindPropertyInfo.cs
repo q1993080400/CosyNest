@@ -17,7 +17,11 @@ public sealed record BindPropertyInfo<Obj>
     public Obj? Value
     {
         get => (Obj?)Property.GetValue(FormModel);
-        set => Property.SetValue(FormModel, value.To(Property.PropertyType));
+        set
+        {
+            Property.SetValue(FormModel, value.To(Property.PropertyType));
+            OnPropertyChangeed();
+        }
     }
     #endregion
     #endregion
@@ -34,6 +38,12 @@ public sealed record BindPropertyInfo<Obj>
     /// </summary>
     private PropertyInfo Property { get; }
     #endregion
+    #region 属性改变后的事件
+    /// <summary>
+    /// 获取属性改变后引发的事件
+    /// </summary>
+    private Func<Task> OnPropertyChangeed { get; }
+    #endregion
     #endregion
     #region 构造函数
     /// <summary>
@@ -41,10 +51,12 @@ public sealed record BindPropertyInfo<Obj>
     /// </summary>
     /// <param name="formModel">要渲染的模型</param>
     /// <param name="property">要渲染的属性</param>
-    internal BindPropertyInfo(object formModel, PropertyInfo property)
+    /// <param name="onPropertyChangeed">属性改变后所引发的事件</param>
+    internal BindPropertyInfo(object formModel, PropertyInfo property, Func<Task> onPropertyChangeed)
     {
         FormModel = formModel;
         Property = property;
+        OnPropertyChangeed = onPropertyChangeed;
     }
     #endregion
 }

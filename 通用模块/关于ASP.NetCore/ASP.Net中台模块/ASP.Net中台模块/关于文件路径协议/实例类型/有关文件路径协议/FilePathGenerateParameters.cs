@@ -13,18 +13,19 @@ public sealed record FilePathGenerateParameters
     /// </summary>
     public required string Path { get; init; }
     #endregion
-    #region 文件的路径或名称
+    #region 文件本来的名字
     /// <summary>
-    /// 获取文件的路径或名称
+    /// 获取文件的本名，
+    /// 也就是它未上传之前本来的名字
     /// </summary>
-    public required string PathOrName { get; init; }
+    public required string TrueName { get; init; }
     #endregion
     #region 文件的名称和扩展名
     /// <summary>
     /// 返回一个元组，它的项分别指示文件的文件名，扩展名（如果有），以及文件的全名
     /// </summary>
     public (string Simple, string? Extended, string FullName) NameAndExtension
-        => ToolPath.SplitPathFile(PathOrName);
+        => ToolPath.SplitPathFile(TrueName);
     #endregion
     #region 封面扩展名
     private readonly string? CoverExtensionFiled;
@@ -57,8 +58,9 @@ public sealed record FilePathGenerateParameters
     #endregion
     #region 排序
     /// <summary>
-    /// 获取媒体文件的排序，顺序为升序
+    /// 获取媒体文件的排序，
+    /// 排在前面的索引具有更高的优先级
     /// </summary>
-    public required int Sort { get; init; }
+    public required IReadOnlyList<int> Sort { get; init; }
     #endregion
 }

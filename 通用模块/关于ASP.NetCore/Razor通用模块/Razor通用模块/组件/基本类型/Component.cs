@@ -44,7 +44,7 @@ public abstract class Component : ComponentBase
     /// <summary>
     /// 返回本组件的渲染阶段
     /// </summary>
-    protected RenderState State { get; private set; } = RenderState.CreateRender3;
+    protected RenderState State { get; private set; } = RenderState.Render3;
 
     /*问：为什么渲染阶段的初始值是CreateRender3？
       答：这是因为在未重写任何方法的情况下，第一次调用OnAfterRenderAsync，
@@ -56,7 +56,7 @@ public abstract class Component : ComponentBase
     protected sealed override Task OnInitializedAsync()
     {
         var task = OnInitializedAsyncRealize();
-        State = task.IsCompleted ? State : RenderState.CreateRender1;
+        State = task.IsCompleted ? State : RenderState.Render1;
         return task;
     }
     #endregion
@@ -75,7 +75,7 @@ public abstract class Component : ComponentBase
     protected sealed override Task OnParametersSetAsync()
     {
         var task = OnParametersSetAsyncRealize();
-        State = task.IsCompleted ? RenderState.CreateRender3 : RenderState.CreateRender2;
+        State = task.IsCompleted ? RenderState.Render3 : RenderState.Render2;
         return task;
     }
     #endregion
@@ -100,12 +100,12 @@ public abstract class Component : ComponentBase
     #region 重写方法
     protected sealed override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (State >= RenderState.CreateRender3)
+        if (State >= RenderState.Render3)
             RenderCount++;
         await OnAfterRenderAsyncRealize(RenderCount is 1);
         if (OnAfterRenderAsyncEvent is { } e)
             await e(State, RenderCount);
-        State = State == RenderState.CreateRender2 ? RenderState.CreateRender3 : State;
+        State = State == RenderState.Render2 ? RenderState.Render3 : State;
     }
     #endregion
     #region 模板方法

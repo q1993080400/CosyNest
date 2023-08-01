@@ -25,4 +25,10 @@ public record RenderVirtualizationElementInfo<Obj>
     /// </summary>
     public required string ID { get; init; }
     #endregion
+    #region 用来删除元素的委托
+    /// <summary>
+    /// 调用这个委托可以将本元素从容器中删除
+    /// </summary>
+    public required EventCallback DeleteElement { get; init; }
+    #endregion
 }

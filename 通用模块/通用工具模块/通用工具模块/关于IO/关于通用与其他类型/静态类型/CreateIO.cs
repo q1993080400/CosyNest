@@ -232,7 +232,7 @@ public static class CreateIO
     /// <returns></returns>
     public static FileStream FileStream(PathText path, FileMode mod = FileMode.OpenOrCreate)
     {
-        System.IO.Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        ToolIO.CreateFather(path);
         return new(path, mod);
     }
     #endregion

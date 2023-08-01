@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "底层交互模块", "..\..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "编译和表达式树模块", "..\..\关于编译和表达式树\编译和表达式树模块\编译和表达式树模块\编译和表达式树模块.csproj", "{451BFC1B-5E99-4ABA-9A10-937405C0C42F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "媒体工具模块", "..\..\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj", "{C6C8B279-D76F-4BCD-B81A-C0CD6B209FED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{451BFC1B-5E99-4ABA-9A10-937405C0C42F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{451BFC1B-5E99-4ABA-9A10-937405C0C42F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{451BFC1B-5E99-4ABA-9A10-937405C0C42F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6C8B279-D76F-4BCD-B81A-C0CD6B209FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6C8B279-D76F-4BCD-B81A-C0CD6B209FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6C8B279-D76F-4BCD-B81A-C0CD6B209FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6C8B279-D76F-4BCD-B81A-C0CD6B209FED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

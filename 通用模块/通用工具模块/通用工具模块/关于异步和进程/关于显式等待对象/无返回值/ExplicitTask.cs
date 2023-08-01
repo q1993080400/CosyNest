@@ -19,13 +19,13 @@ public sealed class ExplicitTask
     /// 调用本方法以完成任务
     /// </summary>
     public void Completed()
-        => (Awaiter ??= GetAwaiter()).Completed();
+        => GetAwaiter().Completed(false);
     #endregion
     #region 是否成功完成
     /// <summary>
     /// 获取任务是否成功完成
     /// </summary>
-    public bool IsCompleted => Awaiter?.IsCompleted ?? false;
+    public bool IsCompleted => Awaiter.IsCompleted;
     #endregion
     #region 提供可等待对象
     /// <summary>
@@ -35,24 +35,29 @@ public sealed class ExplicitTask
     /// <returns></returns>
     public ExplicitAwaiter GetAwaiter()
     {
-        Awaiter = Awaiter ??= new();
-        if (TimeOut is { } @out)
+        if ((TimeOut, IsStart) is ({ } @out, false))
             Task.Run(async () =>
             {
                 await Task.Delay(@out);
-                if (!IsCompleted)
-                    throw new TimeoutException($"显式等待的执行时间超过了{@out}上限");
-            });
+                Awaiter.Completed(true);
+            }).ConfigureAwait(false);
+        IsStart = true;
         return Awaiter;
     }
     #endregion
     #endregion
     #region 内部成员
+    #region 是否启动
+    /// <summary>
+    /// 获取这个异步任务是否启动
+    /// </summary>
+    private bool IsStart { get; set; }
+    #endregion
     #region 缓存可等待对象
     /// <summary>
     /// 缓存可等待对象
     /// </summary>
-    private ExplicitAwaiter? Awaiter { get; set; }
+    private ExplicitAwaiter Awaiter { get; } = new();
     #endregion
     #endregion
 }

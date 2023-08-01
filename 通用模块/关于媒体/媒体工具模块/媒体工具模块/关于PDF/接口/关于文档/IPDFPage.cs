@@ -12,4 +12,10 @@ public interface IPDFPage
     /// </summary>
     IPDFDocument PDF { get; }
     #endregion
+    #region 枚举所有图片
+    /// <summary>
+    /// 枚举这一页的所有图片
+    /// </summary>
+    IEnumerable<IPDFImage> Images { get; }
+    #endregion
 }

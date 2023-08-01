@@ -23,9 +23,9 @@ $$"""
                 {{failMethod}},
                 {
                     enableHighAccuracy:true,
-                    timeout: 5000
+                    timeout: 2500
                 });
-""", null, cancellationToken);
+""", cancellationToken: cancellationToken);
     #endregion
     #region 构造函数
     /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>

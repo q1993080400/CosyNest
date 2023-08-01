@@ -3,7 +3,7 @@
 @typeparam Element
 
 <Virtualization Elements="Elements" Initial="Initial" IsReverse=IsReverse Jump="Jump"
-                Plus="Plus" RenderElement="RenderElement">
+                Plus="Plus" RenderElement="RenderElement" BlankHeight="@BlankHeight">
     <RenderComponent>
         @{
             var newRenderInfo = context with
@@ -32,6 +32,7 @@
                 {
                     @item
                 }
+                <div style="@renderContainer.BlankHeight" />
             }
         </div>
     </RenderComponent>

@@ -27,9 +27,8 @@ public abstract class VerifyAttribute : Attribute
     /// 执行验证，并返回验证结果
     /// </summary>
     /// <param name="obj">要验证的属性的值</param>
-    /// <param name="describe">对验证对象的描述，如果为<see langword="null"/>，
-    /// 表示没有描述，它影响在验证不通过时，生成的错误文本</param>
+    /// <param name="describe">对验证对象的描述，它影响在验证不通过时，生成的错误文本</param>
     /// <returns>验证不通过的原因，如果为<see langword="null"/>，表示验证通过</returns>
-    public abstract string? Verify(object? obj, string? describe = null);
+    public abstract string? Verify(object? obj, string describe);
     #endregion
 }

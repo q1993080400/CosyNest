@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Diagnostics;
 using System.Text;
+
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace System.DataFrancis.DB.EF;
 

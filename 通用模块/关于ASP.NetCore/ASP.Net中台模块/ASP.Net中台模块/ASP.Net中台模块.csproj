@@ -10,6 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
 		<ProjectReference Include="..\..\..\关于树形文档模型\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
 		<ProjectReference Include="..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
 		<ProjectReference Include="..\..\..\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />

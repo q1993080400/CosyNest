@@ -128,6 +128,12 @@
     gap: var(--gapMedium);
 }
 
+    /*简单虚拟化容器的第一个CSS样式*/
+    .virtualizationSimpleContainer > :first-child
+    {
+        margin-top: var(--gapMedium);
+    }
+
 /*豆腐块组件容器的CSS样式*/
 .tofuCubesContainer
 {
@@ -141,11 +147,16 @@
     grid-column: 2
 }
 
+/*豆腐块文本容器样式*/
+.tofuCubesTextContainer
+{
+    grid-area: 2/1/-1/-1;
+}
+
 /*豆腐块组件文本的CSS样式*/
 .tofuCubesText
 {
     text-align: center;
-    grid-area: 2/1/-1/-1
 }
 
 /*文本渲染组件的容器样式*/
@@ -187,4 +198,10 @@ div.autoPlayButtonCntainer > *:first-child
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/*表示一个换行样式*/
+.wrap
+{
+    white-space: pre-wrap;
 }

@@ -57,7 +57,7 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
         return new()
         {
             Text = text,
-            WidthStyle = $"width:{Width ?? $"{MaxRowLength + 1}em"}",
+            WidthStyle = $"width:{Width ?? $"{MaxRowLength}ic"};height:{MaxRow}lh;padding-top:var(--paddingSmall)",
             CSSContainer = "tofuCubesContainer",
             CSSIcon = "tofuCubesIcon",
             CSSText = "tofuCubesText"

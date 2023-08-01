@@ -119,7 +119,7 @@ sealed class JSWindow : JSRuntimeBase, IJSWindow
                             catch({{failMethod}});
                 """;
                      return script;
-                 }, null, cancellationToken);
+                 }, null, null, cancellationToken);
     }
     #endregion
     #region 关于通知

@@ -1,4 +1,6 @@
 ﻿
+using System.Media.Drawing;
+
 using Xabe.FFmpeg.Downloader;
 
 namespace System.Media.Play;
@@ -27,5 +29,12 @@ public static class CreateFFmpeg
     /// 它可以用来处理音视频
     /// </summary>
     public static IVideoProcessing VideoProcessing { get; } = new VideoProcessingFFmpeg();
+    #endregion
+    #region 创建IImageProcessing
+    /// <summary>
+    /// 创建一个底层使用FFmpeg实现的<see cref="IImageProcessing"/>，
+    /// 它可以用来处理图像
+    /// </summary>
+    public static IImageProcessing ImageProcessing { get; } = new ImageProcessingFFmpeg();
     #endregion
 }

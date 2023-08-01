@@ -22,6 +22,12 @@ public sealed record RenderVirtualizationContainerInfo
     /// </summary>
     public required string CSS { get; init; }
     #endregion
+    #region 指示渲染状态
+    /// <summary>
+    /// 指示虚拟化组件的渲染状态
+    /// </summary>
+    public required RenderVirtualizationState State { get; init; }
+    #endregion
     #region OnScroll脚本
     /// <summary>
     /// 获取要添加到容器的OnScroll事件的脚本，
@@ -35,5 +41,13 @@ public sealed record RenderVirtualizationContainerInfo
     /// 调用这个方法，可以直接跳跃到容器顶端
     /// </summary>
     public required EventCallback GoTop { get; init; }
+    #endregion
+    #region 留白高度
+    /// <summary>
+    /// 获取留白高度的样式文本，
+    /// 它在容器最下方提供一个空白高度，
+    /// 这可以使容器变得更加美观
+    /// </summary>
+    public required string BlankHeight { get; init; }
     #endregion
 }

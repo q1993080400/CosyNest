@@ -12,5 +12,5 @@ public enum FormNumRender
     /// <summary>
     /// 表示这个字段是一个评分，而不是一个普通数字
     /// </summary>
-    Grade
+    Grade,
 }

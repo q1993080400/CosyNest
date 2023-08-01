@@ -1,6 +1,5 @@
 ﻿using System.IOFrancis;
 using System.Maths;
-using System.Maths.Plane;
 
 namespace Microsoft.AspNetCore.Components.Forms;
 
@@ -15,24 +14,22 @@ public sealed record UploadTaskFactoryInfo
     /// </summary>
     public required IUnit<IUTStorage> MaxLength { get; init; }
     #endregion
-    #region 图片封面最大大小
+    #region 上传中间件集合
     /// <summary>
-    /// 获取图片封面的最大大小，
-    /// 它的横纵比并不重要
+    /// 获取上传中间件的集合，
+    /// 函数会按照顺序，
+    /// 询问每个中间件是否能够处理上传文件
     /// </summary>
-    public required ISizePixel MaxImageCoverSize { get; init; }
+    public IReadOnlyList<UploadMiddleware> Middlewares { get; init; } = new List<UploadMiddleware>()
+    {
+        UploadMiddlewareCommon.UploadAll()
+    };
     #endregion
-    #region 封面格式
+    #region 上传后事件
     /// <summary>
-    /// 获取封面图片的格式
+    /// 当上传完毕后，执行这个事件，
+    /// 它的参数是一个记录，描述了上传结果
     /// </summary>
-    public string CoverFormat { get; init; } = "png";
-    #endregion
-    #region 最大视频清晰度
-    /// <summary>
-    /// 获取视频的最大清晰度，
-    /// 它的横纵比并不重要
-    /// </summary>
-    public required ISizePixel MaxDefinition { get; init; }
+    public Func<UploadCompletedInfo, Task> OnUploadCompleted { get; init; } = _ => Task.CompletedTask;
     #endregion
 }

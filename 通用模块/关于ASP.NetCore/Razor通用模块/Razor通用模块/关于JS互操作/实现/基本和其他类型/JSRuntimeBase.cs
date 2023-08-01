@@ -25,12 +25,17 @@ abstract class JSRuntimeBase
     /// 第二个参数是Promise执行失败时，执行的JS回调函数名称，返回值是要执行的JS脚本</param>
     /// <param name="fail">当Promise对象执行失败时，执行这个回调函数，
     /// 如果为<see langword="null"/>，直接返回默认值</param>
+    /// <param name="timeOut">任务超时时间</param>
     /// <param name="cancellationToken">用于取消异步操作的令牌</param>
     /// <returns>当Promise对象执行成功时，返回<paramref name="success"/>的返回值，
     /// 执行失败时，返回<typeparamref name="Ret"/>的默认值</returns>
-    protected async Task<Ret?> AwaitPromise<Ret>(Func<JsonElement, Ret?> success, Func<string, string, string> generateScript, Func<JsonElement, Ret?>? fail = null, CancellationToken cancellationToken = default)
+    protected async Task<Ret?> AwaitPromise<Ret>(Func<JsonElement, Ret?> success, Func<string, string, string> generateScript,
+        Func<JsonElement, Ret?>? fail = null, TimeSpan? timeOut = null, CancellationToken cancellationToken = default)
     {
-        var task = new ExplicitTask<Ret?>();
+        var task = new ExplicitTask<Ret?>()
+        {
+            TimeOut = timeOut
+        };
         var document = new JSDocument(JSRuntime);
         var (successMethod, successDisposable) = await document.PackNetMethod<JsonElement>(x => task.Completed(success(x)), cancellation: cancellationToken);
         fail ??= _ => default;

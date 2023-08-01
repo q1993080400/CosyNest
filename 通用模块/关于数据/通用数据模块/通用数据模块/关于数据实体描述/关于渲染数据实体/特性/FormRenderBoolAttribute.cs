@@ -9,12 +9,12 @@ public sealed class FormRenderBoolAttribute : FormRenderAttribute<FormBoolRender
     /// <summary>
     /// 获取如何描述<see langword="true"/>值
     /// </summary>
-    public required string DescribeTrue { get; init; }
+    public string DescribeTrue { get; init; } = "开启";
     #endregion
     #region 描述False
     /// <summary>
     /// 获取如何描述<see langword="false"/>值
     /// </summary>
-    public required string DescribeFalse { get; init; }
+    public string DescribeFalse { get; init; } = "关闭";
     #endregion
 }

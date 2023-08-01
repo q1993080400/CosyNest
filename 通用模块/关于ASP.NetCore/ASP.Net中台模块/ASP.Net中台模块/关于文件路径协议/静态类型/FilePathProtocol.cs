@@ -17,21 +17,21 @@ static class FilePathProtocol
     /// <returns></returns>
     public static FileSource Generate(FilePathGenerateParameters generateParameters)
     {
-        var (simple, extended, fullName) = generateParameters.NameAndExtension;
-        var sort = generateParameters.Sort;
+        var (_, extended, fullName) = generateParameters.NameAndExtension;
+        var sort = generateParameters.Sort.Join("A") + "A";
         var @base = generateParameters.Path;
         var id = Guid.NewGuid().ToString();
         if (extended is null || FileSource.GetMediaSourceType(extended) is FileSourceType.File)
         {
-            var filePath = $"{File}{sort}A{id}{fullName}";
+            var filePath = $"{File}{sort}{id}{fullName}";
             return new()
             {
                 FilePath = Path.Combine(@base, filePath),
                 TrueName = fullName
             };
         }
-        var cover = $"{Cover}{sort}A{id}{simple}.{generateParameters.CoverExtension}";
-        var media = $"{Media}{sort}A{id}{fullName}";
+        var cover = $"{Cover}{sort}{id}M.{generateParameters.CoverExtension}";
+        var media = $"{Media}{sort}{id}M.{extended}";
         return new MediaSource()
         {
             CoverPath = Path.Combine(@base, cover),
@@ -39,6 +39,11 @@ static class FilePathProtocol
             TrueName = fullName
         };
     }
+
+    /*注意：只有非媒体的文件才能够保留原来的名字，
+      图片和视频会被强制重命名为M，这是因为：
+      图片和视频经常被用来进行其他处理，
+      这些处理它们的API不一定考虑到中文路径，带空格的路径等情况*/
     #endregion
     #region 解析文件路径
     #region 正则表达式
@@ -46,7 +51,7 @@ static class FilePathProtocol
     /// 这个正则表达式可以用来解析路径
     /// </summary>
     private static IRegex Regex { get; }
-        = /*language=regex*/@"(?<type>Media|Cover|File)(?<sort>\d+)A(?<id>[A-Za-z0-9-]{36})(?<name>.+)$".Op().Regex();
+        = /*language=regex*/@"(?<type>Media|Cover|File)(?<sort>(\d+A)+)(?<id>[A-Za-z0-9-]{36})(?<name>.+)$".Op().Regex();
     #endregion
     #region 正式方法
     /// <summary>
@@ -63,12 +68,12 @@ static class FilePathProtocol
             return new
             {
                 Type = match["type"].Match,
-                Sort = match["sort"].Match.To<int>(),
+                Sort = match["sort"].Match,
                 ID = match["id"].Match,
                 Name = match["name"].Match,
                 Path = x
             };
-        }).ToArray().OrderBy(x => x.Sort).GroupBy(x => x.ID).ToArray();
+        }).ToArray().OrderBy(x => x.Sort, FastRealize.ComparerFromNumbering()).ThenBy(x => x.Name).ToArray().GroupBy(x => x.ID).ToArray();
         foreach (var item in bodys)
         {
             var dictionary = item.ToDictionary(x => x.Type, x => x);

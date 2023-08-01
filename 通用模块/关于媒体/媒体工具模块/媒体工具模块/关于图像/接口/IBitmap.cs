@@ -23,13 +23,4 @@ public interface IBitmap : IImage
     /// <returns></returns>
     IColor[,] Pixel();
     #endregion
-    #region 生成缩略图
-    /// <summary>
-    /// 生成一个缩略图，并返回
-    /// </summary>
-    /// <param name="maxSize">缩略图的最大大小，
-    /// 函数会保证长宽比不会改变</param>
-    /// <returns></returns>
-    IBitmap Thumbnail(ISizePixel maxSize);
-    #endregion
 }

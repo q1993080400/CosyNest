@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.DataFrancis;
+﻿using System.DataFrancis;
 using System.IOFrancis;
 using System.IOFrancis.FileSystem;
 
@@ -12,34 +11,26 @@ namespace Microsoft.AspNetCore;
 public abstract class WithResource : Entity, IWithResource
 {
     #region 实体属性
-    #region 资源文件夹
-    public required string ResourceFolderPath { get; set; }
+    #region 路径标识
+    /// <summary>
+    /// 获取一个路径标识，
+    /// 它是用来生成路径的种子
+    /// </summary>
+    public Guid PathIdentifying { get; set; } = Guid.NewGuid();
     #endregion
     #endregion
     #region 非实体成员
-    #region 资源文件Uri
-    [NotMapped]
-    public string[] ResourceFileUris { get; set; } = Array.Empty<string>();
-    #endregion
     #region 删除资源文件夹
     public void DeleteResourceFolder()
-    {
-        var io = CreateIO.IO<IDirectory>(ResourceFolderPath);
-        io?.Delete();
-    }
+        => CreateIO.IO<IDirectory>(ResourceFolderPath)?.Delete();
     #endregion
-    #region 初始化资源文件夹
-    public virtual void InitializationResourceFile()
-    {
-        if (ResourceFolderPath is null || ResourceFileUris.Any())
-            return;
-        ResourceFileUris = CreateIO.IO<IDirectory>(ResourceFolderPath)?.Son.OfType<IFile>().
+    #region 获取资源文件夹路径
+    public abstract string ResourceFolderPath { get; }
+    #endregion
+    #region 获取资源的Uri
+    public virtual string[] ResourceUri
+        => CreateIO.IO<IDirectory>(ResourceFolderPath)?.Son.OfType<IFile>().
             Select(x => x.Path.Op().ToUriPath()).ToArray() ?? Array.Empty<string>();
-    }
-    #endregion
-    #region 解析资源文件的路径
-    public IEnumerable<Output> Classify<Output>(Func<IEnumerable<string>, IEnumerable<Output>> pathProtocol)
-        => pathProtocol(ResourceFileUris);
     #endregion
     #endregion
 }

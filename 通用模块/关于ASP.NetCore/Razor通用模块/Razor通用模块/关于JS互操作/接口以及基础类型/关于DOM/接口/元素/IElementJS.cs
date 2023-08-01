@@ -47,11 +47,15 @@ public interface IElementJS : IElementBase
     /// <param name="notScrollingTreatedAs0">如果这个值为<see langword="true"/>，
     /// 则在计算滚动的时候，会加上ClientHeight，它会导致滚动进度永远不为0，
     /// 否则不会加上，它会导致滚动进度永远达不到1</param>
+    /// <param name="treat0HeightAsScrolling1">当元素的高度为0的时候，
+    /// 如果这个值为<see langword="true"/>，视为滚动100%，否则视为没有滚动</param>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
-    async ValueTask<double> ScrollPercentage(bool notScrollingTreatedAs0, CancellationToken cancellationToken = default)
+    async ValueTask<double> ScrollPercentage(bool notScrollingTreatedAs0, bool treat0HeightAsScrolling1, CancellationToken cancellationToken = default)
     {
-        var scrollTop = await ScrollTop;
         var height = await ScrollHeight;
+        if (height is 0)
+            return treat0HeightAsScrolling1 ? 1 : 0;
+        var scrollTop = await ScrollTop;
         var clientHeight = await ClientHeight;
         var top = scrollTop + (notScrollingTreatedAs0 ? 0 : clientHeight);
         return top / height;

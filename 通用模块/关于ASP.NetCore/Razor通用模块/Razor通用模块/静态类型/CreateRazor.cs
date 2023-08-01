@@ -54,4 +54,17 @@ public static class CreateRazor
     #endregion
     #endregion
     #endregion
+    #region 创建UploadTaskFactory
+    /// <summary>
+    /// 创建一个上传任务工厂
+    /// </summary>
+    /// <param name="serviceProvider">服务提供者对象</param>
+    /// <param name="uploadTaskFactoryInfo">用来上传的参数</param>
+    /// <returns></returns>
+    public static UploadTaskFactory<decimal> UploadTaskFactory(IServiceProvider serviceProvider, UploadTaskFactoryInfo uploadTaskFactoryInfo)
+    {
+        var uploadTaskFactory = new UploadTaskFactory(serviceProvider, uploadTaskFactoryInfo);
+        return uploadTaskFactory.CreateUploadTask;
+    }
+    #endregion
 }

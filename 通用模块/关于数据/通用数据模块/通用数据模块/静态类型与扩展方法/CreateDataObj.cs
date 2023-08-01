@@ -1,6 +1,5 @@
 ﻿using System.Design.Direct;
 using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using System.DataFrancis.EntityDescribe;
 using System.ComponentModel.DataAnnotations;
@@ -97,32 +96,58 @@ public static class CreateDataObj
     #endregion
     #endregion
     #region 创建数据验证默认委托
+    #region 正式方法
     /// <summary>
-    /// 对数据进行验证，
-    /// 本方法通常会被赋值给<see cref="DataVerify"/>委托，
-    /// 但是也可以直接调用
+    /// 创建一个用于验证数据的委托
     /// </summary>
-    /// <inheritdoc cref="DataVerify"/>
-    public static VerificationResults DataVerifyDefault(object obj)
+    /// <param name="getVerifyPropertys">这个委托的参数是待验证的实体类，
+    /// 返回值是需要验证的属性，如果为<see langword="null"/>，
+    /// 则默认筛选所有具有<see cref="DisplayAttribute"/>的属性</param>
+    /// <returns></returns>
+    public static DataVerify DataVerifyDefault(Func<object, IEnumerable<PropertyInfo>>? getVerifyPropertys = null)
     {
-        var propertys = obj.GetTypeData().AlmightyPropertys.
-            Where(x => x.HasAttributes<VerifyAttribute>() && !x.HasAttributes<NotMappedAttribute>()).ToArrayIfDeBug();
-        var verify = propertys.Select(x =>
+        if ((getVerifyPropertys, DataVerifyDefaultCache) is (null, { }))
+            return DataVerifyDefaultCache;
+        var newGetVerifyPropertys = getVerifyPropertys ??= obj =>
+         {
+             var propertys = obj.GetType().GetProperties().
+             Where(x => x.HasAttributes<DisplayAttribute>()).ToArrayIfDeBug();
+             return propertys;
+         };
+        #region 验证本地函数
+        VerificationResults Fun(object obj)
         {
-            var describe = x.GetCustomAttribute<DisplayAttribute>()?.Description;
-            var nullabilityInfo = x.GetNullabilityInfo();
-            var value = x.GetValue(obj);
-            if ((nullabilityInfo.ReadState, value) is (NullabilityState.NotNull, null or ""))
-                return (x, $"{describe ?? x.Name}不可为null");
-            var attribute = x.GetCustomAttribute<VerifyAttribute>()!;
-            var verify = attribute.Verify(value, describe);
-            return (x, verify);
-        }).Where(x => x.Item2 is { }).ToArray();
-        return new()
-        {
-            Data = obj,
-            FailureReason = verify!
-        };
+            var propertys = newGetVerifyPropertys(obj);
+            var verify = propertys.Select(x =>
+            {
+                var name = x.GetCustomAttribute<DisplayAttribute>()?.Name ?? x.Name;
+                var value = x.GetValue(obj);
+                var nullabilityInfo = x.GetNullabilityInfo();
+                if ((nullabilityInfo.ReadState, value) is (NullabilityState.NotNull, null or ""))
+                    return (x, $"{name}不可为空");
+                var attribute = x.GetCustomAttribute<VerifyAttribute>();
+                if (attribute is null)
+                    return (x, null);
+                var verify = attribute.Verify(value, name);
+                return (x, verify is null ? null : attribute.Message ?? verify);
+            }).Where(x => x.Item2 is { }).ToArray();
+            return new()
+            {
+                Data = obj,
+                FailureReason = verify!
+            };
+        }
+        #endregion
+        if ((getVerifyPropertys, DataVerifyDefaultCache) is (null, null))
+            DataVerifyDefaultCache = Fun;
+        return Fun;
     }
+    #endregion  
+    #region 缓存
+    /// <summary>
+    /// 默认验证方法的缓存
+    /// </summary>
+    private static DataVerify? DataVerifyDefaultCache { get; set; }
+    #endregion
     #endregion
 }

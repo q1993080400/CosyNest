@@ -125,7 +125,7 @@ public static class ToolPath
     /// <param name="withDot">在路径带有扩展名的情况下，
     /// 如果这个值为<see langword="true"/>，代表扩展名应带点号，否则不带点号</param>
     /// <returns>一个元组，它的项分别是文件或目录的名称，
-    /// 以及文件的扩展名（如果没有扩展名，则返回<see langword="null"/>），
+    /// 以及文件的扩展名（如果没有扩展名，则返回<see langword="null"/>，只会出现小写），
     /// 以及文件的全名</returns>
     public static (string Simple, string? Extended, string FullName) SplitPathFile(string path, bool withDot = false)
     {
@@ -138,7 +138,7 @@ public static class ToolPath
           (withDot ? $".{split[^1]}" : split[^1]) :
           null;
         var simple = hasExtended ? split[..^1].Join(".") : split[0];
-        return (simple, extended, fullName);
+        return (simple, extended?.ToLower(), fullName);
     }
     #endregion
     #region 拆分为父目录和文件/目录

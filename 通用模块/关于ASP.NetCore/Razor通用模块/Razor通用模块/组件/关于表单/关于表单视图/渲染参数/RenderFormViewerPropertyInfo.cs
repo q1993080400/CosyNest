@@ -37,6 +37,20 @@ public sealed record RenderFormViewerPropertyInfo<Model>
     /// <typeparam name="Value">属性的类型</typeparam>
     /// <returns></returns>
     public BindPropertyInfo<Value> Value<Value>()
-        => new(FormModel, Property);
+        => new(FormModel, Property, () => OnPropertyChangeed(this));
+    #endregion
+    #region 是否仅显示
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示仅提供数据显示功能，不提供数据编辑功能
+    /// </summary>
+    public required bool IsReadOnly { get; set; }
+    #endregion
+    #region 数据属性改变时的委托
+    /// <summary>
+    /// 当数据属性改变时，执行这个委托，
+    /// 它的参数就是当前属性渲染参数
+    /// </summary>
+    public required Func<RenderFormViewerPropertyInfo<Model>, Task> OnPropertyChangeed { get; init; }
     #endregion
 }

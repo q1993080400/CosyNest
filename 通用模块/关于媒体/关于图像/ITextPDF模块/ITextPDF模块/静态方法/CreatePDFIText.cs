@@ -16,7 +16,7 @@ public static class CreatePDFIText
     /// 通过路径，创建一个PDF文档
     /// </summary>
     /// <inheritdoc cref="DocumentIText(PathText)"/>
-    public static IPDFDocument PDF(PathText path)
+    public static async Task<IPDFDocument> PDF(PathText path)
     {
         if (!File.Exists(path))
         {
@@ -24,7 +24,8 @@ public static class CreatePDFIText
             new PdfDocument(new PdfWriter(create)).Close();
         }
         using var file = new FileStream(path, FileMode.Open);
-        return new DocumentIText(file, path);
+        var memory = await file.CopyToMemory();
+        return new DocumentIText(memory, path);
     }
     #endregion
     #region 通过流
@@ -32,8 +33,11 @@ public static class CreatePDFIText
     /// 通过流，创建一个PDF文档
     /// </summary>
     /// <inheritdoc cref="DocumentIText(Stream)"/>
-    public static IPDFDocument PDF(Stream stream)
-         => new DocumentIText(stream, null);
+    public static async Task<IPDFDocument> PDF(Stream stream)
+    {
+        var memory = await stream.CopyToMemory();
+        return new DocumentIText(memory, null);
+    }
     #endregion
     #endregion
 }

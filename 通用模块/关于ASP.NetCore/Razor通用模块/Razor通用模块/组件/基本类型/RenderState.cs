@@ -45,7 +45,7 @@ public sealed record RenderState : IComparable<RenderState>
     /// 它表示此时OnInitializedAsync已经调用，
     /// 且返回未完成的<see cref="Task"/>，正在进行渲染，OnParametersSetAsync尚未调用
     /// </summary>
-    public static RenderState CreateRender1 { get; }
+    public static RenderState Render1 { get; }
         = new(1, $"OnInitializedAsync已经调用，且返回未完成的Task，执行渲染，OnParametersSetAsync尚未调用");
     #endregion
     #region OnParametersSetAsync调用完毕后的渲染
@@ -54,7 +54,7 @@ public sealed record RenderState : IComparable<RenderState>
     /// 它表示此时OnParametersSetAsync已经调用，
     /// 且返回未完成的<see cref="Task"/>，正在进行渲染，它不是最终的渲染
     /// </summary>
-    public static RenderState CreateRender2 { get; }
+    public static RenderState Render2 { get; }
         = new(2, "OnParametersSetAsync已经调用，且返回未完成的Task，执行渲染，它不是最终的渲染");
     #endregion
     #region 最终渲染
@@ -63,7 +63,7 @@ public sealed record RenderState : IComparable<RenderState>
     /// 它表示此时OnInitializedAsync和OnParametersSetAsync调用的<see cref="Task"/>都已经全部等待完毕，
     /// 这是最终的渲染，所有数据都已经被完全初始化
     /// </summary>
-    public static RenderState CreateRender3 { get; }
+    public static RenderState Render3 { get; }
         = new(3, "OnInitializedAsync和OnParametersSetAsync调用的Task都已经全部等待完毕，这是最终的渲染");
     #endregion
     #endregion

@@ -27,38 +27,24 @@ public interface IVideoProcessing
     #endregion
     #endregion
     #region 格式转换
-    #region 传入流
     /// <summary>
-    /// 将一个音视频转换为另一种格式
+    /// 对音视频进行格式转换
     /// </summary>
-    /// <param name="read">用来读取音视频的管道</param>
-    /// <param name="currentFormat">音视频的当前格式，不带点号</param>
-    /// <param name="targetPath">转换后的目标路径，它的扩展名指示格式</param>
-    /// <param name="info">用于转换的参数，如果为<see langword="null"/>，则使用默认值</param>
-    Task FormatConversion(IBitRead read, string currentFormat, string targetPath, FormatConversionInfo? info = null);
-    #endregion
-    #region 传入文件
-    /// <param name="file">要转换的音视频文件</param>
-    /// <inheritdoc cref="FormatConversion(IBitRead, string, string, FormatConversionInfo?)"/>
-    Task FormatConversion(IFile file, string targetPath, FormatConversionInfo? info = null);
-    #endregion
+    /// <param name="mediumPath">要转换的音视频文件的路径</param>
+    /// <param name="targetPath">转换的目标路径</param>
+    /// <param name="info">转换参数</param>
+    /// <returns></returns>
+    Task FormatConversion(string mediumPath, string targetPath, FormatConversionInfo? info = null);
     #endregion
     #region 视频截图
-    #region 传入流
     /// <summary>
-    /// 对一个视频文件进行截图
+    /// 对音视频进行截图
     /// </summary>
-    /// <param name="read">用来读取视频文件的管道</param>
-    /// <param name="currentFormat">视频的当前格式，不带点号</param>
+    /// <param name="mediumPath">要截图的视频文件</param>
     /// <param name="infos">这个集合元素的第一个项是要截图的时间，第二个项是截图文件保存路径</param>
+    /// <param name="reportProgress">一个用来报告进度的委托，它的参数就是当前进度</param>
+    /// <param name="cancellationToken">一个用来取消异步操作的令牌</param>
     /// <returns></returns>
-    /// <inheritdoc cref="FormatConversion(IBitRead, string, string, bool, Func{decimal, Task}?, CancellationToken)"/>
-    Task Screenshot(IBitRead read, string currentFormat, IEnumerable<(TimeSpan Fragment, string Path)> infos, Func<decimal, Task>? reportProgress = null, CancellationToken cancellationToken = default);
-    #endregion
-    #region 传入文件
-    /// <param name="file">要截图的视频文件</param>
-    /// <inheritdoc cref="Screenshot(IBitRead, string, IEnumerable{ValueTuple{TimeSpan, string}}, Func{decimal, Task}?, CancellationToken)"/>
-    Task Screenshot(IFile file, IEnumerable<(TimeSpan Fragment, string Path)> infos, Func<decimal, Task>? reportProgress = null, CancellationToken cancellationToken = default);
-    #endregion
+    Task Screenshot(string mediumPath, IEnumerable<(TimeSpan Fragment, string Path)> infos, Func<decimal, Task>? reportProgress = null, CancellationToken cancellationToken = default);
     #endregion
 }

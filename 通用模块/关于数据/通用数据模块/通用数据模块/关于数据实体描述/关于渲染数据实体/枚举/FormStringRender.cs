@@ -12,5 +12,9 @@ public enum FormStringRender
     /// <summary>
     /// 长文本
     /// </summary>
-    LongText
+    LongText,
+    /// <summary>
+    /// 以密码方式渲染
+    /// </summary>
+    Password
 }

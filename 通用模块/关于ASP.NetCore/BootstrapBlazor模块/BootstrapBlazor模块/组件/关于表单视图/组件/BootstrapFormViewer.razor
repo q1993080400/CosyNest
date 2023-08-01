@@ -3,36 +3,27 @@
 @typeparam Model
 
 <FormViewer FilterProperties=FilterProperties ToPropertyInfo=ToPropertyInfo
-            Verify=Verify InitializationModel="InitializationModel!"
-            ResetModel=ResetModel ExistingForms=ExistingForms>
+            Verify=Verify InitializationModel="InitializationModel"
+            ExistingForms=ExistingForms IsReadOnly=IsReadOnly
+            OnPropertyChangeed=OnPropertyChangeed ShowSubmit=ShowSubmit>
     <ChildContent>
-        @{
-            var newInfo = GetRenderInfo(context);
-            var existingForms = context.ExistingForms;
-        }
         @if (ChildContent is null)
         {
-            <div class="formViewerBootstrapContainer">
+            <div class="bootstrapFormViewerContainer">
                 @context.RenderMain
-                <CompactCentered>
-                    <Button Text="@(existingForms?"修改":"提交")" OnClick="newInfo.Submit"></Button>
-                    <Button Text="重置" OnClick="newInfo.Resetting"></Button>
-                    @if (existingForms)
-                    {
-                        <Button Text="删除" OnClick="newInfo.Delete"></Button>
-                    }
-                </CompactCentered>
+                <div />
+                @context.RenderSubmit
             </div>
         }
         else
         {
-            @ChildContent(newInfo)
+            @ChildContent(context)
         }
     </ChildContent>
     <RenderMain>
         @if (RenderMain is null)
         {
-            <div class="formViewerBootstrapContainer">
+            <div class="bootstrapFormViewerContainer">
                 @foreach (var item in context)
                 {
                     @item.Render
@@ -54,4 +45,28 @@
             @RenderProperty(context)
         }
     </RenderProperty>
+    <RenderSubmit>
+        @{
+            var newInfo = GetRenderSubmitInfo(context);
+        }
+        @if (RenderSubmit is null)
+        {
+            <CompactCentered>
+                <Button Text="@(context.ExistingForms?"修改":"提交")" OnClick="newInfo.Submit"></Button>
+                <Button Text="重置" OnClick="newInfo.Resetting"></Button>
+                @if (newInfo.Delete is { } deleteValue)
+                {
+                    <Button Text="删除" OnClick="deleteValue"></Button>
+                }
+                @if (newInfo.Cancellation is { } cancellationValue)
+                {
+                    <Button Text="取消" OnClick="cancellationValue"></Button>
+                }
+            </CompactCentered>
+        }
+        else
+        {
+            @RenderSubmit(newInfo)
+        }
+    </RenderSubmit>
 </FormViewer>

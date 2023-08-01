@@ -44,6 +44,11 @@ public sealed partial class VirtualizationSimple<Element> : ComponentBase
     [Parameter]
     public bool IsReverse { get; set; }
     #endregion
+    #region 留白高度
+    /// <inheritdoc cref="Virtualization{Element}.BlankHeight"/>
+    [Parameter]
+    public string BlankHeight { get; set; } = "margin-top:15dvh;";
+    #endregion
     #region 参数展开
     /// <summary>
     /// 该参数展开控制父div容器的样式

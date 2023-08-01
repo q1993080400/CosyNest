@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Maths;
 using System.Reflection;
 
@@ -79,4 +80,28 @@ public static partial class ExtenTool
     public static IComparer<Obj> Negate<Obj>(this IComparer<Obj> comparable)
         => FastRealize.Comparer<Obj>((x, y) => -comparable.Compare(x, y));
     #endregion
+    #region 浅拷贝对象
+    #region 缓存方法
+    /// <summary>
+    /// 返回浅拷贝的缓存方法
+    /// </summary>
+    private static MethodInfo MemberwiseCloneCache { get; }
+    = typeof(object).GetTypeData().FindMethod("MemberwiseClone");
+    #endregion
+    #region 正式方法
+    /// <summary>
+    /// 通过反射浅拷贝对象，并返回它的副本
+    /// </summary>
+    /// <typeparam name="Ret">拷贝的返回值类型</typeparam>
+    /// <param name="obj">被拷贝的对象</param>
+    /// <returns></returns>
+    [return: NotNullIfNotNull(nameof(obj))]
+    public static Ret? MemberwiseClone<Ret>(this Ret? obj)
+    {
+        if (obj is null)
+            return default;
+        return MemberwiseCloneCache.Invoke<Ret>(obj)!;
+    }
+    #endregion
+    #endregion 
 }

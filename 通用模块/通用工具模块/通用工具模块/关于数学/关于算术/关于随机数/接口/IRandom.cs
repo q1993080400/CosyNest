@@ -92,7 +92,7 @@ public interface IRandom
     /// <returns></returns>
     int RandIndex<Obj>(IEnumerable<Obj> collections, int? count = null)
     {
-        var maxIndex = count ?? (collections.Count() - 1);
+        var maxIndex = (count ?? collections.Count()) - 1;
         if (maxIndex is < 0)
             return -1;
         return RandRange(0, maxIndex);
@@ -121,6 +121,8 @@ public interface IRandom
     {
         var list = collections.Distinct().ToList();
         var c = list.Count;
+        if (c is 0)
+            return Array.Empty<Obj>();
         if (count >= c)
             return list;
         var index = new HashSet<int>();
@@ -131,7 +133,7 @@ public interface IRandom
         }
         if (isBeyond)
         {
-            index.ForEach(list.RemoveAt);
+            index.OrderDescending().ForEach(list.RemoveAt);
             return list;
         }
         return index.Select(x => list[x]).ToArray();

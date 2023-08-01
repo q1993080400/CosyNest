@@ -1,12 +1,10 @@
-﻿using System.IOFrancis;
-using System.Media.Play;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Web;
 
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Http.Connections.Client;
-using Microsoft.Extensions.Logging;
 
 namespace System;
 
@@ -217,21 +215,13 @@ public static class ExtenRazor
     #region 注入上传任务工厂
     /// <summary>
     /// 以单例模式注入一个<see cref="UploadTaskFactory{Progress}"/>，
-    /// 它可以创建一个用于上传文件的任务，
-    /// 本服务依赖于<see cref="ILoggerProvider"/>，<see cref="GenerateFilePathProtocol{Input, Output}"/>和<see cref="IVideoProcessing"/>
+    /// 它可以创建一个用于上传文件的任务
     /// </summary>
     /// <param name="services">要添加的服务容器</param>
     /// <returns></returns>
-    /// <inheritdoc cref="UploadTaskFactory(ILoggerProvider, GenerateFilePathProtocol{FilePathGenerateParameters, FileSource}, IVideoProcessing, UploadTaskFactoryInfo)"/>
+    /// <inheritdoc cref="UploadTaskFactory(IServiceProvider, UploadTaskFactoryInfo)"/>
     public static IServiceCollection AddUploadTaskFactory(this IServiceCollection services, UploadTaskFactoryInfo uploadTaskFactoryInfo)
-        => services.AddSingleton<UploadTaskFactory<decimal>>(x =>
-        {
-            var uploadTaskFactory = new UploadTaskFactory(x.GetRequiredService<ILoggerProvider>(),
-                x.GetRequiredService<GenerateFilePathProtocol<FilePathGenerateParameters, FileSource>>(),
-                x.GetRequiredService<IVideoProcessing>(),
-                uploadTaskFactoryInfo);
-            return uploadTaskFactory.CreateUploadTask;
-        });
+        => services.AddSingleton(x => CreateRazor.UploadTaskFactory(x, uploadTaskFactoryInfo));
     #endregion
     #endregion
     #region 有关组件
@@ -300,6 +290,35 @@ public static class ExtenRazor
     public static async Task<bool> IsAuthenticated(this AuthenticationStateProvider authenticationStateProvider)
         => (await authenticationStateProvider.GetAuthenticationStateAsync()).User.IsAuthenticated();
     #endregion
+    #region 有关NavigationManager
+    #region 导航到组件
+    #region 泛型方法
+    /// <typeparam name="Component">组件的类型</typeparam>
+    /// <inheritdoc cref="NavigateToComponent(NavigationManager, Type, UriParameter?,bool)"/>
+    public static void NavigateToComponent<Component>(this NavigationManager navigation, UriParameter? parameter = null, bool forceLoad = false)
+        where Component : IComponent
+        => navigation.NavigateToComponent(typeof(Component), parameter, forceLoad);
+    #endregion
+    #region 非泛型方法
+    /// <summary>
+    /// 导航到组件
+    /// </summary>
+    /// <param name="navigation">导航对象</param>
+    /// <param name="componentType">组件的类型</param>
+    /// <param name="parameter">组件路径的参数部分，
+    /// 如果为<see langword="null"/>，表示没有参数</param>
+    /// <param name="forceLoad">如果这个值为<see langword="true"/>，则绕过缓存强制刷新</param>
+    public static void NavigateToComponent(this NavigationManager navigation, Type componentType, UriParameter? parameter = null, bool forceLoad = false)
+    {
+        var uri = new UriComplete()
+        {
+            UriExtend = ToolRazor.GetRouteSafe(componentType),
+            UriParameter = parameter
+        };
+        navigation.NavigateTo(uri, forceLoad);
+    }
+    #endregion
+    #endregion
     #region 一次性阻止导航
     /// <summary>
     /// 注册一个事件，它能够阻止用户进入其他导航，
@@ -313,4 +332,5 @@ public static class ExtenRazor
         Func<Task<bool>> locationChangingHandler)
         => new LocationChangingHandlerDisposable(navigation, locationChangingHandler);
     #endregion
+    #endregion 
 }

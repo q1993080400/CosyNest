@@ -112,7 +112,10 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
             if (ex is not OperationCanceledException)
                 throw;
         }
-        await OnUploadStatusChangeed.InvokeAsync(UploadStatus);
+        finally
+        {
+            await OnUploadStatusChangeed.InvokeAsync(UploadStatus);
+        }
     }
     #endregion
     #endregion

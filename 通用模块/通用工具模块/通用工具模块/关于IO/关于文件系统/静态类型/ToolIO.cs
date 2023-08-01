@@ -1,4 +1,6 @@
-﻿namespace System.IO;
+﻿using System.IOFrancis.FileSystem;
+
+namespace System.IO;
 
 /// <summary>
 /// 有关IO的工具类
@@ -19,6 +21,19 @@ public static class ToolIO
     {
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllText(path, text);
+    }
+    #endregion
+    #region 创建父目录
+    /// <summary>
+    /// 创建一个路径的父目录，
+    /// 它可以避免由于父目录不存在所引发的异常
+    /// </summary>
+    /// <param name="path">要创建父目录的路径</param>
+    public static void CreateFather(PathText path)
+    {
+        var father = Path.GetDirectoryName(path);
+        if (father is { })
+            Directory.CreateDirectory(father);
     }
     #endregion
 }
