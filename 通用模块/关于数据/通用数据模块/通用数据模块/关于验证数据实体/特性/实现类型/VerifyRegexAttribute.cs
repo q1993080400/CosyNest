@@ -6,7 +6,11 @@ namespace System.DataFrancis.EntityDescribe;
 /// <summary>
 /// 这个特性使用正则表达式对实体进行验证
 /// </summary>
-public sealed class VerifyRegexAttribute : VerifyAttribute
+/// <remarks>
+/// 使用指定的正则表达式初始化对象
+/// </remarks>
+/// <param name="regex">用来匹配实体属性的正则表达式</param>
+public sealed class VerifyRegexAttribute([StringSyntax(StringSyntaxAttribute.Regex)] string regex) : VerifyAttribute
 {
     #region 公开成员
     #region 执行验证
@@ -25,17 +29,8 @@ public sealed class VerifyRegexAttribute : VerifyAttribute
     /// <summary>
     /// 获取用来匹配实体属性的正则表达式
     /// </summary>
-    private IRegex Regex { get; }
+    private IRegex Regex { get; } = regex.Op().Regex();
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的正则表达式初始化对象
-    /// </summary>
-    /// <param name="regex">用来匹配实体属性的正则表达式</param>
-    public VerifyRegexAttribute([StringSyntax(StringSyntaxAttribute.Regex)] string regex)
-    {
-        Regex = regex.Op().Regex();
-    }
     #endregion
 }

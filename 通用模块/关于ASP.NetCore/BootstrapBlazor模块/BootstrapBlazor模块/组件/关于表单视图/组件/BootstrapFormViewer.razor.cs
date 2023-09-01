@@ -11,7 +11,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 /// <inheritdoc cref="FormViewer{Model}"/>
 public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContentComponent<RenderFragment<RenderFormViewerInfo<Model>>>
-    where Model : class, new()
+    where Model : class
 {
     #region 组件参数
     #region 关于渲染
@@ -32,7 +32,7 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     #region 用来渲染提交部分的委托
     /// <inheritdoc cref="FormViewer{Model}.RenderSubmit"/>
     [Parameter]
-    public RenderFragment<BootstrapRenderSubmitInfo>? RenderSubmit { get; set; }
+    public RenderFragment<BootstrapRenderSubmitInfo<Model>>? RenderSubmit { get; set; }
     #endregion
     #region 是否仅显示
     /// <inheritdoc cref="FormViewer{Model}.IsReadOnly"/>
@@ -47,7 +47,7 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     #region 刷新目标
     /// <summary>
     /// 获取刷新目标，
-    /// 它决定了在提交，重置，删除，取消表单时，应该刷新哪个组件
+    /// 它决定了在提交，删除，取消表单时，应该刷新哪个组件
     /// </summary>
     [Parameter]
     public IHandleEvent RefreshTarget { get; set; }
@@ -57,8 +57,13 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     #region 用来初始化模型的委托
     /// <inheritdoc cref="FormViewer{Model}.InitializationModel"/>
     [Parameter]
+    [EditorRequired]
     public Func<Task<Model>> InitializationModel { get; set; }
-        = () => Task.FromResult<Model>(new());
+    #endregion
+    #region 模型是否按值引用
+    /// <inheritdoc cref="FormViewer{Model}.IsValueReference"/>
+    [Parameter]
+    public bool IsValueReference { get; set; } = true;
     #endregion
     #region 用来判断是否为现有表单的委托
     /// <inheritdoc cref="FormViewer{Model}.ExistingForms"/>
@@ -145,11 +150,15 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     /// <summary>
     /// 获取用来渲染提交部分的渲染参数
     /// </summary>
+    /// <typeparam name="M">模型的类型</typeparam>
     /// <param name="info">基础版本的渲染参数</param>
     /// <returns></returns>
-    private BootstrapRenderSubmitInfo GetRenderSubmitInfo(RenderSubmitInfo info)
+    private BootstrapRenderSubmitInfo<M> GetRenderSubmitInfo<M>(RenderSubmitInfo<M> info)
+        where M : class
         => new()
         {
+            FormModel = info.FormModel,
+            ExistingForms = info.ExistingForms,
             Delete = info.ExistingForms ?
                 new(RefreshTarget, async () =>
                 {
@@ -158,7 +167,7 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
                     if ((isSuccess, Cancellation) is (true, { } cancellation))
                         await cancellation();
                 }) : null,
-            Resetting = new(RefreshTarget, async () =>
+            Resetting = new(this, async () =>
             {
                 await info.Resetting();
                 await Resetting();

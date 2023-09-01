@@ -7,14 +7,18 @@ namespace System.IOFrancis.FileSystem;
 /// 这个类型是<see cref="IDrive"/>的实现，
 /// 可以视为一个驱动器
 /// </summary>
-sealed class DriveRealize : IDrive
+/// <remarks>
+/// 使用指定的驱动器初始化对象
+/// </remarks>
+/// <param name="drive">被封装的驱动器</param>
+sealed class DriveRealize(DriveInfo drive) : IDrive
 {
     #region 封装的驱动器对象
     /// <summary>
     /// 获取封装的驱动器对象，
     /// 本类型的功能就是通过它实现的
     /// </summary>
-    private DriveInfo PackDrive { get; }
+    private DriveInfo PackDrive { get; } = drive;
     #endregion
     #region 获取名称
     public string Name
@@ -65,15 +69,6 @@ sealed class DriveRealize : IDrive
     #region 重写的ToString方法
     public override string ToString()
         => Name;
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的驱动器初始化对象
-    /// </summary>
-    /// <param name="drive">被封装的驱动器</param>
-    public DriveRealize(DriveInfo drive)
-    {
-        PackDrive = drive;
-    }
+
     #endregion
 }

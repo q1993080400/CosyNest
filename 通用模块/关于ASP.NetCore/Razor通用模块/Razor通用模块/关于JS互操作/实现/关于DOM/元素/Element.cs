@@ -9,11 +9,16 @@ namespace Microsoft.JSInterop;
 /// 该类型是<see cref="IElementJS"/>的实现，
 /// 可以视为一个Html元素
 /// </summary>
-sealed class Element : JSRuntimeBase, IElementJS
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="id">元素的ID</param>
+/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
+sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime), IElementJS
 {
     #region 公开成员
     #region 获取ID
-    public string? ID { get; }
+    public string? ID { get; } = id;
     #endregion
     #region 触发鼠标点击事件
     public ValueTask Click(CancellationToken cancellationToken)
@@ -87,7 +92,7 @@ sealed class Element : JSRuntimeBase, IElementJS
     /// 获取元素的前缀，
     /// 它被用来从DOM中找到元素
     /// </summary>
-    private string Prefix { get; }
+    private string Prefix { get; } = $"document.getElementById(\"{id}\")";
     #endregion
     #endregion
     #region 私有辅助类
@@ -120,18 +125,6 @@ sealed class Element : JSRuntimeBase, IElementJS
     {
         throw new NotImplementedException();
     }
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="id">元素的ID</param>
-    /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-    public Element(IJSRuntime jsRuntime, string id)
-        : base(jsRuntime)
-    {
-        ID = id;
-        Prefix = $"document.getElementById(\"{id}\")";
-    }
+
     #endregion
 }

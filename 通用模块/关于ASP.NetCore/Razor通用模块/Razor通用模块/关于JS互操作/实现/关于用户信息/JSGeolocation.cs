@@ -8,7 +8,8 @@ namespace Microsoft.JSInterop;
 /// 该对象是JS中Geolocation对象的封装，
 /// 可以用来确定地理位置
 /// </summary>
-sealed class JSGeolocation : JSRuntimeBase, IPosition
+/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
+sealed class JSGeolocation(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IPosition
 {
     #region 执行定位
     public Task<ILocation?> Position(CancellationToken cancellationToken = default)
@@ -26,12 +27,6 @@ $$"""
                     timeout: 2500
                 });
 """, cancellationToken: cancellationToken);
-    #endregion
-    #region 构造函数
-    /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-    public JSGeolocation(IJSRuntime jsRuntime) : base(jsRuntime)
-    {
 
-    }
     #endregion
 }

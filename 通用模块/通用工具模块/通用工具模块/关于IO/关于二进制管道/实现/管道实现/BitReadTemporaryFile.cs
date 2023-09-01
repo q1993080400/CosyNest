@@ -7,7 +7,11 @@ namespace System.IOFrancis.Bit;
 /// 表示一个用来读取且只能读取临时文件的管道，
 /// 当这个管道被释放时，临时文件会被删除
 /// </summary>
-sealed class BitReadTemporaryFile : AutoRelease, IBitRead
+/// <remarks>
+/// 使用指定的路径创建临时文件
+/// </remarks>
+/// <param name="path">临时文件的路径，如果它不存在，会引发异常</param>
+sealed class BitReadTemporaryFile(PathText path) : AutoRelease, IBitRead
 {
     #region 公开成员
     #region 释放对象
@@ -52,24 +56,14 @@ sealed class BitReadTemporaryFile : AutoRelease, IBitRead
     /// <summary>
     /// 获取临时文件的路径
     /// </summary>
-    private string Path { get; }
+    private string Path { get; } = path;
     #endregion
     #region 读取临时文件的流
     /// <summary>
     /// 获取用来读取临时文件的流
     /// </summary>
-    private Stream Stream { get; }
+    private Stream Stream { get; } = new FileStream(path, FileMode.Open);
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的路径创建临时文件
-    /// </summary>
-    /// <param name="path">临时文件的路径，如果它不存在，会引发异常</param>
-    public BitReadTemporaryFile(PathText path)
-    {
-        Path = path;
-        Stream = new FileStream(path, FileMode.Open);
-    }
     #endregion
 }

@@ -3,11 +3,16 @@
 /// <summary>
 /// 这个类型可以通过JS互操作来索引和修改本地存储
 /// </summary>
-sealed class JSLocalStorage : JSRuntimeBase, IAsyncDictionary<string, string>
+/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
+sealed class JSLocalStorage(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IAsyncDictionary<string, string>
 {
     #region 关于根据键读写值
     #region 读取或写入值（异步索引器）
-    public IAsyncIndex<string, string> IndexAsync { get; }
+    public IAsyncIndex<string, string> IndexAsync { get; } = CreateTasks.AsyncIndex<string, string>(
+           async (key, cancellation) =>
+           (await jsRuntime.InvokeAsync<string?>("localStorage.getItem", cancellation, key)) ??
+           throw new KeyNotFoundException($"未找到键{key}"),
+           (key, value, cancellation) => jsRuntime.InvokeVoidAsync("localStorage.setItem", cancellation, key, value).AsTask());
     #endregion
     #region 根据键读取值（不会引发异常）
     public async Task<(bool Exist, string? Value)> TryGetValueAsync(string key, CancellationToken cancellation = default)
@@ -60,18 +65,7 @@ sealed class JSLocalStorage : JSRuntimeBase, IAsyncDictionary<string, string>
     #region 检查键值对是否存在
     public async Task<bool> ContainsAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
         => (await TryGetValueAsync(item.Key, cancellation)) is (true, var value) && Equals(value, item.Value);
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-    public JSLocalStorage(IJSRuntime jsRuntime)
-        : base(jsRuntime)
-    {
-        IndexAsync = CreateTasks.AsyncIndex<string, string>(
-           async (key, cancellation) =>
-           (await jsRuntime.InvokeAsync<string?>("localStorage.getItem", cancellation, key)) ??
-           throw new KeyNotFoundException($"未找到键{key}"),
-           (key, value, cancellation) => jsRuntime.InvokeVoidAsync("localStorage.setItem", cancellation, key, value).AsTask());
-    }
     #endregion
 }

@@ -7,7 +7,11 @@ namespace System.NetFrancis.Api.Bilibili;
 /// <summary>
 /// 本类型封装了哔哩哔哩API
 /// </summary>
-public sealed class BilibiliAPI : WebApi
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
+public sealed class BilibiliAPI(Func<IHttpClient>? httpClientProvide = null) : WebApi(httpClientProvide)
 {
     #region 通过视频地址获取AID和CID
     /// <summary>
@@ -83,16 +87,7 @@ public sealed class BilibiliAPI : WebApi
         var (aid, cid) = await GetID(uri, cancellationToken);
         return await DownloadVideoFromID(aid, cid, clear, cancellationToken);
     }
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
-    public BilibiliAPI(Func<IHttpClient>? httpClientProvide = null)
-        : base(httpClientProvide)
-    {
-    }
     #endregion
 }

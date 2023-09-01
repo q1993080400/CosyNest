@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Design;
+﻿using System.Design;
 using System.Reflection;
 
 namespace System.Collections.Generic;
@@ -175,25 +174,6 @@ public static class CreateCollection
         where B : notnull
         => new TwoWayMap<A, B>(map);
     #endregion
-    #endregion
-    #endregion
-    #region 帮助创建NotifyCollectionChangedEventArgs 
-    #region 创建描述添加或删除的Args 
-    /// <summary>
-    /// 帮助创建一个<see cref="NotifyCollectionChangedEventArgs"/>，
-    /// 只能创建描述添加或删除的事件数据
-    /// </summary>
-    /// <param name="isAdd">如果这个值为<see langword="true"/>，创建描述添加的事件数据，
-    /// 否则创建描述删除的事件数据</param>
-    /// <param name="elements">受影响的对象，可以是集合（代表多项更改），
-    /// 也可以是集合中的元素（代表单项更改）</param>
-    /// <returns></returns>
-    public static NotifyCollectionChangedEventArgs NCCE(bool isAdd, object elements)
-    {
-        var action = isAdd ? NotifyCollectionChangedAction.Add : NotifyCollectionChangedAction.Remove;
-        IList list = elements is IEnumerable l ? l.ToList<object>() : new object[] { elements };
-        return new(action, list);
-    }
     #endregion
     #endregion
 }

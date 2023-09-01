@@ -9,7 +9,8 @@ namespace Microsoft.JSInterop;
 /// 这个类型是<see cref="IJSDocument"/>的实现，
 /// 可以视为一个JS中的Document对象
 /// </summary>
-sealed class JSDocument : JSRuntimeBase, IJSDocument
+/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
+sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDocument
 {
     #region 返回索引Cookie的字典
     private JSCookie? CookieField;
@@ -121,13 +122,17 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
     /// 这个类型封装了注册到JS运行时中的Net方法
     /// </summary>
     /// <typeparam name="Obj">方法的参数类型</typeparam>
-    private sealed class NetMethodPack<Obj>
+    /// <remarks>
+    /// 使用指定的参数初始化对象
+    /// </remarks>
+    /// <param name="action">事件中执行的Net方法</param>
+    private sealed class NetMethodPack<Obj>(Action<Obj> action)
     {
         #region 封装的Net方法
         /// <summary>
         /// 获取事件中执行的Net方法
         /// </summary>
-        private Action<Obj> Action { get; }
+        private Action<Obj> Action { get; } = action;
         #endregion
         #region 执行Net方法
         /// <summary>
@@ -141,16 +146,7 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         {
             Action(obj);
         }
-        #endregion
-        #region 构造函数
-        /// <summary>
-        /// 使用指定的参数初始化对象
-        /// </summary>
-        /// <param name="action">事件中执行的Net方法</param>
-        public NetMethodPack(Action<Obj> action)
-        {
-            Action = action;
-        }
+
         #endregion
     }
     #endregion
@@ -159,7 +155,13 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
     /// 当这个对象被释放时，
     /// 它也会将JS事件解除注册
     /// </summary>
-    private sealed class JSEventFreed : IDisposable
+    /// <remarks>
+    /// 使用指定的参数初始化对象
+    /// </remarks>
+    /// <param name="script">释放时执行的JS脚本</param>
+    /// <param name="disposable">待释放的Net对象封装</param>
+    /// <param name="jSRuntime">封装的JS运行时，本对象通过它执行脚本</param>
+    private sealed class JSEventFreed(string script, IDisposable disposable, IJSRuntime jSRuntime) : IDisposable
     {
         #region 公开成员
         public void Dispose()
@@ -176,35 +178,22 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         /// <summary>
         /// 获取释放时执行的JS脚本
         /// </summary>
-        private string Script { get; }
+        private string Script { get; } = script;
         #endregion
         #region 待释放的对象
         /// <summary>
         /// 获取待释放的Net对象封装
         /// </summary>
-        private IDisposable? Disposable { get; set; }
+        private IDisposable? Disposable { get; set; } = disposable;
         #endregion
         #region JS运行时
         /// <summary>
         /// 获取封装的JS运行时，
         /// 本对象通过它执行脚本
         /// </summary>
-        private IJSRuntime JSRuntime { get; }
+        private IJSRuntime JSRuntime { get; } = jSRuntime;
+
         #endregion
-        #endregion
-        #region 构造函数
-        /// <summary>
-        /// 使用指定的参数初始化对象
-        /// </summary>
-        /// <param name="script">释放时执行的JS脚本</param>
-        /// <param name="disposable">待释放的Net对象封装</param>
-        /// <param name="jSRuntime">封装的JS运行时，本对象通过它执行脚本</param>
-        public JSEventFreed(string script, IDisposable disposable, IJSRuntime jSRuntime)
-        {
-            Script = script;
-            Disposable = disposable;
-            JSRuntime = jSRuntime;
-        }
         #endregion
     }
     #endregion
@@ -286,15 +275,8 @@ sealed class JSDocument : JSRuntimeBase, IJSDocument
         await JSRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
         return (jsMethodName, netMethodPack);
     }
-    #endregion
-    #endregion
-    #endregion
-    #region 构造函数
-    /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-    public JSDocument(IJSRuntime jsRuntime)
-        : base(jsRuntime)
-    {
 
-    }
+    #endregion
+    #endregion
     #endregion
 }

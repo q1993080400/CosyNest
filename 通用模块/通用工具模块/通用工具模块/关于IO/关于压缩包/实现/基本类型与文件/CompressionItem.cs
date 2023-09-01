@@ -9,11 +9,15 @@ namespace System.IOFrancis.Compressed;
 /// 该类型是<see cref="ICompressionItem"/>的实现，
 /// 可以视为一个压缩包中的项
 /// </summary>
-abstract class CompressionItem : ICompressionItem
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="father">父节点</param>
+abstract class CompressionItem(INode father) : ICompressionItem
 {
     #region 关于文件系统树
     #region 父节点
-    private readonly INode FatherField;
+    private readonly INode FatherField = father;
 
     INode? INode.Father => FatherField;
     #endregion
@@ -52,15 +56,6 @@ abstract class CompressionItem : ICompressionItem
     #region 重写ToString
     public override string ToString()
         => Path;
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="father">父节点</param>
-    public CompressionItem(INode father)
-    {
-        FatherField = father;
-    }
+
     #endregion
 }

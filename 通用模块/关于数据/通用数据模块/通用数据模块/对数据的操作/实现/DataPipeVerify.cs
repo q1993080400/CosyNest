@@ -8,7 +8,13 @@ namespace System.DataFrancis;
 /// 它可以被放置在其他数据管道的前面，
 /// 只有验证通过的数据才会被提交到下一个管道
 /// </summary>
-sealed class DataPipeVerify : IDataPipe
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="pipe">这个管道之后的下一个管道，
+/// 如果数据验证通过，会被提交到这个管道中</param>
+/// <param name="verify">用来验证的委托</param>
+sealed class DataPipeVerify(IDataPipe pipe, DataVerify verify) : IDataPipe
 {
     #region 公开成员
     #region 关于添加和更新数据
@@ -74,26 +80,14 @@ sealed class DataPipeVerify : IDataPipe
     /// 获取这个管道之后的下一个管道，
     /// 如果数据验证通过，会被提交到这个管道中
     /// </summary>
-    private IDataPipe Pipe { get; }
+    private IDataPipe Pipe { get; } = pipe;
     #endregion
     #region 验证委托
     /// <summary>
     /// 获取用来验证的委托
     /// </summary>
-    private DataVerify Verify { get; }
+    private DataVerify Verify { get; } = verify;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="pipe">这个管道之后的下一个管道，
-    /// 如果数据验证通过，会被提交到这个管道中</param>
-    /// <param name="verify">用来验证的委托</param>
-    public DataPipeVerify(IDataPipe pipe, DataVerify verify)
-    {
-        Pipe = pipe;
-        Verify = verify;
-    }
     #endregion
 }

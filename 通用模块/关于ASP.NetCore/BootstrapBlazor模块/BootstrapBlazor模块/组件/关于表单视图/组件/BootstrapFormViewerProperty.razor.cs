@@ -7,7 +7,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 /// <inheritdoc cref="BootstrapFormViewer{Model}"/>
 public sealed partial class BootstrapFormViewerProperty<Model> : ComponentBase
-    where Model : class, new()
+    where Model : class
 {
     #region 组件参数
     #region 渲染参数

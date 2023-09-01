@@ -5,7 +5,12 @@
 /// 它使用委托来读写异步属性
 /// </summary>
 /// <inheritdoc cref="IAsyncProperty{Value}"/>
-sealed class AsyncProperty<Value> : IAsyncProperty<Value>
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="getDelegate">用于读取异步属性的委托</param>
+/// <param name="setDelegate">用于写入异步属性的委托</param>
+sealed class AsyncProperty<Value>(Func<CancellationToken, Task<Value>> getDelegate, Func<Value, CancellationToken, Task> setDelegate) : IAsyncProperty<Value>
 {
     #region 读取异步属性
     #region 正式属性
@@ -16,7 +21,7 @@ sealed class AsyncProperty<Value> : IAsyncProperty<Value>
     /// <summary>
     /// 这个委托用于读取异步属性
     /// </summary>
-    private Func<CancellationToken, Task<Value>> GetDelegate { get; }
+    private Func<CancellationToken, Task<Value>> GetDelegate { get; } = getDelegate;
     #endregion
     #endregion
     #region 写入异步属性
@@ -28,19 +33,8 @@ sealed class AsyncProperty<Value> : IAsyncProperty<Value>
     /// <summary>
     /// 这个委托用于写入异步属性
     /// </summary>
-    private Func<Value, CancellationToken, Task> SetDelegate { get; }
+    private Func<Value, CancellationToken, Task> SetDelegate { get; } = setDelegate;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="getDelegate">用于读取异步属性的委托</param>
-    /// <param name="setDelegate">用于写入异步属性的委托</param>
-    public AsyncProperty(Func<CancellationToken, Task<Value>> getDelegate, Func<Value, CancellationToken, Task> setDelegate)
-    {
-        GetDelegate = getDelegate;
-        SetDelegate = setDelegate;
-    }
     #endregion
 }

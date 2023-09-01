@@ -7,7 +7,12 @@
 /// </summary>
 /// <typeparam name="ConvertTo">转换的目标类型</typeparam>
 /// <typeparam name="Map">投影类型</typeparam>
-sealed class JsonConvertMap<ConvertTo, Map> : JsonConverter<ConvertTo>
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="toMap">本委托将复杂类型转换为投影类型</param>
+/// <param name="fromMap">本委托将投影类型转换为复杂类型</param>
+sealed class JsonConvertMap<ConvertTo, Map>(Func<ConvertTo, Map> toMap, Func<Map, ConvertTo> fromMap) : JsonConverter<ConvertTo>
 {
     #region 公开成员
     #region 反序列化
@@ -29,25 +34,14 @@ sealed class JsonConvertMap<ConvertTo, Map> : JsonConverter<ConvertTo>
     /// <summary>
     /// 本委托将复杂类型转换为投影类型
     /// </summary>
-    private Func<ConvertTo, Map> ToMap { get; }
+    private Func<ConvertTo, Map> ToMap { get; } = toMap;
     #endregion
     #region 从投影类型转换为复杂类型
     /// <summary>
     /// 本委托将投影类型转换为复杂类型
     /// </summary>
-    private Func<Map, ConvertTo> FromMap { get; }
+    private Func<Map, ConvertTo> FromMap { get; } = fromMap;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="toMap">本委托将复杂类型转换为投影类型</param>
-    /// <param name="fromMap">本委托将投影类型转换为复杂类型</param>
-    public JsonConvertMap(Func<ConvertTo, Map> toMap, Func<Map, ConvertTo> fromMap)
-    {
-        ToMap = toMap;
-        FromMap = fromMap;
-    }
     #endregion
 }

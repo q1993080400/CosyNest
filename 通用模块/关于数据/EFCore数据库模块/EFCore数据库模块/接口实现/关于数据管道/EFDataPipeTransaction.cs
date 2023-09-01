@@ -9,7 +9,12 @@ namespace System.DataFrancis.DB.EF;
 /// 这个类型是支持事务的<see cref="IDataPipe"/>实现，
 /// 只要将它一直传递下去，就可以保证事务一致性
 /// </summary>
-sealed class EFDataPipeTransaction : IDataPipeDBWithJoin, IDisposable
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="createDbContext">这个工厂方法用于创建数据库上下文，
+/// 它的参数就是请求的实体类的类型</param>
+sealed class EFDataPipeTransaction(Func<Type, DbContextFrancis> createDbContext) : IDataPipeDBWithJoin, IDisposable
 {
     #region 公开成员
     #region 执行事务
@@ -93,7 +98,7 @@ sealed class EFDataPipeTransaction : IDataPipeDBWithJoin, IDisposable
     /// 这个工厂方法用于创建数据库上下文，
     /// 它的参数就是请求的实体类的类型
     /// </summary>
-    private Func<Type, DbContextFrancis> CreateDbContext { get; }
+    private Func<Type, DbContextFrancis> CreateDbContext { get; } = createDbContext;
     #endregion
     #region 事务对象
     /// <summary>
@@ -120,17 +125,7 @@ sealed class EFDataPipeTransaction : IDataPipeDBWithJoin, IDisposable
         DBTransaction = DbContext.Database.BeginTransaction();
         return DbContext;
     }
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="createDbContext">这个工厂方法用于创建数据库上下文，
-    /// 它的参数就是请求的实体类的类型</param>
-    public EFDataPipeTransaction(Func<Type, DbContextFrancis> createDbContext)
-    {
-        CreateDbContext = createDbContext;
-    }
     #endregion
 }

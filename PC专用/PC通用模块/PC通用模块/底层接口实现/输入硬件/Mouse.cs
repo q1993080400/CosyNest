@@ -15,16 +15,10 @@ sealed class Mouse : IMouse
     #region 底层实现支持
     #region Win32结构
     [StructLayout(LayoutKind.Sequential)]
-    private struct POINT
+    private struct POINT(int x, int y)
     {
-        public int X;
-        public int Y;
-
-        public POINT(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
+        public int X = x;
+        public int Y = y;
     }
     #endregion
     #region Win32方法封装

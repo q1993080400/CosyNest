@@ -5,7 +5,14 @@ namespace System.Design.Logging;
 /// <summary>
 /// 这个类型使用一个函数来记录日志
 /// </summary>
-sealed class LoggerFunction : ILogger
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="setLog">这个委托被用来写入日志，
+/// 它的第一个参数是服务提供对象，第二个参数是发生的异常，
+/// 第三个参数是记录日志时传入的状态对象</param>
+/// <param name="serviceProvider">服务提供者对象，它可以用于请求其他服务</param>
+sealed class LoggerFunction(Func<IServiceProvider, Exception, object?, Task> setLog, IServiceProvider serviceProvider) : ILogger
 {
     #region 公开成员
     #region 记录日志
@@ -34,27 +41,14 @@ sealed class LoggerFunction : ILogger
     /// 第二个参数是发生的异常，
     /// 第三个参数是记录日志时传入的状态对象
     /// </summary>
-    private Func<IServiceProvider, Exception, object?, Task> SetLog { get; }
+    private Func<IServiceProvider, Exception, object?, Task> SetLog { get; } = setLog;
     #endregion
     #region 服务提供者对象
     /// <summary>
     /// 获取服务提供者对象，它可以用于请求其他服务
     /// </summary>
-    private IServiceProvider ServiceProvider { get; }
+    private IServiceProvider ServiceProvider { get; } = serviceProvider;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="setLog">这个委托被用来写入日志，
-    /// 它的第一个参数是服务提供对象，第二个参数是发生的异常，
-    /// 第三个参数是记录日志时传入的状态对象</param>
-    /// <param name="serviceProvider">服务提供者对象，它可以用于请求其他服务</param>
-    public LoggerFunction(Func<IServiceProvider, Exception, object?, Task> setLog, IServiceProvider serviceProvider)
-    {
-        SetLog = setLog;
-        ServiceProvider = serviceProvider;
-    }
     #endregion
 }

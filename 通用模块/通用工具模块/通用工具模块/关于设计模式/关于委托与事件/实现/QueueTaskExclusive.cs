@@ -4,7 +4,14 @@
 /// 该类型是<see cref="IQueueTask"/>的实现，
 /// 它实际上不进行排队，而是独占一个任务
 /// </summary>
-sealed class QueueTaskExclusive : IQueueTask
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="inSynchronizationLocking">当同步任务被抢占时，执行这个委托，
+/// 如果为<see langword="null"/>，则不执行</param>
+/// <param name="inAsynchronousLocking">当异步任务被抢占时，执行这个委托，
+/// 如果为<see langword="null"/>，则不执行</param>
+sealed class QueueTaskExclusive(Action? inSynchronizationLocking, Func<Task>? inAsynchronousLocking) : IQueueTask
 {
     #region 说明文档
     /*问：本对象实际上不进行排队，
@@ -30,7 +37,7 @@ sealed class QueueTaskExclusive : IQueueTask
     /// <summary>
     /// 当同步任务被抢占时，执行这个委托
     /// </summary>
-    private Action? InSynchronizationLocking { get; }
+    private Action? InSynchronizationLocking { get; } = inSynchronizationLocking;
     #endregion
     #region 执行任务
     public void Queue(Action task)
@@ -73,7 +80,7 @@ sealed class QueueTaskExclusive : IQueueTask
     /// <summary>
     /// 当异步任务被抢占时，执行这个委托
     /// </summary>
-    private Func<Task>? InAsynchronousLocking { get; }
+    private Func<Task>? InAsynchronousLocking { get; } = inAsynchronousLocking;
     #endregion
     #region 执行任务
     public async Task Queue(Func<Task> task)
@@ -95,20 +102,7 @@ sealed class QueueTaskExclusive : IQueueTask
             await InAsynchronousLocking();
         }
     }
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="inSynchronizationLocking">当同步任务被抢占时，执行这个委托，
-    /// 如果为<see langword="null"/>，则不执行</param>
-    /// <param name="inAsynchronousLocking">当异步任务被抢占时，执行这个委托，
-    /// 如果为<see langword="null"/>，则不执行</param>
-    public QueueTaskExclusive(Action? inSynchronizationLocking, Func<Task>? inAsynchronousLocking)
-    {
-        InSynchronizationLocking = inSynchronizationLocking;
-        InAsynchronousLocking = inAsynchronousLocking;
-    }
     #endregion
 }

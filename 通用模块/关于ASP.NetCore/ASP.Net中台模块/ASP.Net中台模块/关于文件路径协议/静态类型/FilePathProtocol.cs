@@ -63,9 +63,8 @@ static class FilePathProtocol
     {
         var bodys = paths.Select(x =>
         {
-            var match = Regex.MatcheSingle(x) ??
-            throw new ArgumentException($"路径{x}不符合协议的规定，无法对它进行解析");
-            return new
+            var match = Regex.MatcheSingle(x);
+            return match is null ? null! : new
             {
                 Type = match["type"].Match,
                 Sort = match["sort"].Match,
@@ -73,7 +72,9 @@ static class FilePathProtocol
                 Name = match["name"].Match,
                 Path = x
             };
-        }).ToArray().OrderBy(x => x.Sort, FastRealize.ComparerFromNumbering()).ThenBy(x => x.Name).ToArray().GroupBy(x => x.ID).ToArray();
+        }).Where(x => x != null).ToArray().
+        OrderBy(x => x.Sort, FastRealize.ComparerFromNumbering()).ThenBy(x => x.Name).ToArray().
+        GroupBy(x => x.ID).ToArray();
         foreach (var item in bodys)
         {
             var dictionary = item.ToDictionary(x => x.Type, x => x);

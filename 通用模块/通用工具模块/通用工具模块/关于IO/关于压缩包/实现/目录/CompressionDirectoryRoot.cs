@@ -8,7 +8,9 @@ namespace System.IOFrancis.Compressed;
 /// 该类型是<see cref="ICompressionDirectory"/>的实现，
 /// 可以视为一个压缩包中的根目录
 /// </summary>
-sealed class CompressionDirectoryRoot : CompressionDirectoryBase, INode
+/// <param name="package">根目录所在的压缩包</param>
+/// <inheritdoc cref="CompressionDirectoryBase(INode,ZipArchive)"/>
+sealed class CompressionDirectoryRoot(CompressedPackage package) : CompressionDirectoryBase(package, package.Zip), INode
 {
     #region 路径
     public override string Path
@@ -24,14 +26,6 @@ sealed class CompressionDirectoryRoot : CompressionDirectoryBase, INode
     #region 解压到指定目录
     public override Task Decompress(PathText path, bool cover = false)
         => Task.Run(() => Zip.ExtractToDirectory(path, cover));
-    #endregion
-    #region 构造函数
-    /// <param name="package">根目录所在的压缩包</param>
-    /// <inheritdoc cref="CompressionDirectoryBase(INode,ZipArchive)"/>
-    public CompressionDirectoryRoot(CompressedPackage package)
-        : base(package, package.Zip)
-    {
 
-    }
     #endregion
 }

@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore.Components;
 /// </summary>
 /// <inheritdoc cref="FormViewer{Model}"/>
 public sealed record RenderFormViewerPropertyInfo<Model>
-    where Model : class, new()
+    where Model : class
 {
     #region 要渲染的模型
     /// <summary>
@@ -44,7 +44,7 @@ public sealed record RenderFormViewerPropertyInfo<Model>
     /// 如果这个值为<see langword="true"/>，
     /// 表示仅提供数据显示功能，不提供数据编辑功能
     /// </summary>
-    public required bool IsReadOnly { get; set; }
+    public required bool IsReadOnly { get; init; }
     #endregion
     #region 数据属性改变时的委托
     /// <summary>

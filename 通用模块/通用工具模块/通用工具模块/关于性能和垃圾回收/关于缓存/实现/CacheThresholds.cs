@@ -8,7 +8,12 @@ namespace System.Performance;
 /// </summary>
 /// <typeparam name="Key">缓存的键类型</typeparam>
 /// <typeparam name="Value">缓存的值类型</typeparam>
-sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
+/// <remarks>
+/// 使用指定的添加键委托和垃圾回收阈值初始化缓存
+/// </remarks>
+/// <param name="getValue">在键不存在的时候，会通过这个委托获取值</param>
+/// <param name="threshold">当字典的元素数量达到这个阈值的时候，会进行一次GC</param>
+sealed class CacheThresholds<Key, Value>(Func<Key, Value> getValue, int threshold) : ICache<Key, Value>
     where Key : notnull
 {
     #region 关于字典
@@ -24,7 +29,7 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
     /// 在读取值的时候，如果键不存在，
     /// 则会执行这个委托获取返回值，
     /// </summary>
-    private Func<Key, Value> NotExist { get; }
+    private Func<Key, Value> NotExist { get; } = getValue;
     #endregion
     #region 提取缓存数据
     #region 隐式提取
@@ -66,7 +71,7 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
     /// 获取垃圾回收阈值， 
     /// 当字典的元素达到这个阈值后，将会对字典进行一次垃圾回收
     /// </summary>
-    private int Threshold { get; }
+    private int Threshold { get; } = Math.Max(75, threshold);                      //回收阈值最低为75
     #endregion
     #region 指示应该回收字典的前半部分还是后半部分
     /// <summary>
@@ -107,19 +112,8 @@ sealed class CacheThresholds<Key, Value> : ICache<Key, Value>
         Dictionary = cache;
         GCFront = !GCFront;
     }
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的添加键委托和垃圾回收阈值初始化缓存
-    /// </summary>
-    /// <param name="getValue">在键不存在的时候，会通过这个委托获取值</param>
-    /// <param name="threshold">当字典的元素数量达到这个阈值的时候，会进行一次GC</param>
-    public CacheThresholds(Func<Key, Value> getValue, int threshold)
-    {
-        NotExist = getValue;
-        Threshold = Math.Max(75, threshold);                      //回收阈值最低为75
-    }
     #endregion
     #region 辅助类型
     /// <summary>

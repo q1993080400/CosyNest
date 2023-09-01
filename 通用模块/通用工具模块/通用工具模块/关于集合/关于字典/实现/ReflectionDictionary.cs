@@ -6,20 +6,26 @@ namespace System.Collections.Generic;
 /// <summary>
 /// 该字典通过反射属性来读写值
 /// </summary>
-sealed class ReflectionDictionary : IRestrictedDictionary<string, object?>
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="target">属性所依附的对象</param>
+/// <param name="properties">要读写值的属性</param>
+/// <returns></returns>
+sealed class ReflectionDictionary(object? target, IEnumerable<PropertyInfo> properties) : IRestrictedDictionary<string, object?>
 {
     #region 有关反射的对象
     #region 反射目标
     /// <summary>
     /// 获取反射的目标
     /// </summary>
-    private object? Target { get; }
+    private object? Target { get; } = target;
     #endregion
     #region 反射字典
     /// <summary>
     /// 该字典通过名称索引属性对象
     /// </summary>
-    private IReadOnlyDictionary<string, PropertyInfo> Properties { get; }
+    private IReadOnlyDictionary<string, PropertyInfo> Properties { get; } = properties.ToDictionary(x => (x.Name, x), true);
     #endregion
     #endregion
     #region 有关键值对集合
@@ -66,19 +72,7 @@ sealed class ReflectionDictionary : IRestrictedDictionary<string, object?>
         get => Properties[key].GetValue(Target);
         set => Properties[key].SetValue(Target, value);
     }
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="target">属性所依附的对象</param>
-    /// <param name="properties">要读写值的属性</param>
-    /// <returns></returns>
-    public ReflectionDictionary(object? target, IEnumerable<PropertyInfo> properties)
-    {
-        Target = target;
-        Properties = properties.ToDictionary(x => (x.Name, x), true);
-    }
     #endregion
 }

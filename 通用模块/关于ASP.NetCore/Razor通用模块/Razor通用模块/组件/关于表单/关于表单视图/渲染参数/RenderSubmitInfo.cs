@@ -5,7 +5,9 @@ namespace Microsoft.AspNetCore.Components;
 /// <summary>
 /// 这个记录是渲染表单视图提交部分的参数
 /// </summary>
-public sealed record RenderSubmitInfo
+/// <typeparam name="Model">模型的类型</typeparam>
+public sealed record RenderSubmitInfo<Model>
+    where Model : class
 {
     #region 用来重置表单的委托
     /// <summary>
@@ -28,5 +30,11 @@ public sealed record RenderSubmitInfo
     /// 现有表单支持修改和删除，不支持新增
     /// </summary>
     public required bool ExistingForms { get; init; }
+    #endregion
+    #region 表单模型
+    /// <summary>
+    /// 获取要渲染的表单模型
+    /// </summary>
+    public required Model FormModel { get; set; }
     #endregion
 }

@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore.Components;
 /// 主体部分指的是表单部分，不包括提交重置按钮等
 /// </summary>
 public sealed record RenderFormViewerMainInfo<Model>
-    where Model : class, new()
+    where Model : class
 {
     #region 获取当前模型
     /// <summary>

@@ -23,9 +23,11 @@
 
 <div class="bootstrapFormViewerPropertyContainer">
     <div class="bootstrapFormViewerPropertyItem">
+        @{
+            var format = GetRenderAttribute<FormatAttribute>()?.Format;
+        }
         @if (RenderInfo.IsReadOnly)
         {
-            var format = GetRenderAttribute<FormatAttribute>()?.Format;
             var value = property.GetValue(RenderInfo.FormModel);
             var text = value is IFormattable f ? f.ToString(format, null) : value?.ToString();
             <div class="bootstrapFormViewerPropertyContainer">
@@ -73,7 +75,7 @@
                                 var value = RenderInfo.Value<T>();
                                 <BootstrapInputNumber TValue="T" ShowLabel="true"
                                                       Max="@max" Min="@min"
-                                                      DisplayText="@name" @bind-Value=value.Value />
+                                                      DisplayText="@name" @bind-Value=value.Value FormatString="@format" />
                                 break;
                             case FormNumRender.Grade when typeof(T) == typeof(double):
                                 var v = RenderInfo.Value<double>();
@@ -155,6 +157,7 @@
                     <RadioList Items="enumSelect" TValue="int" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value />
                     break;
                 case var t when t == typeof(DateTimeOffset):
+                    var formatDate = format ?? "yyyy-MM-dd";
                     var valueDate = RenderInfo.Value<DateTimeOffset>();
                     var verifyAge = GetRenderAttribute<VerifyAgeAttribute>();
                     if (verifyAge is { })
@@ -162,11 +165,11 @@
                         var now = DateTime.Now;
                         var maxBirthday = now.AddYears((decimal)-verifyAge.MinAge);
                         var minBirthday = now.AddYears((decimal)-verifyAge.MaxAge);
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" MinValue="minBirthday" MaxValue=" maxBirthday" />
+                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" MinValue="minBirthday" MaxValue=" maxBirthday" Format="@formatDate" />
                     }
                     else
                     {
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" />
+                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" Format="@formatDate" />
                     }
                     break;
                 case var t:

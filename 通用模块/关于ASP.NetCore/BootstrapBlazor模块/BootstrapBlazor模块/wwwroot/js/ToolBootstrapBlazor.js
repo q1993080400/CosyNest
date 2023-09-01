@@ -6,8 +6,8 @@
         var isActive = node.classList.contains('active');
         var videos = node.querySelectorAll('video');
         for (var video of videos) {
-            video.loop = true;
             if (isActive) {
+                video.loop = true;
                 video.play();
             }
             else {

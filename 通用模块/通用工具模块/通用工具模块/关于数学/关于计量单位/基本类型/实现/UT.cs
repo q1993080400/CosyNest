@@ -4,7 +4,15 @@
 /// 表示一个计量单位的模板，
 /// 它规定了该单位的大小和类型
 /// </summary>
-public abstract class UT : IUT
+/// <remarks>
+/// 使用指定的名称和转换方法创建单位
+/// </remarks>
+/// <param name="name">本单位的名称</param>
+/// <param name="toMetric">从本单位转换为公制单位的委托</param>
+/// <param name="fromMetric">从公制单位转换为本单位的委托</param>
+/// <param name="isStatic">如果这个值为<see langword="true"/>，
+/// 代表本单位为静态单位，否则为动态单位</param>
+public abstract class UT(string name, Func<Num, Num> toMetric, Func<Num, Num> fromMetric, bool isStatic = true) : IUT
 {
 #pragma warning disable CA2208
 
@@ -13,7 +21,7 @@ public abstract class UT : IUT
     /// <summary>
     /// 从本单位转换为公制单位的委托
     /// </summary>
-    private Func<Num, Num> ToMetricDelegate { get; }
+    private Func<Num, Num> ToMetricDelegate { get; } = toMetric;
 
     public Num ToMetric(Num thisUnit)
           => ToMetricDelegate(thisUnit);
@@ -22,7 +30,7 @@ public abstract class UT : IUT
     /// <summary>
     /// 从公制单位转换为本单位的委托
     /// </summary>
-    private Func<Num, Num> FromMetricDelegate { get; }
+    private Func<Num, Num> FromMetricDelegate { get; } = fromMetric;
 
     public Num FromMetric(Num metricUnit)
           => FromMetricDelegate(metricUnit);
@@ -45,10 +53,10 @@ public abstract class UT : IUT
     #endregion
     #region 关于本单位的信息
     #region 是否为静态单位
-    public bool IsStatic { get; }
+    public bool IsStatic { get; } = isStatic;
     #endregion
     #region 返回单位名称
-    public string Name { get; }
+    public string Name { get; } = name;
     #endregion
     #region 返回本单位的类型
     /// <summary>
@@ -72,25 +80,11 @@ public abstract class UT : IUT
     #region 重写ToString
     public sealed override string ToString()
         => Name;
+
     #endregion
     #endregion
     #region 构造函数
     #region 指定名称与转换委托
-    /// <summary>
-    /// 使用指定的名称和转换方法创建单位
-    /// </summary>
-    /// <param name="name">本单位的名称</param>
-    /// <param name="toMetric">从本单位转换为公制单位的委托</param>
-    /// <param name="fromMetric">从公制单位转换为本单位的委托</param>
-    /// <param name="isStatic">如果这个值为<see langword="true"/>，
-    /// 代表本单位为静态单位，否则为动态单位</param>
-    public UT(string name, Func<Num, Num> toMetric, Func<Num, Num> fromMetric, bool isStatic = true)
-    {
-        Name = name;
-        ToMetricDelegate = toMetric;
-        FromMetricDelegate = fromMetric;
-        IsStatic = isStatic;
-    }
     #endregion
     #region 指定名称与转换常数
     /// <summary>

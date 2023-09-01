@@ -8,7 +8,11 @@ namespace System.TreeObject;
 /// 这个转换器允许进行多态序列化与反序列化
 /// </summary>
 /// <typeparam name="Obj">要转换的对象类型</typeparam>
-sealed class JsonConvertPolymorphic<Obj> : JsonConverter<Obj>
+/// <remarks>
+/// 使用指定的对象初始化类型
+/// </remarks>
+/// <param name="assemblies">转换器会从这些程序集中搜索多态反序列化的类型</param>
+sealed class JsonConvertPolymorphic<Obj>(IEnumerable<Assembly> assemblies) : JsonConverter<Obj>
 {
     #region 公开成员
     #region 是否可转换
@@ -109,7 +113,8 @@ sealed class JsonConvertPolymorphic<Obj> : JsonConverter<Obj>
     /// 转换器会从这些程序集中搜索多态反序列化的类型，
     /// 它的键就是程序集的全名
     /// </summary>
-    private Dictionary<string, Assembly> Assemblies { get; }
+    private Dictionary<string, Assembly> Assemblies { get; } = assemblies.ToDictionary(x => x.FullName ??
+        throw new NullReferenceException($"在创建多态Json转换器的时候，某个程序集的全名为null"), x => x);
     #endregion
     #region 用于标记类型全名的键
     /// <summary>
@@ -128,17 +133,7 @@ sealed class JsonConvertPolymorphic<Obj> : JsonConverter<Obj>
     /// 这个键被用来作为值的属性名字
     /// </summary>
     private const string ValueKey = "FEE34934-59C9-8F1E-2D9D-ECFF4B05EF24";
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的对象初始化类型
-    /// </summary>
-    /// <param name="assemblies">转换器会从这些程序集中搜索多态反序列化的类型</param>
-    public JsonConvertPolymorphic(IEnumerable<Assembly> assemblies)
-    {
-        Assemblies = assemblies.ToDictionary(x => x.FullName ??
-        throw new NullReferenceException($"在创建多态Json转换器的时候，某个程序集的全名为null"), x => x);
-    }
     #endregion
 }

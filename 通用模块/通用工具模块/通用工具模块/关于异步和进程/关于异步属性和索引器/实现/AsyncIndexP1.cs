@@ -5,7 +5,12 @@
 /// 可以视为一个只有一个参数的异步索引器
 /// </summary>
 /// <inheritdoc cref="IAsyncIndex{P1, Value}"/>
-sealed class AsyncIndexP1<P1, Value> : IAsyncIndex<P1, Value>
+/// <remarks>
+/// 使用指定的读取和写入委托初始化异步索引器
+/// </remarks>
+/// <param name="getDelegate">用于读取异步索引器的委托</param>
+/// <param name="setDelegate">用于写入异步索引器的委托</param>
+sealed class AsyncIndexP1<P1, Value>(Func<P1, CancellationToken, Task<Value>> getDelegate, Func<P1, Value, CancellationToken, Task> setDelegate) : IAsyncIndex<P1, Value>
 {
     #region 读取索引器
     #region 正式方法
@@ -16,7 +21,7 @@ sealed class AsyncIndexP1<P1, Value> : IAsyncIndex<P1, Value>
     /// <summary>
     /// 这个委托用于读取异步索引器
     /// </summary>
-    private Func<P1, CancellationToken, Task<Value>> GetDelegate { get; }
+    private Func<P1, CancellationToken, Task<Value>> GetDelegate { get; } = getDelegate;
     #endregion
     #endregion
     #region 写入索引器
@@ -28,19 +33,8 @@ sealed class AsyncIndexP1<P1, Value> : IAsyncIndex<P1, Value>
     /// <summary>
     /// 这个委托用于写入异步索引器
     /// </summary>
-    private Func<P1, Value, CancellationToken, Task> SetDelegate { get; }
+    private Func<P1, Value, CancellationToken, Task> SetDelegate { get; } = setDelegate;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的读取和写入委托初始化异步索引器
-    /// </summary>
-    /// <param name="getDelegate">用于读取异步索引器的委托</param>
-    /// <param name="setDelegate">用于写入异步索引器的委托</param>
-    public AsyncIndexP1(Func<P1, CancellationToken, Task<Value>> getDelegate, Func<P1, Value, CancellationToken, Task> setDelegate)
-    {
-        GetDelegate = getDelegate;
-        SetDelegate = setDelegate;
-    }
     #endregion
 }

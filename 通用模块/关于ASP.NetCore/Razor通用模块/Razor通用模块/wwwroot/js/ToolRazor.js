@@ -4,6 +4,37 @@ function InvokeCode(code) {
     return Function(code)();
 }
 
+//动态加载js脚本
+function LoadScript(uri) {
+    for (var i in document.scripts) {
+        if (i.src == uri)
+            return;
+    }
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = uri;
+    document.body.appendChild(script);
+}
+
+//动态加载css
+function LoadCSS(uri) {
+    var head = document.head;
+    for (var i in head.childNodes) {
+        if (i.href == uri)
+            return;
+    }
+    var link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = uri;
+    head.insertBefore(link, head.firstChild);
+}
+
+//初始化VideoJS
+function InitializationVideoJS(id, op) {
+    videojs(id, op);
+}
+
 //这是一个读写cookie的小框架
 
 var docCookies = {

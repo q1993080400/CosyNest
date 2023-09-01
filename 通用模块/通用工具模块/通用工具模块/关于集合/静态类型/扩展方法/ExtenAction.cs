@@ -178,4 +178,24 @@ public static partial class ExtenIEnumerable
     #endregion
     #endregion
     #endregion
+    #region 替换元素
+    /// <summary>
+    /// 替换一个集合中的元素，
+    /// 如果存在多个元素，则替换第一个元素
+    /// </summary>
+    /// <typeparam name="Obj">集合元素的类型</typeparam>
+    /// <param name="objs">要替换的集合</param>
+    /// <param name="old">旧元素</param>
+    /// <param name="new">新元素</param>
+    /// <returns>是否替换成功</returns>
+    public static bool Replace<Obj>(this IList<Obj> objs, Obj old, Obj @new)
+    {
+        var index = objs.IndexOf(old);
+        if (index < 0)
+            return false;
+        objs.RemoveAt(index);
+        objs.Insert(index, @new);
+        return true;
+    }
+    #endregion
 }

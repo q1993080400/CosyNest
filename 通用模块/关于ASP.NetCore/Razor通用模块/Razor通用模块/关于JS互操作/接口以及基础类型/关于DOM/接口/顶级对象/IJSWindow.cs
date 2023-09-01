@@ -176,4 +176,13 @@ public interface IJSWindow : IJSRuntime
     Task<INotifications?> Notifications(bool requestNotifications);
     #endregion
     #endregion
+    #region 动态加载脚本
+    /// <summary>
+    /// 动态加载一个脚本，支持js和css文件，
+    /// 如果相同uri的脚本已经存在，则不会加载
+    /// </summary>
+    /// <param name="uri">要加载的脚本的uri</param>
+    /// <returns></returns>
+    ValueTask LoadScript(string uri);
+    #endregion
 }

@@ -4,17 +4,22 @@
 /// 这个类型是<see cref="IRegex"/>的实现，
 /// 可以视为一个正则表达式
 /// </summary>
-sealed class RegexRealize : IRegex
+/// <remarks>
+/// 使用指定的正则表达式初始化对象
+/// </remarks>
+/// <param name="regexText">指定的正则表达式</param>
+/// <param name="options">正则表达式的选项</param>
+sealed class RegexRealize(string regexText, RegexOptions options) : IRegex
 {
     #region 匹配所需的信息
     #region 用于匹配的正则表达式
-    public string RegexText { get; }
+    public string RegexText { get; } = regexText;
     #endregion
     #region 匹配选项
     /// <summary>
     /// 获取用于匹配的选项
     /// </summary>
-    private RegexOptions Options { get; }
+    private RegexOptions Options { get; } = options;
     #endregion
     #endregion
     #region 关于匹配
@@ -52,19 +57,10 @@ sealed class RegexRealize : IRegex
         }
         return text;
     }
+
     #endregion
     #endregion
     #region 构造方法
-    /// <summary>
-    /// 使用指定的正则表达式初始化对象
-    /// </summary>
-    /// <param name="regexText">指定的正则表达式</param>
-    /// <param name="options">正则表达式的选项</param>
-    public RegexRealize(string regexText, RegexOptions options)
-    {
-        RegexText = regexText;
-        Options = options;
-    }
     #endregion
     #region 静态构造函数
     static RegexRealize()

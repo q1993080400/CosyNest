@@ -5,7 +5,7 @@
 /// </summary>
 /// <inheritdoc cref="FormViewer{Model}"/>
 public sealed record RenderFormViewerInfo<Model>
-    where Model : class, new()
+    where Model : class
 {
     #region 用来渲染主体部分的委托
     /// <summary>

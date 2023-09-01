@@ -7,7 +7,12 @@ namespace System.DataFrancis.DB.EF;
 /// <summary>
 /// 这个类型是使用EFCore实现的数据管道
 /// </summary>
-sealed class EFDataPipe : IDataPipeDBWithJoin
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="createDbContext">这个工厂方法用于创建数据库上下文，
+/// 它的参数就是请求的实体类的类型</param>
+sealed class EFDataPipe(Func<Type, DbContextFrancis> createDbContext) : IDataPipeDBWithJoin
 {
     #region 说明文档
     /*问：使用本类型，而不是直接使用EFCore有什么好处？
@@ -110,18 +115,7 @@ sealed class EFDataPipe : IDataPipeDBWithJoin
     /// 这个工厂方法用于创建数据库上下文，
     /// 它的参数就是请求的实体类的类型
     /// </summary>
-    private Func<Type, DbContextFrancis> CreateDbContext { get; }
+    private Func<Type, DbContextFrancis> CreateDbContext { get; } = createDbContext;
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="createDbContext">这个工厂方法用于创建数据库上下文，
-    /// 它的参数就是请求的实体类的类型</param>
-    public EFDataPipe(Func<Type, DbContextFrancis> createDbContext)
-    {
-        CreateDbContext = createDbContext;
-    }
     #endregion
 }

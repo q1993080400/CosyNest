@@ -5,16 +5,21 @@
 /// 可以视为一个不可变的计量单位
 /// </summary>
 /// <inheritdoc cref="IUnit{Template}"/>
-sealed class Unit<Template> : IUnit<Template>
+/// <remarks>
+/// 使用指定的模板和公制单位数量初始化单位
+/// </remarks>
+/// <param name="template">单位的模板</param>
+/// <param name="metricValue">公制单位的数量</param>
+sealed class Unit<Template>(Template template, Num metricValue) : IUnit<Template>
     where Template : IUT
 {
     #region 接口实现
     #region 关于单位的值
     #region 公制单位形式
-    public Num ValueMetric { get; }
+    public Num ValueMetric { get; } = metricValue;
     #endregion
     #region 本单位形式
-    public (Template Template, Num Value) Value { get; }
+    public (Template Template, Num Value) Value { get; } = (template, template.FromMetric(metricValue));
     #endregion
     #endregion
     #region 比较单位的大小
@@ -38,18 +43,7 @@ sealed class Unit<Template> : IUnit<Template>
     #region 重写ToString
     public override string ToString()
         => Value.Value.ToString() + Value.Template;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的模板和公制单位数量初始化单位
-    /// </summary>
-    /// <param name="template">单位的模板</param>
-    /// <param name="metricValue">公制单位的数量</param>
-    public Unit(Template template, Num metricValue)
-    {
-        Value = (template, template.FromMetric(metricValue));
-        ValueMetric = metricValue;
-    }
     #endregion
 }

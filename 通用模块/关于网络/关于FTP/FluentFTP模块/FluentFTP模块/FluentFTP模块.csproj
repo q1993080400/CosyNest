@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentFTP" Version="46.0.2" PrivateAssets="compile" />
+    <PackageReference Include="FluentFTP" Version="47.1.0" PrivateAssets="compile" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,7 +8,7 @@
 		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="TencentCloudSDK.Nlp" Version="3.0.678" PrivateAssets="compile" />
+		<PackageReference Include="TencentCloudSDK.Nlp" Version="3.0.831" PrivateAssets="compile" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj" />

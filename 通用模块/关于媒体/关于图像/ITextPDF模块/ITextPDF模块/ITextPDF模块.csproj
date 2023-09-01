@@ -9,8 +9,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="itext7" Version="8.0.0" PrivateAssets="compile" />
-		<PackageReference Include="itext7.bouncy-castle-adapter" Version="8.0.0" PrivateAssets="compile" />
+		<PackageReference Include="itext7" Version="8.0.1" PrivateAssets="compile" />
+		<PackageReference Include="itext7.bouncy-castle-adapter" Version="8.0.1" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

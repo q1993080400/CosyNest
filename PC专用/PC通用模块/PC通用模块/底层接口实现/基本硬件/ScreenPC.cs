@@ -8,7 +8,7 @@ namespace System.Underlying.PC;
 /// 这个类型是<see cref="IScreen"/>的实现，
 /// 封装了当前PC硬件屏幕的信息
 /// </summary>
-sealed class ScreenPC : IScreen
+sealed partial class ScreenPC : IScreen
 {
     #region 获取物理分辨率
     public ISizePixel Resolution { get; }
@@ -36,14 +36,14 @@ sealed class ScreenPC : IScreen
     }
     #endregion
     #region Win32API调用
-    [DllImport("user32.dll")]
-    static extern IntPtr GetDC(IntPtr ptr);
+    [LibraryImport("user32.dll")]
+    private static partial IntPtr GetDC(IntPtr ptr);
 
-    [DllImport("gdi32.dll")]
-    static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+    [LibraryImport("gdi32.dll")]
+    private static partial int GetDeviceCaps(IntPtr hdc, int nIndex);
 
-    [DllImport("user32.dll", EntryPoint = "ReleaseDC")]
-    static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDc);
+    [LibraryImport("user32.dll", EntryPoint = "ReleaseDC")]
+    private static partial IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDc);
 
     const int LOGPIXELSX = 88;
 

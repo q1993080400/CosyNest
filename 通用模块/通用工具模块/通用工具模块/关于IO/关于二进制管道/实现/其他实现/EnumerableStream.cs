@@ -3,7 +3,11 @@
 /// <summary>
 /// 这个流可以借助<see cref="IEnumerator{T}"/>来获取二进制数据
 /// </summary>
-sealed class EnumerableStream : Stream
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="bytes">一个枚举所有数据的枚举器，本对象的功能就是通过它实现的</param>
+sealed class EnumerableStream(IEnumerator<IEnumerable<byte>> bytes) : Stream
 {
     #region 公开成员
     #region 不支持的成员
@@ -102,7 +106,7 @@ sealed class EnumerableStream : Stream
     /// 获取一个枚举所有数据的枚举器，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private IEnumerator<IEnumerable<byte>> Bytes { get; }
+    private IEnumerator<IEnumerable<byte>> Bytes { get; } = bytes;
     #endregion
     #region 剩余数据
     /// <summary>
@@ -111,16 +115,7 @@ sealed class EnumerableStream : Stream
     /// 由于缓冲区的限制没有返回的部分
     /// </summary>
     private byte[] OldData { get; set; } = Array.Empty<byte>();
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="bytes">一个枚举所有数据的枚举器，本对象的功能就是通过它实现的</param>
-    public EnumerableStream(IEnumerator<IEnumerable<byte>> bytes)
-    {
-        Bytes = bytes;
-    }
     #endregion
 }

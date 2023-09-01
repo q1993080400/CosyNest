@@ -4,7 +4,11 @@
 /// 代表有理数类型，
 /// 它可以兼容一切现有的数字类型，为数学运算提供方便
 /// </summary>
-public readonly struct Num : IComparable<Num>, IEquatable<Num>
+/// <remarks>
+/// 将指定的数字封装进对象
+/// </remarks>
+/// <param name="num">待封装的数字</param>
+public readonly struct Num(decimal num) : IComparable<Num>, IEquatable<Num>
 {
     #region 说明文档
     /*说明文档：
@@ -90,7 +94,7 @@ public readonly struct Num : IComparable<Num>, IEquatable<Num>
     /// <summary>
     /// 返回数字的值
     /// </summary>
-    public decimal Value { get; }
+    public decimal Value { get; } = num;
     #endregion
     #region 对数字的转换
     #region 返回数字是否为整数
@@ -136,16 +140,7 @@ public readonly struct Num : IComparable<Num>, IEquatable<Num>
     #region 实现IEquatable
     public bool Equals(Num other)
         => Value == other.Value;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 将指定的数字封装进对象
-    /// </summary>
-    /// <param name="num">待封装的数字</param>
-    public Num(decimal num)
-    {
-        Value = num;
-    }
     #endregion
 }

@@ -51,7 +51,7 @@ sealed class ConvertObject
         return default;
     }
     #endregion
-    #region 静态狗杂函数
+    #region 静态构造函数
     static ConvertObject()
     {
         var parseDateTimeOffset = new ConvertObject().Add(static x =>

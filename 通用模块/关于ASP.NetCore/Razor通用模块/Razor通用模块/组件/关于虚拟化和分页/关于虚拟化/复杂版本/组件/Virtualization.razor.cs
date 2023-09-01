@@ -27,6 +27,13 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     [Parameter]
     public RenderFragment<RenderVirtualizationInfo<Element>> RenderComponent { get; set; }
     #endregion
+    #region 渲染空集合时的委托
+    /// <summary>
+    /// 获取一个渲染空集合时的委托
+    /// </summary>
+    [Parameter]
+    public RenderFragment RenderEmpty { get; set; } = _ => { };
+    #endregion
     #region 枚举元素的迭代器
     #region 正式属性
 #pragma warning disable BL0007
@@ -114,6 +121,7 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     #region 释放对象
     public async ValueTask DisposeAsync()
     {
+        ContinueRendering = false;
         if (Old is { })
             await Old.DisposeAsync();
         await Elements.DisposeAsync();
@@ -222,7 +230,14 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     private const string NotRender = "window.notRender";
     #endregion
     #endregion
-    #endregion 
+    #region 是否应继续渲染
+    /// <summary>
+    /// 如果这个值为<see langword="false"/>，
+    /// 表示组件已经被释放，应该停止一切渲染
+    /// </summary>
+    private bool ContinueRendering { get; set; } = true;
+    #endregion
+    #endregion
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsyncRealize(bool firstCompletelyRender)
     {
@@ -237,7 +252,6 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
         if (!firstCompletelyRender)
             return;
         (_, NetPackReference) = await JSWindow.Document.PackNetMethod((JsonElement _) => OnAddRender(), OnAddRenderJSMethodName);
-        await Task.Delay(ToolASP.BaseTimeOut * 2);
         await RefreshContainer();
         if (Jump is { } i)
             await JSWindow.Document.ScrollIntoView(GetElementID(i));
@@ -250,25 +264,36 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
     /// <returns></returns>
     private async Task RefreshContainer()
     {
-        var div = await JSWindow.Document.GetElementById(ID) ??
-            throw new NullReferenceException($"未能找到ID为{ID}的元素，{nameof(Virtualization<Element>)}不能正常工作");
-        await JSWindow.InvokeCodeVoidAsync($"{NotRender}=false");
-        while (true)
+        try
         {
-            var top = await div.ScrollTop;
-            var percentage = await div.ScrollPercentage(false, true);
-            if ((top, percentage) is not (0, >= 0.98) && Rendered.Count > 0)
-                break;
-            //这是为了防止由于Initial过低，初始加载完全部的元素后仍然不显示滚动条，导致无法滚动加载剩余元素的问题
-            var newElement = (await Elements.MoveRange(Ready ? Plus : Initial)).Element;
-            Ready = true;
-            Rendered = Rendered.AddRange(newElement);
-            StateHasChanged();
-            await Task.Delay(ToolASP.BaseTimeOut * 1.5);
-            if (IsReverse)
-                await div.ScrollFromPercentage(0, 1);
-            if (!newElement.Any())
-                break;
+            var div = await JSWindow.Document.GetElementById(ID) ??
+            throw new NullReferenceException($"未能找到ID为{ID}的元素，{nameof(Virtualization<Element>)}不能正常工作");
+            await JSWindow.InvokeCodeVoidAsync($"{NotRender}=false");
+            while (ContinueRendering)
+            {
+                var top = await div.ScrollTop;
+                var percentage = await div.ScrollPercentage(false, true);
+                if ((top, percentage) is not (0, >= 0.98) && Rendered.Count > 0)
+                    break;
+                //这是为了防止由于Initial过低，初始加载完全部的元素后仍然不显示滚动条，导致无法滚动加载剩余元素的问题
+                var newElement = (await Elements.MoveRange(Ready ? Plus : Initial)).Element;
+                Ready = true;
+                Rendered = Rendered.AddRange(newElement);
+                StateHasChanged();
+                await Task.Delay(ToolASP.BaseTimeOut * 1.5);
+                if (IsReverse)
+                    await div.ScrollFromPercentage(0, 1);
+                if (!newElement.Any())
+                    break;
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+
+        }
+        catch (JSException ex)
+        {
+            ex.Log(ServiceProvider);
         }
     }
     #endregion
@@ -320,6 +345,7 @@ public sealed partial class Virtualization<Element> : Component, IAsyncDisposabl
                 OnScrollScript = OnScroll(),
                 GoTop = new(this, GoTop),
                 BlankHeight = BlankHeight,
+                RenderEmpty = RenderEmpty,
                 State = renderElement.Length switch
                 {
                     not 0 => RenderVirtualizationState.HasElements,

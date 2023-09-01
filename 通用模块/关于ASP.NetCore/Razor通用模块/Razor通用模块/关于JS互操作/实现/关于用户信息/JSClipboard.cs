@@ -3,7 +3,8 @@
 /// <summary>
 /// 这个类型是剪切板对象在JS上的实现
 /// </summary>
-sealed class JSClipboard : JSRuntimeBase, IJSClipboard
+/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
+sealed class JSClipboard(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSClipboard
 {
     #region 公开成员
     #region 写入剪切板文本
@@ -21,15 +22,8 @@ sealed class JSClipboard : JSRuntimeBase, IJSClipboard
             then(x=>{callbackFunctionName}(true)).
             catch(x=>{callbackFunctionName}(false));
         """;
-    #endregion
-    #endregion
-    #endregion
-    #region 构造函数
-    /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-    public JSClipboard(IJSRuntime jsRuntime)
-        : base(jsRuntime)
-    {
 
-    }
-    #endregion 
+    #endregion
+    #endregion
+    #endregion
 }

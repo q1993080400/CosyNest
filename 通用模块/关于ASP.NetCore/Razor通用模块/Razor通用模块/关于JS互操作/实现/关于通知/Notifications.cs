@@ -7,7 +7,12 @@ namespace Microsoft.JSInterop;
 /// 它可以用来发送通知，警告：
 /// 本类型在低版本IOS浏览器上无法正常工作
 /// </summary>
-sealed class Notifications : INotifications
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="jSRuntime">封装的JS运行时对象，
+/// 本对象的功能就是通过它实现的</param>
+sealed class Notifications(IJSRuntime jSRuntime) : INotifications
 {
     #region 公开成员
     #region 发送通知
@@ -60,18 +65,8 @@ sealed class Notifications : INotifications
     /// 获取封装的JS运行时对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private IJSRuntime JSRuntime { get; }
+    private IJSRuntime JSRuntime { get; } = jSRuntime;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="jSRuntime">封装的JS运行时对象，
-    /// 本对象的功能就是通过它实现的</param>
-    public Notifications(IJSRuntime jSRuntime)
-    {
-        JSRuntime = jSRuntime;
-    }
     #endregion
 }

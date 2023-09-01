@@ -18,6 +18,11 @@ public sealed partial class VirtualizationSimple<Element> : ComponentBase
     [Parameter]
     public RenderFragment<RenderVirtualizationSimpleInfo<Element>>? RenderComponent { get; set; }
     #endregion
+    #region 渲染空集合时的委托
+    /// <inheritdoc cref="Virtualization{Element}.RenderEmpty"/>
+    [Parameter]
+    public RenderFragment RenderEmpty { get; set; } = _ => { };
+    #endregion
     #region 枚举元素的迭代器
     /// <inheritdoc cref="Virtualization{Element}.Elements"/>
     [EditorRequired]

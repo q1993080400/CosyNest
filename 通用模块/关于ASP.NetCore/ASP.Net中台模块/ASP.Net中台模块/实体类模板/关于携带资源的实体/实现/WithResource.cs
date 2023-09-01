@@ -27,10 +27,39 @@ public abstract class WithResource : Entity, IWithResource
     #region 获取资源文件夹路径
     public abstract string ResourceFolderPath { get; }
     #endregion
+    #region 获取资源文件夹所有文件子路径
+    /// <summary>
+    /// 获取资源文件夹的所有文件子路径
+    /// </summary>
+    public string[] ResourceFolderSonPath
+    {
+        get
+        {
+            var directory = CreateIO.IO<IDirectory>(ResourceFolderPath);
+            if (directory is null)
+                return Array.Empty<string>();
+            return directory.Son.OfType<IFile>().Select(x => x.Path).ToArray();
+        }
+    }
+    #endregion
     #region 获取资源的Uri
     public virtual string[] ResourceUri
         => CreateIO.IO<IDirectory>(ResourceFolderPath)?.Son.OfType<IFile>().
             Select(x => x.Path.Op().ToUriPath()).ToArray() ?? Array.Empty<string>();
+    #endregion
+    #region 解析资源文件夹
+    /// <summary>
+    /// 解析资源文件夹
+    /// </summary>
+    /// <typeparam name="Ret">返回值类型</typeparam>
+    /// <param name="analysis">用来解析的委托</param>
+    /// <returns></returns>
+    public Ret Analysis<Ret>(AnalysisFilePathProtocol<IEnumerable<string>, Ret> analysis)
+    {
+        var paths = CreateIO.IO<IDirectory>(ResourceFolderPath)?.Son.OfType<IFile>().
+            Select(x => x.Path).ToArray() ?? Array.Empty<string>();
+        return analysis(paths);
+    }
     #endregion
     #endregion
 }

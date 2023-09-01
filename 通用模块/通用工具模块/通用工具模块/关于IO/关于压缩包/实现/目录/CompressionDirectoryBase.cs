@@ -9,14 +9,16 @@ namespace System.IOFrancis.Compressed;
 /// 该类型是<see cref="IDirectoryBase"/>的实现，
 /// 它是压缩包目录的基类
 /// </summary>
-abstract class CompressionDirectoryBase : CompressionItem, ICompressionDirectory
+/// <param name="zip">压缩包对象</param>
+/// <inheritdoc cref="CompressionItem(INode)"/>
+abstract class CompressionDirectoryBase(INode father, ZipArchive zip) : CompressionItem(father), ICompressionDirectory
 {
     #region 压缩包
     /// <summary>
     /// 获取封装的压缩包对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    protected ZipArchive Zip { get; }
+    protected ZipArchive Zip { get; } = zip;
     #endregion
     #region 创建文件目录
     public IO Create<IO>(string? name = null)
@@ -77,14 +79,6 @@ abstract class CompressionDirectoryBase : CompressionItem, ICompressionDirectory
             }
         }
     }
-    #endregion
-    #region 构造函数
-    /// <param name="zip">压缩包对象</param>
-    /// <inheritdoc cref="CompressionItem(INode)"/>
-    public CompressionDirectoryBase(INode father, ZipArchive zip)
-        : base(father)
-    {
-        Zip = zip;
-    }
+
     #endregion
 }

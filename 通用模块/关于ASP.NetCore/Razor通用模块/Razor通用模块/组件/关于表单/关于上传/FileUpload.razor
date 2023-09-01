@@ -7,6 +7,6 @@
     <label>
         @ChildContent
         <BlockNavigation IsBlock="@(()=>BlockNavigation(UploadStatus is UploadStatus.Uploading))" />
-        <InputFile OnChange="OnChange" style="opacity:0;width:1px;height:1px;position:absolute" @attributes=AdditionalAttributes />
+        <InputFile OnChange="OnChange" style="display:none" @attributes=AdditionalAttributes />
     </label>
 }

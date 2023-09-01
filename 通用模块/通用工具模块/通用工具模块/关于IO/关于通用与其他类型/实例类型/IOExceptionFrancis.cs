@@ -5,7 +5,12 @@ namespace System.IOFrancis;
 /// <summary>
 /// 表示在进行IO操作时引发的异常
 /// </summary>
-public sealed class IOExceptionFrancis : IOException
+/// <remarks>
+/// 用指定的路径和异常原因初始化IO异常
+/// </remarks>
+/// <param name="path">发生异常的路径</param>
+/// <param name="message">发生异常的原因</param>
+public sealed class IOExceptionFrancis(string path, string message) : IOException(message)
 {
     #region 获取和检查异常的静态方法
     #region 错误原因：源文件或目录不存在
@@ -96,18 +101,7 @@ public sealed class IOExceptionFrancis : IOException
     /// <summary>
     /// 获取发生异常的路径
     /// </summary>
-    public string Path { get; }
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 用指定的路径和异常原因初始化IO异常
-    /// </summary>
-    /// <param name="path">发生异常的路径</param>
-    /// <param name="message">发生异常的原因</param>
-    public IOExceptionFrancis(string path, string message)
-        : base(message)
-    {
-        Path = path;
-    }
+    public string Path { get; } = path;
+
     #endregion
 }

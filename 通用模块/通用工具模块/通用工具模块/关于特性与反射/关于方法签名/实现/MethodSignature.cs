@@ -3,10 +3,16 @@
 /// <summary>
 /// 这个类型表示一个方法的签名
 /// </summary>
-sealed class MethodSignature : Signature, IMethodSignature
+/// <remarks>
+/// 用指定的返回值类型和参数列表初始化方法签名
+/// </remarks>
+/// <param name="return">返回值类型，如果为<see langword="null"/>，则为<see cref="void"/></param>
+/// <param name="parameters">方法的参数列表，如果它的元素不是<see cref="Type"/>，
+/// 则调用<see cref="object.GetType"/>将其转换为<see cref="Type"/></param>
+sealed class MethodSignature(Type? @return, params object[] parameters) : Signature(parameters), IMethodSignature
 {
     #region 返回值类型
-    public Type Return { get; }
+    public Type Return { get; } = @return ?? typeof(void);
     #endregion
     #region 重写的方法
     #region 重写GetHash
@@ -29,18 +35,6 @@ sealed class MethodSignature : Signature, IMethodSignature
         => other is IMethodSignature m &&
         Return.IsAssignableFrom(m.Return) &&
         ComparisonParameters(m);
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 用指定的返回值类型和参数列表初始化方法签名
-    /// </summary>
-    /// <param name="return">返回值类型，如果为<see langword="null"/>，则为<see cref="void"/></param>
-    /// <param name="parameters">方法的参数列表，如果它的元素不是<see cref="Type"/>，
-    /// 则调用<see cref="object.GetType"/>将其转换为<see cref="Type"/></param>
-    public MethodSignature(Type? @return, params object[] parameters)
-        : base(parameters)
-    {
-        Return = @return ?? typeof(void);
-    }
+
     #endregion
 }

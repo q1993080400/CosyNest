@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Components;
 /// </summary>
 /// <typeparam name="Model">表单模型的类型</typeparam>
 public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent<RenderFragment<RenderFormViewerInfo<Model>>>
-    where Model : class, new()
+    where Model : class
 {
     #region 组件参数
     #region 有关渲染
@@ -44,13 +44,15 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderSubmitInfo> RenderSubmit { get; set; }
+    public RenderFragment<RenderSubmitInfo<Model>> RenderSubmit { get; set; }
     #endregion
     #region 是否仅显示
     /// <summary>
     /// 这个委托的第一个参数是当前属性，
     /// 第二个参数是当前模型，
-    /// 返回值是该属性是否处于只读状态，不提供数据编辑功能
+    /// 返回值是该属性是否处于只读状态，不提供数据编辑功能，
+    /// 与<see cref="ShowSubmit"/>不同的是，
+    /// 本委托是属性级的，而它是模型级的
     /// </summary>
     [Parameter]
     public Func<PropertyInfo, Model, bool> IsReadOnly { get; set; } = (_, _) => false;
@@ -67,13 +69,19 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
     #region 有关模型
     #region 初始化模型
     /// <summary>
-    /// 获取用来初始化模型的委托，
-    /// 组件实际上会获取它的返回值的浅拷贝，
-    /// 建议每次执行此委托，都返回一个新的模型
+    /// 获取用来初始化模型的委托
     /// </summary>
     [Parameter]
+    [EditorRequired]
     public Func<Task<Model>> InitializationModel { get; set; }
-        = () => Task.FromResult<Model>(new());
+    #endregion
+    #region 模型是否按值引用
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示模型按值引用，否则按引用引用
+    /// </summary>
+    [Parameter]
+    public bool IsValueReference { get; set; } = true;
     #endregion
     #region 用来判断是否为现有表单的委托
     /// <summary>
@@ -97,9 +105,7 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
     #region 默认方法
     /// <summary>
     /// 本方法是<see cref="FilterProperties"/>的默认方法，
-    /// 它选中具有<see cref="DisplayAttribute"/>特性的属性，并将其作为渲染的成员，
-    /// 如果<paramref name="isOnlyDisplay"/>为<see langword="false"/>，
-    /// 还要求这个属性是全能属性
+    /// 它选中具有<see cref="DisplayAttribute"/>特性的属性，并将其作为渲染的成员
     /// </summary>
     /// <param name="property">要筛选的属性</param>
     /// <returns></returns>
@@ -135,7 +141,7 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
             {
                 Item = x,
                 Name = display?.Name ?? x.Name,
-                Order = display?.Order ?? 0,
+                Order = display?.GetOrder() ?? 0,
             };
         }).ToArray().OrderBy(x => x.Order).ToArrayIfDeBug();
         var model = formViewer.FormModel;
@@ -147,7 +153,7 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
                 FormModel = model,
                 Property = property,
                 PropertyName = x.Name,
-                IsReadOnly = !formViewer.ShowSubmit(model) || !property.IsAlmighty() || formViewer.IsReadOnly(property, model),
+                IsReadOnly = !property.IsAlmighty() || formViewer.IsReadOnly(property, model),
                 OnPropertyChangeed = formViewer.OnPropertyChangeed
             };
         }).ToArray();
@@ -218,15 +224,16 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
             Render = x.Item2,
             FormModel = FormModel
         }).ToArray();
-        var renderSubmit = ShowSubmit(FormModel) ? new RenderSubmitInfo()
+        var renderSubmit = ShowSubmit(FormModel) ? new RenderSubmitInfo<Model>()
         {
             Resetting = async () =>
             {
                 var model = await InitializationModel();
-                FormModel = model.MemberwiseClone();
+                FormModel = IsValueReference ? model.MemberwiseClone() : model;
             },
             ModelAndVerify = () => Verify(FormModel),
             ExistingForms = ExistingForms(FormModel),
+            FormModel = FormModel
         } : null;
         return new()
         {
@@ -242,7 +249,7 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
     protected override async Task OnInitializedAsync()
     {
         var model = await InitializationModel();
-        FormModel = model.MemberwiseClone();
+        FormModel = IsValueReference ? model.MemberwiseClone() : model;
     }
     #endregion
     #endregion

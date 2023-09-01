@@ -6,7 +6,19 @@ namespace System.NetFrancis.Api.Baidupan;
 /// <summary>
 /// 本类型封装了百度云盘API
 /// </summary>
-public sealed class BaidupanAPI : WebApi
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="accessToken">访问令牌，它用于验证身份</param>
+/// <param name="refreshToken">刷新令牌，当访问令牌失效后，通过它刷新访问令牌</param>
+/// <param name="clientId">应用ID</param>
+/// <param name="clientSecret">应用密钥</param>
+/// <param name="saveToken">该委托用于保存刷新后的令牌，
+/// 它的第一个参数是访问令牌，第二个参数是刷新令牌</param>
+/// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
+public sealed class BaidupanAPI(string accessToken, string refreshToken,
+    string clientId, string clientSecret,
+    Action<string, string> saveToken, Func<IHttpClient>? httpClientProvide = null) : WebApi(httpClientProvide)
 {
     #region 公开成员
     #region 获取文件或目录列表
@@ -58,33 +70,33 @@ public sealed class BaidupanAPI : WebApi
     /// <summary>
     /// 获取访问令牌，它用于验证身份
     /// </summary>
-    internal string AccessToken { get; private set; }
+    internal string AccessToken { get; private set; } = accessToken;
     #endregion
     #region 刷新令牌
     /// <summary>
     /// 获取刷新令牌，当访问令牌失效后，
     /// 通过它刷新访问令牌
     /// </summary>
-    private string RefreshToken { get; set; }
+    private string RefreshToken { get; set; } = refreshToken;
     #endregion
     #region 应用ID
     /// <summary>
     /// 获取应用ID
     /// </summary>
-    private string ClientId { get; }
+    private string ClientId { get; } = clientId;
     #endregion
     #region 应用密钥
     /// <summary>
     /// 获取应用密钥
     /// </summary>
-    private string ClientSecret { get; }
+    private string ClientSecret { get; } = clientSecret;
     #endregion
     #region 保存令牌的委托
     /// <summary>
     /// 该委托用于保存刷新后的令牌，
     /// 它的第一个参数是访问令牌，第二个参数是刷新令牌
     /// </summary>
-    private Action<string, string> SaveToken { get; }
+    private Action<string, string> SaveToken { get; } = saveToken;
     #endregion
     #region 辅助方法
     #region 基础方法
@@ -143,30 +155,8 @@ public sealed class BaidupanAPI : WebApi
             new[] { ("method", "search"), ("access_token", AccessToken),
             ("key", search), ("dir", dir), ("recursion", "1")}!), false);
     }
+
     #endregion
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="accessToken">访问令牌，它用于验证身份</param>
-    /// <param name="refreshToken">刷新令牌，当访问令牌失效后，通过它刷新访问令牌</param>
-    /// <param name="clientId">应用ID</param>
-    /// <param name="clientSecret">应用密钥</param>
-    /// <param name="saveToken">该委托用于保存刷新后的令牌，
-    /// 它的第一个参数是访问令牌，第二个参数是刷新令牌</param>
-    /// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
-    public BaidupanAPI(string accessToken, string refreshToken,
-        string clientId, string clientSecret,
-        Action<string, string> saveToken, Func<IHttpClient>? httpClientProvide = null)
-        : base(httpClientProvide)
-    {
-        AccessToken = accessToken;
-        RefreshToken = refreshToken;
-        ClientId = clientId;
-        ClientSecret = clientSecret;
-        SaveToken = saveToken;
-    }
     #endregion
 }

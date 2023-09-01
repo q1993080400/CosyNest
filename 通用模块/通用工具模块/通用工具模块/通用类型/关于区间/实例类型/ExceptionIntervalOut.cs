@@ -5,32 +5,25 @@
 /// </summary>
 /// <typeparam name="Obj">位于区间中的对象，
 /// 它通过<see cref="IComparable{T}"/>进行比较</typeparam>
-public sealed class ExceptionIntervalOut<Obj> : Exception
+/// <remarks>
+/// 使用指定的对象和区间初始化异常
+/// </remarks>
+/// <param name="exceptionObj">引发异常的对象</param>
+/// <param name="interval">对象的合法区间</param>
+public sealed class ExceptionIntervalOut<Obj>(Obj exceptionObj, IInterval<Obj> interval) : Exception($"{exceptionObj}不在区间中，合法{interval}")
 {
     #region 对象的合法区间
     /// <summary>
     /// 返回对象的合法区间
     /// </summary>
-    public IInterval<Obj> Interval { get; }
+    public IInterval<Obj> Interval { get; } = interval;
     #endregion
     #region 引发异常的对象
     /// <summary>
     /// 获取引发异常的对象
     /// </summary>
-    public Obj ExceptionObj { get; }
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的对象和区间初始化异常
-    /// </summary>
-    /// <param name="exceptionObj">引发异常的对象</param>
-    /// <param name="interval">对象的合法区间</param>
-    public ExceptionIntervalOut(Obj exceptionObj, IInterval<Obj> interval)
-        : base($"{exceptionObj}不在区间中，合法{interval}")
-    {
-        ExceptionObj = exceptionObj;
-        Interval = interval;
-    }
+    public Obj ExceptionObj { get; } = exceptionObj;
+
     #endregion
 }
 #region 静态辅助类型

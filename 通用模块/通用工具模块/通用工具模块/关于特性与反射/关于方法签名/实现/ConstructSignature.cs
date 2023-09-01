@@ -3,7 +3,12 @@
 /// <summary>
 /// 这个类型表示构造函数的签名
 /// </summary>
-sealed class ConstructSignature : Signature, IConstructSignature
+/// <remarks>
+/// 使用指定的参数列表初始化对象
+/// </remarks>
+/// <param name="parameters">构造函数的参数列表，如果它的元素不是<see cref="Type"/>，
+/// 则调用<see cref="object.GetType"/>将其转换为<see cref="Type"/></param>
+sealed class ConstructSignature(params object[] parameters) : Signature(parameters), IConstructSignature
 {
     #region 重写的方法
     #region 重写GetHashCode
@@ -24,17 +29,6 @@ sealed class ConstructSignature : Signature, IConstructSignature
     public override bool IsSame(ISignature other)
         => other is IConstructSignature c &&
         ComparisonParameters(c);
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数列表初始化对象
-    /// </summary>
-    /// <param name="parameters">构造函数的参数列表，如果它的元素不是<see cref="Type"/>，
-    /// 则调用<see cref="object.GetType"/>将其转换为<see cref="Type"/></param>
-    public ConstructSignature(params object[] parameters)
-        : base(parameters)
-    {
 
-    }
     #endregion
 }

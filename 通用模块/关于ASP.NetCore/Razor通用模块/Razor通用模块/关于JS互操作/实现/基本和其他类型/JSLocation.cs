@@ -4,7 +4,8 @@
 /// 这个类型是<see cref="IJSLocation"/>的实现，
 /// 可以视为一个JS中的Location对象
 /// </summary>
-sealed class JSLocation : JSRuntimeBase, IJSLocation
+/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
+sealed class JSLocation(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSLocation
 {
     #region 关于Uri
     #region 获取或设置当前Uri
@@ -31,13 +32,6 @@ sealed class JSLocation : JSRuntimeBase, IJSLocation
     #region 刷新页面
     public ValueTask Reload(CancellationToken cancellation = default)
         => JSRuntime.InvokeVoidAsync("location.reload", cancellation);
-    #endregion
-    #region 构造函数
-    /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-    public JSLocation(IJSRuntime jsRuntime)
-        : base(jsRuntime)
-    {
 
-    }
     #endregion
 }

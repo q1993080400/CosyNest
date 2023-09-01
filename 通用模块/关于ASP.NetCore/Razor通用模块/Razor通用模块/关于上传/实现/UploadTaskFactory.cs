@@ -9,7 +9,12 @@ namespace Microsoft.AspNetCore.Components.Forms;
 /// <summary>
 /// 这个类型可以用来创建上传任务工厂
 /// </summary>
-sealed class UploadTaskFactory
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="serviceProvider">一个用来请求服务的对象</param>
+/// <param name="uploadTaskFactoryInfo">创建上传任务工厂的参数</param>
+sealed class UploadTaskFactory(IServiceProvider serviceProvider, UploadTaskFactoryInfo uploadTaskFactoryInfo)
 {
     #region 公开成员
     #region 创建上传任务工厂
@@ -129,25 +134,14 @@ sealed class UploadTaskFactory
     /// <summary>
     /// 获取一个用来请求服务的对象
     /// </summary>
-    private IServiceProvider ServiceProvider { get; }
+    private IServiceProvider ServiceProvider { get; } = serviceProvider;
     #endregion
     #region 创建上传任务工厂的参数
     /// <summary>
     /// 获取创建上传任务工厂的参数
     /// </summary>
-    private UploadTaskFactoryInfo UploadTaskFactoryInfo { get; }
+    private UploadTaskFactoryInfo UploadTaskFactoryInfo { get; } = uploadTaskFactoryInfo;
+
     #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="serviceProvider">一个用来请求服务的对象</param>
-    /// <param name="uploadTaskFactoryInfo">创建上传任务工厂的参数</param>
-    public UploadTaskFactory(IServiceProvider serviceProvider, UploadTaskFactoryInfo uploadTaskFactoryInfo)
-    {
-        ServiceProvider = serviceProvider;
-        UploadTaskFactoryInfo = uploadTaskFactoryInfo;
-    }
     #endregion
 }

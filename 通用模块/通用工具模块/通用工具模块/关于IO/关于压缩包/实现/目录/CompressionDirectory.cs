@@ -9,7 +9,9 @@ namespace System.IOFrancis.Compressed;
 /// 该类型是<see cref="ICompressionDirectory"/>的实现，
 /// 可以视为一个压缩包中的目录
 /// </summary>
-sealed class CompressionDirectory : CompressionDirectoryBase
+/// <param name="path">压缩包中的路径</param>
+/// <inheritdoc cref="CompressionDirectoryBase(INode,ZipArchive)"/>
+sealed class CompressionDirectory(string path, INode father) : CompressionDirectoryBase(father, father.Ancestors.To<CompressedPackage>().Zip)
 {
     #region 压缩包项
     /// <summary>
@@ -19,7 +21,7 @@ sealed class CompressionDirectory : CompressionDirectoryBase
     private ZipArchiveEntry? Entry => Zip.GetEntry(Path);
     #endregion
     #region 路径
-    private readonly string PathField;
+    private readonly string PathField = path;
 
     public override string Path
     {
@@ -39,19 +41,11 @@ sealed class CompressionDirectory : CompressionDirectoryBase
     {
         var directory = IO.Path.Combine(path, this.To<IDirectoryBase>().NameFull);
         Directory.CreateDirectory(directory);
-        foreach (ICompressionItem item in Son)
+        foreach (ICompressionItem item in Son.Cast<ICompressionItem>())
         {
             await item.Decompress(directory, cover);
         }
     }
-    #endregion
-    #region 构造函数
-    /// <param name="path">压缩包中的路径</param>
-    /// <inheritdoc cref="CompressionDirectoryBase(INode,ZipArchive)"/>
-    public CompressionDirectory(string path, INode father)
-        : base(father, father.Ancestors.To<CompressedPackage>().Zip)
-    {
-        PathField = path;
-    }
+
     #endregion
 }

@@ -5,7 +5,11 @@ namespace System.NetFrancis.Api.Bing.Image;
 /// <summary>
 /// 本类型封装了必应图片的API
 /// </summary>
-sealed class BingImageAPI : WebApi, IBingImageAPI
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
+sealed class BingImageAPI(Func<IHttpClient>? httpClientProvide = null) : WebApi(httpClientProvide), IBingImageAPI
 {
     #region 关于必应每日图片
     #region 获取今日图片
@@ -26,17 +30,7 @@ sealed class BingImageAPI : WebApi, IBingImageAPI
                 Uri = result.Uri.Replace("1920x1080", "1080x1920")          //此处有隐患，但是尚未发现更好的方法，因为作者不知道这个API的官方文档在哪里
             };
     }
-    #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
-    public BingImageAPI(Func<IHttpClient>? httpClientProvide = null)
-        : base(httpClientProvide)
-    {
 
-    }
+    #endregion
     #endregion
 }

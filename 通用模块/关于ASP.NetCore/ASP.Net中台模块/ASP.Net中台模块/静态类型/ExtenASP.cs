@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.IOFrancis;
+using System.IOFrancis.BaseFileSystem;
+
+using Microsoft.AspNetCore;
 
 namespace System;
 
@@ -28,5 +31,19 @@ public static class ExtenASP
             };
             return await @continue(newInfo);
         };
+    #endregion
+    #region 解析一个目录
+    /// <summary>
+    /// 解析一个目录
+    /// </summary>
+    /// <typeparam name="Obj">返回值类型</typeparam>
+    /// <param name="directory">待解析的目录</param>
+    /// <param name="analysis">用来解析的委托</param>
+    /// <returns></returns>
+    public static Obj Analysis<Obj>(this IDirectoryBase directory, AnalysisFilePathProtocol<IEnumerable<string>, Obj> analysis)
+    {
+        var son = directory.Son.OfType<IFileBase>().Select(x => x.Path).ToArray();
+        return analysis(son);
+    }
     #endregion
 }

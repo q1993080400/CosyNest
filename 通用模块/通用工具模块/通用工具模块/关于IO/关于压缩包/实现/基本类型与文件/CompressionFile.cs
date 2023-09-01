@@ -10,14 +10,16 @@ namespace System.IOFrancis.Compressed;
 /// 该类型是<see cref="ICompressionFile"/>的实现，
 /// 可以视为一个压缩包中的文件
 /// </summary>
-sealed class CompressionFile : CompressionItem, ICompressionFile
+/// <param name="zip">压缩包中的文件项</param>
+/// <inheritdoc cref="CompressionItem(INode)"/>
+sealed class CompressionFile(ZipArchiveEntry zip, INode father) : CompressionItem(father), ICompressionFile
 {
     #region 封装的对象
     /// <summary>
     /// 获取封装的Zip项，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private ZipArchiveEntry ZipEntry { get; }
+    private ZipArchiveEntry ZipEntry { get; } = zip;
     #endregion
     #region 关于路径与名称
     #region 路径
@@ -65,15 +67,7 @@ sealed class CompressionFile : CompressionItem, ICompressionFile
         using var file = CreateIO.FileStream(IO.Path.Combine(path, this.To<IFileBase>().NameFull));
         await read.CopyTo(file);
     }
+
     #endregion
-    #endregion 
-    #region 构造函数
-    /// <param name="zip">压缩包中的文件项</param>
-    /// <inheritdoc cref="CompressionItem(INode)"/>
-    public CompressionFile(ZipArchiveEntry zip, INode father)
-        : base(father)
-    {
-        ZipEntry = zip;
-    }
     #endregion
 }

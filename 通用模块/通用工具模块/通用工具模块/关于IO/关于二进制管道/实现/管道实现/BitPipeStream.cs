@@ -6,7 +6,8 @@ namespace System.IOFrancis.Bit;
 /// <summary>
 /// 这个类型允许将流适配为管道
 /// </summary>
-sealed class BitPipeStream : AutoRelease, IBitRead, IBitWrite
+/// <inheritdoc cref="ExtenIO.ToBitPipe(Stream, string, string?)"/>
+sealed class BitPipeStream(Stream stream, string? format, string? describe) : AutoRelease, IBitRead, IBitWrite
 {
     #region 封装的对象
     #region Stream对象
@@ -14,15 +15,15 @@ sealed class BitPipeStream : AutoRelease, IBitRead, IBitWrite
     /// 获取封装的<see cref="IO.Stream"/>对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private Stream Stream { get; }
+    private Stream Stream { get; } = stream;
     #endregion
     #endregion
     #region 数据的基本信息
     #region 数据的描述
-    public string? Describe { get; }
+    public string? Describe { get; } = describe;
     #endregion
     #region 数据的格式
-    public string? Format { get; }
+    public string? Format { get; } = format;
     #endregion
     #region 数据的长度
     public long? Length => Stream.Length;
@@ -107,14 +108,6 @@ sealed class BitPipeStream : AutoRelease, IBitRead, IBitWrite
     #region 释放对象
     protected override void DisposeRealize()
         => Stream.Dispose();
-    #endregion
-    #region 构造函数
-    /// <inheritdoc cref="ExtenIO.ToBitPipe(Stream, string, string?)"/>
-    public BitPipeStream(Stream stream, string? format, string? describe)
-    {
-        Stream = stream;
-        Format = format;
-        Describe = describe;
-    }
+
     #endregion
 }
