@@ -1,7 +1,7 @@
 ﻿
-using static System.Maths.CreateMath;
+using static System.MathFrancis.CreateMath;
 
-namespace System.Maths.Plane;
+namespace System.MathFrancis.Plane;
 
 /// <summary>
 /// 关于坐标和平面的工具类

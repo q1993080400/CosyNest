@@ -1,5 +1,5 @@
 ﻿using System.Design;
-using System.Maths;
+using System.MathFrancis;
 
 namespace System.IOFrancis.Bit;
 

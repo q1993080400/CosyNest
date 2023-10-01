@@ -1,0 +1,8 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if (ChildContent is { })
+{
+    var renderMod = MaskingMod(this);
+    @ChildContent(renderMod)
+}

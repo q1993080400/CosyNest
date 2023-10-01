@@ -1,6 +1,6 @@
 ﻿using System.IOFrancis.Bit;
-using System.Maths;
-using System.Maths.Tree;
+using System.MathFrancis;
+using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
 

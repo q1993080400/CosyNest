@@ -1,5 +1,5 @@
 ﻿using System.IOFrancis.FileSystem;
-using System.Maths;
+using System.MathFrancis;
 
 namespace System.IOFrancis;
 

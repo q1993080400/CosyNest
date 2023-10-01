@@ -15,36 +15,39 @@ namespace System.NetFrancis.Http;
 /// </remarks>
 /// <param name="httpClient">指定的Http客户端，
 /// 本对象的功能就是通过它实现的</param>
+/// <param name="requestTransform">用来转换Http请求的函数，
+/// 它可以用来改变Http请求的默认值，并具有较低的优先级，
+/// 如果为<see langword="null"/>，则不做转换</param>
 /// <param name="throwException">如果这个值为<see langword="true"/>，
 /// 则在请求失败时，自动抛出异常</param>
-sealed class HttpClientRealize(HttpClient httpClient, bool throwException) : IHttpClient
+sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? requestTransform, bool throwException) : IHttpClient
 {
     #region 公开成员
     #region 发起Http请求
     #region 返回IHttpResponse
-    public async Task<IHttpResponse> Request(HttpRequestRecording request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
+    public async Task<IHttpResponse> Request(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
     {
         #region 本地函数
         async Task<IHttpResponse> Fun(HttpRequestRecording request)      //解决重定向问题
         {
-            var transformationRequest = transformation?.Invoke(request) ?? request;
-            using var r = await transformationRequest.ToHttpRequestMessage(HttpClient.BaseAddress);
-            using var response = await HttpClient.SendAsync(r, cancellationToken);
+            var transformationRequest = (transformation ?? requestTransform)?.Invoke(request) ?? request;
+            using var r = await transformationRequest.ToHttpRequestMessage(httpClient.BaseAddress);
+            using var response = await httpClient.SendAsync(r, cancellationToken);
             return response.StatusCode is HttpStatusCode.Found ?
                await Fun(new(response.Headers.Location!.AbsoluteUri)) :
                await response.ToHttpResponse();
         }
         #endregion
         var response = await Fun(request);
-        if (ThrowException)
+        if (throwException)
             response.ThrowIfNotSuccess();
         return response;
     }
     #endregion
     #region 返回IBitRead
-    public async Task<IBitRead> RequestDownload(HttpRequestRecording request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
+    public async Task<IBitRead> RequestDownload(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
     {
-        var transformationRequest = transformation?.Invoke(request) ?? request;
+        var transformationRequest = (transformation ?? requestTransform)?.Invoke(request) ?? request;
         if (transformationRequest.HttpMethod != HttpMethod.Get)
             throw new NotSupportedException($"提供下载的Http请求仅支持Get方法");
         var uri = transformationRequest.Uri;
@@ -73,7 +76,7 @@ sealed class HttpClientRealize(HttpClient httpClient, bool throwException) : IHt
     #endregion
     #region 发起强类型请求
     #region 正式方法
-    public async Task<IHttpResponse> Request<API>(Expression<Func<API, object?>> request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null,
+    public async Task<IHttpResponse> Request<API>(Expression<Func<API, object?>> request, HttpRequestTransform? transformation = null,
         JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         where API : class
     {
@@ -182,23 +185,6 @@ sealed class HttpClientRealize(HttpClient httpClient, bool throwException) : IHt
     }
     #endregion
     #endregion
-    #endregion
-    #endregion
-    #region 内部成员
-    #region HttpClient对象
-    /// <summary>
-    /// 获取封装的<see cref="Net.Http.HttpClient"/>对象，
-    /// 本对象的功能就是通过它实现的
-    /// </summary>
-    private HttpClient HttpClient { get; } = httpClient;
-    #endregion
-    #region 如果请求失败，是否抛出异常
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 则在请求失败时，自动抛出异常
-    /// </summary>
-    private bool ThrowException { get; set; } = throwException;
-
     #endregion
     #endregion
 }

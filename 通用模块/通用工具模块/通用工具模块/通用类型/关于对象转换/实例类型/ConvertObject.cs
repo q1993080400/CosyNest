@@ -9,7 +9,7 @@ sealed class ConvertObject
 {
     #region 静态类型
     /// <summary>
-    /// 该字典注册特殊转换方法，它可以被<see cref="ExtenTool.To{Ret}(object?, bool, LazyPro{Ret}?)"/>所识别，
+    /// 该字典注册特殊转换方法，它可以被<see cref="ExtendTool.To{Ret}(object?, bool, LazyPro{Ret}?)"/>所识别，
     /// 它的键是转换的源类型和目标类型，值是注册进去的特殊转换方法
     /// </summary>
     public static IAddOnlyDictionary<(Type From, Type To), ConvertObject> Conversion { get; }

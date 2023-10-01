@@ -21,7 +21,7 @@ public sealed partial class TextRendering : ComponentBase, IContentComponent<Ren
     #region 子内容
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderTextRenderingInfo>? ChildContent { get; set; }
+    public RenderFragment<RenderTextRenderingInfo> ChildContent { get; set; }
     #endregion
     #endregion
     #region 内部成员

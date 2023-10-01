@@ -18,7 +18,7 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
       当第一个用户订阅事件时，实例化WeakDel，
       这样的好处是可以只实例化有效的事件，节约内存
 
-      静态类ToolPerfo的AddWeakDel方法已经封装了这个操作，
+      静态类ToolPerformance的AddWeakDel方法已经封装了这个操作，
       在注册事件时，请使用这个方法，在移除事件或调用事件时，
       请判断WeakDel是否为null
 
@@ -99,7 +99,7 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
     /// <summary>
     /// 获取用来比较委托元组的比较器
     /// </summary>
-    private static IEqualityComparer<(WeakReference? Target, MethodInfo Met)> DelegateEquatable { get; }
+    private static IEqualityComparer<(WeakReference? Target, MethodInfo Met)> DelegateEquality { get; }
     = FastRealize.EqualityComparer<(WeakReference? Target, MethodInfo Met)>
         ((x, y) => Equals(x.Target?.Target, y.Target?.Target) && Equals(x.Met, y.Met),
         x => x.Met.GetHashCode());
@@ -110,7 +110,7 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
     /// 第一个项是方法的调用方，第二个项是方法的元数据
     /// </summary>
     private HashSet<(WeakReference? Target, MethodInfo Met)> DelegateCollections { get; }
-    = new HashSet<(WeakReference? Target, MethodInfo Met)>(DelegateEquatable);
+    = new HashSet<(WeakReference? Target, MethodInfo Met)>(DelegateEquality);
     #endregion
     #region 对委托进行一个弱引用封装
     /// <summary>

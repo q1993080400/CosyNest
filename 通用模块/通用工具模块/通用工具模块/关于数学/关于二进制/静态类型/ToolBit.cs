@@ -1,8 +1,8 @@
 ﻿
 using static System.ExceptionIntervalOut;
-using static System.Maths.ToolArithmetic;
+using static System.MathFrancis.ToolArithmetic;
 
-namespace System.Maths;
+namespace System.MathFrancis;
 
 /// <summary>
 /// 关于位运算与非十进制的工具类
@@ -105,13 +105,13 @@ public static class ToolBit
     /// <returns></returns>
     public static byte[] ToBit(byte @byte)
     {
-        var arry = new byte[8];
+        var array = new byte[8];
         for (byte i = 8; i > 0; i--)
         {
-            arry[i - 1] = (byte)(@byte % 2);
+            array[i - 1] = (byte)(@byte % 2);
             @byte /= 2;
         }
-        return arry;
+        return array;
     }
     #endregion 
     #endregion
@@ -173,13 +173,13 @@ public static class ToolBit
     /// <summary>
     /// 创建一个位域，并返回
     /// </summary>
-    /// <param name="indexs">该位域所兼容的以2为底的指数</param>
+    /// <param name="index">该位域所兼容的以2为底的指数</param>
     /// <returns></returns>
-    public static int CreateFlag(params int[] indexs)
+    public static int CreateFlag(params int[] index)
     {
-        indexs = indexs.Distinct().ToArray();
-        indexs.ForEach(x => Check(0, 30, x));
-        return indexs.Select(x => (int)Math.Pow(2, x)).Aggregate((x, y) => x | y);
+        index = index.Distinct().ToArray();
+        index.ForEach(x => Check(0, 30, x));
+        return index.Select(x => (int)Math.Pow(2, x)).Aggregate((x, y) => x | y);
     }
     #endregion
     #endregion

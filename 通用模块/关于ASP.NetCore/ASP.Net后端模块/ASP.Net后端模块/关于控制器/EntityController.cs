@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.Mvc;
 /// <typeparam name="Entity">实体的类型</typeparam>
 [ApiController]
 public abstract class EntityController<Entity> : ControllerBase
-    where Entity : class, IData
+    where Entity : class
 {
     #region 增加或修改
     /// <summary>

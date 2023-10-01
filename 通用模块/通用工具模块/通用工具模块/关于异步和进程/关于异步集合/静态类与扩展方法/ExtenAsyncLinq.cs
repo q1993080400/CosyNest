@@ -2,7 +2,7 @@
 
 namespace System.Linq;
 
-public static partial class ExtenIEnumerable
+public static partial class ExtendEnumerable
 {
     //这个部分类专门用来处理和异步迭代器有关的API
 

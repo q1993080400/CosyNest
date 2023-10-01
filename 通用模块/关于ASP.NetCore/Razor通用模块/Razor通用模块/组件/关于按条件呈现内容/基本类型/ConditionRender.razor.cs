@@ -18,6 +18,6 @@ public abstract partial class ConditionRender<Condition> : ComponentBase, IConte
     /// 它的参数就是呈现条件
     /// </summary>
     [Parameter]
-    public RenderFragment<Condition>? ChildContent { get; set; }
+    public RenderFragment<Condition> ChildContent { get; set; }
     #endregion
 }

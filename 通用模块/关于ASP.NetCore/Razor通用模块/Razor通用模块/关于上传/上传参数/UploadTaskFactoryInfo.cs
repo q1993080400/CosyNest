@@ -1,5 +1,5 @@
 ﻿using System.IOFrancis;
-using System.Maths;
+using System.MathFrancis;
 
 namespace Microsoft.AspNetCore.Components.Forms;
 

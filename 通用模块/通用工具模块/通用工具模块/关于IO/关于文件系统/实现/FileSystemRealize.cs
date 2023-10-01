@@ -1,4 +1,4 @@
-﻿using System.Maths.Tree;
+﻿using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
 

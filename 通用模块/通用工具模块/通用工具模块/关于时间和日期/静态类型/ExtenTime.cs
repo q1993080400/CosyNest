@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using System.Maths;
+using System.MathFrancis;
 
 namespace System;
 

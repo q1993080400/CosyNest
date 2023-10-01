@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.IOFrancis.BaseFileSystem;
 using System.IOFrancis.FileSystem;
-using System.Maths.Tree;
+using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.Compressed;
 
@@ -46,6 +46,5 @@ sealed class CompressionDirectory(string path, INode father) : CompressionDirect
             await item.Decompress(directory, cover);
         }
     }
-
     #endregion
 }

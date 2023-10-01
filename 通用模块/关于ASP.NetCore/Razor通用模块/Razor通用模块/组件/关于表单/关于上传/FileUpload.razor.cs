@@ -27,7 +27,7 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public RenderFragment? ChildContent { get; set; }
+    public RenderFragment ChildContent { get; set; }
     #endregion
     #region 是否应该阻止导航
     /// <summary>

@@ -1,5 +1,5 @@
 ﻿using System.IOFrancis.FileSystem;
-using System.Maths.Tree;
+using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.Compressed;
 
@@ -23,5 +23,11 @@ public interface ICompressedPackage : IFromIO, INode
     /// 返回压缩包的根目录
     /// </summary>
     ICompressionDirectory RootDirectory { get; }
+    #endregion
+    #region 删除
+    /// <summary>
+    /// 删除压缩包文件
+    /// </summary>
+    void Delete();
     #endregion
 }

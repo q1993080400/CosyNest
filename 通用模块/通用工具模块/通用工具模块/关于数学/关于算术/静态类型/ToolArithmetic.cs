@@ -1,4 +1,4 @@
-﻿namespace System.Maths;
+﻿namespace System.MathFrancis;
 
 /// <summary>
 /// 关于算术和初等数学的工具类
@@ -32,13 +32,13 @@ public static class ToolArithmetic
     /// 将两个对象a和b相除，并返回一个元组，
     /// 元组的第一个项是相除得出的商（只保留整数），第二个项是余数，第三个项是是否除尽
     /// </summary>
-    /// <param name="numa">对象a，可以是任何能够同时进行减法，取余，除法运算的类型</param>
-    /// <param name="numb">对象b，可以是任何能够同时进行减法，取余，除法运算的类型</param>
+    /// <param name="numA">对象a，可以是任何能够同时进行减法，取余，除法运算的类型</param>
+    /// <param name="numB">对象b，可以是任何能够同时进行减法，取余，除法运算的类型</param>
     /// <returns></returns>
-    public static (Num Divisor, Num Remainder, bool IsDivisor) Div(Num numa, Num numb)
+    public static (Num Divisor, Num Remainder, bool IsDivisor) Div(Num numA, Num numB)
     {
-        var dic = numa % numb;
-        var rem = (numa - dic) / numb;
+        var dic = numA % numB;
+        var rem = (numA - dic) / numB;
         return (rem, dic, dic == 0);
     }
     #endregion

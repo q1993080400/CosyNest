@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Plane;
+﻿namespace System.MathFrancis.Plane;
 
 /// <summary>
 /// 所有实现这个接口的类型，

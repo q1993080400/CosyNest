@@ -1,7 +1,7 @@
 ﻿using System.IOFrancis;
 using System.IOFrancis.Bit;
 using System.IOFrancis.FileSystem;
-using System.Maths.Plane;
+using System.MathFrancis.Plane;
 
 namespace System.Media.Drawing.Graphics;
 

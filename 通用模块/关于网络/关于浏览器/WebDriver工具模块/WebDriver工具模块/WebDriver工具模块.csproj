@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7</TargetFramework>
+		<TargetFramework>net8</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AssemblyName>ToolWebDriver</AssemblyName>
@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Selenium.WebDriver" Version="4.11.0" PrivateAssets="compile" />
+	  <PackageReference Include="Selenium.WebDriver" Version="4.12.4" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

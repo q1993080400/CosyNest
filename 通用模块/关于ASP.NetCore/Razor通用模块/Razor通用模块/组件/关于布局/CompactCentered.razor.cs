@@ -14,6 +14,14 @@ public sealed partial class CompactCentered : ComponentBase
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
     #endregion
+    #region 不要填充父容器
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则不填充父容器，否则将父容器填满
+    /// </summary>
+    [Parameter]
+    public bool NotFill { get; set; }
+    #endregion
     #region 参数展开
     /// <summary>
     /// 这个参数展开控制容器的样式

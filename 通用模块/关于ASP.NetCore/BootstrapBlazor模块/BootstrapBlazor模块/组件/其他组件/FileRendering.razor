@@ -6,11 +6,11 @@
     var trueFileName = GetFileName?.Invoke(fileName) ?? fileName;
 }
 <a href="@Uri" download="@trueFileName" target="_blank" @attributes=Attributes>
-    <NineGrids>
+    <Center>
         <TofuCubesSimple Text="@trueFileName" Width="@Width">
             <RenderIcon>
                 <FileIcon Extension="@Path.GetExtension(Uri)" />
             </RenderIcon>
         </TofuCubesSimple>
-    </NineGrids>
+    </Center>
 </a>

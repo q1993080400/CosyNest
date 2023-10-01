@@ -13,6 +13,6 @@ public interface IDataPipeFrom
     /// <typeparam name="Data">数据的类型</typeparam>
     /// <returns></returns>
     IQueryable<Data> Query<Data>()
-        where Data : class, IData;
+        where Data : class;
     #endregion
 }

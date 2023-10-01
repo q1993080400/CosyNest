@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.IOFrancis.BaseFileSystem;
-using System.Maths;
-using System.Maths.Tree;
+using System.MathFrancis;
+using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
 

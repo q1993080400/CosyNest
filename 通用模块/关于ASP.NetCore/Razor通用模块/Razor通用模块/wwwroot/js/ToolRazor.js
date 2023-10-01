@@ -30,9 +30,73 @@ function LoadCSS(uri) {
     head.insertBefore(link, head.firstChild);
 }
 
+//观察虚拟化容器
+function ObservingVirtualizationContainers(netMethod, endID) {
+    var key = endID + 'Observe';
+    if (window[key] == undefined) {
+        window[key] = new IntersectionObserver(x => {
+            if (x[0].isIntersecting)
+                netMethod(0);
+        });
+    }
+    var observe = window[key];
+    observe.observe(document.getElementById(endID));
+}
+
 //初始化VideoJS
 function InitializationVideoJS(id, op) {
     videojs(id, op);
+}
+
+//注册观察媒体事件，它检测媒体的可见性，并自动播放暂停媒体
+function ObserveVisiblePlay(id) {
+    var element = document.querySelectorAll(`#${id} :is(video,audio)`);
+    var observe = new IntersectionObserver(array => {
+        for (var i of array) {
+            var medium = i.target;
+            if (i.isIntersecting) {
+                medium.play();
+            }
+            else {
+                medium.pause();
+            }
+        }
+    });
+    for (var i of element) {
+        observe.observe(i);
+    }
+    function callback(mutationList, observer) {
+        for (var i of mutationList) {
+            if (i.type != "childList")
+                continue;
+            for (var add of i.addedNodes) {
+                if (add.tagName == "VIDEO" || add.tagName == "AUDIO") {
+                    observe.observe(add);
+                }
+            }
+            for (var removed of i.removedNodes) {
+                if (removed.tagName == "VIDEO" || removed.tagName == "AUDIO") {
+                    observe.unobserve(removed);
+                }
+            }
+        }
+    }
+    var observerDOM = new MutationObserver(callback);
+    observerDOM.observe(document.getElementById(id),
+        {
+            subtree: true,
+            childList: true
+        });
+}
+
+//将一个SVG标签的文本封装成Blob，再封装成一个Uri
+function CreateSVGUri(svgID) {
+    var svg = document.getElementById(svgID).outerHTML;
+    var blob = new Blob([svg],
+        {
+            type: "image/svg+xml"
+        });
+    return URL.createObjectURL(blob);
 }
 
 //这是一个读写cookie的小框架

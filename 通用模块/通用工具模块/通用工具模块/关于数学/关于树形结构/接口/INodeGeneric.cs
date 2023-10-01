@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Tree;
+﻿namespace System.MathFrancis.Tree;
 
 /// <summary>
 /// 凡是实现这个接口的类型，都可以作为一个树形结构的节点，

@@ -1,7 +1,7 @@
-﻿using System.Maths.Plane;
-using System.Maths.Plane.Geometric;
+﻿using System.MathFrancis.Plane;
+using System.MathFrancis.Plane.Geometric;
 
-namespace System.Maths;
+namespace System.MathFrancis;
 
 /// <summary>
 /// 有关数学的扩展方法全部放在这里

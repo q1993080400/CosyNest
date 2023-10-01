@@ -1,6 +1,6 @@
-﻿using static System.Maths.CreateBaseMath;
+﻿using static System.MathFrancis.CreateBaseMath;
 
-namespace System.Maths.Plane;
+namespace System.MathFrancis.Plane;
 
 /// <summary>
 /// 凡是实现这个接口的类型，

@@ -1,6 +1,6 @@
 ﻿using System.Design;
 using System.Diagnostics.CodeAnalysis;
-using System.Maths;
+using System.MathFrancis;
 using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Text.Json;

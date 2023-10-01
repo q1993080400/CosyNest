@@ -1,4 +1,4 @@
-﻿using System.Maths.Plane;
+﻿using System.MathFrancis.Plane;
 using System.NetFrancis.Browser;
 
 namespace Microsoft.JSInterop;

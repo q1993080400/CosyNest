@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace System;
 
-public static partial class ExtenTool
+public static partial class ExtendTool
 {
 
     //本部分类专门用于储存与对象转换有关的扩展方法
@@ -18,7 +18,7 @@ public static partial class ExtenTool
     /// 警告：本方法有关寻找<see cref="MethodInfo"/>的逻辑存在缺陷，可能会产生潜在BUG
     /// </summary>
     private static MethodInfo ToMethod
-        => ToMethodField ??= typeof(ExtenTool).GetMethods().First
+        => ToMethodField ??= typeof(ExtendTool).GetMethods().First
         (x => x.Name is nameof(To) &&
         x.GetParameters().Length is 3 &&
         x.IsGenericMethod);

@@ -12,7 +12,7 @@ public static class ToolDataObj
     /// </summary>
     public static void InitializerModule()
     {
-        CreateDataObj.DataEmpty();
+
     }
     #endregion
 }

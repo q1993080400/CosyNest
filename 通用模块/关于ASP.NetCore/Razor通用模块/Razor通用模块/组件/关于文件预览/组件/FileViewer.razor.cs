@@ -49,12 +49,12 @@ public sealed partial class FileViewer : ComponentBase
     {
         var fileSource = FileSource.ToArray();
         #region 本地函数
-        Func<Task> Fun(int index)
-            => () =>
+        EventCallback Fun(int index)
+            => new(this, () =>
             {
                 PreviewMediaIndex = index;
                 return Task.CompletedTask;
-            };
+            });
         #endregion
         var renderCover = fileSource.PackIndex().Select(x => new RenderCoverInfo()
         {

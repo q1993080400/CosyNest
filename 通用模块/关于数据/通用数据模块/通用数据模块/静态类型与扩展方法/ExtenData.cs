@@ -26,27 +26,19 @@ public static class ExtenData
     #region 关于依赖注入
     #region 注入一个简易的日志记录方法
     /// <summary>
-    /// 注入一个简易的日志记录方法，
-    /// 它只能使用<typeparamref name="Log"/>来作为记录类型
+    /// 注入一个简易的日志记录方法
     /// </summary>
     /// <typeparam name="Log">日志记录的类型</typeparam>
     /// <param name="loggingBuilder">日志记录器</param>
+    /// <param name="createLog">这个委托的参数是发生的错误，
+    /// 返回值是创建好的日志</param>
     /// <returns></returns>
-    public static ILoggingBuilder AddBusinessLoggingSimple<Log>(this ILoggingBuilder loggingBuilder)
-        where Log : ExceptionRecord, new()
+    public static ILoggingBuilder AddBusinessLoggingSimple<Log>(this ILoggingBuilder loggingBuilder, Func<Exception, Log> createLog)
+        where Log : class
     {
         loggingBuilder.AddLoggerFunction(async (server, exception, _) =>
         {
-            var ex = exception is { InnerException: { } e } ? e : exception;
-            var method = ex.TargetSite;
-            var log = new Log()
-            {
-                Date = DateTimeOffset.Now,
-                Message = ex.Message,
-                Stack = ex.StackTrace ?? "",
-                Method = method is null ? "" : $"{method.DeclaringType}.{method.Name}",
-                Exception = ex.GetType().Name,
-            };
+            var log = createLog(exception);
             var pipe = server.GetRequiredService<IDataPipe>();
             await pipe.AddOrUpdate(log);
         });

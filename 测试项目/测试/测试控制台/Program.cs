@@ -1,1 +1,2 @@
-﻿await Test.Pack();
+﻿
+Console.ReadLine();

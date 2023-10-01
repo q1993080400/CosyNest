@@ -42,12 +42,12 @@ public interface IHttpClient
     /// 发起Http请求，并返回结果
     /// </summary>
     /// <param name="request">请求消息的内容</param>
-    /// <param name="transformation">一个函数，它输入旧的Http请求对象，
-    /// 返回一个新的Http请求对象，它可以用来改变Http请求的默认值，
-    /// 如果为<see langword="null"/>，则不做改变</param>
+    /// <param name="transformation">用来转换Http请求的函数，
+    /// 如果为<see langword="null"/>，使用当前<see cref="IHttpClient"/>的默认配置，
+    /// 注意：默认配置不等于不进行转换</param>
     /// <param name="cancellationToken">一个用于取消操作的令牌</param>
     /// <returns>Http请求的结果</returns>
-    Task<IHttpResponse> Request(HttpRequestRecording request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default);
+    Task<IHttpResponse> Request(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default);
     #endregion
     #region 返回IBitRead
     /// <summary>
@@ -55,22 +55,22 @@ public interface IHttpClient
     /// 它可以用于下载
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="Request(HttpRequestRecording, Func{HttpRequestRecording, HttpRequestRecording}?, CancellationToken)"/>
-    Task<IBitRead> RequestDownload(HttpRequestRecording request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default);
+    /// <inheritdoc cref="Request(HttpRequestRecording, HttpRequestTransform?, CancellationToken)"/>
+    Task<IBitRead> RequestDownload(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default);
     #endregion
     #endregion
     #region 发起Http请求（指定Uri）
     #region 直接返回IHttpResponse
     /// <param name="uri">请求的Uri</param>
     /// <param name="parameters">枚举请求的参数名称和值（如果有）</param>
-    /// <inheritdoc cref="Request(HttpRequestRecording,Func{HttpRequestRecording, HttpRequestRecording}?,CancellationToken)"/>
-    Task<IHttpResponse> Request(string uri, (string Parameter, string Value)[]? parameters = null, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="Request(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
+    Task<IHttpResponse> Request(string uri, (string Parameter, string Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
         => Request(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region 返回IBitRead
-    /// <inheritdoc cref="RequestDownload(HttpRequestRecording,Func{HttpRequestRecording, HttpRequestRecording}?,CancellationToken)"/>
-    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],Func{HttpRequestRecording, HttpRequestRecording}?,CancellationToken)"/>
-    Task<IBitRead> RequestDownload(string uri, (string Parameter, string Value)[]? parameters = null, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="RequestDownload(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
+    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],HttpRequestTransform?,CancellationToken)"/>
+    Task<IBitRead> RequestDownload(string uri, (string Parameter, string Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
         => RequestDownload(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region Post请求
@@ -82,9 +82,9 @@ public interface IHttpClient
     /// 就算为<see langword="null"/>，它仍自带有对<see cref="IDirect"/>的支持</param>
     /// <param name="parameters">请求的Uri参数名称和值，
     /// 是的，即便是Post请求，它也可以包含Uri参数</param>
-    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],Func{HttpRequestRecording, HttpRequestRecording}?, CancellationToken)"/>
+    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],HttpRequestTransform?, CancellationToken)"/>
     async Task<IHttpResponse> RequestPost(string uri, object content, JsonSerializerOptions? options = null,
-        (string Parameter, string Value)[]? parameters = null, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null, CancellationToken cancellationToken = default)
+        (string Parameter, string Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
     {
         var json = JsonContent.Create(content, options: options ?? CreateDesign.JsonCommonOptions);
 #if DEBUG
@@ -109,8 +109,8 @@ public interface IHttpClient
     /// <param name="options">一个用于执行Json转换的对象</param>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
-    /// <inheritdoc cref="Request(HttpRequestRecording, Func{HttpRequestRecording, HttpRequestRecording}?, CancellationToken)"/>
-    Task<IHttpResponse> Request<API>(Expression<Func<API, object?>> request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null,
+    /// <inheritdoc cref="Request(HttpRequestRecording, HttpRequestTransform?, CancellationToken)"/>
+    Task<IHttpResponse> Request<API>(Expression<Func<API, object?>> request, HttpRequestTransform? transformation = null,
         JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         where API : class;
 
@@ -130,8 +130,8 @@ public interface IHttpClient
     /// </summary>
     /// <typeparam name="Ret">返回值类型</typeparam>
     /// <returns></returns>
-    /// <inheritdoc cref="Request{API}(Expression{Func{API, object?}},Func{HttpRequestRecording, HttpRequestRecording}?,JsonSerializerOptions?, CancellationToken)"/>
-    async Task<Ret?> Request<API, Ret>(Expression<Func<API, Task<Ret>>> request, Func<HttpRequestRecording, HttpRequestRecording>? transformation = null,
+    /// <inheritdoc cref="Request{API}(Expression{Func{API, object?}},HttpRequestTransform?,JsonSerializerOptions?, CancellationToken)"/>
+    async Task<Ret?> Request<API, Ret>(Expression<Func<API, Task<Ret>>> request, HttpRequestTransform? transformation = null,
         JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         where API : class
     {

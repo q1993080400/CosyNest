@@ -1,6 +1,6 @@
 ﻿using System.Performance;
 
-namespace System.Maths;
+namespace System.MathFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，

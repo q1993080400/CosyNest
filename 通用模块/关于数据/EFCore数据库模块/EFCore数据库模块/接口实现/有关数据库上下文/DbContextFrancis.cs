@@ -25,7 +25,10 @@ public abstract class DbContextFrancis : DbContext
     #region 重写OnConfiguring方法
 #if DEBUG
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.AddInterceptors(RecordSQL.Single);
+    {
+        if (WriteLog)
+            optionsBuilder.AddInterceptors(RecordSQL.Single);
+    }
 #endif
     #endregion
     #endregion

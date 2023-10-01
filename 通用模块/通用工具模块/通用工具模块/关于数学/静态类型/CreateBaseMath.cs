@@ -1,6 +1,6 @@
-﻿using System.Maths.Tree;
+﻿using System.MathFrancis.Tree;
 
-namespace System.Maths;
+namespace System.MathFrancis;
 
 /// <summary>
 /// 这个静态类可以用来帮助创建基本数学对象

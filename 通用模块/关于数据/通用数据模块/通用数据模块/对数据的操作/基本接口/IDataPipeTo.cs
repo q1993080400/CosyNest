@@ -22,30 +22,24 @@ public interface IDataPipeTo
     /// 则必须传入本参数，否则会产生异常</param>
     /// <param name="cancellation">用于取消异步操作的令牌</param>
     Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
-        where Data : class, IData;
+        where Data : class;
     #endregion
     #region 传入异步集合
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, Func{Guid, bool}?, CancellationToken)"/>
     async Task AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
-        where Data : class, IData
+        where Data : class
         => await AddOrUpdate(await datas.ToListAsync(), specifyPrimaryKey, cancellation);
     #endregion
     #region 传入单个数据
     /// <param name="data">待添加或更新的数据</param>
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, Func{Guid, bool}?, CancellationToken)"/>
     Task AddOrUpdate<Data>(Data data, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
-       where Data : class, IData
-       => AddOrUpdate(new[] { data }, specifyPrimaryKey, cancellation);
+       where Data : class
+       => AddOrUpdate<Data>(new[] { data }, specifyPrimaryKey, cancellation);
     #endregion
     #endregion
     #endregion
     #region 关于删除数据
-    #region 说明文档
-    /*实现本API请遵循以下规范：
-      #如果IData.ID为null，不执行任何操作，
-      如果不为null，则删除数据后，将这个属性写入null，
-      以注销它的主键*/
-    #endregion
     #region 传入同步集合
     /// <summary>
     /// 从数据源中删除指定的数据
@@ -55,19 +49,19 @@ public interface IDataPipeTo
     /// <param name="cancellation">用于取消异步操作的令牌</param>
     /// <returns></returns>
     Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
-        where Data : class, IData;
+        where Data : class;
     #endregion
     #region 传入异步集合
     /// <inheritdoc cref="Delete{Data}(IEnumerable{Data}, CancellationToken)"/>
     async Task Delete<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
-        where Data : class, IData
+        where Data : class
         => await Delete(await datas.ToListAsync(), cancellation);
     #endregion
     #region 传入单个数据
     /// <param name="data">要删除的数据</param>
     /// <inheritdoc cref="Delete{Data}(IEnumerable{Data}, CancellationToken)"/>
     Task Delete<Data>(Data data, CancellationToken cancellation = default)
-        where Data : class, IData
+        where Data : class
         => Delete(new[] { data }, cancellation);
     #endregion
     #region 按条件删除数据
@@ -77,7 +71,7 @@ public interface IDataPipeTo
     /// <param name="expression">一个用来指定删除条件的表达式</param>
     /// <inheritdoc cref="IDataPipeFrom.Query{Data}"/>
     Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation = default)
-        where Data : class, IData;
+        where Data : class;
     #endregion
     #endregion
 }

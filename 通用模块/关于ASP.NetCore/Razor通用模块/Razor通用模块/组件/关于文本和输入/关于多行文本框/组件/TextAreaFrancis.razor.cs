@@ -10,7 +10,7 @@ public sealed partial class TextAreaFrancis : ComponentBase, IContentComponent<R
     #region 子内容
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderTextArea>? ChildContent { get; set; }
+    public RenderFragment<RenderTextArea> ChildContent { get; set; }
     #endregion
     #endregion
     #region 内部成员

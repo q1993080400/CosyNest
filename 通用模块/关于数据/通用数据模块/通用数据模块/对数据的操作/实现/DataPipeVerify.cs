@@ -34,7 +34,7 @@ sealed class DataPipeVerify(IDataPipe pipe, DataVerify verify) : IDataPipe
     /// <typeparam name="Data">待验证的数据类型</typeparam>
     /// <param name="datas">待验证的数据</param>
     private void VerifyData<Data>(IEnumerable<Data> datas)
-        where Data : class, IData
+        where Data : class
     {
         foreach (var item in datas)
         {

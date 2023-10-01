@@ -25,7 +25,7 @@ public static class ExtenEFCoreDB
     /// <param name="dbSet">实体所在的数据表</param>
     /// <param name="datas">要级联删除的实体</param>
     internal static void CascadingDelete<Data>(this DbSet<Data> dbSet, IEnumerable<Data> datas)
-        where Data : class, IData
+        where Data : class
     {
         #region 本地函数
         static void Fun(object? obj, IEntityType entityType)

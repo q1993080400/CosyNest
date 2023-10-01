@@ -1,6 +1,6 @@
 ﻿using System.IO.Compression;
 using System.IOFrancis.FileSystem;
-using System.Maths.Tree;
+using System.MathFrancis.Tree;
 using System.Text;
 
 namespace System.IOFrancis.Compressed;
@@ -49,6 +49,15 @@ sealed class CompressedPackage : FromIO, ICompressedPackage
         Zip.Dispose();
         Stream.Dispose();
         return ValueTask.CompletedTask;
+    }
+    #endregion
+    #region 删除
+    public void Delete()
+    {
+        Zip.Dispose();
+        Stream.Dispose();
+        if (Path is { } path)
+            CreateIO.IO(path)?.Delete();
     }
     #endregion
     #region 重写ToString

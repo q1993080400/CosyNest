@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace BootstrapBlazor.Components;
 
@@ -59,14 +57,6 @@ public sealed partial class BootstrapFileViewer : ComponentBase
     /// </summary>
     private bool IsOpen { get; set; }
     #endregion
-    #region 跑马灯ID
-    /// <summary>
-    /// 获取跑马灯的ID，
-    /// 它被用来搜索video，
-    /// 来实现视频的自动播放和暂停
-    /// </summary>
-    private string CarouselID { get; } = ToolASP.CreateJSObjectName();
-    #endregion
     #region 获取要渲染的媒体或文件
     /// <summary>
     /// 枚举要渲染的媒体或文件，
@@ -74,7 +64,7 @@ public sealed partial class BootstrapFileViewer : ComponentBase
     /// </summary>
     /// <param name="info">用来渲染组件的参数</param>
     /// <returns></returns>
-    private static IEnumerable<FileSource> Files(RenderFileViewerInfo info)
+    private static FileSource[] Files(RenderFileViewerInfo info)
     {
         var index = info.PreviewFileIndex;
         if (index < 0)
@@ -94,13 +84,11 @@ public sealed partial class BootstrapFileViewer : ComponentBase
         {
             RenderCoverInfo = info with
             {
-                PreviewEvent = async () =>
+                PreviewEvent = new(this, async () =>
                 {
                     IsOpen = true;
-                    await info.PreviewEvent();
-                    StateHasChanged();
-                    await JSWindow.InvokeVoidAsync("ObserverMediaViewer", new[] { CarouselID });
-                }
+                    await info.PreviewEvent.InvokeAsync();
+                })
             },
             CoverSize = CoverSize
         };

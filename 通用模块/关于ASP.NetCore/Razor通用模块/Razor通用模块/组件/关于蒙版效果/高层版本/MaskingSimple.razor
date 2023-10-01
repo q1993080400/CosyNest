@@ -1,0 +1,20 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+<Masking IsFullScreen=IsFullScreen MaskingMod="MaskingMod">
+    <div class="@context.ExternalCSS" @attributes=ContainerAttributes>
+        @{
+            var internalCSS = context.InternalCSS;
+        }
+        @if (internalCSS is { })
+        {
+            <div class="@internalCSS">
+                @ChildContent
+            </div>
+        }
+        else
+        {
+            @ChildContent
+        }
+    </div>
+</Masking>

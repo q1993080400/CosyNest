@@ -13,9 +13,8 @@ public interface IGenerateResourcePath
     /// </summary>
     /// <param name="pathIdentifying">路径的标识，
     /// 同一标识生成的路径相同</param>
-    /// <param name="temporary">如果为<see langword="true"/>，
-    /// 生成一个临时文件夹路径，否则生成一个永久的</param>
+    /// <param name="base">路径的基路径，有的情况下，可能不需要基路径</param>
     /// <returns></returns>
-    abstract static string GenerateResourcePath(Guid pathIdentifying, bool temporary = false);
+    abstract static string GenerateResourcePath(Guid pathIdentifying, string? @base);
     #endregion
 }

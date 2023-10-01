@@ -1,4 +1,4 @@
-﻿using System.Maths;
+﻿using System.MathFrancis;
 
 namespace System.Geography.Map;
 

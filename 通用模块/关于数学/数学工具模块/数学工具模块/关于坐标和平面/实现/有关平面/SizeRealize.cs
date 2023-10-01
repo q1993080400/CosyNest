@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Plane;
+﻿namespace System.MathFrancis.Plane;
 
 /// <summary>
 /// <see cref="ISize"/>的实现，

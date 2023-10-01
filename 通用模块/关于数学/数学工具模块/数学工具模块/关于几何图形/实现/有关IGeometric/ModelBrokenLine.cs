@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Plane.Geometric;
+﻿namespace System.MathFrancis.Plane.Geometric;
 
 /// <summary>
 /// 这个几何模型可以用来创建由多条折线组合而成的几何图形

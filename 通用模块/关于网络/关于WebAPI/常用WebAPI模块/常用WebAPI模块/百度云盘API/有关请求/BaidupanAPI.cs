@@ -11,14 +11,14 @@ namespace System.NetFrancis.Api.Baidupan;
 /// </remarks>
 /// <param name="accessToken">访问令牌，它用于验证身份</param>
 /// <param name="refreshToken">刷新令牌，当访问令牌失效后，通过它刷新访问令牌</param>
-/// <param name="clientId">应用ID</param>
-/// <param name="clientSecret">应用密钥</param>
+/// <param name="clientId">应用ID，它对应AppKey</param>
+/// <param name="clientSecret">应用密钥，它对应SecretKey</param>
 /// <param name="saveToken">该委托用于保存刷新后的令牌，
 /// 它的第一个参数是访问令牌，第二个参数是刷新令牌</param>
 /// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
 public sealed class BaidupanAPI(string accessToken, string refreshToken,
     string clientId, string clientSecret,
-    Action<string, string> saveToken, Func<IHttpClient>? httpClientProvide = null) : WebApi(httpClientProvide)
+    Func<string, string, Task> saveToken, Func<IHttpClient>? httpClientProvide = null) : WebApi(httpClientProvide)
 {
     #region 公开成员
     #region 获取文件或目录列表
@@ -54,50 +54,18 @@ public sealed class BaidupanAPI(string accessToken, string refreshToken,
         }
         var ids = file.Select(x => x.GetValue<long>("fs_id"));
         var requestInfo = new HttpRequestRecording("http://pan.baidu.com/rest/2.0/xpan/multimedia",
-         new[] {("method", "filemetas"), ("access_token", AccessToken),
+         new[] {("method", "filemetas"), ("access_token", accessToken),
            ("fsids", $"[{ids.Join(",")}]"), ("dlink", "1") }!);
         var responseInfo = GetList(await Base(async () => (await HttpClientProvide().Request(requestInfo).Read(x => x.ToObject()))!));
         var infoDictionary = responseInfo!.ToDictionary(GetPath, x => x);
         foreach (var item in file)
         {
-            yield return new BaidupanFile(item, infoDictionary[GetPath(item)], AccessToken, HttpClientProvide);
+            yield return new BaidupanFile(item, infoDictionary[GetPath(item)], accessToken, HttpClientProvide);
         }
     }
     #endregion
     #endregion
     #region 内部成员
-    #region 访问令牌
-    /// <summary>
-    /// 获取访问令牌，它用于验证身份
-    /// </summary>
-    internal string AccessToken { get; private set; } = accessToken;
-    #endregion
-    #region 刷新令牌
-    /// <summary>
-    /// 获取刷新令牌，当访问令牌失效后，
-    /// 通过它刷新访问令牌
-    /// </summary>
-    private string RefreshToken { get; set; } = refreshToken;
-    #endregion
-    #region 应用ID
-    /// <summary>
-    /// 获取应用ID
-    /// </summary>
-    private string ClientId { get; } = clientId;
-    #endregion
-    #region 应用密钥
-    /// <summary>
-    /// 获取应用密钥
-    /// </summary>
-    private string ClientSecret { get; } = clientSecret;
-    #endregion
-    #region 保存令牌的委托
-    /// <summary>
-    /// 该委托用于保存刷新后的令牌，
-    /// 它的第一个参数是访问令牌，第二个参数是刷新令牌
-    /// </summary>
-    private Action<string, string> SaveToken { get; } = saveToken;
-    #endregion
     #region 辅助方法
     #region 基础方法
     /// <summary>
@@ -117,13 +85,13 @@ public sealed class BaidupanAPI(string accessToken, string refreshToken,
                 var refresh = await (await HttpClientProvide().Request("https://openapi.baidu.com/oauth/2.0/token", new[]
                  {
                   ("grant_type", "refresh_token"),
-                  ("refresh_token", RefreshToken),
-                  ("client_id", ClientId),
-                  ("client_secret", ClientSecret)
+                  ("refresh_token", refreshToken),
+                  ("client_id", clientId),
+                  ("client_secret", clientSecret)
                  }!)).Content.ToObject();
-                AccessToken = refresh!.GetValue<string>("access_token")!;
-                RefreshToken = refresh.GetValue<string>("refresh_token")!;
-                SaveToken(AccessToken, RefreshToken);
+                accessToken = refresh!.GetValue<string>("access_token")!;
+                refreshToken = refresh.GetValue<string>("refresh_token")!;
+                await saveToken(accessToken, refreshToken);
                 return await request();
             case var e:
                 if (response.GetValue<string>("errmsg", false) is { } msg)
@@ -149,10 +117,10 @@ public sealed class BaidupanAPI(string accessToken, string refreshToken,
             var isSingleFile = !Path.GetExtension(dir).IsVoid();
             dir = isSingleFile ? Path.GetDirectoryName(dir)!.Op().ToUriPath() : dir;
             return (new HttpRequestRecording("https://pan.baidu.com/rest/2.0/xpan/file",
-                new[] { ("method", "list"), ("access_token", AccessToken), ("dir", dir) }!), isSingleFile);
+                new[] { ("method", "list"), ("access_token", accessToken), ("dir", dir) }!), isSingleFile);
         }
         return (new HttpRequestRecording("http://pan.baidu.com/rest/2.0/xpan/file",
-            new[] { ("method", "search"), ("access_token", AccessToken),
+            new[] { ("method", "search"), ("access_token", accessToken),
             ("key", search), ("dir", dir), ("recursion", "1")}!), false);
     }
 

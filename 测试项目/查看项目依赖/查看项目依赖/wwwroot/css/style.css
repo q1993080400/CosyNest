@@ -1,0 +1,15 @@
+﻿
+/*按钮样式*/
+button
+{
+    border: solid;
+    background-color: transparent;
+    padding: 2ch;
+    width: max-content;
+}
+
+/*所有样式*/
+*
+{
+    font-family: 'Noto Sans SC', sans-serif;
+}

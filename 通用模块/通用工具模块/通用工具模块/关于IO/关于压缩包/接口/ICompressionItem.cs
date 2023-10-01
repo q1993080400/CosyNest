@@ -1,6 +1,6 @@
 ﻿using System.IOFrancis.BaseFileSystem;
 using System.IOFrancis.FileSystem;
-using System.Maths.Tree;
+using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.Compressed;
 

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
+using System.Design.Direct;
 
 namespace System.TreeObject.Json;
 
@@ -44,5 +45,12 @@ public static class CreateJson
     /// <inheritdoc cref="JsonConvertPolymorphic{Obj}"/>
     public static JsonConverter<Obj> JsonPolymorphic<Obj>(IEnumerable<Assembly>? assemblies = null)
         => new JsonConvertPolymorphic<Obj>(assemblies ?? new[] { typeof(Obj).Assembly });
+    #endregion
+    #region 创建IDirect转换器
+    /// <summary>
+    /// 返回一个支持序列化和反序列化<see cref="IDirect"/>的对象，
+    /// 请注意，它只能转换<see cref="IDirect"/>，不能转换它的派生类型
+    /// </summary>
+    public static JsonConverter JsonDirect { get; } = new JsonConvertDirect();
     #endregion
 }

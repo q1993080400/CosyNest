@@ -1,4 +1,4 @@
-﻿namespace System.Maths;
+﻿namespace System.MathFrancis;
 
 /// <summary>
 /// 这个类型是<see cref="IUnit{Template}"/>的实现，

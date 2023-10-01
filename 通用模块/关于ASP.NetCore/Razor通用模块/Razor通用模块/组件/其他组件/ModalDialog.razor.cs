@@ -15,7 +15,7 @@ public sealed partial class ModalDialog : ComponentBase, IContentComponent<Rende
     #endregion
     #region 组件的子内容
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public RenderFragment ChildContent { get; set; }
     #endregion
     #region 参数展开
     /// <summary>

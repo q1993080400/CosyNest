@@ -1,5 +1,5 @@
 ﻿using System.Geography.Weather;
-using System.Maths;
+using System.MathFrancis;
 
 namespace System.Geography;
 

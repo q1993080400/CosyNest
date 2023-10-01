@@ -1,8 +1,8 @@
 ﻿
-using static System.Maths.CreateBaseMath;
-using static System.Maths.ToolArithmetic;
+using static System.MathFrancis.CreateBaseMath;
+using static System.MathFrancis.ToolArithmetic;
 
-namespace System.Maths.Plane.Geometric;
+namespace System.MathFrancis.Plane.Geometric;
 
 /// <summary>
 /// 有关三角函数的工具类

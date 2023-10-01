@@ -1,6 +1,6 @@
 ﻿@namespace Microsoft.AspNetCore.Components
 @inherits ComponentBase
 
-<div class="compactCentered" @attributes="ContainerAttributes">
+<div class="@(NotFill?"compactCentered":"compactCenteredFill")" @attributes="ContainerAttributes">
     @ChildContent
 </div>

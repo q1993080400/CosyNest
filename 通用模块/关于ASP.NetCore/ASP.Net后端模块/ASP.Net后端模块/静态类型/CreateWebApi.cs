@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Json;
 using Microsoft.AspNetCore.Mvc.Formatters;
 
@@ -32,6 +33,25 @@ public static class CreateWebApi
     public static TextInputFormatter InputFormatterJson(JsonSerializerOptions options)
         => new JsonInputFormatterGeneral(options);
     #endregion
+    #endregion
+    #region 创建访问日志
+    /// <summary>
+    /// 创建一个访问日志
+    /// </summary>
+    /// <typeparam name="Log">访问日志的类型</typeparam>
+    /// <param name="http">当前访问的Http上下文对象</param>
+    /// <returns></returns>
+    public static Log LogAccess<Log>(HttpContext http)
+        where Log : LogAccess, new()
+    {
+        var request = http.Request;
+        return new Log()
+        {
+            UserAgent = request.Headers.UserAgent.ToString() ?? "",
+            IP = http.Connection.RemoteIpAddress?.ToString() ?? "",
+            Uri = request.GetEncodedUrl()
+        };
+    }
     #endregion
     #endregion
 }

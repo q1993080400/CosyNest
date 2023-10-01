@@ -45,7 +45,7 @@ sealed class EFDataPipe(Func<Type, DbContextFrancis> createDbContext) : IDataPip
     #region 公开成员
     #region 查询实体
     public IQueryable<Data> Query<Data>()
-        where Data : class, IData
+        where Data : class
     {
         var db = CreateDbContext(typeof(Data));
         return db.Set<Data>();
@@ -61,7 +61,7 @@ sealed class EFDataPipe(Func<Type, DbContextFrancis> createDbContext) : IDataPip
     #endregion
     #region 正式方法
     public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey, CancellationToken cancellation)
-        where Data : class, IData
+        where Data : class
     {
         datas = datas.ToArray();
         var db = CreateDbContext(typeof(Data));
@@ -73,7 +73,7 @@ sealed class EFDataPipe(Func<Type, DbContextFrancis> createDbContext) : IDataPip
     #region 删除实体
     #region 按照实体
     public async Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
-        where Data : class, IData
+        where Data : class
     {
         var db = CreateDbContext(typeof(Data));
         var dbSet = db.Set<Data>();
@@ -83,7 +83,7 @@ sealed class EFDataPipe(Func<Type, DbContextFrancis> createDbContext) : IDataPip
     #endregion
     #region 按照条件
     public async Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
-        where Data : class, IData
+        where Data : class
     {
         await Query<Data>().Where(expression).ExecuteDeleteAsync(cancellation);
     }

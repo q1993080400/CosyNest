@@ -13,7 +13,7 @@ public sealed partial class WithLabel : ComponentBase, IContentComponent<RenderF
     /// </summary>
     [EditorRequired]
     [Parameter]
-    public RenderFragment<Guid>? ChildContent { get; set; }
+    public RenderFragment<Guid> ChildContent { get; set; }
     #endregion
     #region 标签的文本
     /// <summary>

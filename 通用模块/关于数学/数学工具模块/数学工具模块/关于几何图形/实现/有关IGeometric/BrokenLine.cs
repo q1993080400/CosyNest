@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Plane.Geometric;
+﻿namespace System.MathFrancis.Plane.Geometric;
 
 /// <summary>
 /// 这个类型代表由一条或多条折线组合而成的几何图形

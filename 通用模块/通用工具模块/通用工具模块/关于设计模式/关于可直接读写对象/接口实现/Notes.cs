@@ -20,13 +20,6 @@ sealed class Notes : IDirect
       不值得为此使用数据库*/
     #endregion
     #region 接口实现
-    #region 架构
-    public ISchema? Schema
-    {
-        get => null;
-        set => throw new NotImplementedException("不支持这个功能");
-    }
-    #endregion
     #region 复制
     public IDirect Copy(bool copyValue = true, Type? type = null)
     {

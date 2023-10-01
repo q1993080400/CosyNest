@@ -16,7 +16,7 @@ public sealed partial class SearchViewer<Obj> : ComponentBase, IContentComponent
     /// </summary>
     [EditorRequired]
     [Parameter]
-    public RenderFragment<RenderSearchViewerInfo<Obj>>? ChildContent { get; set; }
+    public RenderFragment<RenderSearchViewerInfo<Obj>> ChildContent { get; set; }
     #endregion
     #endregion
     #region 内部成员

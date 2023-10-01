@@ -1,5 +1,5 @@
 ﻿using System.IOFrancis;
-using System.Maths.Plane;
+using System.MathFrancis.Plane;
 using System.Media.Drawing.Graphics;
 
 namespace System.Media.Drawing;

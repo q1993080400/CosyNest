@@ -17,7 +17,7 @@ static class ToolEFDataPipe
     /// <param name="specifyPrimaryKey">用来确定主键是否为显式指定的委托</param>
     /// <returns></returns>
     public static void Track<Data>(DbContext dbContext, IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey)
-        where Data : class, IData
+        where Data : class
     {
         if (specifyPrimaryKey is null)
         {

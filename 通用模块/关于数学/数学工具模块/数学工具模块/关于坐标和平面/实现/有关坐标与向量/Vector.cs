@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Plane;
+﻿namespace System.MathFrancis.Plane;
 
 /// <summary>
 /// 这个类型是<see cref="IVector"/>的实现，

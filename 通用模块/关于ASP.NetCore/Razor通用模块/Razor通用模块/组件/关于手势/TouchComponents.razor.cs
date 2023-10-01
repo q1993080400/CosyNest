@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 
-using System.Maths;
-using System.Maths.Plane;
+using System.MathFrancis;
+using System.MathFrancis.Plane;
 
 namespace Microsoft.AspNetCore.Components;
 

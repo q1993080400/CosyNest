@@ -30,6 +30,7 @@ public static class InitializationToolTreeObject
         var json = CreateDesign.JsonCommon;
         json.Add(CreateJson.JsonCollection);
         json.Add(CreateJson.JsonTuple);
+        json.Add(CreateJson.JsonDirect);
     }
     #endregion
 }

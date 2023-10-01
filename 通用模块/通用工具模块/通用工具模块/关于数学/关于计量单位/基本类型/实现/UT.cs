@@ -1,4 +1,4 @@
-﻿namespace System.Maths;
+﻿namespace System.MathFrancis;
 
 /// <summary>
 /// 表示一个计量单位的模板，

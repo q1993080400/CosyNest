@@ -1,5 +1,5 @@
-﻿using System.Maths;
-using System.Maths.Plane;
+﻿using System.MathFrancis;
+using System.MathFrancis.Plane;
 using System.Runtime.InteropServices;
 
 namespace System.Underlying.PC;

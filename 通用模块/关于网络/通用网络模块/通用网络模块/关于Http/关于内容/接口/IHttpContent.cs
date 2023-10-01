@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.Design;
+﻿using System.Design;
 using System.Design.Direct;
 using System.IOFrancis.Bit;
 using System.Text;
@@ -83,7 +82,7 @@ public interface IHttpContent
     #region 非泛型方法
     /// <inheritdoc cref="ToObject{Obj}(JsonSerializerOptions?)"/>
     async Task<IDirect> ToObject(JsonSerializerOptions? options = null)
-       => (await ToObject<IDirect>(options)) ?? CreateDataObj.DataEmpty();
+       => (await ToObject<IDirect>(options ?? CreateDesign.JsonCommonOptions)) ?? CreateDesign.DirectEmpty();
     #endregion
     #endregion
     #endregion

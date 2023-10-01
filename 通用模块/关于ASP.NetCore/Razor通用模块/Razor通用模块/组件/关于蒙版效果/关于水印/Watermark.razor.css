@@ -1,0 +1,15 @@
+﻿
+/*水印容器样式*/
+.watermarkContainer
+{
+    z-index: 99999;
+    pointer-events: none;
+    background-repeat: repeat;
+    background-position: center;
+}
+
+/*SVG容器样式*/
+.svgContainer
+{
+    display: none;
+}

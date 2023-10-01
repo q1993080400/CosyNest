@@ -59,12 +59,12 @@ sealed class EFDataPipeTransaction(Func<Type, DbContextFrancis> createDbContext)
     #endregion
     #region 执行查询
     public IQueryable<Data> Query<Data>()
-        where Data : class, IData
+        where Data : class
          => CreateDbContextFromEntityType(typeof(Data)).Set<Data>();
     #endregion
     #region 添加或更新数据
     public Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey, CancellationToken cancellation)
-         where Data : class, IData
+         where Data : class
     {
         datas = datas.ToArray();
         var db = CreateDbContextFromEntityType(typeof(Data));
@@ -75,7 +75,7 @@ sealed class EFDataPipeTransaction(Func<Type, DbContextFrancis> createDbContext)
     #region 删除数据
     #region 按照实体
     public Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation)
-         where Data : class, IData
+         where Data : class
     {
         var db = CreateDbContextFromEntityType(typeof(Data));
         var dbSet = db.Set<Data>();
@@ -85,7 +85,7 @@ sealed class EFDataPipeTransaction(Func<Type, DbContextFrancis> createDbContext)
     #endregion
     #region 按照条件
     public async Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation)
-         where Data : class, IData
+         where Data : class
     {
         await Query<Data>().Where(expression).ExecuteDeleteAsync(cancellation);
     }

@@ -2,11 +2,13 @@
 @inherits ComponentBase
 @typeparam Model
 
-<FormViewer FilterProperties=FilterProperties ToPropertyInfo=ToPropertyInfo
-            Verify=Verify InitializationModel="InitializationModel"
-            ExistingForms=ExistingForms IsReadOnly=IsReadOnly
-            OnPropertyChangeed=OnPropertyChangeed ShowSubmit=ShowSubmit
-            IsValueReference=IsValueReference>
+<BusinessFormViewer FilterProperties=FilterProperties ToPropertyInfo=ToPropertyInfo
+                    Verify=Verify InitializationModel="InitializationModel"
+                    ExistingForms=ExistingForms IsReadOnly=IsReadOnly
+                    OnPropertyChangeed=OnPropertyChangeed ShowSubmit=ShowSubmit
+                    IsValueReference=IsValueReference Delete="Delete" Cancellation="Cancellation"
+                    RefreshTarget="RefreshTarget" ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
+                    Submit="Submit" VerifyFail="VerifyFail">
     <ChildContent>
         @if (ChildContent is null)
         {
@@ -47,19 +49,16 @@
         }
     </RenderProperty>
     <RenderSubmit>
-        @{
-            var newInfo = GetRenderSubmitInfo(context);
-        }
         @if (RenderSubmit is null)
         {
             <CompactCentered>
-                <Button Text="@(context.ExistingForms?"修改":"提交")" OnClick="newInfo.Submit"></Button>
-                <Button Text="重置" OnClick="newInfo.Resetting"></Button>
-                @if (newInfo.Delete is { } deleteValue)
+                <Button Text="@(context.ExistingForms?"修改":"提交")" OnClick="context.Submit"></Button>
+                <Button Text="重置" OnClick="context.Resetting"></Button>
+                @if (context.Delete is { } deleteValue)
                 {
                     <Button Text="删除" OnClick="deleteValue"></Button>
                 }
-                @if (newInfo.Cancellation is { } cancellationValue)
+                @if (context.Cancellation is { } cancellationValue)
                 {
                     <Button Text="取消" OnClick="cancellationValue"></Button>
                 }
@@ -67,7 +66,7 @@
         }
         else
         {
-            @RenderSubmit(newInfo)
+            @RenderSubmit(context)
         }
     </RenderSubmit>
-</FormViewer>
+</BusinessFormViewer>

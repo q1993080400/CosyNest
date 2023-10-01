@@ -22,7 +22,7 @@ public sealed partial class Select<Obj> : ComponentBase, IContentComponent<Rende
     /// </summary>
     [EditorRequired]
     [Parameter]
-    public RenderFragment<(bool, Obj)>? ChildContent { get; set; }
+    public RenderFragment<(bool, Obj)> ChildContent { get; set; }
     #endregion
     #region 待选择的值
     /// <summary>

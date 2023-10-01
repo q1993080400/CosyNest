@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>BootstrapBlazor.Components</RootNamespace>
@@ -17,9 +17,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="7.10.0" />
-		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.4.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.10" />
+		<PackageReference Include="BootstrapBlazor" Version="7.10.7" />
+		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="7.5.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0-rc.1.23421.29" />
 	</ItemGroup>
 
 	<ItemGroup>

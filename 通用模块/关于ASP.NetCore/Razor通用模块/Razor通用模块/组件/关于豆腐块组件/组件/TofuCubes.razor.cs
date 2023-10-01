@@ -43,7 +43,7 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
     #region 子内容
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderTofuCubesInfo>? ChildContent { get; set; }
+    public RenderFragment<RenderTofuCubesInfo> ChildContent { get; set; }
     #endregion
     #endregion
     #region 内部成员

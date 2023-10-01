@@ -10,7 +10,7 @@ public sealed partial class AutoPlayButton : ComponentBase, IContentComponent<Re
     #region 子内容
     [EditorRequired]
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public RenderFragment ChildContent { get; set; }
     #endregion
     #region 是否添加播放按钮
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Plane;
+﻿namespace System.MathFrancis.Plane;
 
 /// <summary>
 /// 这个接口代表一个具有位置的二维平面

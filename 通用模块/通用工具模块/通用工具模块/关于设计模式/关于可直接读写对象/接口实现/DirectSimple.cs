@@ -17,13 +17,6 @@ sealed class DirectSimple : IDirect
     private Dictionary<string, object?> Dictionary { get; } = new();
     #endregion
     #region 接口实现
-    #region 架构约束
-    public ISchema? Schema
-    {
-        get => null;
-        set => throw new NotImplementedException("本类型没有也不支持架构约束");
-    }
-    #endregion
     #region 复制字典
     public IDirect Copy(bool copyValue = true, Type? type = null)
     {

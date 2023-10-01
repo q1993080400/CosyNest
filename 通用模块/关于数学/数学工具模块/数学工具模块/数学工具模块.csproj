@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7</TargetFramework>
+		<TargetFramework>net8</TargetFramework>
 		<AssemblyName>ToolMath</AssemblyName>
-		<RootNamespace>System.Maths</RootNamespace>
+		<RootNamespace>System.MathFrancis</RootNamespace>
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>

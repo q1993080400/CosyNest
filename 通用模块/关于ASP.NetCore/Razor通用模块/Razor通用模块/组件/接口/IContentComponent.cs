@@ -9,9 +9,8 @@ public interface IContentComponent<Content> : IComponent
 {
     #region 子内容
     /// <summary>
-    /// 获取或设置组件的子内容，
-    /// 如果为<see langword="null"/>，则不会呈现
+    /// 获取或设置组件的子内容
     /// </summary>
-    Content? ChildContent { get; set; }
+    Content ChildContent { get; set; }
     #endregion
 }

@@ -24,41 +24,43 @@
             <Modal FirstAfterRenderCallbackAsync="@(x=>x.Show())">
                 <BootstrapBlazor.Components.ModalDialog IsCentered=true Size="Size.Medium" IsScrolling="true" ShowCloseButton=false ShowHeader=false>
                     <BodyTemplate>
-                        <div id="@CarouselID">
-                            <Carousel ShowIndicators=false>
-                                @foreach (var item in Files(context))
-                                {
-                                    var uri = item.FilePath;
-                                    <CarouselItem Interval="1000*600" @key=item>
-                                        <NineGrids>
-                                            @switch (item)
-                                            {
-                                                case MediaSource { MediaSourceType: FileSourceType.WebImage }:
-                                                    <img src="@uri" class="mediaPreview" />
-                                                    break;
-                                                case MediaSource { MediaSourceType: FileSourceType.WebVideo }:
-                                                    var options = new RenderVideoJS()
-                                            {
-                                                Src = uri,
-                                                Autoplay = true,
-                                                Controls = true,
-                                                Loop = true
-                                            };
-                                                    <VideoJS RenderVideoJS="options" />
-                                                    break;
-                                            }
-                                        </NineGrids>
-                                    </CarouselItem>
-                                }
-                            </Carousel>
-                        </div>
+                        <VisiblePlay Context="id">
+                            <div id="@id">
+                                <Carousel ShowIndicators=false>
+                                    @foreach (var item in Files(context))
+                                    {
+                                        var uri = item.FilePath;
+                                        <CarouselItem Interval="1000*600" @key=item>
+                                            <Center>
+                                                @switch (item)
+                                                {
+                                                    case MediaSource { MediaSourceType: FileSourceType.WebImage }:
+                                                        <img src="@uri" class="mediaPreview" />
+                                                        break;
+                                                    case MediaSource { MediaSourceType: FileSourceType.WebVideo }:
+                                                        var options = new RenderVideoJS()
+                                                {
+                                                    Src = uri,
+                                                    Controls = true,
+                                                    Loop = true
+                                                };
+                                                        <VideoJS RenderVideoJS="options" />
+                                                        break;
+                                                }
+                                            </Center>
+                                        </CarouselItem>
+                                    }
+                                </Carousel>
+                            </div>
+                        </VisiblePlay>
                     </BodyTemplate>
                     <FooterTemplate>
                         @{
+
                             async Task OnClickWithoutRender()
                             {
                                 IsOpen = false;
-                                await context.QuitPreview();
+                                await context.QuitPreview.InvokeAsync();
                             }
                         }
                         <CompactCentered>

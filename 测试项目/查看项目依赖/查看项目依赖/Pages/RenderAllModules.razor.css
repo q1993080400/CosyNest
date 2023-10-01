@@ -1,0 +1,32 @@
+﻿
+/*总容器样式*/
+.generalContainer
+{
+    display: flex;
+    gap: var(--gapMedium);
+}
+
+/*所有模块容器样式*/
+.allModulesContainer
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gapBig);
+}
+
+/*说明容器样式*/
+.descriptionContainer
+{
+    display: flex;
+    flex-direction: column;
+    gap: var(--gapMedium);
+    width: 15ic;
+}
+
+/*模块容器样式*/
+.modulesContainer
+{
+    display: flex;
+    gap: var(--gapBig);
+}

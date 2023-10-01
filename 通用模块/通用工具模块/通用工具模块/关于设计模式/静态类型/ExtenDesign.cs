@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Design;
-using System.Design.Direct;
 using System.Design.Logging;
 using System.Runtime.CompilerServices;
 
@@ -43,46 +41,6 @@ public static class ExtenDesign
     public static void Changed(this INotifyPropertyChanged obj, PropertyChangedEventHandler? @delegate, [CallerMemberName] string propertyName = "")
         => @delegate?.Invoke(obj, new PropertyChangedEventArgs(propertyName));
     #endregion
-    #endregion
-    #endregion
-    #region 关于IDirect
-    #region 检查IDirect的架构
-    #region 同步迭代器版本
-    /// <summary>
-    /// 检查一个<see cref="IDirect"/>集合的架构，
-    /// 如果出现任何架构不一致的元素，则抛出异常
-    /// </summary>
-    /// <param name="directs">待检查架构的集合</param>
-    /// <returns></returns>
-    public static IEnumerable<Direct> CheckSchema<Direct>(this IEnumerable<Direct> directs)
-        where Direct : IDirect
-    {
-        var (first, other, hasElements) = directs.First(true);
-        if (!hasElements)
-            yield break;
-        var schema = first.Schema ?? CreateDesign.Schema(first);
-        yield return first;
-        foreach (var item in other)
-        {
-            schema.SchemaCompatible(item, true);
-            yield return item;
-        }
-    }
-    #endregion
-    #region 异步迭代器版本
-
-    #endregion
-    #endregion
-    #region 将数据集合转换为实体类集合
-    /// <summary>
-    /// 将数据集合转换为实体类集合
-    /// </summary>
-    /// <typeparam name="Entity">转换的目标类型</typeparam>
-    /// <param name="datas">待转换的实体类集合</param>
-    /// <returns></returns>
-    public static IEnumerable<Entity> CastEntity<Entity>(this IEnumerable<IDirect> datas)
-        where Entity : IDirect
-        => datas.Select(x => x is Entity e ? e : x.Copy<Entity>());
     #endregion
     #endregion
     #region 关于日志

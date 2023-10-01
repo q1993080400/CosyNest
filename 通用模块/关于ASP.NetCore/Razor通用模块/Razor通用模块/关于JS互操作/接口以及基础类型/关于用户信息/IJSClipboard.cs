@@ -18,7 +18,11 @@ public interface IJSClipboard : IClipboard
       问：既然如此，为什么仍然保留Clipboard的JS标准实现？
       答：这是因为作者考虑到，BlazorServer和BlazorWebAssembly进行JS互操作的原理不同，
       或许，它在BlazorWebAssembly上可以正常工作，因此作者仍然保留旧实现，
-      如果发现它在BlazorWebAssembly上仍然无效，请移除这个实现*/
+      如果发现它在BlazorWebAssembly上仍然无效，请移除这个实现
+    
+      跟进：
+      关于刚才这个问题，经过测试已经证明它在WebAssembly上可以正常工作，
+      无需移除这个接口及其实现*/
     #endregion
     #region 返回写入剪切板的脚本
     /// <summary>

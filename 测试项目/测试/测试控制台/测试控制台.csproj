@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net7-windows</TargetFramework>
+		<TargetFramework>net8-windows</TargetFramework>
 		<RootNamespace>System</RootNamespace>
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
@@ -12,9 +12,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\PC专用\PC通用模块\PC通用模块\PC通用模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于地理\通用地理模块\通用地理模块\通用地理模块.csproj" />
-		<ProjectReference Include="..\..\..\通用模块\关于媒体\关于图像\ImageSharp图片工具模块\ImageSharp图片工具模块\ImageSharp图片工具模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于媒体\关于图像\ITextPDF模块\ITextPDF模块\ITextPDF模块.csproj" />
-		<ProjectReference Include="..\..\..\通用模块\关于媒体\关于图像\ZXing二维码模块\ZXing二维码模块\ZXing二维码模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />
@@ -22,7 +20,6 @@
 		<ProjectReference Include="..\..\..\通用模块\关于时间和日期\时间工具模块\时间工具模块\时间工具模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于树形文档模型\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
-		<ProjectReference Include="..\..\..\通用模块\关于网络\关于FTP\FluentFTP模块\FluentFTP模块\FluentFTP模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于网络\关于WebAPI\常用WebAPI模块\常用WebAPI模块\常用WebAPI模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于网络\关于浏览器\WebDriver工具模块\WebDriver工具模块\WebDriver工具模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于网络\通用网络模块\通用网络模块\通用网络模块.csproj" />

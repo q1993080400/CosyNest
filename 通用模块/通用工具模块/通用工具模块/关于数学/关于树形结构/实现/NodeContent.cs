@@ -1,4 +1,4 @@
-﻿namespace System.Maths.Tree;
+﻿namespace System.MathFrancis.Tree;
 
 /// <summary>
 /// 这个类型是<see cref="INodeContent{Obj}"/>的实现，

@@ -1,7 +1,7 @@
-﻿using System.Maths.Plane;
-using System.Maths.Plane.Geometric;
+﻿using System.MathFrancis.Plane;
+using System.MathFrancis.Plane.Geometric;
 
-namespace System.Maths;
+namespace System.MathFrancis;
 
 /// <summary>
 /// 这个静态类型可以用来帮助创建数学对象

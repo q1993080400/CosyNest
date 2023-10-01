@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7</TargetFramework>
+		<TargetFramework>net8</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<AssemblyName>ToolNet</AssemblyName>
 		<RootNamespace>System.NetFrancis</RootNamespace>
@@ -10,8 +10,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.10" />
-	  <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.0-rc.1.23421.29" />
+	  <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0-rc.1.23419.4" />
 	</ItemGroup>
 
 	<ItemGroup>

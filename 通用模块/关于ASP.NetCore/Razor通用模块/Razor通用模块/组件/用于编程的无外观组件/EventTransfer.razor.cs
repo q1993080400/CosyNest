@@ -36,7 +36,7 @@ public sealed partial class EventTransfer<Event> : ComponentBase, IContentCompon
     #region 子内容
     [Parameter]
     [EditorRequired]
-    public RenderFragment<IEventInvoke>? ChildContent { get; set; }
+    public RenderFragment<IEventInvoke> ChildContent { get; set; }
     #endregion
     #endregion
     #region 内部成员

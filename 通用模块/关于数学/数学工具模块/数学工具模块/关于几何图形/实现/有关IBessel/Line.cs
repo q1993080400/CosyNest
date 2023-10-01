@@ -1,7 +1,7 @@
 ﻿
-using static System.Maths.ToolArithmetic;
+using static System.MathFrancis.ToolArithmetic;
 
-namespace System.Maths.Plane.Geometric;
+namespace System.MathFrancis.Plane.Geometric;
 
 /// <summary>
 /// 这个类型是<see cref="IBessel"/>的实现，
