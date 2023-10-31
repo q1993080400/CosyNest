@@ -63,11 +63,9 @@ public partial class Monitor : ComponentBase, IDisposable
     /// </summary>
     private IDisposable? AuthorizationFailedPack { get; set; }
     #endregion
-    #region 重写OnAfterRenderAsync
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    #region 重写OnParametersSetAsync
+    protected override async Task OnParametersSetAsync()
     {
-        if (!firstRender)
-            return;
         (var authorizationSucceeded, AuthorizationSucceededPack) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AuthorizationSucceeded?.Invoke());
         (var authorizationFailed, AuthorizationFailedPack) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AuthorizationFailed?.Invoke());
         var script = $$$"""

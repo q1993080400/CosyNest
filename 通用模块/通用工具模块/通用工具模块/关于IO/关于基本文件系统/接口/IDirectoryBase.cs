@@ -53,7 +53,7 @@ public interface IDirectoryBase : IIOBase
         var names = directory.Son.Cast<IIOBase>().Select(x => x.NameFull);
         return names.Distinct(name, (n, i) =>
         {
-            var (simple, extended, _) = ToolPath.SplitPathFile(n, true);
+            var (simple, extended, _) = ToolPath.SplitFilePath(n, true);
             return $"{simple}({i}){extended}";
         });
     }

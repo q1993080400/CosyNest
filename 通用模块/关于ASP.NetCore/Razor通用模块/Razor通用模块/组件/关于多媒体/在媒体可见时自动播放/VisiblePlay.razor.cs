@@ -27,11 +27,10 @@ public sealed partial class VisiblePlay : ComponentBase
     /// </summary>
     private string ID { get; } = ToolASP.CreateJSObjectName();
     #endregion
-    #region 重写OnAfterRenderAsync
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    #region 重写OnParametersSetAsync
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
-            await JSWindow.InvokeVoidAsync("ObserveVisiblePlay", ID);
+        await JSWindow.InvokeVoidAsync("ObserveVisiblePlay", ID);
     }
     #endregion
     #endregion

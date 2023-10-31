@@ -1,7 +1,0 @@
-﻿@namespace Microsoft.AspNetCore.Components
-@typeparam Condition
-
-@if ((ChildContent, GetCondition) is ({ }, { }))
-{
-    @ChildContent(GetCondition)
-}

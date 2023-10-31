@@ -98,7 +98,7 @@ public interface IFileType
     /// 如果它是扩展名，则不带点号</param>
     bool IsCompatible(string extensionNameOrPath)
     {
-        var extensionName = ToolPath.SplitPathFile(extensionNameOrPath).Extended ?? extensionNameOrPath;
+        var extensionName = ToolPath.SplitFilePath(extensionNameOrPath).Extended ?? extensionNameOrPath;
         return ExtensionName.Contains(extensionName);
     }
     #endregion

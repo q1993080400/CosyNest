@@ -172,7 +172,7 @@ public interface IRandom
     {
         if (category.Any(x => !x.IsClosed))
             throw new Exception($"{nameof(category)}中的全部元素必须为封闭区间");
-        category = category.Length is not 0 ? category : new[] { IInterval.CreateSpecific((char?)ushort.MinValue, (char?)ushort.MaxValue) };      //如果不指定合法字符范围，则默认可以生成任何UTF16字符
+        category = category.Length is not 0 ? category : [IInterval.CreateSpecific((char?)ushort.MinValue, (char?)ushort.MaxValue)];      //如果不指定合法字符范围，则默认可以生成任何UTF16字符
         int len = RandRange(minLength, maxLength);
         var charts = new char[len];
         for (int i = 0; i < len; i++)

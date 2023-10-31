@@ -1,9 +1,0 @@
-﻿@namespace Microsoft.AspNetCore.Components.Web
-@inherits ComponentBase
-
-<HeadContent>
-    @{
-        var assembly = this.GetType().Assembly.GetName().Name;
-    }
-    <link rel="stylesheet" href="_content/@(assembly)/css/style.css" />
-</HeadContent>

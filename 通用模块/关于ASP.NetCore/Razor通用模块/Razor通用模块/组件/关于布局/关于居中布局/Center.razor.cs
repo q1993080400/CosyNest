@@ -7,14 +7,6 @@
 public sealed partial class Center : ComponentBase, IContentComponent<RenderFragment>
 {
     #region 组件参数
-    #region 是否允许横屏
-    /// <summary>
-    /// 如果<see cref="IsAbsolute"/>和本属性均为<see langword="true"/>，
-    /// 则在手机端还会强制横屏
-    /// </summary>
-    [Parameter]
-    public bool CanHorizontalScreen { get; set; }
-    #endregion
     #region 居中模式
     /// <summary>
     /// 居中模式，

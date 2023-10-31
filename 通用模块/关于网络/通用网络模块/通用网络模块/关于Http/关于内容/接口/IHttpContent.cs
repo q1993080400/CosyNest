@@ -76,7 +76,9 @@ public interface IHttpContent
 #endif
         if (options is { })
             return JsonSerializer.Deserialize<Obj>(array, options);
-        return JsonSerializer.Deserialize<Obj>(array, CreateDesign.JsonCommonOptions);
+        var commonOptions = CreateDesign.JsonCommonOptions;
+        commonOptions.PropertyNameCaseInsensitive = true;
+        return JsonSerializer.Deserialize<Obj>(array, commonOptions);
     }
     #endregion
     #region 非泛型方法

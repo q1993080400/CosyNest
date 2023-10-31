@@ -65,7 +65,7 @@ sealed class BitReadEnumerable<Byte> : IBitRead
         {
             var (element, toEnd) = await enumerator.MoveRange(bufferSize);
             var array = element.ToArray();
-            if (array.Any())
+            if (array.Length != 0)
                 yield return array;
             if (toEnd)
                 yield break;

@@ -84,7 +84,8 @@ public static class ExtenJson
     #region 正式方法
     /// <summary>
     /// 将<see cref="JsonElement"/>解释为与它兼容的基本类型，
-    /// 如果它不是基本类型，会产生异常
+    /// 如果它不是基本类型，会产生异常，
+    /// 注意：它将任何数字转换为<see cref="double"/>
     /// </summary>
     /// <param name="json">待解释的<see cref="JsonElement"/></param>
     /// <returns></returns>
@@ -99,7 +100,7 @@ public static class ExtenJson
             JsonValueKind.String => json.TryGetDateTimeOffset(out var datetime) ? datetime :
             json.TryGetDateTimeOffset(out var dateTimeOffset) ? dateTimeOffset :
             json.TryGetGuid(out var guid) ? guid : json.GetString(),
-            JsonValueKind.Number => (Num)json.GetDecimal(),
+            JsonValueKind.Number => json.GetDouble(),
             var kind => throw new NotSupportedException($"不能读取{kind}类型的令牌")
         };
     #endregion

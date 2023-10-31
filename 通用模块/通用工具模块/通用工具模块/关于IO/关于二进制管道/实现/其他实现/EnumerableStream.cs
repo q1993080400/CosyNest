@@ -114,7 +114,7 @@ sealed class EnumerableStream(IEnumerator<IEnumerable<byte>> bytes) : Stream
     /// 它是上次读取字节数组后，
     /// 由于缓冲区的限制没有返回的部分
     /// </summary>
-    private byte[] OldData { get; set; } = Array.Empty<byte>();
+    private byte[] OldData { get; set; } = [];
 
     #endregion
     #endregion

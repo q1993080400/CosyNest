@@ -204,5 +204,4 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
         RefreshTarget = this;
     }
     #endregion
-
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR;
 
 using System.Design;
@@ -43,10 +44,14 @@ public static partial class ExtendWebApi
     {
         pattern ??= x => $"/Hub/{x.Trim(false, "Hub")}";
         var method = typeof(HubEndpointRouteBuilderExtensions).GetTypeData().
-            FindMethod(nameof(HubEndpointRouteBuilderExtensions.MapHub), CreateReflection.MethodSignature(typeof(HubEndpointConventionBuilder), typeof(IEndpointRouteBuilder), typeof(string)));
+            FindMethod(nameof(HubEndpointRouteBuilderExtensions.MapHub), CreateReflection.MethodSignature(typeof(HubEndpointConventionBuilder), typeof(IEndpointRouteBuilder),
+            typeof(string), typeof(Action<HttpConnectionDispatcherOptions>)));
         foreach (var item in assembly.GetTypes().Where(x => typeof(Hub).IsAssignableFrom(x) && x.IsPublic && !x.IsAbstract))
         {
-            method.MakeGenericMethod(item).Invoke<object>(null, builder, pattern(item.Name));
+            method.MakeGenericMethod(item).Invoke<object>(null, builder, pattern(item.Name), (HttpConnectionDispatcherOptions options) =>
+            {
+                options.AllowStatefulReconnects = true;
+            });
         }
     }
     #endregion

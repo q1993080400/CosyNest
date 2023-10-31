@@ -14,7 +14,7 @@ sealed class DirectSimple : IDirect
     /// 获取封装的字典，
     /// 本类型的功能就是通过它实现的
     /// </summary>
-    private Dictionary<string, object?> Dictionary { get; } = new();
+    private Dictionary<string, object?> Dictionary { get; } = [];
     #endregion
     #region 接口实现
     #region 复制字典

@@ -32,20 +32,40 @@ function LoadCSS(uri) {
 
 //观察虚拟化容器
 function ObservingVirtualizationContainers(netMethod, endID) {
-    var key = endID + 'Observe';
-    if (window[key] == undefined) {
-        window[key] = new IntersectionObserver(x => {
-            if (x[0].isIntersecting)
-                netMethod(0);
-        });
-    }
-    var observe = window[key];
+    var observe = new IntersectionObserver(x => {
+        if (x[0].isIntersecting)
+            netMethod(0);
+    });
+    CacheObservation(endID + 'Observe', observe);
     observe.observe(document.getElementById(endID));
 }
 
 //初始化VideoJS
 function InitializationVideoJS(id, op) {
-    videojs(id, op);
+    var play = videojs.getPlayer(id);
+    if (play != undefined) {
+        if (play.srcHash != op.srcHash) {
+            play.src(op.sources);
+            play.srcHash = op.srcHash;
+        }
+        return;
+    }
+    var element = document.getElementById(id);
+    element.style.display = 'none';
+    var newPlay = videojs(id, op, function () {
+        element.style.display = 'block';
+    });
+    newPlay.srcHash = op.srcHash;
+}
+
+//如果页面存在一个观察者的缓存，则将它释放，然后放入新的观察者
+//它可以避免观察者被重复初始化
+function CacheObservation(key, observe) {
+    var old = window[key];
+    if (old != undefined) {
+        old?.disconnect();
+    }
+    window[key] = observe;
 }
 
 //注册观察媒体事件，它检测媒体的可见性，并自动播放暂停媒体
@@ -62,6 +82,7 @@ function ObserveVisiblePlay(id) {
             }
         }
     });
+    CacheObservation(id + 'Observe', observe);
     for (var i of element) {
         observe.observe(i);
     }
@@ -82,6 +103,7 @@ function ObserveVisiblePlay(id) {
         }
     }
     var observerDOM = new MutationObserver(callback);
+    CacheObservation(id + 'ObserveDOM', observerDOM);
     observerDOM.observe(document.getElementById(id),
         {
             subtree: true,
@@ -91,7 +113,7 @@ function ObserveVisiblePlay(id) {
 
 //将一个SVG标签的文本封装成Blob，再封装成一个Uri
 function CreateSVGUri(svgID) {
-    var svg = document.getElementById(svgID).outerHTML;
+    var svg = document.getElementById(svgID).innerHTML;
     var blob = new Blob([svg],
         {
             type: "image/svg+xml"

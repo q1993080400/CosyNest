@@ -20,7 +20,7 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
     /// 获取或设置豆腐块的每行最大字数
     /// </summary>
     [Parameter]
-    public int MaxRowLength { get; set; } = 8;
+    public int MaxRowLength { get; set; } = 6;
     #endregion
     #region 最大行数
     /// <summary>
@@ -57,7 +57,8 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
         return new()
         {
             Text = text,
-            WidthStyle = $"width:{Width ?? $"{MaxRowLength}ic"};height:{MaxRow}lh;padding-top:var(--paddingSmall)",
+            ContainerWidth = $"width:{Width ?? $"calc({MaxRowLength}ic + 2ch)"}",
+            TextHeight = $"height:{MaxRow}lh",
             CSSContainer = "tofuCubesContainer",
             CSSIcon = "tofuCubesIcon",
             CSSText = "tofuCubesText"

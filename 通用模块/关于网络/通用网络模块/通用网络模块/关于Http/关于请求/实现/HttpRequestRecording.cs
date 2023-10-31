@@ -43,6 +43,13 @@ public sealed record HttpRequestRecording
     /// </summary>
     public IHttpContent? Content { get; init; }
     #endregion
+    #region 如果响应不成功，是否抛出异常
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 且响应不成功，则抛出异常
+    /// </summary>
+    public bool ThrowIfNotSuccess { get; set; } = true;
+    #endregion
     #endregion
     #region 构造函数
     #region 无参数构造函数

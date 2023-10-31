@@ -34,7 +34,7 @@ sealed class RecordSQL : DbCommandInterceptor
         var log = new StringBuilder();
         log.AppendLine("----------");
         log.AppendLine("SQL脚本记录开始");
-        if (parameters.Any())
+        if (parameters.Length != 0)
         {
             log.AppendLine("参数：");
             log.AppendLine(parameters.Join(x => $"{x.ParameterName}={x.Value}", "，"));

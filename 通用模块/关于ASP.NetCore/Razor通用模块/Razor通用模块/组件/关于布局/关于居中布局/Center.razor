@@ -10,7 +10,7 @@
         CenterMod.Screen => "centerMiddAbsolute",
         var mod => throw new NotSupportedException($"无法识别{mod}模式")
     };
-    <div class="@css @((CenterMod,CanHorizontalScreen) is (CenterMod.Screen,true)?"horizontalScreen":"")" @attributes="ContainerAttributes">
+    <div class="@css" @attributes="ContainerAttributes">
         <div>
             @ChildContent
         </div>

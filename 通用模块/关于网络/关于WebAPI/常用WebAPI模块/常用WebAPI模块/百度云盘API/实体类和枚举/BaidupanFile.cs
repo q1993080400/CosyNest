@@ -31,6 +31,12 @@ public sealed record BaidupanFile : BaidupanFD
         await read.SaveToFile(path, cancellation: cancellationToken);
     }
     #endregion
+    #region 文件类型
+    /// <summary>
+    /// 获取文件类型
+    /// </summary>
+    public BaidupanFileType Type { get; }
+    #endregion
     #endregion
     #region 内部成员
     #region Http工厂
@@ -53,6 +59,7 @@ public sealed record BaidupanFile : BaidupanFD
     {
         HttpClientProvide = httpClientProvide;
         Download = infoData.GetValue<string>("dlink")! + $"&access_token={accessToken}";
+        Type = fileData.GetValue<BaidupanFileType>("category");
     }
     #endregion 
 }

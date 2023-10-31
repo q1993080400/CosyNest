@@ -15,25 +15,19 @@ public abstract record BaidupanFD
     /// </summary>
     public string Path { get; }
     #endregion
-    #region 文件名称
+    #region 文件信息
     /// <summary>
     /// 获取一个元组，它的项分别是文件或目录的简称，
     /// 扩展名（如果存在，不带点号），以及全称
     /// </summary>
-    public (string Simple, string? Extended, string FullName) Name
-        => ToolPath.SplitPathFile(Path);
+    public (string Simple, string? Extended, string FullName) Info
+        => ToolPath.SplitFilePath(Path);
     #endregion
     #region 文件ID
     /// <summary>
     /// 获取文件的ID
     /// </summary>
     public long ID { get; }
-    #endregion
-    #region 文件类型
-    /// <summary>
-    /// 获取文件类型
-    /// </summary>
-    public BaidupanFileType Type { get; }
     #endregion
     #region 重写ToString
     public sealed override string ToString()
@@ -49,7 +43,6 @@ public abstract record BaidupanFD
     {
         Path = data.GetValue<string>("path")!;
         ID = data.GetValue<long>("fs_id");
-        Type = data.GetValue<BaidupanFileType>("category");
     }
     #endregion
 }

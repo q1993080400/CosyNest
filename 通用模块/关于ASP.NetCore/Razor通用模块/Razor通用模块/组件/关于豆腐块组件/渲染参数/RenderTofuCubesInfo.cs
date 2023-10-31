@@ -23,12 +23,17 @@ public sealed record RenderTofuCubesInfo
     /// </summary>
     public required string CSSText { get; init; }
     #endregion
-    #region 宽度样式
+    #region 容器宽度
     /// <summary>
-    /// 获取一个样式文本，
-    /// 它让每个组件都获得统一的宽度
+    /// 获取整个容器的宽度样式（不是CSS类名）
     /// </summary>
-    public required string WidthStyle { get; init; }
+    public required string ContainerWidth { get; init; }
+    #endregion
+    #region 文字高度
+    /// <summary>
+    /// 获取文字部分的高度样式（不是CSS类名）
+    /// </summary>
+    public required string TextHeight { get; init; }
     #endregion
     #region 要渲染的文字
     /// <summary>

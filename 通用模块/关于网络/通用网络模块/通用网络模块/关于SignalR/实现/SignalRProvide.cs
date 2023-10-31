@@ -19,7 +19,7 @@ sealed class SignalRProvide(Func<string, Task<HubConnection>> create, Func<strin
     /// <summary>
     /// 该属性按照Uri缓存已经创建的连接
     /// </summary>
-    private Dictionary<string, Task<HubConnection>> Cache { get; } = new();
+    private Dictionary<string, Task<HubConnection>> Cache { get; } = [];
     #endregion
     #region 用于创建连接的委托
     /// <summary>

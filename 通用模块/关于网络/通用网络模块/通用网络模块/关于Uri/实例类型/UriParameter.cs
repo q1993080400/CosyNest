@@ -28,7 +28,7 @@ public sealed record UriParameter : UriBase
     /// <summary>
     /// 获取用来匹配参数字符串的正则表达式
     /// </summary>
-    private static IRegex Regex { get; } =/*language=regex*/@"(?<key>(\w|-|\.)+)=(?<value>(\w|-|\.|%)+)".
+    private static IRegex Regex { get; } =/*language=regex*/@"(?<key>(\w|-|\.)+)=(?<value>(\w|-|\.|%|/)+)".
         Op().Regex(RegexOptions.IgnoreCase);
     #endregion
     #region 使用键值对集合

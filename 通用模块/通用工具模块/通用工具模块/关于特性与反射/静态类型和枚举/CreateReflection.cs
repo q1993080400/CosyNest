@@ -20,7 +20,7 @@ public static class CreateReflection
     /// <summary>
     /// 返回无参数无返回值的方法签名
     /// </summary>
-    public static IMethodSignature MethodNoParameters { get; } = new MethodSignature(null, Array.Empty<object>());
+    public static IMethodSignature MethodNoParameters { get; } = new MethodSignature(null, []);
     #endregion
     #region 创建委托的签名
     /// <summary>
@@ -48,7 +48,7 @@ public static class CreateReflection
     /// <summary>
     /// 返回无参数构造函数的签名
     /// </summary>
-    public static IConstructSignature ConstructNoParameters { get; } = new ConstructSignature(Array.Empty<object>());
+    public static IConstructSignature ConstructNoParameters { get; } = new ConstructSignature([]);
     #endregion
     #endregion
 }

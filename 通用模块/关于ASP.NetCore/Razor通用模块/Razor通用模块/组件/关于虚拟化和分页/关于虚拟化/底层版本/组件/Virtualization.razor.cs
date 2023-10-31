@@ -106,7 +106,7 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// <summary>
     /// 获取要渲染的元素列表
     /// </summary>
-    private ImmutableList<Element> ElementList { get; set; } = ImmutableList<Element>.Empty;
+    private ImmutableList<Element> ElementList { get; set; } = [];
     #endregion
     #region 枚举要渲染的元素
     /// <summary>
@@ -187,30 +187,32 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             if (RenderElements is { })
                 await RenderElements.DisposeAsync();
             RenderElements = elements.GetAsyncEnumerator();
-            ElementList = ImmutableList<Element>.Empty;
+            ElementList = [];
             var isReverse = parameters.GetValueOrDefault<bool>(nameof(IsReverse));
             await AddElement(Initial, isReverse);
         }
         await base.SetParametersAsync(parameters);
     }
     #endregion
-    #region 重写OnAfterRenderAsync
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    #region 重写OnParametersSetAsync
+    protected override async Task OnParametersSetAsync()
     {
-        if (IsReverse)
-        {
-            var lastElementindex = Math.Min(ElementList.Count, Plus) - 1;
-            if (lastElementindex > 0)
-                await JSWindow.Document.ScrollIntoView(GetElementID(lastElementindex));
-        }
-        if (!firstRender)
-            return;
         if (IsReverse)
             await JSWindow.Document.ScrollIntoView(BottomID);
         (var methodName, PackNet) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AddElementAndRender());
         await JSWindow.InvokeCodeVoidAsync($"""
                 ObservingVirtualizationContainers({methodName},'{EndID}');
                 """);
+    }
+    #endregion
+    #region 重写OnAfterRenderAsync
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!IsReverse)
+            return;
+        var lastElementindex = Math.Min(ElementList.Count, Plus) - 1;
+        if (lastElementindex > 0)
+            await JSWindow.Document.ScrollIntoView(GetElementID(lastElementindex));
     }
     #endregion
     #endregion

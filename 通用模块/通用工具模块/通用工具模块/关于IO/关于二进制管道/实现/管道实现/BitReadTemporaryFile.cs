@@ -35,10 +35,10 @@ sealed class BitReadTemporaryFile(PathText path) : AutoRelease, IBitRead
     public long? Length => Stream.Length;
     #endregion
     #region 文件的格式
-    public string? Format => ToolPath.SplitPathFile(Path).Extended;
+    public string? Format => ToolPath.SplitFilePath(Path).Extended;
     #endregion
     #region 对管道的描述
-    public string? Describe => ToolPath.SplitPathFile(Path).FullName;
+    public string? Describe => ToolPath.SplitFilePath(Path).FullName;
     #endregion
     #region 转换为流
     public Stream ToStream()

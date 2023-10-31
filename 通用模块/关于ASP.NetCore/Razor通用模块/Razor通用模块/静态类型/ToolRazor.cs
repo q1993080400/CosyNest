@@ -49,7 +49,7 @@ public static class ToolRazor
     /// <inheritdoc cref="GetRoute(Type)"/>
     public static string GetRouteSafe(Type componentType)
         => GetRoute(componentType) ??
-        throw new NullReferenceException($"{typeof(Component)}没有指定{nameof(RouteAttribute)}特性，它没有路由模板");
+        throw new NullReferenceException($"{componentType}没有指定{nameof(RouteAttribute)}特性，它没有路由模板");
     #endregion
     #endregion
     #endregion

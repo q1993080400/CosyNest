@@ -144,7 +144,7 @@ public static class ExtenIO
         var pos = 0;
         while (true)
         {
-            while (surplus.Any())           //处理上次迭代的剩余部分
+            while (surplus.Length != 0)           //处理上次迭代的剩余部分
             {
                 var copyLen = Math.Min(bufferSize - pos, surplus.Length);
                 Array.Copy(surplus, 0, buffer, pos, copyLen);
@@ -155,7 +155,7 @@ public static class ExtenIO
                     buffer = new byte[bufferSize];
                     pos = 0;
                 }
-                surplus = copyLen == surplus.Length ? Array.Empty<byte>() : surplus[copyLen..];
+                surplus = copyLen == surplus.Length ? [] : surplus[copyLen..];
             }
             var hasElement = await enumerator.MoveNextAsync();
             if (!hasElement)

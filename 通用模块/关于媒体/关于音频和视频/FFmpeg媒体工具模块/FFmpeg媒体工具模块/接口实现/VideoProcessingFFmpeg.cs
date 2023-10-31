@@ -1,7 +1,7 @@
 ﻿using System.IOFrancis;
 using System.IOFrancis.Bit;
 using System.IOFrancis.FileSystem;
-using System.Maths;
+using System.MathFrancis;
 
 using Xabe.FFmpeg;
 
@@ -40,15 +40,26 @@ sealed class VideoProcessingFFmpeg : IVideoProcessing
         info ??= new();
         var mediaInfo = await FFmpeg.GetMediaInfo(mediumPath);
         var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
-        var scale = "";
-        if ((info, videoStream) is ({ MaxDefinition: { } definition }, { }))
+        #region 返回缩放比例的本地函数
+        string GetScale()
         {
-            var size = CreateMath.SizePixel(videoStream.Width, videoStream.Height);
-            var (w, _) = size.DimensionalityReduction(definition);
-            var proportion = decimal.Divide(size.PixelCount.Horizontal, w);
-            scale = $"-vf scale=iw/{proportion}:ih/{proportion}";
+            if ((info, videoStream) is ({ MaxDefinition: { } definition }, { }))
+            {
+                var size = CreateMath.SizePixel(videoStream.Width, videoStream.Height);
+                var (ow, oh) = size;
+                var (cw, _) = size.DimensionalityReduction(definition);
+                var proportion = decimal.Divide(ow, cw);
+                var (fw, fh) = ((int)(ow / proportion), (int)(oh / proportion));
+                var (rw, rh) = (fw % 2, fh % 2);
+                if (rw is not 0 || rh is not 0)
+                    return $"-vf scale={fw - rw}:{fh - rh}";    //FFmpeg不知道为什么，不允许视频的长宽为奇数，这段代码就是为了解决这个问题
+                return $"-vf scale={fw}:-1";
+            }
+            return "";
         }
-        var arguments = $"-i {mediumPath} -c:v libx264 -c:a aac {scale} {targetPath}";
+        #endregion
+        var emphasizeCompatibility = info.EmphasizeCompatibility;
+        var arguments = $"-i {mediumPath} -c:v {(emphasizeCompatibility ? "libx264" : "libvpx-vp9")} -c:a {(emphasizeCompatibility ? "aac" : "libopus")} {GetScale()} {targetPath}";
         ToolIO.CreateFather(targetPath);
         await FFmpeg.Conversions.New().Start(arguments, info.CancellationToken);
     }

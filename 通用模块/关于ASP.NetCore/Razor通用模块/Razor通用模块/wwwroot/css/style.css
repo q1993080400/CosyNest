@@ -35,18 +35,24 @@
 /*横向屏幕，即宽大于高，一般用于电脑*/
 @media (orientation: landscape)
 {
+    /*占满屏幕，并且在横屏时自动旋转*/
+    .horizontalScreen
+    {
+        min-width: 100dvw;
+        min-height: 100dvh;
+    }
 }
 
 /*竖向屏幕，即高大于宽，一般用于手机*/
 @media (orientation: portrait)
 {
-    /*横屏显示*/
+    /*占满屏幕，并且在横屏时自动旋转*/
     .horizontalScreen
     {
         min-width: 100dvh;
         min-height: 100dvw;
         transform-origin: left top;
-        transform: translateX(100dvw) rotate(90deg)
+        transform: translateX(100dvw) rotate(90deg);
     }
 }
 
@@ -72,6 +78,16 @@
     /*中等圆角样式*/
     --mediumRadius: 20px;
 }
+
+/*占满屏幕，并且在横屏时自动旋转*/
+.horizontalScreen
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+}
+
 
 /*普通容器样式*/
 .commonContainers
@@ -109,20 +125,14 @@
 /*豆腐块组件容器的CSS样式*/
 .tofuCubesContainer
 {
-    display: grid;
-    grid-template: auto auto/1fr auto 1fr
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--paddingSmall);
 }
 
 /*豆腐块组件图标的CSS样式*/
 .tofuCubesIcon
 {
-    grid-column: 2
-}
-
-/*豆腐块文本容器样式*/
-.tofuCubesTextContainer
-{
-    grid-area: 2/1/-1/-1;
 }
 
 /*豆腐块组件文本的CSS样式*/

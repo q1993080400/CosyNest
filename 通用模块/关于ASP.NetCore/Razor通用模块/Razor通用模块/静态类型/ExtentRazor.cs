@@ -214,6 +214,7 @@ public static class ExtendRazor
                  {
                      op.Cookies.Add(new Net.Cookie(HttpUtility.UrlEncode(key), HttpUtility.UrlEncode(value), "/", host));
                  }
+                 op.UseStatefulReconnect = true;
                  withUri?.Invoke(op);
              }).
              AddJsonProtocol(x => x.AddFormatterJson()).
@@ -287,6 +288,17 @@ public static class ExtendRazor
         var dictionary = parameters.ToDictionary().ToDictionary(true);
         reconfiguration(dictionary);
         return ParameterView.FromDictionary(dictionary!);
+    }
+    #endregion
+    #region 公开StateHasChanged方法
+    /// <summary>
+    /// 公开组件的StateHasChanged方法，并调用它
+    /// </summary>
+    /// <param name="component">要刷新的组件</param>
+    public static void StateHasChanged(this ComponentBase component)
+    {
+        var stateHasChanged = component.GetTypeData().FindMethod("StateHasChanged");
+        stateHasChanged.Invoke(component, null);
     }
     #endregion
     #endregion

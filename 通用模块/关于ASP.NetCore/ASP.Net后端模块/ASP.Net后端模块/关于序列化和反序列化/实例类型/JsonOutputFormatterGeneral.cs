@@ -42,7 +42,7 @@ sealed class JsonOutputFormatterGeneral : TextOutputFormatter
     {
         Options = options;
         Options.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.Json));
+        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.TextJson));
         SupportedEncodings.Add(Encoding.UTF8);
         SupportedEncodings.Add(Encoding.Unicode);
     }

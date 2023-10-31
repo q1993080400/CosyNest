@@ -33,13 +33,21 @@ public static class FileTypeCom
         = CreateIO.FileType("Web图片文件", "apng", "bmp", "gif", "ico",
             "cur", "jpg", "jpeg", "jfif", "pjpeg", "pjp", "png", "svg", "webp");
     #endregion
-    #region 视频文件
+    #region Web视频文件
     /// <summary>
     /// 返回代表Web视频文件的文件类型，
     /// 它被各大浏览器广泛支持
     /// </summary>
     public static IFileType WebVideo { get; }
         = CreateIO.FileType("Web视频文件", "webm", "mp4", "mov");
+    #endregion
+    #region Web音频文件
+    /// <summary>
+    /// 返回代表Web音频文件的文件类型，
+    /// 它被各大浏览器广泛支持
+    /// </summary>
+    public static IFileType WebAudio { get; }
+        = CreateIO.FileType("Web音频文件", "mp3");
     #endregion
     #endregion
 }

@@ -32,7 +32,7 @@ sealed class FileType : IFileType
             if (registered.TryGetValue(item, out var value))
                 value.Add(this);
             else
-                registered.Add(item, new() { this });
+                registered.Add(item, [this]);
         }
     }
     #endregion

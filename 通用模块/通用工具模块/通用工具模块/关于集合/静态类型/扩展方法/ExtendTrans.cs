@@ -161,7 +161,7 @@ public static partial class ExtendEnumerable
                 yield return list;
                 if (notObj)
                     yield break;
-                list = new LinkedList<Obj>();
+                list = [];
                 arrayIndex = Math.Min(index.Length - 1, arrayIndex + 1);
             }
             list.AddLast(enumerator.Current);

@@ -21,15 +21,14 @@ public static class ExtendNet
     /// </summary>
     /// <param name="httpClient">待包装的<see cref="HttpClient"/></param>
     /// <returns></returns>
-    /// <inheritdoc cref="HttpClientRealize(HttpClient, HttpRequestTransform?,bool)"/>
-    public static IHttpClient ToHttpClient(this HttpClient httpClient, HttpRequestTransform? requestTransform = null, bool throwException = true)
-        => new HttpClientRealize(httpClient, requestTransform, throwException);
+    /// <inheritdoc cref="HttpClientRealize(HttpClient, HttpRequestTransform?)"/>
+    public static IHttpClient ToHttpClient(this HttpClient httpClient, HttpRequestTransform? requestTransform = null)
+        => new HttpClientRealize(httpClient, requestTransform);
     #endregion
     #region 读取IHttpResponse的内容，并将其转换为更高层的类型
     /// <summary>
     /// 读取一个<see cref="IHttpResponse"/>的内容，
-    /// 并将其转换为更高层次的类型返回，
-    /// 如果请求未能成功，则抛出一个异常
+    /// 并将其转换为更高层次的类型返回
     /// </summary>
     /// <typeparam name="Ret">返回值类型</typeparam>
     /// <param name="response">待读取的<see cref="IHttpResponse"/></param>
@@ -38,7 +37,6 @@ public static class ExtendNet
     public static async Task<Ret> Read<Ret>(this Task<IHttpResponse> response, Func<IHttpContent, Task<Ret>> read)
     {
         var r = await response;
-        r.ThrowIfNotSuccess();
         return await read(r.Content);
     }
     #endregion
@@ -132,28 +130,28 @@ public static class ExtendNet
     #endregion
     #endregion
     #region 有关字符串互相转换
-    #region 转换Uri字符串
-    #region 转换为Uri字符串
+    #region 转换Base64字符串
+    #region 转换为Base64字符串
     /// <summary>
-    /// 将字符串转换为Uri字符串，
+    /// 将字符串转换为Base64字符串，
     /// 它替换了所有不安全的字符
     /// </summary>
     /// <param name="text">封装要转换的字符串的对象</param>
     /// <returns></returns>
-    public static string ToUriText(this StringOperate text)
+    public static string ToBase64(this StringOperate text)
     {
         var plainTextBytes = text.Text.ToBytes();
         var base64 = Convert.ToBase64String(plainTextBytes).Replace('+', '-').Replace('/', '_').TrimEnd('=');
         return base64;
     }
     #endregion
-    #region 从Uri字符串转换
+    #region 从Base64字符串转换
     /// <summary>
-    /// 将Uri字符串解码，然后将其转换为字符串
+    /// 将Base64字符串解码，然后将其转换为字符串
     /// </summary>
     /// <param name="text">封装要转换的字符串的对象</param>
     /// <returns></returns>
-    public static string FromUriText(this StringOperate text)
+    public static string FromBase64(this StringOperate text)
     {
         var secureUrlBase64 = text.Text.Replace('-', '+').Replace('_', '/');
         switch (secureUrlBase64.Length % 4)
@@ -238,11 +236,12 @@ public static class ExtendNet
     /// <returns></returns>
     public static string ToVirtualPath(this StringOperate localPath)
     {
+        var text = localPath.Text;
         const string wwwroot = "wwwroot";
-        var index = localPath.Text.IndexOf("wwwroot");
+        var index = text.IndexOf("wwwroot");
         return index < 0 ?
-            throw new ArgumentException($"路径{localPath}不包含{wwwroot}文件夹") :
-            localPath.Text[(index + wwwroot.Length)..];
+            text :
+            text[(index + wwwroot.Length)..];
     }
     #endregion
     #region 将虚拟路径转换为真实路径
@@ -259,14 +258,13 @@ public static class ExtendNet
     #region 关于依赖注入
     #region 注入IHttpClient
     /// <summary>
-    /// 注入一个<see cref="IHttpClient"/>，
+    /// 以瞬间模式注入一个<see cref="IHttpClient"/>，
     /// 它可以用来发起Http请求，
     /// 如果服务容器中注册了<see cref="HttpRequestTransform"/>，
     /// 那么还会将它作为<see cref="IHttpClient"/>的请求转换函数
     /// </summary>
     /// <param name="services">要注入的服务集合</param>
     /// <returns></returns>
-    /// <inheritdoc cref="ToHttpClient(HttpClient, HttpRequestTransform?, bool)"/>
     public static IServiceCollection AddIHttpClient(this IServiceCollection services)
     {
         services.AddHttpClient();
@@ -287,7 +285,6 @@ public static class ExtendNet
     /// <param name="create">该委托传入中心的绝对Uri，以及一个用来提供服务的对象，
     /// 然后创建一个新的<see cref="HubConnection"/>，如果为<see langword="null"/>，则使用默认方法</param>
     /// <returns></returns>
-    /// <inheritdoc cref="CreateNet.SignalRProvide(Func{string, Task{HubConnection}}?, Func{string, string}?)"/>
     public static IServiceCollection AddSignalRProvide(this IServiceCollection services, Func<string, IServiceProvider, Task<HubConnection>>? create = null)
         => services.AddTransient(server =>
         {
@@ -295,16 +292,6 @@ public static class ExtendNet
             return CreateNet.SignalRProvide(create is null ? null : uri => create(uri, server),
                 uri => navigation.Convert(uri, true));
         });
-    #endregion
-    #region 注入HttpRequestTransformation
-    /// <summary>
-    /// 以范围模式注入一个<see cref="HttpRequestHelp"/>，
-    /// 它可以封装一个Http转换函数
-    /// </summary>
-    /// <param name="services">待注入的服务容器</param>
-    /// <returns></returns>
-    public static IServiceCollection AddHttpRequestTransformation(this IServiceCollection services)
-        => services.AddScoped<HttpRequestHelp>();
     #endregion
     #endregion 
 }

@@ -11,11 +11,21 @@ public sealed record RenderVideoJS
     /// </summary>
     public bool Autoplay { get; init; }
     #endregion
-    #region 视频的地址
+    #region 视频的源
     /// <summary>
-    /// 获取视频的地址
+    /// 获取视频的源，
+    /// 它的顺序很重要，
+    /// 函数会以此作为优先级依次加载媒体
     /// </summary>
-    public required string Src { get; init; }
+    public required IEnumerable<VideoJSSource> Source { get; init; }
+    #endregion
+    #region 是否为音频专用模式
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，表示它是专门用来播放音频的，
+    /// 为<see langword="false"/>，表示它是一个视频播放器，
+    /// 为<see langword="null"/>，表示自动推断
+    /// </summary>
+    public bool? AudioOnlyMode { get; init; }
     #endregion
     #region 是否循环播放
     /// <summary>
@@ -28,12 +38,6 @@ public sealed record RenderVideoJS
     /// 获取是否显示控件
     /// </summary>
     public bool Controls { get; init; }
-    #endregion
-    #region 视频的ID
-    /// <summary>
-    /// 获取视频的ID
-    /// </summary>
-    public string ID { get; init; } = ToolASP.CreateJSObjectName();
     #endregion
     #region 宽度
     /// <summary>

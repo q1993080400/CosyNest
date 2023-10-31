@@ -1,6 +1,4 @@
-﻿using System.Maths;
-using System.Maths.Plane;
-using System.Media.Drawing;
+﻿using System.Media.Drawing;
 
 using Xabe.FFmpeg;
 

@@ -33,7 +33,7 @@ public static class ToolPath
     /// <returns></returns>
     public static string RefactoringPath(PathText path, Func<string, string>? newSimple = null, Func<string?, string>? newExtension = null)
     {
-        var (simple, extended, _) = SplitPathFile(path);
+        var (simple, extended, _) = SplitFilePath(path);
         var father = Path.GetDirectoryName(path);
         var name = GetFullName(newSimple?.Invoke(simple) ?? simple, newExtension?.Invoke(extended) ?? extended);
         return father switch
@@ -127,7 +127,7 @@ public static class ToolPath
     /// <returns>一个元组，它的项分别是文件或目录的名称，
     /// 以及文件的扩展名（如果没有扩展名，则返回<see langword="null"/>，只会出现小写），
     /// 以及文件的全名</returns>
-    public static (string Simple, string? Extended, string FullName) SplitPathFile(string path, bool withDot = false)
+    public static (string Simple, string? Extended, string FullName) SplitFilePath(string path, bool withDot = false)
     {
         var fullName = Path.GetFileName(path);
         if (fullName.IsVoid())

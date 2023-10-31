@@ -19,7 +19,7 @@ sealed class ConvertObject
     /// <summary>
     /// 该集合枚举用于转换对象的委托
     /// </summary>
-    private ConcurrentBag<Func<object, (bool IsSuccess, object Result)>> ConvertDelegate { get; } = new();
+    private ConcurrentBag<Func<object, (bool IsSuccess, object Result)>> ConvertDelegate { get; } = [];
     #endregion
     #region 添加转换委托
     /// <summary>

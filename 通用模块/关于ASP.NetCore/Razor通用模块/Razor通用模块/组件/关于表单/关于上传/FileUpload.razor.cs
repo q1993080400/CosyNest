@@ -91,6 +91,12 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     private CancellationTokenSource CancellationTokenSource { get; } = new();
     #endregion
     #region 关于选择文件
+    #region 正在上传的文件数量
+    /// <summary>
+    /// 获取正在上传的文件数量
+    /// </summary>
+    private int FileCount { get; set; }
+    #endregion
     #region 选择文件时执行的方法
     /// <summary>
     /// 选择文件时执行的方法
@@ -99,15 +105,26 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     private async Task OnChange(InputFileChangeEventArgs args)
     {
         var files = args.GetMultipleFiles(args.FileCount);
-        UploadStatus = UploadStatus.Uploading;
-        await OnUploadStatusChangeed.InvokeAsync(UploadStatus);
+        if (files.Count is 0)
+            return;
         try
         {
+            UploadStatus = UploadStatus.Uploading;
+            FileCount++;
+            await OnUploadStatusChangeed.InvokeAsync(UploadStatus);
             var isSuccess = await OnSelectFile(files, CancellationTokenSource.Token);
-            UploadStatus = isSuccess ? UploadStatus.UploadCompleted : UploadStatus.UploadFailed;
+            FileCount--;
+            if (isSuccess)
+            {
+                if (FileCount is 0)
+                    UploadStatus = UploadStatus.UploadCompleted;
+            }
+            else
+                UploadStatus = UploadStatus.UploadFailed;
         }
         catch (Exception ex)
         {
+            FileCount--;
             UploadStatus = UploadStatus.UploadFailed;
             if (ex is not OperationCanceledException)
                 throw;

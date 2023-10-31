@@ -3,7 +3,6 @@
 .watermarkContainer
 {
     z-index: 99999;
-    pointer-events: none;
     background-repeat: repeat;
     background-position: center;
 }

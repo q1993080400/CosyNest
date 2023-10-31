@@ -16,7 +16,7 @@ public abstract record HttpHeader : IHttpHeader
     /// <summary>
     /// 获取标头字典，它是可变的
     /// </summary>
-    public Dictionary<string, IEnumerable<string>> Headers { get; } = new();
+    public Dictionary<string, IEnumerable<string>> Headers { get; } = [];
     #endregion
     #endregion
     #endregion
@@ -72,7 +72,7 @@ public abstract record HttpHeader : IHttpHeader
     public HttpHeader(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
     {
         var h = headers.Select(x => (x.Key, x.Value.Where(x => !x.IsVoid()).ToArray())).
-            Where(x => !x.Key.IsVoid() && x.Item2.Any()).ToArray();
+            Where(x => (x.Key.IsVoid(), x.Item2.Length) is (false, > 0)).ToArray();
         foreach (var (k, v) in h)
         {
             if (Headers.TryGetValue(k, out var value))

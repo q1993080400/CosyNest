@@ -109,7 +109,7 @@ public static partial class ExtenExpressions
         var right = binary.Right.CalValue();
         return binary.Method == null ?
             ToolExpression.CalBinaryOperators(left!, right, binary.NodeType) :
-            binary.Method.Invoke(null, new[] { left, right });
+            binary.Method.Invoke(null, [left, right]);
     }
     #endregion
     #region 不会引发异常

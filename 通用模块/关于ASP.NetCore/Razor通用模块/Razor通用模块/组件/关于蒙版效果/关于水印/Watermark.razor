@@ -2,8 +2,8 @@
 @inherits ComponentBase
 @inject IJSWindow JSWindow
 
-<div class="occupyScre watermarkContainer" style="background-image:url(@(SVGUri));background-size:@(ImageSize)">
-    <div class="svgContainer">
-        @ChildContent(SVGID)
+<div class="occupyScre watermarkContainer" style="background-image:url(@(SVGUri));background-size:@(ImageSize)" inert>
+    <div class="svgContainer" id="@SVGContainerID">
+        @ChildContent
     </div>
 </div>

@@ -62,7 +62,7 @@ public abstract class FromIO : ReleaseAsync, IFromIO
     #region 正式属性
     public string Format
         => Path is { } p ?
-        ToolPath.SplitPathFile(p).Extended ?? "" :
+        ToolPath.SplitFilePath(p).Extended ?? "" :
         FormatTemplate;
     #endregion
     #region 模板方法

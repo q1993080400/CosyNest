@@ -33,7 +33,7 @@ sealed class RegexRealize(string regexText, RegexOptions options) : IRegex
         if (text is null)
             return (false, Array.Empty<IMatch>());
         var matcher = Regex.Matches(text, RegexText, Options).Select(x => new RegexMatch(x, RegexText)).ToArray();
-        return (matcher.Any(), matcher);
+        return (matcher.Length != 0, matcher);
     }
     #endregion
     #region 返回唯一一个匹配到的结果

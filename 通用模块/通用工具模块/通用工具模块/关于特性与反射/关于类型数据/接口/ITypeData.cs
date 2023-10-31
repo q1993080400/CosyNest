@@ -201,9 +201,10 @@ public interface ITypeData
     /// 根据名称，签名和声明类型筛选方法
     /// </summary>
     /// <param name="name">方法的名称</param>
-    /// <param name="signature">声明该方法的类型，
+    /// <param name="signature">方法的签名，
+    /// 如果为<see langword="null"/>，则对签名不做筛选</param>
+    /// <param name="declaringType">声明该方法的类型，
     /// 如果为<see langword="null"/>，则忽略</param>
-    /// <param name="declaringType"></param>
     /// <returns>符合条件的方法，如果没有找到，或找到了多个方法，则引发异常</returns>
     MethodInfo FindMethod(string name, IMethodSignature? signature = null, Type? declaringType = null);
     #endregion

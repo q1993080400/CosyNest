@@ -1,0 +1,17 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Condition
+
+@if (InitializationCondition)
+{
+    @if (AsCascadingParameter)
+    {
+        <CascadingValue Value="@ConditionCache" IsFixed=true>
+            @ChildContent(ConditionCache)
+        </CascadingValue>
+    }
+    else
+    {
+        @ChildContent(ConditionCache)
+    }
+}

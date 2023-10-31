@@ -37,7 +37,7 @@ sealed class UploadTaskFactory(IServiceProvider serviceProvider, UploadTaskFacto
                 };
                 var processedPath = new Tag<ImmutableHashSet<string>>()
                 {
-                    Content = ImmutableHashSet<string>.Empty
+                    Content = []
                 };
                 foreach (var (item, index, _) in files.PackIndex())
                 {

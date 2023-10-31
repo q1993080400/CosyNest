@@ -38,7 +38,7 @@ sealed class FileRealize : IORealize, IFile
     #region 读写扩展名
     public string NameExtension
     {
-        get => ToolPath.SplitPathFile(Path, false).Extended ?? "";
+        get => ToolPath.SplitFilePath(Path, false).Extended ?? "";
         set => Path = ToolPath.RefactoringPath(Path, null,
           _ => value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
     }
@@ -60,7 +60,7 @@ sealed class FileRealize : IORealize, IFile
         newName ??= File.NameFull;
         if (rename is { })
         {
-            var (simple, extended, _) = ToolPath.SplitPathFile(newName);
+            var (simple, extended, _) = ToolPath.SplitFilePath(newName);
             newName = ToolPath.Distinct(target, newName,
                 (x, y) => ToolPath.GetFullName(rename(simple, y), extended));
         }

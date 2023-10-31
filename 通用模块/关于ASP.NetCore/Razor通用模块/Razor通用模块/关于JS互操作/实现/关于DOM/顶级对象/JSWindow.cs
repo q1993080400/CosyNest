@@ -111,7 +111,7 @@ sealed class JSWindow(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSWindo
                             credentials:'same-origin',
                             headers: 
                             {
-                                'Content-Type': '{{MediaTypeName.Json}}'
+                                'Content-Type': '{{MediaTypeName.TextJson}}'
                             }
                         };
                         fetch('{{uri}}',myInit).

@@ -57,7 +57,7 @@ public static class ToolTemporaryFile
     /// <returns>新创建的临时文件，该文件会在程序退出时自动删除</returns>
     public static IFile CreateTemporaryFile(string? extension = null)
     {
-        if (TemporaryLimit is { } limit && TemporaryDirectory.Size > TemporaryLimit)
+        if (TemporaryLimit is { } && TemporaryDirectory.Size > TemporaryLimit)
             TemporaryDirectory.Clear();
         return TemporaryDirectory.CreateFile<IFile>(nameExtended: extension);
     }
@@ -69,7 +69,7 @@ public static class ToolTemporaryFile
     /// <returns></returns>
     public static IDirectory CreateTemporaryDirectory()
     {
-        if (TemporaryLimit is { } limit && TemporaryDirectory.Size > TemporaryLimit)
+        if (TemporaryLimit is { } && TemporaryDirectory.Size > TemporaryLimit)
             TemporaryDirectory.Clear();
         return TemporaryDirectory.Create<IDirectory>();
     }

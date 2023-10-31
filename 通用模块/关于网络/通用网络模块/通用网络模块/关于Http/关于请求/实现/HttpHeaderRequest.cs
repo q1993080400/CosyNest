@@ -13,26 +13,33 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
     public AuthenticationHeaderValue? Authorization
     {
         get => GetHeader("Authorization", v => AuthenticationHeaderValue.Parse(v.Join(" ")));
-        init => SetHeader("Authorization", value, v => v.ToString().Split(' ').ToArray());
+        init => SetHeader("Authorization", value, v => v.ToString().Split(' '));
     }
     #endregion
     #region Cookie标头
     public string? Cookie
     {
         get => GetHeader("Cookie", v => v.Join(";"));
-        init => SetHeader("Cookie", value, v => v.Split(";").ToArray());
+        init => SetHeader("Cookie", value, v => v.Split(";"));
     }
     #endregion
     #region User-Agent标头
     public string? UserAgent
     {
         get => GetHeader("User-Agent", v => v.Join(" "));
-        init => SetHeader("User-Agent", value, v => new[] { v });
+        init => SetHeader("User-Agent", value, v => v.Split(";"));
     }
 
     /*警告：
       国内微信，QQ等浏览器实现这个标头不规范，
       在这种情况下，直接设置这个标头会引发异常*/
+    #endregion
+    #region Host标头
+    public string? Host
+    {
+        get => GetHeader("Host", v => v.First());
+        init => SetHeader("Host", value, v => new[] { v });
+    }
     #endregion
     #endregion
     #region 构造函数

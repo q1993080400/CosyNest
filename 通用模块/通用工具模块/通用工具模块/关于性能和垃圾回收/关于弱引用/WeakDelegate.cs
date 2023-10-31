@@ -51,7 +51,7 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
         {
             if (item is { Met.IsStatic: false, Target.Target: null })
             {
-                failure ??= new();
+                failure ??= [];
                 failure.AddLast(item);
             }
             else

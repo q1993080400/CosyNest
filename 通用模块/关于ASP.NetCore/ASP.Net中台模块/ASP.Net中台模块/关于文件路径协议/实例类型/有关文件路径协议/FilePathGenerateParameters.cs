@@ -25,7 +25,7 @@ public sealed record FilePathGenerateParameters
     /// 返回一个元组，它的项分别指示文件的文件名，扩展名（如果有），以及文件的全名
     /// </summary>
     public (string Simple, string? Extended, string FullName) NameAndExtension
-        => ToolPath.SplitPathFile(TrueName);
+        => ToolPath.SplitFilePath(TrueName);
     #endregion
     #region 封面扩展名
     private readonly string? CoverExtensionFiled;
@@ -49,7 +49,7 @@ public sealed record FilePathGenerateParameters
         }
         init
         {
-            var ex = value is null ? null : ToolPath.SplitPathFile(value).Extended ?? value;
+            var ex = value is null ? null : ToolPath.SplitFilePath(value).Extended ?? value;
             if (ex is { } && !FileTypeCom.WebImage.IsCompatible(ex))
                 throw new NotSupportedException($"扩展名{ex}不是一个Web兼容的图片文件格式");
             CoverExtensionFiled = ex;

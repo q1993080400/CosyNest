@@ -16,7 +16,7 @@ public sealed partial class TofuCubesSimple : ComponentBase
     #region 每行最大字数
     /// <inheritdoc cref="TofuCubes.MaxRowLength"/>
     [Parameter]
-    public int MaxRowLength { get; set; } = 8;
+    public int MaxRowLength { get; set; } = 6;
     #endregion
     #region 最大行数
     /// <inheritdoc cref="TofuCubes.MaxRow"/>

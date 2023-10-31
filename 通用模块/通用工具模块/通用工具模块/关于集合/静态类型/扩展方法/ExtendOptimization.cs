@@ -32,7 +32,7 @@ public static partial class ExtendEnumerable
         {
             var i when i == maxIndex => objs[first..],
             var i when i >= 0 && i < maxIndex => objs[first..(first + pageSize)],
-            _ => Array.Empty<Obj>(),
+            _ => [],
         };
     }
     #endregion

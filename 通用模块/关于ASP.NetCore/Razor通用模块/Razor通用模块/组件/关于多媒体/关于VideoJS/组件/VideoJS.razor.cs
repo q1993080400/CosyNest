@@ -8,7 +8,9 @@ public sealed partial class VideoJS : ComponentBase
     #region 组件参数
     #region 渲染参数
     /// <summary>
-    /// 获取本组件的渲染参数
+    /// 获取本组件的渲染参数，
+    /// 注意：如果这个参数被更改，
+    /// 只有对<see cref="RenderVideoJS.Source"/>的更改会得到响应
     /// </summary>
     [Parameter]
     [EditorRequired]
@@ -16,22 +18,37 @@ public sealed partial class VideoJS : ComponentBase
     #endregion
     #endregion
     #region 内部成员
-    #region 重写OnAfterRenderAsync
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    #region 获取播放器的ID
+    /// <summary>
+    /// 获取播放器的ID
+    /// </summary>
+    private string ID { get; } = ToolASP.CreateJSObjectName();
+    #endregion
+    #region 重写OnParametersSetAsync
+    protected override async Task OnParametersSetAsync()
     {
-        if (!firstRender)
-            return;
+        await Task.Delay(1);
+        var source = RenderVideoJS.Source;
+        var audioOnlyMode = RenderVideoJS.AudioOnlyMode ??
+            source.All(x => x.MediumType.StartsWith("audio"));
         var options = new
         {
             Autoplay = RenderVideoJS.Autoplay ? "any" : (object)false,
-            RenderVideoJS.Src,
+            Sources = source.Select(x =>
+            new
+            {
+                Src = x.Uri,
+                Type = x.MediumType
+            }).ToArray(),
+            AudioOnlyMode = audioOnlyMode,
             RenderVideoJS.Loop,
             RenderVideoJS.Controls,
             RenderVideoJS.Width,
             RenderVideoJS.Height,
             Responsive = true,
+            SrcHash = ToolEqual.CreateHash(RenderVideoJS.Source.Select(x => x.Uri).ToArray())
         };
-        await JSRuntime.InvokeVoidAsync("InitializationVideoJS", RenderVideoJS.ID, options);
+        await JSRuntime.InvokeVoidAsync("InitializationVideoJS", ID, options);
     }
     #endregion
     #endregion

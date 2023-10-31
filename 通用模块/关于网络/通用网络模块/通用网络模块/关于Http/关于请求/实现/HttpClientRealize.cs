@@ -18,9 +18,7 @@ namespace System.NetFrancis.Http;
 /// <param name="requestTransform">用来转换Http请求的函数，
 /// 它可以用来改变Http请求的默认值，并具有较低的优先级，
 /// 如果为<see langword="null"/>，则不做转换</param>
-/// <param name="throwException">如果这个值为<see langword="true"/>，
-/// 则在请求失败时，自动抛出异常</param>
-sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? requestTransform, bool throwException) : IHttpClient
+sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? requestTransform) : IHttpClient
 {
     #region 公开成员
     #region 发起Http请求
@@ -39,7 +37,7 @@ sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? requ
         }
         #endregion
         var response = await Fun(request);
-        if (throwException)
+        if (request.ThrowIfNotSuccess)
             response.ThrowIfNotSuccess();
         return response;
     }
@@ -173,7 +171,7 @@ sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? requ
         {
             Header = new()
             {
-                ContentType = new(MediaTypeName.Json)
+                ContentType = new(MediaTypeName.TextJson)
             },
             Content = json.ToBytes().ToBitRead()
         };

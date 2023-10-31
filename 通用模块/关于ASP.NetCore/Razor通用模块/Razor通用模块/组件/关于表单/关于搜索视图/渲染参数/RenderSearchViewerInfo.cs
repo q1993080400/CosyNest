@@ -170,13 +170,13 @@ public sealed record RenderSearchViewerInfo<Obj>
     /// <summary>
     /// 根据属性名称缓存查询条件的字典
     /// </summary>
-    internal Dictionary<string, QueryCondition<Obj>> QueryCondition { get; } = new();
+    internal Dictionary<string, QueryCondition<Obj>> QueryCondition { get; } = [];
     #endregion
     #region 缓存排序条件
     /// <summary>
     /// 根据属性名称缓存排序条件的字典
     /// </summary>
-    internal Dictionary<string, SortCondition<Obj>> SortCondition { get; } = new();
+    internal Dictionary<string, SortCondition<Obj>> SortCondition { get; } = [];
     #endregion
     #endregion
 }

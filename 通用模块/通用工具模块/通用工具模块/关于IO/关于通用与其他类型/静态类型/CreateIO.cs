@@ -104,7 +104,7 @@ public static class CreateIO
     /// <returns></returns>
     public static IFullDuplex FullDuplexFile(PathText path, FileMode mod = FileMode.OpenOrCreate)
     {
-        var extended = ToolPath.SplitPathFile(path).Extended;
+        var extended = ToolPath.SplitFilePath(path).Extended;
         return new FileStream(path, mod).ToBitPipe(extended);
     }
     #endregion

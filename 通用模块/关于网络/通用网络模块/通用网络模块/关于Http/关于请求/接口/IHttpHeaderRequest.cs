@@ -28,4 +28,10 @@ public interface IHttpHeaderRequest : IHttpHeader
     /// </summary>
     string? UserAgent { get; }
     #endregion
+    #region Host标头
+    /// <summary>
+    /// Host标头
+    /// </summary>
+    string? Host { get; }
+    #endregion
 }

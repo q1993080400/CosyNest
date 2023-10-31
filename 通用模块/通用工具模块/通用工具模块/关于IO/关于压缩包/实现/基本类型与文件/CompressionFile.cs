@@ -32,14 +32,14 @@ sealed class CompressionFile(ZipArchiveEntry zip, INode father) : CompressionIte
     #region 简称
     public string NameSimple
     {
-        get => ToolPath.SplitPathFile(ZipEntry.Name).Simple;
+        get => ToolPath.SplitFilePath(ZipEntry.Name).Simple;
         set => throw new NotImplementedException();
     }
     #endregion
     #region 扩展名
     public string NameExtension
     {
-        get => ToolPath.SplitPathFile(ZipEntry.Name).Extended ?? "";
+        get => ToolPath.SplitFilePath(ZipEntry.Name).Extended ?? "";
         set => throw new NotImplementedException();
     }
     #endregion

@@ -81,6 +81,7 @@ public static class UploadMiddlewareCommon
             var source = GenerateFileSource(info, mediumInfo.CoverFormat);
             if (source is not MediaSource { MediaSourceType: FileSourceType.WebImage, FilePath: { } filePath, CoverPath: var converPath })
                 return UploadReturnValue.NotSupported;
+            var imagePath = ToolPath.RefactoringPath(filePath, newExtension: _ => "webp");
             try
             {
                 var cancellationToken = info.CancellationToken;
@@ -89,13 +90,16 @@ public static class UploadMiddlewareCommon
                 cancellationToken.ThrowIfCancellationRequested();
                 var imageProcessing = info.ServiceProvider.GetRequiredService<IImageProcessing>();
                 await imageProcessing.FormatConversion(filePath, converPath, mediumInfo.MaxImageCoverSize, info.CancellationToken);
+                await imageProcessing.FormatConversion(filePath, imagePath, null, info.CancellationToken);
                 var set = info.ProcessedPath;
-                set.Content = set.Content?.Union(new[] { filePath, converPath });
+                set.Content = set.Content?.Union(new[] { imagePath, converPath });
+                File.Delete(filePath);
                 return UploadReturnValue.Success;
             }
             catch (Exception ex)
             {
                 File.Delete(filePath);
+                File.Delete(imagePath);
                 File.Delete(converPath);
                 if (ex is not OperationCanceledException)
                     throw;
@@ -116,7 +120,7 @@ public static class UploadMiddlewareCommon
     public static UploadMiddleware UploadPDFExtractingImages(Func<string, Task<IPDFDocument>> createPDF, UploadMiddlewareMediumInfo mediumInfo)
         => async info =>
         {
-            if (ToolPath.SplitPathFile(info.TrueName).Extended is not "pdf")
+            if (ToolPath.SplitFilePath(info.TrueName).Extended is not "pdf")
                 return UploadReturnValue.NotSupported;
             var filePath = Path.Combine(info.Path, $"{Guid.NewGuid()}.pdf");
             IPDFDocument? pdf = null;

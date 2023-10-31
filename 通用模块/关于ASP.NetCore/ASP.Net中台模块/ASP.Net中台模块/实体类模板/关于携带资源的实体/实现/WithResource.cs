@@ -37,7 +37,7 @@ public abstract class WithResource : Entity, IWithResource
         {
             var directory = CreateIO.IO<IDirectory>(ResourceFolderPath);
             if (directory is null)
-                return Array.Empty<string>();
+                return [];
             return directory.Son.OfType<IFile>().Select(x => x.Path).ToArray();
         }
     }
@@ -45,7 +45,7 @@ public abstract class WithResource : Entity, IWithResource
     #region 获取资源的Uri
     public virtual string[] ResourceUri
         => CreateIO.IO<IDirectory>(ResourceFolderPath)?.Son.OfType<IFile>().
-            Select(x => x.Path.Op().ToUriPath()).ToArray() ?? Array.Empty<string>();
+            Select(x => x.Path.Op().ToUriPath()).ToArray() ?? [];
     #endregion
     #region 解析资源文件夹
     /// <summary>
@@ -57,7 +57,7 @@ public abstract class WithResource : Entity, IWithResource
     public Ret Analysis<Ret>(AnalysisFilePathProtocol<IEnumerable<string>, Ret> analysis)
     {
         var paths = CreateIO.IO<IDirectory>(ResourceFolderPath)?.Son.OfType<IFile>().
-            Select(x => x.Path).ToArray() ?? Array.Empty<string>();
+            Select(x => x.Path).ToArray() ?? [];
         return analysis(paths);
     }
     #endregion

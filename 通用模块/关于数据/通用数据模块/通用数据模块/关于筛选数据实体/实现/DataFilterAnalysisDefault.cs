@@ -34,7 +34,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
     {
         var condition = description.QueryCondition.ToArray();
-        if (condition.Any())
+        if (condition.Length != 0)
         {
             var where = GenerateWhereExpression(condition, reconsitution);
             return dataSource.Where(where);
@@ -54,7 +54,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     {
         var parameter = Parameter(typeof(Obj));
         var body = GenerateWhereBodyExpression(condition, parameter, reconsitution);
-        return Lambda<Func<Obj, bool>>(body, new[] { parameter });
+        return Lambda<Func<Obj, bool>>(body, [parameter]);
     }
     #endregion
     #region 生成Where表达式树的Body部分
@@ -106,7 +106,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     private static Expression GenerateWhereBodyPartExpression(Expression expression, string[] propertyAccess,
         LogicalOperator logicalOperator, object? compareValue)
     {
-        if (!propertyAccess.Any())
+        if (propertyAccess.Length == 0)
             return GenerateCompareExpression(expression, logicalOperator, compareValue);
         var nextProperty = propertyAccess[1..];
         var propertyName = propertyAccess[0];
@@ -184,7 +184,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     private static IOrderedQueryable<Obj> GenerateSortExpression<Obj>(DataFilterDescription<Obj> description, IOrderedQueryable<Obj> dataSource)
     {
         var condition = description.SortCondition.ToArray();
-        if (condition.Any())
+        if (condition.Length != 0)
         {
             return condition.Aggregate(dataSource, GenerateSortSingleExpression);
         }

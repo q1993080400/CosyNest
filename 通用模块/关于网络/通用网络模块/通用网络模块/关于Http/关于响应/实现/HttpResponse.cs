@@ -28,7 +28,7 @@ sealed class HttpResponse : IHttpResponse
     /// </summary>
     public void ThrowIfNotSuccess()
     {
-        if (!this.To<IHttpResponse>().IsSuccess)
+        if (!IsSuccess)
             throw new HttpRequestException($"""
 Http请求未能成功
 状态码：{(int)Status}

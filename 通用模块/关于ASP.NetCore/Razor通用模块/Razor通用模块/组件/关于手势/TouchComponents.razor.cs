@@ -81,7 +81,7 @@ public sealed partial class TouchComponents : ComponentBase
     /// 获取手势触点列表，
     /// 触点坐标相对于浏览器视口
     /// </summary>
-    private List<IPoint> Points { get; } = new();
+    private List<IPoint> Points { get; } = [];
     #endregion
     #endregion
 }

@@ -87,7 +87,7 @@ public static partial class ExtenReflection
     /// <param name="property">要判断的属性</param>
     /// <returns></returns>
     public static bool IsIndexing(this PropertyInfo property)
-        => property.GetIndexParameters().Any();
+        => property.GetIndexParameters().Length != 0;
     #endregion
     #region 是否为全能属性
     /// <summary>
@@ -198,22 +198,6 @@ public static partial class ExtenReflection
     /// <returns></returns>
     public static bool IsCompilerGenerated(this MemberInfo member)
         => member.IsDefined(typeof(CompilerGeneratedAttribute));
-    #endregion
-    #region 返回成员是否为隐藏
-    /// <summary>
-    /// 如果此方法返回<see langword="true"/>，
-    /// 代表该成员是隐藏的，它由编译器生成，不可直接调用
-    /// </summary>
-    /// <param name="member">待检查的成员</param>
-    /// <returns></returns>
-    public static bool IsHide(this MemberInfo member)
-        => member switch
-        {
-            var m when m.Name.StartsWith("<") => true,
-            MethodInfo { IsSpecialName: true } => true,
-            MethodInfo { Name: "Finalize" } => true,
-            _ => false
-        };
     #endregion
     #region 获取一个成员的真正类型
     /// <summary>

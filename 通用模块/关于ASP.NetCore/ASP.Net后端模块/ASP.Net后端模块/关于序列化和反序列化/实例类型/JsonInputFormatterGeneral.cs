@@ -42,7 +42,7 @@ sealed class JsonInputFormatterGeneral : TextInputFormatter
     public JsonInputFormatterGeneral(JsonSerializerOptions options)
     {
         Options = options;
-        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.Json));
+        SupportedMediaTypes.Add(MediaTypeHeaderValue.Parse(MediaTypeName.TextJson));
         SupportedEncodings.Add(Encoding.UTF8);
         SupportedEncodings.Add(Encoding.Unicode);
     }

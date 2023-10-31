@@ -44,7 +44,7 @@ public record FileSource
     /// 它的项分别指示文件的名称，扩展名，还有文件的全名
     /// </summary>
     public (string Simple, string? Extended, string FullName) FileInfo
-        => ToolPath.SplitPathFile(FilePath);
+        => ToolPath.SplitFilePath(FilePath);
     #endregion
     #region 返回返回媒体的类型
     /// <summary>
