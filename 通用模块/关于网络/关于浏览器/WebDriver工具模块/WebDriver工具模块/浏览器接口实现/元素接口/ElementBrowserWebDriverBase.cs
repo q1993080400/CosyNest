@@ -39,10 +39,10 @@ abstract class ElementBrowserWebDriverBase : IElementBrowser
             var elements = wait.Until(x =>
             {
                 var e = this.Element.FindElements(By.CssSelector(cssSelect));
-                return e.Any() ? e : null;
+                return e.Count != 0 ? e : null;
             });
             return elements?.Where(x => x is { }).Select(x => new ElementBrowserWebDriver(Browser, x)).
-                OfType<Element>().ToArray() ?? Array.Empty<Element>();
+                OfType<Element>().ToArray() ?? [];
         }
         catch (WebDriverTimeoutException) when (ignoreException)
         {

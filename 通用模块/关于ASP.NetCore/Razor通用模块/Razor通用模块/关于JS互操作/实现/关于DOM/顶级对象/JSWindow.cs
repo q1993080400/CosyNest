@@ -195,20 +195,4 @@ sealed class JSWindow(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSWindo
     #endregion
     #endregion
     #endregion
-    #region 动态加载脚本
-    public async ValueTask LoadScript(string uri)
-    {
-        switch (uri)
-        {
-            case var u when u.EndsWith(".css"):
-                await JSRuntime.InvokeVoidAsync("LoadCSS", uri);
-                return;
-            case var u when u.EndsWith(".js"):
-                await JSRuntime.InvokeVoidAsync("LoadScript", uri);
-                return;
-            case var u:
-                throw new NotSupportedException($"{u}既不是一个js文件，也不是一个css文件");
-        }
-    }
-    #endregion
 }

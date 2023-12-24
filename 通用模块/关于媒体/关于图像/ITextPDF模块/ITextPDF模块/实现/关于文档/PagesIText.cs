@@ -6,13 +6,13 @@ namespace System.Media.Drawing.PDF;
 /// <summary>
 /// 该类型是一个PDF页面集合
 /// </summary>
-sealed class PagesIText : IPDFCollect
+sealed class PagesIText(DocumentIText pdf) : IPDFCollect
 {
     #region 封装的PDF对象
     /// <summary>
     /// 获取封装的PDF对象
     /// </summary>
-    private DocumentIText PDF { get; }
+    private DocumentIText PDF { get; } = pdf;
     #endregion
     #region PDF文档
     IPDFDocument IPDFCollect.PDF => PDF;
@@ -140,12 +140,9 @@ sealed class PagesIText : IPDFCollect
         source.CopyTo(this, sourceIndex..(sourceIndex + 1), index);
         PDF.IsChange = true;
     }
+
     #endregion
     #endregion
     #region 构造函数
-    public PagesIText(DocumentIText pdf)
-    {
-        this.PDF = pdf;
-    }
     #endregion
 }

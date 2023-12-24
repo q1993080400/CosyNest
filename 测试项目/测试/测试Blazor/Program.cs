@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddServerComponents(x => x.DetailedErrors = true);
+    .AddInteractiveServerComponents(x => x.DetailedErrors = true);
 builder.Services.AddBootstrapBlazor();
 builder.Services.AddFront();
 
@@ -23,6 +23,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.MapRazorComponents<App>()
-    .AddServerRenderMode();
+    .AddInteractiveServerRenderMode();
 
 app.Run();

@@ -21,7 +21,6 @@ public interface IDataFilterAnalysis
     /// <param name="reconsitution">这个委托允许重构生成的每个查询表达式，
     /// 并返回重构后的表达式，如果为<see langword="null"/>，则不进行重构</param>
     /// <returns></returns>
-    /// <inheritdoc cref="DataFilterDescription{Obj}"/>
     IOrderedQueryable<Obj> Analysis<Obj>(IQueryable<Obj> dataSource, DataFilterDescription<Obj> description,
         Func<IQueryable<Obj>, IOrderedQueryable<Obj>>? sortFunction = null,
         Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution = null);

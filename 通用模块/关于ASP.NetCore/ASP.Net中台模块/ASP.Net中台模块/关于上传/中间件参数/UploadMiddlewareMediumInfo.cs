@@ -26,6 +26,6 @@ public sealed class UploadMiddlewareMediumInfo
     /// <summary>
     /// 获取封面图片的格式
     /// </summary>
-    public string CoverFormat { get; init; } = "jpg";
+    public string CoverFormat { get; init; } = "webp";
     #endregion
 }

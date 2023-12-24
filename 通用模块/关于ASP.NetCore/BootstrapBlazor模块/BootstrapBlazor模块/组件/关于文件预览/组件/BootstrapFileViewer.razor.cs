@@ -68,7 +68,7 @@ public sealed partial class BootstrapFileViewer : ComponentBase
     {
         var index = info.PreviewFileIndex;
         if (index < 0)
-            return Array.Empty<FileSource>();
+            return [];
         var medias = info.Files.ToArray();
         return medias[index..].Concat(medias[..index]).ToArray();
     }

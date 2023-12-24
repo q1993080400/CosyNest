@@ -44,7 +44,8 @@ public sealed record UploadMiddlewareInfo
     #region 文件本来的名字
     /// <summary>
     /// 获取文件的本名，
-    /// 也就是它未上传之前本来的名字
+    /// 也就是它未上传之前本来的名字，
+    /// 这个本名包含扩展名
     /// </summary>
     public required string TrueName { get; init; }
     #endregion

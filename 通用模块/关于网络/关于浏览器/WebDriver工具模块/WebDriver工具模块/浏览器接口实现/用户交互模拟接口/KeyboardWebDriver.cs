@@ -11,7 +11,12 @@ namespace System.NetFrancis.Browser;
 /// 这个类型是<see cref="IKeyBoard"/>的实现，
 /// 可以用来模拟浏览器键盘操作
 /// </summary>
-sealed class KeyboardWebDriver : IKeyBoard
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="webDriver">浏览器测试用例，
+/// 本对象的功能就是通过它实现的</param>
+sealed class KeyboardWebDriver(WebDriver webDriver) : IKeyBoard
 {
     #region 公开成员
     #region 按下按键
@@ -54,18 +59,10 @@ sealed class KeyboardWebDriver : IKeyBoard
     /// 获取浏览器测试用例，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private WebDriver WebDriver { get; }
+    private WebDriver WebDriver { get; } = webDriver;
+
     #endregion
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="webDriver">浏览器测试用例，
-    /// 本对象的功能就是通过它实现的</param>
-    public KeyboardWebDriver(WebDriver webDriver)
-    {
-        WebDriver = webDriver;
-    }
     #endregion
 }

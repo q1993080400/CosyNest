@@ -17,6 +17,22 @@ public sealed partial class VideoJS : ComponentBase
     public RenderVideoJS RenderVideoJS { get; set; }
     #endregion
     #endregion
+    #region 公开成员
+    #region CSS的路径
+    /// <summary>
+    /// 获取用来加载CSS文件的路径
+    /// </summary>
+    public static string CSSUri { get; set; }
+        = "https://vjs.zencdn.net/8.5.2/video-js.css";
+    #endregion
+    #region JS文件的路径
+    /// <summary>
+    /// 获取用来加载JS文件的路径
+    /// </summary>
+    public static string JSUri { get; set; }
+        = "https://vjs.zencdn.net/8.5.2/video.min.js";
+    #endregion
+    #endregion
     #region 内部成员
     #region 获取播放器的ID
     /// <summary>
@@ -48,7 +64,7 @@ public sealed partial class VideoJS : ComponentBase
             Responsive = true,
             SrcHash = ToolEqual.CreateHash(RenderVideoJS.Source.Select(x => x.Uri).ToArray())
         };
-        await JSRuntime.InvokeVoidAsync("InitializationVideoJS", ID, options);
+        await JSRuntime.InvokeVoidAsync("InitializationVideoJS", ID, options, CSSUri, JSUri);
     }
     #endregion
     #endregion

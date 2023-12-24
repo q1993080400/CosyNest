@@ -4,9 +4,9 @@ using System.NetFrancis;
 namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
-/// 这个类型可以作为<see cref="RenderVideoJS"/>的媒体源
+/// 这个类型可以作为播放器的媒体源
 /// </summary>
-public sealed record VideoJSSource
+public sealed record MediumSource
 {
     #region Uri
     /// <summary>
@@ -28,7 +28,7 @@ public sealed record VideoJSSource
     /// </summary>
     /// <param name="uri">媒体的Uri</param>
     /// <returns></returns>
-    public static VideoJSSource CreateSingle(string uri)
+    public static MediumSource CreateSingle(string uri)
     {
         var extended = ToolPath.SplitFilePath(uri).Extended ??
             throw new NotSupportedException($"{uri}不包含扩展名，无法推断它的媒体类型");
@@ -47,7 +47,7 @@ public sealed record VideoJSSource
     /// <param name="uris">媒体的Uri集合，
     /// 它的顺序很重要，组件会根据这个依次加载媒体源</param>
     /// <returns></returns>
-    public static VideoJSSource[] Create(params string[] uris)
+    public static MediumSource[] Create(params string[] uris)
         => uris.Select(CreateSingle).ToArray();
     #endregion
     #endregion

@@ -17,7 +17,7 @@ public sealed record RenderVideoJS
     /// 它的顺序很重要，
     /// 函数会以此作为优先级依次加载媒体
     /// </summary>
-    public required IEnumerable<VideoJSSource> Source { get; init; }
+    public required IEnumerable<MediumSource> Source { get; init; }
     #endregion
     #region 是否为音频专用模式
     /// <summary>

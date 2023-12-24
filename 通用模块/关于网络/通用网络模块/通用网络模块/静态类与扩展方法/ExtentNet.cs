@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Text;
@@ -204,6 +205,7 @@ public static class ExtendNet
       答：本地路径是在服务器本机上的路径，它以左斜杠作为分隔符，
       Uri路径是客户端从服务端获取资源的路径，它以右斜杠作为分隔符*/
     #endregion
+    #region Uri路径和本地路径之间的转换
     #region 将Uri路径转换为本地路径
     /// <summary>
     /// 将Uri路径转换为本地路径
@@ -228,6 +230,8 @@ public static class ExtendNet
     public static string ToUriPath(this StringOperate localPath)
         => localPath.ToVirtualPath().Replace("\\", "/");
     #endregion
+    #endregion
+    #region 真实路径和虚拟路径之间的转换
     #region 将真实路径转换为虚拟路径
     /// <summary>
     /// 将真实的物理路径转换为相对wwwroot文件夹的虚拟路径
@@ -252,6 +256,28 @@ public static class ExtendNet
     /// <returns></returns>
     public static string ToRealityPath(this StringOperate realityPath)
         => Path.Combine("wwwroot", realityPath.Text.TrimStart('\\'));
+    #endregion
+    #endregion
+    #region Web编码
+    /// <summary>
+    /// 将路径编码为兼容Web的格式
+    /// </summary>
+    /// <param name="path">要编码的路径</param>
+    /// <returns></returns>
+    public static string ToWebEncode(this StringOperate path)
+    {
+        #region 本地函数
+        static string Fun(string path, char delimiter, Func<string, string>? recursion)
+        {
+            var split = path.Split(delimiter);
+            var part = split.Select(x => recursion?.Invoke(x) ?? WebUtility.UrlEncode(x).Replace("+", "%20")).ToArray();
+            return part.Join(delimiter.ToString());
+        }
+        #endregion
+        return Fun(path.Text, '/',
+            x => Fun(x, '?',
+            x => Fun(x, '#', null)));
+    }
     #endregion
     #endregion
     #endregion

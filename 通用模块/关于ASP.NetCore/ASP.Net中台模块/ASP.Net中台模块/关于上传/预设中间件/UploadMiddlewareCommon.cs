@@ -39,17 +39,23 @@ public static class UploadMiddlewareCommon
                 await info.Upload(temporaryFilesPath);
                 cancellationToken.ThrowIfCancellationRequested();
                 var videoProcessing = info.ServiceProvider.GetRequiredService<IVideoProcessing>();
-                await videoProcessing.FormatConversion(temporaryFilesPath, targetPath, new()
+                await videoProcessing.FormatConversion(new()
                 {
+                    MediaPath = temporaryFilesPath,
+                    TargetPath = targetPath,
                     MaxDefinition = mediumInfo.MaxDefinition,
-                    CancellationToken = cancellationToken,
-                    ReportProgress = null,
+                    CancellationToken = cancellationToken
                 });
                 cancellationToken.ThrowIfCancellationRequested();
-                await videoProcessing.Screenshot(targetPath, new[]
+                await videoProcessing.Screenshot(new()
                 {
-                    (TimeSpan.Zero,converPath)
-                }, cancellationToken: cancellationToken);
+                    Fragment =
+                    [
+                        (TimeSpan.Zero, converPath)
+                    ],
+                    MediaPath = targetPath,
+                    CancellationToken = cancellationToken
+                });
                 var set = info.ProcessedPath;
                 set.Content = set.Content?.Union(new[] { targetPath, converPath });
                 return UploadReturnValue.Success;
@@ -255,7 +261,7 @@ public static class UploadMiddlewareCommon
     /// <param name="info">中间件参数</param>
     /// <param name="coverFormat">如果生成封面，则这个参数指定封面格式</param>
     /// <returns></returns>
-    private static FileSource GenerateFileSource(UploadMiddlewareInfo info, string coverFormat = "png")
+    private static FileSource GenerateFileSource(UploadMiddlewareInfo info, string coverFormat = "webp")
     {
         var parameters = new FilePathGenerateParameters()
         {

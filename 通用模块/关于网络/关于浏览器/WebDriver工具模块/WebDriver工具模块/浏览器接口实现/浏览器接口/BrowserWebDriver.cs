@@ -28,7 +28,7 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     /// <summary>
     /// 所有选项卡的集合
     /// </summary>
-    internal List<ITab> Tabs { get; } = new();
+    internal List<ITab> Tabs { get; } = [];
     #endregion
     #region 当前选项卡
     public ITab CurrentTab { get; set; }

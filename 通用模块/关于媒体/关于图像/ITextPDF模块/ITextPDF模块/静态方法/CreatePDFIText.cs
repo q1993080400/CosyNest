@@ -15,7 +15,7 @@ public static class CreatePDFIText
     /// <summary>
     /// 通过路径，创建一个PDF文档
     /// </summary>
-    /// <inheritdoc cref="DocumentIText(PathText)"/>
+    /// <inheritdoc cref="DocumentIText(Stream, PathText?)"/>
     public static async Task<IPDFDocument> PDF(PathText path)
     {
         if (!File.Exists(path))
@@ -32,7 +32,7 @@ public static class CreatePDFIText
     /// <summary>
     /// 通过流，创建一个PDF文档
     /// </summary>
-    /// <inheritdoc cref="DocumentIText(Stream)"/>
+    /// <inheritdoc cref="DocumentIText(Stream, PathText?)"/>
     public static async Task<IPDFDocument> PDF(Stream stream)
     {
         var memory = await stream.CopyToMemory();

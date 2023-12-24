@@ -40,7 +40,7 @@
                                                     case MediaSource { MediaSourceType: FileSourceType.WebVideo }:
                                                         var options = new RenderVideoJS()
                                                 {
-                                                    Src = uri,
+                                                    Source = [MediumSource.CreateSingle(uri)],
                                                     Controls = true,
                                                     Loop = true
                                                 };

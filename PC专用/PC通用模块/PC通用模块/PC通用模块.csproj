@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Management" Version="8.0.0-rc.1.23419.4" PrivateAssets="compile" />
+		<PackageReference Include="System.Management" Version="8.0.0" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

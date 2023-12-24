@@ -1,7 +1,4 @@
-﻿using System.IOFrancis;
-using System.IOFrancis.Bit;
-using System.IOFrancis.FileSystem;
-using System.MathFrancis;
+﻿using System.MathFrancis;
 
 using Xabe.FFmpeg;
 
@@ -14,31 +11,19 @@ namespace System.Media.Play;
 sealed class VideoProcessingFFmpeg : IVideoProcessing
 {
     #region 音视频混流
-    #region 传入流
-    public async Task<IBitRead> MixedFlow(IBitRead video, IBitRead audio)
+    public async Task MixedFlow(string videoPath, string audioPath, string outputPath)
     {
-        var videoPath = ToolTemporaryFile.CreateTemporaryPath("mp4");
-        var audioPath = ToolTemporaryFile.CreateTemporaryPath("mp3");
-        await video.SaveToFile(videoPath);
-        await audio.SaveToFile(audioPath);
-        return await MixedFlow(CreateIO.File(videoPath), CreateIO.File(audioPath));
-    }
-    #endregion
-    #region 传入文件
-    public async Task<IBitRead> MixedFlow(IFile videoFile, IFile audioFile)
-    {
-        var output = ToolTemporaryFile.CreateTemporaryPath("mp4");
-        var conversion = FFmpeg.Conversions.New().AddParameter($"-i {videoFile.Path} -i {audioFile.Path} -c:v copy -c:a aac -strict experimental {output}");
+        ToolIO.CreateFather(outputPath);
+        var conversion = FFmpeg.Conversions.New().AddParameter($"-i {videoPath} -i {audioPath} -c:v copy -c:a aac -strict experimental {outputPath}");
         await conversion.Start();
-        return CreateIO.FileStream(output).ToBitPipe().Read;
     }
-    #endregion
     #endregion
     #region 格式转换
-    public async Task FormatConversion(string mediumPath, string targetPath, FormatConversionInfo? info = null)
+    public async Task FormatConversion(FormatConversionInfo info)
     {
-        info ??= new();
-        var mediaInfo = await FFmpeg.GetMediaInfo(mediumPath);
+        var mediaPath = info.MediaPath;
+        var targetPath = info.TargetPath;
+        var mediaInfo = await FFmpeg.GetMediaInfo(mediaPath);
         var videoStream = mediaInfo.VideoStreams.FirstOrDefault();
         #region 返回缩放比例的本地函数
         string GetScale()
@@ -59,23 +44,35 @@ sealed class VideoProcessingFFmpeg : IVideoProcessing
         }
         #endregion
         var emphasizeCompatibility = info.EmphasizeCompatibility;
-        var arguments = $"-i {mediumPath} -c:v {(emphasizeCompatibility ? "libx264" : "libvpx-vp9")} -c:a {(emphasizeCompatibility ? "aac" : "libopus")} {GetScale()} {targetPath}";
+        var arguments = $"-i {mediaPath} -c:v {(emphasizeCompatibility ? "libx264" : "libvpx-vp9")} -c:a {(emphasizeCompatibility ? "aac" : "libopus")} {GetScale()} {targetPath}";
         ToolIO.CreateFather(targetPath);
         await FFmpeg.Conversions.New().Start(arguments, info.CancellationToken);
     }
     #endregion
     #region 视频截图
-    public async Task Screenshot(string mediumPath, IEnumerable<(TimeSpan Fragment, string Path)> infos, Func<decimal, Task>? reportProgress = null, CancellationToken cancellationToken = default)
+    public async Task Screenshot(ScreenshotInfo info)
     {
+        var allFragment = info.Fragment.OrderBy(x => x.Fragment).PackIndex(true).ToArray();
+        if (allFragment.Length is 0)
+            return;
         var snippet = FFmpeg.Conversions.FromSnippet;
-        reportProgress ??= _ => Task.CompletedTask;
-        foreach (var ((fragment, output), index, count) in infos.PackIndex(true))
+        var reportProgress = info.ReportProgress ?? new Func<decimal, Task>(_ => Task.CompletedTask);
+        var mediaPath = info.MediaPath;
+        var cancellationToken = info.CancellationToken;
+        foreach (var ((fragment, output), index, count) in allFragment)
         {
             ToolIO.CreateFather(output);
-            var conversion = await snippet.Snapshot(mediumPath, output, fragment);
+            var conversion = await snippet.Snapshot(mediaPath, output, fragment);
             await conversion.Start(cancellationToken);
             await reportProgress(decimal.Divide(index + 1, count));
         }
+    }
+    #endregion
+    #region 获取音视频信息
+    public async Task<IMediaInfo> GetMediaInfo(string mediaPath)
+    {
+        var mediaInfo = await FFmpeg.GetMediaInfo(mediaPath);
+        return new MediaInfoFFmpeg(mediaInfo);
     }
     #endregion
 }

@@ -1,0 +1,10 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+<audio loop="@RenderAudio.Loop" muted="@RenderAudio.Muted" style="display:none">
+    @foreach (var item in RenderAudio.MediaSource)
+    {
+        <source src="@item.Uri" type="@item.MediumType" />
+    }
+</audio>
+@ChildContent(RenderAudio)

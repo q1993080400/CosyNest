@@ -32,7 +32,7 @@ public static partial class ExtenExpressions
     /// <param name="expression">要执行的表达式</param>
     /// <returns>表达式的计算结果</returns>
     public static object? CalValue(this Expression? expression)
-        => expression?.CanReduce ?? false ? expression.Reduce() : expression switch
+        => expression switch
         {
             null => null,
             ConstantExpression e => e.Value,

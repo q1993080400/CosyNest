@@ -22,7 +22,7 @@ public sealed record UriExtend : UriBase
     /// <summary>
     /// 获取用来匹配扩展地址的正则表达式
     /// </summary>
-    private static IRegex Regex { get; } =/*language=regex*/@"^(\w|\.|-|/|%|\+)+$".
+    private static IRegex Regex { get; } =/*language=regex*/@"^[^#?]+$".
         Op().Regex(RegexOptions.IgnoreCase);
     #endregion
     #region 正式方法

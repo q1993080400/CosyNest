@@ -7,7 +7,12 @@ namespace System.NetFrancis.Browser;
 /// <summary>
 /// 本类型是底层使用Selenium实现的浏览器标签
 /// </summary>
-sealed class TabWebDriver : Release, ITab
+/// <remarks>
+/// 使用指定的Edge测试用例初始化对象
+/// </remarks>
+/// <param name="browser">本标签所隶属的浏览器对象</param>
+/// <param name="windowHandle">窗口句柄，它可以用来标识窗口</param>
+sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : Release, ITab
 {
     #region 公开成员
     #region 选择选项卡
@@ -25,7 +30,7 @@ sealed class TabWebDriver : Release, ITab
     /// <summary>
     /// 本标签所隶属的浏览器对象
     /// </summary>
-    internal BrowserWebDriver Browser { get; }
+    internal BrowserWebDriver Browser { get; } = browser;
     #endregion
 
     /// <summary>
@@ -40,7 +45,7 @@ sealed class TabWebDriver : Release, ITab
         WebDriver.Close();
         var tabs = Browser.Tabs;
         tabs.Remove(this);
-        if (tabs.Any())
+        if (tabs.Count != 0)
             tabs[^1].Select();
     }
     #endregion
@@ -48,19 +53,10 @@ sealed class TabWebDriver : Release, ITab
     /// <summary>
     /// 获取窗口句柄，它可以用来标识窗口
     /// </summary>
-    private string WindowHandle { get; }
+    private string WindowHandle { get; } = windowHandle;
+
     #endregion
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的Edge测试用例初始化对象
-    /// </summary>
-    /// <param name="browser">本标签所隶属的浏览器对象</param>
-    /// <param name="windowHandle">窗口句柄，它可以用来标识窗口</param>
-    public TabWebDriver(BrowserWebDriver browser, string windowHandle)
-    {
-        Browser = browser;
-        WindowHandle = windowHandle;
-    }
     #endregion
 }

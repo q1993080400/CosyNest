@@ -114,7 +114,7 @@ public static class CreateCollection
         for (int i = 0; true; i++)
         {
             var list = await fun(i).ToListAsync();
-            if (!list.Any())
+            if (list.Count == 0)
                 yield break;
             foreach (var item in list)
             {

@@ -4,19 +4,7 @@ function InvokeCode(code) {
     return Function(code)();
 }
 
-//动态加载js脚本
-function LoadScript(uri) {
-    for (var i in document.scripts) {
-        if (i.src == uri)
-            return;
-    }
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = uri;
-    document.body.appendChild(script);
-}
-
-//动态加载css
+//动态加载css文件
 function LoadCSS(uri) {
     var head = document.head;
     for (var i in head.childNodes) {
@@ -32,16 +20,18 @@ function LoadCSS(uri) {
 
 //观察虚拟化容器
 function ObservingVirtualizationContainers(netMethod, endID) {
-    var observe = new IntersectionObserver(x => {
-        if (x[0].isIntersecting)
-            netMethod(0);
-    });
-    CacheObservation(endID + 'Observe', observe);
+    var observe = CacheObservation(endID + 'Observe',
+        () => new IntersectionObserver(x => {
+            if (x[0].isIntersecting)
+                netMethod(0);
+        }));
     observe.observe(document.getElementById(endID));
 }
 
 //初始化VideoJS
-function InitializationVideoJS(id, op) {
+async function InitializationVideoJS(id, op, cssUri, jsUri) {
+    LoadCSS(cssUri);
+    await import(jsUri);
     var play = videojs.getPlayer(id);
     if (play != undefined) {
         if (play.srcHash != op.srcHash) {
@@ -60,29 +50,31 @@ function InitializationVideoJS(id, op) {
 
 //如果页面存在一个观察者的缓存，则将它释放，然后放入新的观察者
 //它可以避免观察者被重复初始化
-function CacheObservation(key, observe) {
+function CacheObservation(key, createObserve) {
     var old = window[key];
     if (old != undefined) {
         old?.disconnect();
     }
+    var observe = createObserve();
     window[key] = observe;
+    return observe;
 }
 
 //注册观察媒体事件，它检测媒体的可见性，并自动播放暂停媒体
 function ObserveVisiblePlay(id) {
     var element = document.querySelectorAll(`#${id} :is(video,audio)`);
-    var observe = new IntersectionObserver(array => {
-        for (var i of array) {
-            var medium = i.target;
-            if (i.isIntersecting) {
-                medium.play();
+    var observe = CacheObservation(id + 'Observe',
+        () => new IntersectionObserver(array => {
+            for (var i of array) {
+                var medium = i.target;
+                if (i.isIntersecting) {
+                    medium.play();
+                }
+                else {
+                    medium.pause();
+                }
             }
-            else {
-                medium.pause();
-            }
-        }
-    });
-    CacheObservation(id + 'Observe', observe);
+        }));
     for (var i of element) {
         observe.observe(i);
     }
@@ -102,8 +94,7 @@ function ObserveVisiblePlay(id) {
             }
         }
     }
-    var observerDOM = new MutationObserver(callback);
-    CacheObservation(id + 'ObserveDOM', observerDOM);
+    var observerDOM = CacheObservation(id + 'ObserveDOM', () => new MutationObserver(callback));
     observerDOM.observe(document.getElementById(id),
         {
             subtree: true,

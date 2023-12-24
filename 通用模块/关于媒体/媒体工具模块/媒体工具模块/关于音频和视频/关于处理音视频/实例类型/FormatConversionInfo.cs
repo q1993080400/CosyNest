@@ -3,10 +3,22 @@
 namespace System.Media.Play;
 
 /// <summary>
-/// 这个记录是<see cref="IVideoProcessing.FormatConversion(IOFrancis.Bit.IBitRead, string, string, FormatConversionInfo)"/>方法的参数
+/// 这个记录是<see cref="IVideoProcessing.FormatConversion(FormatConversionInfo)"/>方法的参数
 /// </summary>
 public sealed record class FormatConversionInfo
 {
+    #region 要转换的音视频路径
+    /// <summary>
+    /// 获取要转换的音视频的路径
+    /// </summary>
+    public required string MediaPath { get; init; }
+    #endregion
+    #region 转换的目标路径
+    /// <summary>
+    /// 获取要转换的目标路径
+    /// </summary>
+    public required string TargetPath { get; init; }
+    #endregion
     #region 选择编码时是否重视兼容
     /// <summary>
     /// 指定转换过程中选择编码的策略，

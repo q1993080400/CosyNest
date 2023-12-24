@@ -7,7 +7,12 @@ namespace System.Media.Drawing.PDF;
 /// <summary>
 /// 
 /// </summary>
-sealed class PDFImageIText : IPDFImage
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="image">封装的图片对象，
+/// 本对象的功能就是通过它实现的</param>
+sealed class PDFImageIText(PdfImageXObject image) : IPDFImage
 {
     #region 公开成员
     #region 保存对象
@@ -31,18 +36,10 @@ sealed class PDFImageIText : IPDFImage
     /// 获取封装的图片对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private PdfImageXObject Image { get; }
+    private PdfImageXObject Image { get; } = image;
+
     #endregion
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="image">封装的图片对象，
-    /// 本对象的功能就是通过它实现的</param>
-    public PDFImageIText(PdfImageXObject image)
-    {
-        Image = image;
-    }
     #endregion
 }

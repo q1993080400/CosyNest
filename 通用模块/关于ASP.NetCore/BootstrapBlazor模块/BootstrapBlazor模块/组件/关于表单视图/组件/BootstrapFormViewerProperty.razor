@@ -145,7 +145,7 @@
                     Select(x =>
                     {
                         var attribute = x.GetCustomAttribute<DisplayAttribute>();
-                        return (x.GetValue<int>(), attribute?.Name ?? x.Name, attribute?.Order ?? 0);
+                        return (x.GetValue<int>(), attribute?.Name ?? x.Name, attribute?.GetOrder() ?? 0);
                     }).
                     OrderBy(x => x.Item3).
                     Select(x => new SelectedItem()
