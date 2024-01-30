@@ -47,7 +47,7 @@ public static class FileTypeCom
     /// 它被各大浏览器广泛支持
     /// </summary>
     public static IFileType WebAudio { get; }
-        = CreateIO.FileType("Web音频文件", "mp3");
+        = CreateIO.FileType("Web音频文件", "mp3", "wav");
     #endregion
     #endregion
 }

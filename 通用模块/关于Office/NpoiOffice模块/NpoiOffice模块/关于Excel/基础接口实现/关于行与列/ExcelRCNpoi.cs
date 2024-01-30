@@ -7,7 +7,8 @@ namespace System.Office.Excel;
 /// <summary>
 /// 该类型是使用Npoi实现的Excel行与列的基类
 /// </summary>
-abstract class ExcelRCNpoi : ExcelRC
+/// <inheritdoc cref="ExcelRC(IExcelSheet, bool, int, int)"/>
+abstract class ExcelRCNpoi(IExcelSheet sheet, bool isRow, int begin, int end) : ExcelRC(sheet, isRow, begin, end)
 {
     #region Npoi格式的工作表
     /// <summary>
@@ -30,13 +31,8 @@ abstract class ExcelRCNpoi : ExcelRC
     {
         throw new NotImplementedException();
     }
+
     #endregion
     #region 构造函数
-    /// <inheritdoc cref="ExcelRC(IExcelSheet, bool, int, int)"/>
-    public ExcelRCNpoi(IExcelSheet sheet, bool isRow, int begin, int end)
-        : base(sheet, isRow, begin, end)
-    {
-
-    }
-    #endregion 
+    #endregion
 }

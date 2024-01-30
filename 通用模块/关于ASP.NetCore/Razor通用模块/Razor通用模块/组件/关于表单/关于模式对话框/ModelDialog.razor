@@ -1,0 +1,10 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@inject IJSWindow JSWindow
+
+@if (IsOpen)
+{
+    <dialog id="@ID">
+        @ChildContent
+    </dialog>
+}

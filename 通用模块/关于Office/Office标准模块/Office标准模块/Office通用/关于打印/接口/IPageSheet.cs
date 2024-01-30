@@ -1,5 +1,5 @@
 ﻿using System.IOFrancis.FileSystem;
-using System.Maths.Plane;
+using System.MathFrancis.Plane;
 using System.Underlying;
 
 namespace System.Office.Excel;

@@ -3,6 +3,7 @@ using System.Design;
 using System.NetFrancis;
 using System.NetFrancis.Http;
 
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Extensions;
 
@@ -128,5 +129,24 @@ public static partial class ExtendWebApi
             await pipe.AddOrUpdate(log);
             await follow();
         });
+    #endregion
+    #region 添加PWA版本中间件
+    /// <summary>
+    /// 添加一个中间件，它能够使响应携带PWA版本
+    /// </summary>
+    /// <param name="applicationBuilder">待添加中间件的<see cref="IApplicationBuilder"/></param>
+    /// <param name="manifestPath">manifest.webmanifest文件的位置</param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public static IApplicationBuilder UsePWAVersion(this IApplicationBuilder applicationBuilder, string manifestPath = @"wwwroot\manifest.webmanifest")
+    {
+        var pwaVersion = ToolPWA.GetManifest(manifestPath)[ToolPWA.KeyVersion]?.ToString() ??
+            throw new KeyNotFoundException("未找到PWA版本");
+        return applicationBuilder.Use(async (httpContext, next) =>
+        {
+            httpContext.Response.Headers.TryAdd("PWAVersion", pwaVersion);
+            await next();
+        });
+    }
     #endregion
 }

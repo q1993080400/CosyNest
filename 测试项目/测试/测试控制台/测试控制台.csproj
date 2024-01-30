@@ -11,6 +11,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\PC专用\PC通用模块\PC通用模块\PC通用模块.csproj" />
+		<ProjectReference Include="..\..\..\通用模块\关于Office\NpoiOffice模块\NpoiOffice模块\NpoiOffice模块.csproj" />
+		<ProjectReference Include="..\..\..\通用模块\关于Office\Office标准模块\Office标准模块\Office标准模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于地理\通用地理模块\通用地理模块\通用地理模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于媒体\关于图像\ITextPDF模块\ITextPDF模块\ITextPDF模块.csproj" />
 		<ProjectReference Include="..\..\..\通用模块\关于媒体\关于音频和视频\FFmpeg媒体工具模块\FFmpeg媒体工具模块\FFmpeg媒体工具模块.csproj" />

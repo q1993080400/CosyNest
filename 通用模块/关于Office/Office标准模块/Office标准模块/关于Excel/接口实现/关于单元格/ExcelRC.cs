@@ -6,7 +6,15 @@ namespace System.Office.Excel.Realize;
 /// 在实现<see cref="IExcelRC"/>时，
 /// 可以继承自本类型，以减少重复的工作
 /// </summary>
-public abstract class ExcelRC : ExcelRange, IExcelRC
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="sheet">这个单元格行列所在的工作表</param>
+/// <param name="isRow">如果这个值为<see langword="true"/>，
+/// 代表这个对象是行，否则代表这个对象是列</param>
+/// <param name="begin">开始行号或列号</param>
+/// <param name="end">结束行号或列号</param>
+public abstract class ExcelRC(IExcelSheet sheet, bool isRow, int begin, int end) : ExcelRange(sheet), IExcelRC
 {
     #region 接口形式
     /// <summary>
@@ -15,11 +23,11 @@ public abstract class ExcelRC : ExcelRange, IExcelRC
     protected IExcelRC Interface => this;
     #endregion
     #region 返回对象是否为行
-    public bool IsRow { get; }
+    public bool IsRow { get; } = isRow;
     #endregion
     #region 关于行或者列的位置和规模
     #region 返回开始和结束行列数
-    public (int Begin, int End) Range { get; }
+    public (int Begin, int End) Range { get; } = (begin, end);
     #endregion
     #region 以文本形式返回地址（重写辅助方法）
     private protected override string AddressTextSimple(bool isR1C1)
@@ -55,21 +63,8 @@ public abstract class ExcelRC : ExcelRange, IExcelRC
     #endregion
     #region 删除行或者列
     public abstract void Delete();
+
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="sheet">这个单元格行列所在的工作表</param>
-    /// <param name="isRow">如果这个值为<see langword="true"/>，
-    /// 代表这个对象是行，否则代表这个对象是列</param>
-    /// <param name="begin">开始行号或列号</param>
-    /// <param name="end">结束行号或列号</param>
-    public ExcelRC(IExcelSheet sheet, bool isRow, int begin, int end)
-        : base(sheet)
-    {
-        this.IsRow = isRow;
-        this.Range = (begin, end);
-    }
     #endregion
 }

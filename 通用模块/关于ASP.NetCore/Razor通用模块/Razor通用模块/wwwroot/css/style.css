@@ -7,6 +7,8 @@
     {
         /*长度基准，它用来自适应不同平台的长度*/
         --lengthReference: 1.75;
+        /*最顶层组件的左边和右边大小*/
+        --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2);
     }
 }
 
@@ -18,6 +20,8 @@
     {
         /*长度基准，它用来自适应不同平台的长度*/
         --lengthReference: 1.25;
+        /*最顶层组件的左边和右边大小*/
+        --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 1.5);
     }
 }
 
@@ -29,6 +33,8 @@
     {
         /*长度基准，它用来自适应不同平台的长度*/
         --lengthReference: 1;
+        /*最顶层组件的左边和右边大小*/
+        --topLayoutPaddingHorizontal: var(--topLayoutPaddingVertical);
     }
 }
 
@@ -61,14 +67,14 @@
 {
     /*全局中等gap属性*/
     --gapMedium: calc(1ch * var(--lengthReference));
-    /*全局中等padding属性*/
-    --paddingMedium: calc(1ch * var(--lengthReference));
     /*全局极端紧凑gap属性*/
     --gapExtremeSmall: calc(var(--gapMedium) * 0.25);
     /*全局紧凑gap属性*/
     --gapSmall: calc(var(--gapMedium) * 0.5);
     /*全局宽松gap属性*/
     --gapBig: calc(var(--gapMedium) * 2);
+    /*全局中等padding属性*/
+    --paddingMedium: calc(1ch * var(--lengthReference));
     /*全局极端紧凑padding属性*/
     --paddingExtremeSmall: calc(var(--paddingMedium) * 0.25);
     /*全局紧凑padding属性*/
@@ -76,7 +82,27 @@
     /*全局宽松padding属性*/
     --paddingBig: calc(var(--paddingMedium) * 2);
     /*中等圆角样式*/
-    --mediumRadius: 20px;
+    --radiusMedium: 20px;
+    /*紧凑圆角样式*/
+    --radiusSmall: calc(var(--radiusMedium) * 0.5);
+    /*最顶层组件的上边和下边大小*/
+    --topLayoutPaddingVertical: 5dvmin;
+    /*屏蔽深色模式，因为作者认为这个需要由开发者自己适配，否则会产生很多意想不到的结果*/
+    color-scheme: only light;
+}
+
+/*主体样式*/
+body
+{
+    margin: 0;
+}
+
+/*模态对话框样式*/
+dialog
+{
+    background: unset;
+    border: unset;
+    padding: unset;
 }
 
 /*占满屏幕，并且在横屏时自动旋转*/
@@ -111,7 +137,7 @@
 /*最顶层组件的布局样式*/
 .topLayout
 {
-    padding: 5dvmin;
+    padding: var(--topLayoutPaddingVertical) var(--topLayoutPaddingHorizontal);
 }
 
 /*简单虚拟化容器的CSS样式*/
@@ -232,16 +258,6 @@ div.autoPlayButtonCntainer > *:first-child
     justify-content: space-evenly;
 }
 
-/*表示一个紧凑居中布局，它一般用来排列按钮，它还会填满父容器*/
-.compactCenteredFill
-{
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 100%;
-    height: 100%;
-}
-
 /*全屏蒙版容器样式*/
 .maskingContainerFullScreen
 {
@@ -261,6 +277,7 @@ div.autoPlayButtonCntainer > *:first-child
 /*亚克力蒙版样式*/
 .acrylicMask
 {
+    background: rgba(251, 251, 253, 0.4);
     backdrop-filter: saturate(1.8) blur(15px);
     -webkit-backdrop-filter: saturate(1.8) blur(15px);
     width: 100%;
@@ -270,21 +287,25 @@ div.autoPlayButtonCntainer > *:first-child
 /*IOS蒙版容器样式*/
 .iosContainer
 {
-    border-radius: var(--mediumRadius);
+    background-position: center;
+    background-size: cover;
+    background-color: transparent;
     width: 100%;
     height: 100%;
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
 
 /*IOS蒙版浅色样式*/
 .iosContainerUndertint
 {
-    background: rgba(251, 251, 253, 0.4);
+    background-color: rgba(250, 250, 252, 0.8);
+    backdrop-filter: saturate(1.8) blur(20px);
+    -webkit-backdrop-filter: saturate(1.8) blur(20px);
 }
 
 /*IOS蒙版深色样式*/
 .iosContainerDarkness
 {
-    background: rgba(4, 4, 2, 0.4);
+    background: rgba(4, 4, 2, 0.8);
+    backdrop-filter: saturate(1.8) blur(20px);
+    -webkit-backdrop-filter: saturate(1.8) blur(20px);
 }

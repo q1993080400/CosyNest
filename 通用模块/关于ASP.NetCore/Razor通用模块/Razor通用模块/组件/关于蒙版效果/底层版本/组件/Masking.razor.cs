@@ -54,7 +54,7 @@ public sealed partial class Masking : ComponentBase, IContentComponent<RenderFra
     /// 返回深色模式，否则返回浅色模式</param>
     /// <returns></returns>
     public static Func<IMaskingParameter, RenderMasking> MaskingIOS(bool isDarkness)
-        => x => MaskingBase(x, $"iosContainer {(isDarkness ? "iosContainerDarkness" : "iosContainerUndertint")}");
+        => x => MaskingBase(x, $"iosContainer", isDarkness ? "iosContainerDarkness" : "iosContainerUndertint");
     #endregion
     #region 基础方法
     /// <summary>

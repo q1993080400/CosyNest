@@ -38,7 +38,7 @@ public static partial class ExtendEnumerable
     public static Obj[] Sort<Obj, Key>(this IEnumerable<Obj> collections, Func<Obj, Key> @delegate, bool isAscending = true, IComparer<Key>? comparable = null)
         => isAscending ?
         collections.OrderBy(@delegate, comparable).ToArray() :
-        collections.OrderByDescending(@delegate, comparable).ToArray();
+        [.. collections.OrderByDescending(@delegate, comparable)];
     #endregion
     #region 指定多个键
     /// <summary>
@@ -56,7 +56,7 @@ public static partial class ExtendEnumerable
         {
             list = isAscending ? list.ThenBy(item) : list.ThenByDescending(item);
         }
-        return list.ToArray();
+        return [.. list];
     }
     #endregion
     #endregion

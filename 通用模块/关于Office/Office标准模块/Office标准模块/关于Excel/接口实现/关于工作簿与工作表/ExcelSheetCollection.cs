@@ -6,10 +6,14 @@ namespace System.Office.Excel.Realize;
 /// 在实现<see cref="IExcelSheetCollection"/>时，
 /// 可以继承自本类型，以减少重复的工作
 /// </summary>
-public abstract class ExcelSheetCollection : IExcelSheetCollection
+/// <remarks>
+/// 将指定的工作簿封装进对象
+/// </remarks>
+/// <param name="book">指定的工作簿</param>
+public abstract class ExcelSheetCollection(IExcelBook book) : IExcelSheetCollection
 {
     #region 返回工作簿
-    public IExcelBook Book { get; }
+    public IExcelBook Book { get; } = book;
     #endregion
     #region 关于工作表集合
     #region 获取工作表
@@ -85,16 +89,9 @@ public abstract class ExcelSheetCollection : IExcelSheetCollection
         foreach (var i in this)
             array[arrayIndex++] = i;
     }
+
     #endregion
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 将指定的工作簿封装进对象
-    /// </summary>
-    /// <param name="book">指定的工作簿</param>
-    public ExcelSheetCollection(IExcelBook book)
-    {
-        this.Book = book;
-    }
     #endregion
 }

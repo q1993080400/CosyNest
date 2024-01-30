@@ -13,6 +13,7 @@ namespace System.TreeObject;
 /// </remarks>
 /// <param name="assemblies">转换器会从这些程序集中搜索多态反序列化的类型</param>
 sealed class JsonConvertPolymorphic<Obj>(IEnumerable<Assembly> assemblies) : JsonConverter<Obj>
+    where Obj : class
 {
     #region 公开成员
     #region 是否可转换
@@ -32,29 +33,23 @@ sealed class JsonConvertPolymorphic<Obj>(IEnumerable<Assembly> assemblies) : Jso
                 case JsonTokenType.StartObject:
                     reader.Read();
                     return ReadObj(ref reader, typeToConvert);
-                case JsonTokenType.PropertyName:
-                    if (reader.GetString() is TypeNameKey)
+                case JsonTokenType.PropertyName when reader.GetString() is TypeIDKey:
+                    reader.Read();
+                    var typeID = reader.GetGuid();
+                    var type = TypeDictionary.TryGetValue(typeID).Value ??
+                        throw new ArgumentException($"在所有枚举的程序集中都未能找到具有以下ID的类型{typeID}");
+                    var typeData = type.GetTypeData();
+                    var obj = typeData.ConstructorCreate<object>();
+                    var properties = typeData.AlmightyPropertys;
+                    reader.Read();
+                    reader.Read();
+                    foreach (var item in properties)
                     {
-                        reader.Read();
-                        var typeName = reader.GetString() ??
-                            throw new NullReferenceException("未能找到描述类型名称的字段，这个Json字符串的格式可能不正确");
-                        reader.Read();
-                        reader.Read();
-                        var assemblyName = reader.GetString() ??
-                            throw new NullReferenceException("未能找到描述程序集名称的字段，这个Json字符串的格式可能不正确");
-                        reader.Read();
-                        reader.Read();
-                        var type = Assemblies.TryGetValue(assemblyName).Value?.GetType(typeName) ??
-                            throw new ArgumentException($"在所有枚举的程序集中都未能找到类型{typeName}");
-                        var obj = type.GetTypeData().ConstructorCreate<object>();
-                        var properties = type.GetTypeData().AlmightyPropertys;
-                        foreach (var item in properties)
-                        {
-                            item.SetValue(obj, ReadObj(ref reader, item.PropertyType));
-                        }
-                        reader.Read();
-                        return obj;
+                        item.SetValue(obj, ReadObj(ref reader, item.PropertyType));
                     }
+                    reader.Read();
+                    return obj;
+                case JsonTokenType.PropertyName:
                     reader.Read();
                     var @return = JsonSerializer.Deserialize(ref reader, typeToConvert, options)!;
                     reader.Read();
@@ -85,15 +80,12 @@ sealed class JsonConvertPolymorphic<Obj>(IEnumerable<Assembly> assemblies) : Jso
                 JsonSerializer.Serialize(writer, setValue, trueType, options);
                 return;
             }
+            writer.WriteStartObject();
+            writer.WritePropertyName(TypeIDKey);
+            writer.WriteStringValue(trueType.GUID);
+            writer.WritePropertyName(ObjectKey);
+            writer.WriteStartObject();
             var propertie = trueType.GetTypeData().AlmightyPropertys;
-            writer.WriteStartObject();
-            writer.WritePropertyName(TypeNameKey);
-            writer.WriteStringValue(trueType.FullName);
-            writer.WritePropertyName(AssemblyKey);
-            var assembly = trueType.Assembly;
-            writer.WriteStringValue(assembly.FullName);
-            writer.WritePropertyName(ValueKey);
-            writer.WriteStartObject();
             foreach (var item in propertie)
             {
                 writer.WritePropertyName(item.Name);
@@ -113,27 +105,22 @@ sealed class JsonConvertPolymorphic<Obj>(IEnumerable<Assembly> assemblies) : Jso
     /// 转换器会从这些程序集中搜索多态反序列化的类型，
     /// 它的键就是程序集的全名
     /// </summary>
-    private Dictionary<string, Assembly> Assemblies { get; } = assemblies.ToDictionary(x => x.FullName ??
-        throw new NullReferenceException($"在创建多态Json转换器的时候，某个程序集的全名为null"), x => x);
+    private IReadOnlyDictionary<Guid, Type> TypeDictionary { get; }
+        = assemblies.Select(x => x.GetTypes()).SelectMany(x => x).
+        Where(x => typeof(Obj).IsAssignableFrom(x)).
+        ToDictionary(x => x.GUID, x => x);
     #endregion
-    #region 用于标记类型全名的键
+    #region 用于标记类型ID的键
     /// <summary>
-    /// 这个键被用来作为类型名称的属性名字
+    /// 这个键被用来作为类型ID的属性名称
     /// </summary>
-    private const string TypeNameKey = "25A05450-2150-D6E6-D4BE-28723C1898E3";
+    private const string TypeIDKey = "25A05450-2150-D6E6-D4BE-28723C1898E3";
     #endregion
-    #region 用来标记程序集名称的键
+    #region 用来标记对象的键
     /// <summary>
-    /// 这个键被用来作为程序集名称的属性名字
+    /// 用来标记实际被序列化的对象的键
     /// </summary>
-    private const string AssemblyKey = "6718FB50-9359-4791-BE1C-3B967041C105";
-    #endregion
-    #region 用来标记值的键
-    /// <summary>
-    /// 这个键被用来作为值的属性名字
-    /// </summary>
-    private const string ValueKey = "FEE34934-59C9-8F1E-2D9D-ECFF4B05EF24";
-
+    private const string ObjectKey = "2693BC00-F2ED-4434-B386-ED31330700F3";
     #endregion
     #endregion
 }

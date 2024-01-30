@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.Components;
 /// 它能够正确地渲染表单
 /// </summary>
 /// <typeparam name="Model">表单模型的类型</typeparam>
-public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent<RenderFragment<RenderFormViewerInfo<Model>>>
+public sealed partial class FormViewer<Model> : ComponentBase
     where Model : class
 {
     #region 组件参数
@@ -23,9 +23,12 @@ public sealed partial class FormViewer<Model> : ComponentBase, IContentComponent
     public RenderFragment<RenderFormViewerPropertyInfo<Model>> RenderProperty { get; set; }
     #endregion
     #region 用来渲染组件的委托
+    /// <summary>
+    /// 用来渲染整个组件的委托
+    /// </summary>
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderFormViewerInfo<Model>> ChildContent { get; set; }
+    public RenderFragment<RenderFormViewerInfo<Model>> RenderComponent { get; set; }
     #endregion
     #region 用来渲染主体部分的委托
     /// <summary>

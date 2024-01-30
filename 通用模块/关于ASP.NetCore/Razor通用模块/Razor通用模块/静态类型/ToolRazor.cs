@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace Microsoft.AspNetCore;
 
@@ -76,35 +75,6 @@ public static class ToolRazor
             """;
         }).Prepend(script).ToArrayIfDeBug();
         return string.Join(Environment.NewLine, newScript);
-    }
-    #endregion
-    #region 更新PWA版本
-    /// <summary>
-    /// 以当日日期作为种子，更新一个PWA的版本
-    /// </summary>
-    /// <param name="manifestPath">manifest.json文件的位置</param>
-    public static void UpdatePWAVersion(string manifestPath = @"wwwroot\manifest.json")
-    {
-#if DEBUG
-        var text = File.ReadAllText(manifestPath);
-        var regex =/*language=regex*/ """
-            "version": "(?<date>\d{4}.\d{2}.\d{2}).(?<index>\d{3})",
-            """.Op().Regex(RegexOptions.IgnoreCase);
-        var now = DateTime.Now.ToString("yyyy.MM.dd");
-        var match = regex.MatcheSingle(text) ??
-            throw new KeyNotFoundException($"""
-                在PWA配置清单中未找到版本信息，请将以下字符串加入配置清单中：
-                "version": "{now}.000",
-                """);
-        var date = match.GroupsNamed["date"].Match;
-        var index = match.GroupsNamed["index"].Match.To<int>();
-        var newIndex = date == now ? index + 1 : 0;
-        var newVersion = $"""
-            "version": "{now}.{newIndex:D3}",
-            """;
-        var newText = text.Replace(match.Match, newVersion);
-        File.WriteAllText(manifestPath, newText);
-#endif
     }
     #endregion
 }

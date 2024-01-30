@@ -1,4 +1,4 @@
-﻿using System.Maths;
+﻿using System.MathFrancis;
 using System.Media.Drawing;
 using System.Media.Drawing.Text;
 

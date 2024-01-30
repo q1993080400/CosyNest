@@ -1,5 +1,5 @@
-﻿using System.Maths;
-using System.Maths.Plane;
+﻿using System.MathFrancis;
+using System.MathFrancis.Plane;
 
 using NPOI.SS.Util;
 
@@ -9,11 +9,13 @@ namespace System.Office.Excel;
 /// 该类型表示由Npoi实现，
 /// 包含多个单元格的单元格
 /// </summary>
-sealed class ExcelCellMultipleNpoi : ExcelCellNpoi
+/// <param name="address">单元格地址</param>
+/// <inheritdoc cref="ExcelCellNpoi(IExcelSheet)"/>
+sealed class ExcelCellMultipleNpoi(IExcelSheet sheet, (int, int, int, int) address) : ExcelCellNpoi(sheet)
 {
     #region 关于单元格本身
     #region 单元格地址
-    public override (int BeginRow, int BeginCol, int EndRwo, int EndCol) Address { get; }
+    public override (int BeginRow, int BeginCol, int EndRwo, int EndCol) Address { get; } = address;
     #endregion
     #region 单元格的值
     public override RangeValue Value
@@ -102,15 +104,9 @@ sealed class ExcelCellMultipleNpoi : ExcelCellNpoi
     #region 替换单元格
     public override void Replace(string content, string replace)
          => throw new NotImplementedException();
+
     #endregion
     #endregion
     #region 构造函数
-    /// <param name="address">单元格地址</param>
-    /// <inheritdoc cref="ExcelCellNpoi(IExcelSheet)"/>
-    public ExcelCellMultipleNpoi(IExcelSheet sheet, (int, int, int, int) address)
-        : base(sheet)
-    {
-        Address = address;
-    }
     #endregion
 }

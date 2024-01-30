@@ -12,7 +12,8 @@ public interface IFill<in Obj>
     /// 将其他对象填充到自身中
     /// </summary>
     /// <param name="obj">要填充的其他对象</param>
-    /// <param name="serviceProvider">一个用来请求服务的对象</param>
-    void Fill(Obj obj, IServiceProvider serviceProvider);
+    /// <param name="serviceProvider">一个用来请求服务的对象，
+    /// 如果不需要，可以为<see langword="null"/></param>
+    void Fill(Obj obj, IServiceProvider? serviceProvider);
     #endregion
 }

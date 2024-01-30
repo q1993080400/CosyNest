@@ -32,7 +32,7 @@ sealed class ExcelBookNpoi : ExcelBook
     #region 保存工作簿
     protected override Task SaveRealize(string path, bool isSitu)
     {
-        if (!Sheets.Any())
+        if (Sheets.Count == 0)
             return Task.CompletedTask;
         if (isSitu)
         {
@@ -114,7 +114,7 @@ sealed class ExcelBookNpoi : ExcelBook
         Is2007 = path switch
         {
             null => true,
-            var p => ToolPath.SplitPathFile(p).Extended switch
+            var p => ToolPath.SplitFilePath(p).Extended switch
             {
                 "xls" => false,
                 "xlsx" or "xlsm" => true,

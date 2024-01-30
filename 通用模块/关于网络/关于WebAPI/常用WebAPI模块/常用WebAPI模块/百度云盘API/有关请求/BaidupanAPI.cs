@@ -57,14 +57,15 @@ public sealed class BaidupanAPI(string accessToken, string refreshToken,
     /// 搜索文件或者目录
     /// </summary>
     /// <param name="search">要搜索的文件或目录的名字</param>
+    /// <param name="dir">指示应该在什么目录下搜索，如果不指定，默认为搜索全部目录</param>
     /// <returns></returns>
-    public IAsyncEnumerable<BaidupanFD> SearchFD(string search)
+    public IAsyncEnumerable<BaidupanFD> SearchFD(string search, string dir = "/")
     {
         #region 本地函数
         HttpRequestRecording Fun(string accessToken)
             => new("https://pan.baidu.com/rest/2.0/xpan/file",
             new[] { ("method", "search"), ("access_token", accessToken),
-            ("key", search), ("dir", "/"), ("recursion", "1")}!);
+            ("key", search), ("dir", dir), ("recursion", "1")}!);
         #endregion
         return GetFDBase(Fun);
     }

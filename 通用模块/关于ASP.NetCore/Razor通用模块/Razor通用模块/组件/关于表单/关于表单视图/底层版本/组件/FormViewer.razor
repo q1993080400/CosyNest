@@ -2,7 +2,7 @@
 @inherits ComponentBase
 @typeparam Model
 
-@if ((ChildContent, FormModel) is ({ }, { }))
+@if ((RenderComponent, FormModel) is ({ }, { }))
 {
-    @ChildContent(GetRenderInfo())
+    @RenderComponent(GetRenderInfo())
 }

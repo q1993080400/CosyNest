@@ -12,7 +12,12 @@ namespace System.Office.Excel;
 /// 这个类型是<see cref="IRangeStyle"/>的实现，
 /// 可以视为一个底层由NPOI实现，适用于单个单元格的样式
 /// </summary>
-sealed class ExcelCellStyleSingleNpoi : IRangeStyle
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="cell">封装的单元格，
+/// 本对象的功能就是通过它实现的</param>
+sealed class ExcelCellStyleSingleNpoi(ICell cell) : IRangeStyle
 {
     #region 公开成员
     #region 背景颜色
@@ -52,7 +57,7 @@ sealed class ExcelCellStyleSingleNpoi : IRangeStyle
     /// 获取封装的单元格，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private ICell Cell { get; }
+    private ICell Cell { get; } = cell;
     #endregion
     #region 单元格样式
     /// <summary>
@@ -96,16 +101,8 @@ sealed class ExcelCellStyleSingleNpoi : IRangeStyle
     public bool AutoLineBreaks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public OfficeAlignment AlignmentVertical { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public OfficeAlignment AlignmentHorizontal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="cell">封装的单元格，
-    /// 本对象的功能就是通过它实现的</param>
-    public ExcelCellStyleSingleNpoi(ICell cell)
-    {
-        Cell = cell;
-    }
     #endregion
 }

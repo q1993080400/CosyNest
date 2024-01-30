@@ -88,7 +88,7 @@ sealed class EnumerableStream(IEnumerator<IEnumerable<byte>> bytes) : Stream
                 arrays.Add(current);
                 arraysLen += current.Length;
             } while (arraysLen <= 4096 && Bytes.MoveNext());
-            return Fun(old.Concat(arrays.ToArray()));
+            return Fun(old.Concat([.. arrays]));
         }
         #endregion
         var arry = Fun(OldData);

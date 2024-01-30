@@ -1,4 +1,4 @@
-﻿using System.Maths.Plane;
+﻿using System.MathFrancis.Plane;
 
 namespace System.Office.Excel.Realize;
 
@@ -6,7 +6,11 @@ namespace System.Office.Excel.Realize;
 /// 在实现<see cref="IExcelCells"/>时，
 /// 可以继承自本类型，以减少重复的工作
 /// </summary>
-public abstract class ExcelCells : ExcelRange, IExcelCells
+/// <remarks>
+/// 用指定的参数初始化单元格
+/// </remarks>
+/// <param name="sheet">指定的工作表</param>
+public abstract class ExcelCells(IExcelSheet sheet) : ExcelRange(sheet), IExcelCells
 {
     #region 返回IExcelCells接口
     /// <summary>
@@ -120,17 +124,7 @@ public abstract class ExcelCells : ExcelRange, IExcelCells
     public virtual IEnumerable<IExcelCells> Find(string content, bool findValue = true)
         => Cells.Where(x =>
          (findValue ? x.Value.ToText : x.FormulaR1C1)?.Contains(content) ?? false);
-    #endregion
-    #endregion
-    #region 构造方法
-    /// <summary>
-    /// 用指定的参数初始化单元格
-    /// </summary>
-    /// <param name="sheet">指定的工作表</param>
-    public ExcelCells(IExcelSheet sheet)
-        : base(sheet)
-    {
 
-    }
+    #endregion
     #endregion
 }

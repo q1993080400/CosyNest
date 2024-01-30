@@ -47,4 +47,15 @@ public static class ExtenData
     }
     #endregion
     #endregion
+    #region 关于请求服务
+    #region 请求IDataPipe
+    /// <summary>
+    /// 向服务容器请求一个<see cref="IDataPipe"/>
+    /// </summary>
+    /// <param name="serviceProvider">要请求的服务容器</param>
+    /// <returns></returns>
+    public static IDataPipe RequestDataPipe(this IServiceProvider serviceProvider)
+        => serviceProvider.GetRequiredService<IDataPipe>();
+    #endregion
+    #endregion
 }

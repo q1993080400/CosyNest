@@ -16,7 +16,6 @@ sealed class Comparer<Obj>(Func<Obj?, Obj?, int> isGreater) : IComparer<Obj>
     #endregion
     #region 接口实现
     public int Compare(Obj? x, Obj? y)
-        => IsGreater(x, y);
-
+        => Equals(x, y) ? 0 : IsGreater(x, y);
     #endregion
 }

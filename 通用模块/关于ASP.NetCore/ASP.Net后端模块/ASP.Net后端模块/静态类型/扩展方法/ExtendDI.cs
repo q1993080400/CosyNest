@@ -1,5 +1,8 @@
 ﻿using System.Design;
+using System.NetFrancis;
 using System.NetFrancis.Http;
+
+using Microsoft.Extensions.Configuration;
 
 namespace System;
 
@@ -20,9 +23,17 @@ public static partial class ExtendWebApi
         services.AddScoped(x =>
         {
             var tag = x.GetRequiredService<Tag<IUriManager>>();
-            return tag.Content ??
-            throw new NullReferenceException($"请求到的{nameof(IUriManager)}为null，" +
-            $"您是不是忘了调用{nameof(UseConfigurationUriManager)}中间件？");
+            if (tag.Content is { } content)
+                return content;
+            var configuration = x.GetRequiredService<IConfiguration>();
+            var fallbackUri = configuration.GetValue<string>("FallbackUri");
+            return fallbackUri is { } ?
+            CreateNet.UriManager(fallbackUri) :
+            throw new NullReferenceException($"""
+                请求到的{nameof(IUriManager)}为null，您可以使用以下手段排查问题：
+                1.检查是否忘记调用{nameof(UseConfigurationUriManager)}中间件
+                2.在appsettings.json中设置FallbackUri子节点，它给予程序一个回退Uri
+                """);
         });
         return services;
     }

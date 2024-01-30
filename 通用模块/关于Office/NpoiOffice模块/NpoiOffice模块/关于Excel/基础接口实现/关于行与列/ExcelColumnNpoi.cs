@@ -3,7 +3,9 @@
 /// <summary>
 /// 该类型是底层使用Npoi实现的Excel列
 /// </summary>
-sealed class ExcelColumnNpoi : ExcelRCNpoi
+/// <param name="styles">该集合枚举所有列的样式</param>
+/// <inheritdoc cref="ExcelRCNpoi(IExcelSheet, bool, int, int)"/>
+sealed class ExcelColumnNpoi(IExcelSheet sheet, int begin, int end) : ExcelRCNpoi(sheet, false, begin, end)
 {
     #region 是否隐藏
     #region 辅助方法
@@ -41,15 +43,9 @@ sealed class ExcelColumnNpoi : ExcelRCNpoi
             }
         }
     }
-    #endregion 
+
+    #endregion
     #endregion
     #region 构造函数
-    /// <param name="styles">该集合枚举所有列的样式</param>
-    /// <inheritdoc cref="ExcelRCNpoi(IExcelSheet, bool, int, int)"/>
-    public ExcelColumnNpoi(IExcelSheet sheet, int begin, int end)
-        : base(sheet, false, begin, end)
-    {
-
-    }
     #endregion
 }

@@ -9,7 +9,11 @@ namespace System.Office.Excel.Realize;
 ///  在实现<see cref="IExcelSheet"/>时，可以继承自本类型，
 ///  以减少重复的操作
 /// </summary>
-public abstract class ExcelSheet : IExcelSheet
+/// <remarks>
+/// 将指定的工作簿封装进工作表中
+/// </remarks>
+/// <param name="book">指定的工作簿</param>
+public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
 {
     #region 返回IExcelSheet接口
     /// <summary>
@@ -39,7 +43,7 @@ public abstract class ExcelSheet : IExcelSheet
     #endregion
     #region 关于工作簿与工作表
     #region 返回工作表所在的工作薄
-    public IExcelBook Book { get; }
+    public IExcelBook Book { get; } = book;
     #endregion
     #region 获取或设置工作表的名称
     public abstract string Name { get; set; }
@@ -83,15 +87,8 @@ public abstract class ExcelSheet : IExcelSheet
     #region 重写ToString方法
     public override string ToString()
         => Name;
+
     #endregion
     #region 构造方法
-    /// <summary>
-    /// 将指定的工作簿封装进工作表中
-    /// </summary>
-    /// <param name="book">指定的工作簿</param>
-    public ExcelSheet(IExcelBook book)
-    {
-        this.Book = book;
-    }
     #endregion
 }

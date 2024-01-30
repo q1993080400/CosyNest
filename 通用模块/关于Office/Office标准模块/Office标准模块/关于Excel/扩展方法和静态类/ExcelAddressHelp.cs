@@ -1,11 +1,10 @@
 ﻿using System.IOFrancis.FileSystem;
-using System.Maths.Plane;
-using System.Maths;
 using System.Text.RegularExpressions;
 using System.Office.Realize;
+using System.MathFrancis.Plane;
+using System.MathFrancis;
 
-using static System.Maths.CreateMath;
-using static System.Maths.ToolArithmetic;
+using static System.MathFrancis.CreateMath;
 
 namespace System.Office.Excel.Realize;
 
@@ -169,7 +168,7 @@ public static partial class ExcelRealizeHelp
     {
         ExceptionIntervalOut.Check(0, null, beginRow);
         ExceptionIntervalOut.Check(1, null, rowCount, columnCount);
-        return SizePosPixel(beginColumn, Abs(beginRow), columnCount, rowCount);
+        return SizePosPixel(beginColumn, ToolArithmetic.Abs(beginRow), columnCount, rowCount);
     }
     #endregion
     #endregion

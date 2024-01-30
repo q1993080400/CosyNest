@@ -28,7 +28,7 @@ sealed class JsonConvertDirect : JsonConverter<IDirect>
         while (true)
         {
             if (reader.TokenType is JsonTokenType.EndArray)
-                return link.ToArray();
+                return [.. link];
             link.AddLast(ReadObject(ref reader, options));
             reader.Read();
         }
@@ -106,8 +106,7 @@ sealed class JsonConvertDirect : JsonConverter<IDirect>
     #region 序列化
     public override void Write(Utf8JsonWriter writer, IDirect value, JsonSerializerOptions options)
     {
-        var dictionary = value.ToDictionary(true);
-        JsonSerializer.Serialize(writer, dictionary, options);
+        JsonSerializer.Serialize<IReadOnlyDictionary<string, object?>>(writer, value, options);
     }
     #endregion 
 }

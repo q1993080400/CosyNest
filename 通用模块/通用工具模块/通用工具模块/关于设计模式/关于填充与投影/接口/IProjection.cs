@@ -10,8 +10,9 @@ public interface IProjection<out Obj>
     /// <summary>
     /// 将自身投影成其他对象
     /// </summary>
-    /// <param name="serviceProvider">一个用于提供服务的对象</param>
+    /// <param name="serviceProvider">一个用于提供服务的对象，
+    /// 如果不需要，可以为<see langword="null"/></param>
     /// <returns></returns>
-    Obj Projection(IServiceProvider serviceProvider);
+    Obj Projection(IServiceProvider? serviceProvider);
     #endregion
 }

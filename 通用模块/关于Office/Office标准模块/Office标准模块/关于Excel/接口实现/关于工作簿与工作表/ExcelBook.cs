@@ -7,7 +7,13 @@ namespace System.Office.Excel.Realize;
 /// 在实现<see cref="IExcelBook"/>时，可以继承本类型，
 /// 以减少重复的工作
 /// </summary>
-public abstract class ExcelBook : FromIO, IExcelBook
+/// <remarks>
+/// 用指定的文件路径初始化Excel工作簿
+/// </remarks>
+/// <param name="path">工作簿所在的文件路径，
+/// 如果不是通过文件创建的，则为<see langword="null"/></param>
+/// <param name="supported">该Excel对象所支持的文件类型</param>
+public abstract class ExcelBook(PathText? path, IFileType supported) : FromIO(path, supported), IExcelBook
 {
     #region 返回IExcelBook接口
     /// <summary>
@@ -45,19 +51,9 @@ public abstract class ExcelBook : FromIO, IExcelBook
     /// <returns></returns>
     public static IExcelBook GetExcelsBook(PathText path, Func<PathText, ExcelBook> @delegate)
         => GetFromIO(path, @delegate);
+
     #endregion
     #region 构造函数：指定路径和受支持文件类型
-    /// <summary>
-    /// 用指定的文件路径初始化Excel工作簿
-    /// </summary>
-    /// <param name="path">工作簿所在的文件路径，
-    /// 如果不是通过文件创建的，则为<see langword="null"/></param>
-    /// <param name="supported">该Excel对象所支持的文件类型</param>
-    public ExcelBook(PathText? path, IFileType supported)
-        : base(path, supported)
-    {
-
-    }
     #endregion
     #endregion
 }

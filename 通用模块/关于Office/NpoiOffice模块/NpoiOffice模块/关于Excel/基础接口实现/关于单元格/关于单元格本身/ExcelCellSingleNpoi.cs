@@ -6,7 +6,9 @@ namespace System.Office.Excel;
 /// 该类型代表一个底层由Npoi实现的单一单元格，
 /// 它没有子单元格，或者说只有自己一个子单元格
 /// </summary>
-sealed class ExcelCellSingleNpoi : ExcelCellNpoi, IExcelCells
+/// <param name="cell">封装的单元格，本对象的功能就是通过它实现的</param>
+/// <inheritdoc cref="Realize.ExcelCells.ExcelCells(IExcelSheet)"/>
+sealed class ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell) : ExcelCellNpoi(sheet), IExcelCells
 {
     #region 公开成员
     #region 关于单元格本身
@@ -131,16 +133,10 @@ sealed class ExcelCellSingleNpoi : ExcelCellNpoi, IExcelCells
     /// 获取封装的单元格，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private ICell Cell { get; }
+    private ICell Cell { get; } = cell;
+
     #endregion
     #endregion
     #region 构造函数
-    /// <param name="cell">封装的单元格，本对象的功能就是通过它实现的</param>
-    /// <inheritdoc cref="Realize.ExcelCells.ExcelCells(IExcelSheet)"/>
-    public ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell)
-        : base(sheet)
-    {
-        Cell = cell;
-    }
     #endregion
 }

@@ -20,9 +20,10 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     public RenderFragment<RenderFormViewerPropertyInfo<Model>> RenderProperty { get; set; }
     #endregion
     #region 用来渲染组件的委托
+    /// <inheritdoc cref="FormViewer{Model}.RenderComponent"/>
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderFormViewerInfo<Model>> ChildContent { get; set; }
+    public RenderFragment<RenderFormViewerInfo<Model>> RenderComponent { get; set; }
     #endregion
     #region 用来渲染主体部分的委托
     /// <inheritdoc cref="FormViewer{Model}.RenderMain"/>

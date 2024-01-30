@@ -9,7 +9,13 @@ namespace System.Office.Word.Realize;
 /// 在实现<see cref="IWordDocument"/>的时候，
 /// 可以继承自本类型，以减少重复的工作
 /// </summary>
-public abstract class WordDocument : FromIO, IWordDocument
+/// <remarks>
+/// 用指定的文件路径初始化Word文档
+/// </remarks>
+/// <param name="path">文档所在的文件路径，
+/// 如果文档不是通过文件创建的，则为<see langword="null"/></param>
+/// <param name="supported">这个Word实现所支持的文件类型</param>
+public abstract class WordDocument(PathText? path, IFileType supported) : FromIO(path, supported), IWordDocument
 {
     #region 返回IWordDocument接口
     /// <summary>
@@ -176,19 +182,9 @@ public abstract class WordDocument : FromIO, IWordDocument
     /// <returns></returns>
     public static IWordDocument GetDocument(PathText path, Func<PathText, WordDocument> @delegate)
         => GetFromIO(path, @delegate);
+
     #endregion
     #region 指定路径与受支持文件类型
-    /// <summary>
-    /// 用指定的文件路径初始化Word文档
-    /// </summary>
-    /// <param name="path">文档所在的文件路径，
-    /// 如果文档不是通过文件创建的，则为<see langword="null"/></param>
-    /// <param name="supported">这个Word实现所支持的文件类型</param>
-    public WordDocument(PathText? path, IFileType supported)
-        : base(path, supported)
-    {
-
-    }
     #endregion
     #endregion
 }

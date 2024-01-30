@@ -20,7 +20,7 @@ public abstract class DbContextFrancis : DbContext
     /// 如果这个值为<see langword="true"/>，
     /// 则执行日志记录，否则不记录日志
     /// </summary>
-    public static bool WriteLog { get; set; } = true;
+    public static bool WriteLog { get; set; }
     #endregion
     #region 重写OnConfiguring方法
 #if DEBUG

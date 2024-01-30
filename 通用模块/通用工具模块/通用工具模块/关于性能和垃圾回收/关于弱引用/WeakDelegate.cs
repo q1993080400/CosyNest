@@ -1,4 +1,5 @@
-﻿using System.Design;
+﻿using System.Collections.Immutable;
+using System.Design;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -44,24 +45,18 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
     #region 异步动态调用事件
     public async Task InvokeAsync(params object?[] parameters)
     {
-        if (DelegateCollections.Count is 0)
+        var delegateCollectionsOriginal = DelegateCollections;
+        if (delegateCollectionsOriginal.Count is 0)
             return;
-        LinkedList<(WeakReference?, MethodInfo)>? failure = null;     //如果没有委托被回收，则不初始化这个对象，减轻GC压力
-        foreach (var item in DelegateCollections)
+        var delegateCollections = delegateCollectionsOriginal.
+            Where(x => x is not { Met.IsStatic: false, Target.Target: null }).ToArray();
+        foreach (var (target, met) in delegateCollections)
         {
-            if (item is { Met.IsStatic: false, Target.Target: null })
-            {
-                failure ??= [];
-                failure.AddLast(item);
-            }
-            else
-            {
-                var task = item.Met.Invoke(item.Target?.Target, parameters);
-                if ((task, IsAsync) is ({ }, true))
-                    await (dynamic)task;
-            }
+            var task = met.Invoke(target?.Target, parameters);
+            if ((task, IsAsync) is ({ }, true))
+                await (dynamic)task;
         }
-        failure?.ForEach(x => DelegateCollections.Remove(x));                       //删除掉所有已经失去目标引用，而且不是静态方法的委托
+        DelegateCollections = [.. delegateCollections];             //删除掉所有已经失去目标引用，而且不是静态方法的委托
     }
     #endregion
     #region 添加委托
@@ -70,7 +65,7 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
     /// </summary>
     /// <param name="delegate">要添加的委托</param>
     public void Add(Del @delegate)
-        => DelegateCollections.Add(WeakDelegate<Del>.PackDel(@delegate));
+        => DelegateCollections = DelegateCollections.Add(WeakDelegate<Del>.PackDel(@delegate));
     #endregion
     #region 移除委托
     /// <summary>
@@ -78,14 +73,14 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
     /// </summary>
     /// <param name="delegate">要移除的委托</param>
     public void Remove(Del @delegate)
-        => DelegateCollections.Remove(WeakDelegate<Del>.PackDel(@delegate));
+        => DelegateCollections = DelegateCollections.Remove(WeakDelegate<Del>.PackDel(@delegate));
     #endregion
     #region 移除所有委托
     /// <summary>
     /// 从调用列表中移除所有委托
     /// </summary>
     public void Clear()
-        => DelegateCollections.Clear();
+        => DelegateCollections = [];
     #endregion
     #endregion
     #region 内部成员
@@ -95,22 +90,12 @@ public sealed class WeakDelegate<Del> : IEventSubscribe<Del>, IEventInvoke
     /// </summary>
     private bool IsAsync { get; }
     #endregion
-    #region 比较器
-    /// <summary>
-    /// 获取用来比较委托元组的比较器
-    /// </summary>
-    private static IEqualityComparer<(WeakReference? Target, MethodInfo Met)> DelegateEquality { get; }
-    = FastRealize.EqualityComparer<(WeakReference? Target, MethodInfo Met)>
-        ((x, y) => Equals(x.Target?.Target, y.Target?.Target) && Equals(x.Met, y.Met),
-        x => x.Met.GetHashCode());
-    #endregion
     #region 用弱引用储存的委托
     /// <summary>
     /// 储存委托的集合，委托被简化为一个元组，
     /// 第一个项是方法的调用方，第二个项是方法的元数据
     /// </summary>
-    private HashSet<(WeakReference? Target, MethodInfo Met)> DelegateCollections { get; }
-    = new HashSet<(WeakReference? Target, MethodInfo Met)>(DelegateEquality);
+    private ImmutableList<(WeakReference? Target, MethodInfo Met)> DelegateCollections { get; set; } = [];
     #endregion
     #region 对委托进行一个弱引用封装
     /// <summary>
