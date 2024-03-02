@@ -9,7 +9,11 @@ namespace System.NetFrancis.Browser;
 /// <summary>
 /// 这个类型是使用WebDriver实现的浏览器元素的基类
 /// </summary>
-abstract class ElementBrowserWebDriverBase : IElementBrowser
+/// <remarks>
+/// 使用指定的参数初始化对象
+/// </remarks>
+/// <param name="browser">封装的浏览器对象，本对象的功能就是通过它实现的</param>
+abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementBrowser
 {
     #region 公开成员
     #region 关于元素本身
@@ -88,7 +92,7 @@ abstract class ElementBrowserWebDriverBase : IElementBrowser
     /// 获取封装的浏览器对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    protected BrowserWebDriver Browser { get; }
+    protected BrowserWebDriver Browser { get; } = browser;
     #endregion
     #region WebDriver对象
     /// <summary>
@@ -108,15 +112,8 @@ abstract class ElementBrowserWebDriverBase : IElementBrowser
     public string? ID => throw new NotImplementedException();
 
     public string CssClass => throw new NotImplementedException();
+
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="browser">封装的浏览器对象，本对象的功能就是通过它实现的</param>
-    protected ElementBrowserWebDriverBase(BrowserWebDriver browser)
-    {
-        Browser = browser;
-    }
     #endregion
 }

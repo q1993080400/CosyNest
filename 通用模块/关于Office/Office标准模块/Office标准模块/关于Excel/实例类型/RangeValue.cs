@@ -59,25 +59,26 @@ public readonly struct RangeValue
         get => ContentField;
         init
         {
-            #region 转换数组的本地函数
-            static Array ConvertArray(Array array)
-            {
-                switch (array.Rank)
-                {
-                    case 1:
-                        return array.OfType().Select(Convert).ToArray();
-                    case 2:
-                        var length = array.GetLength();
-                        return array.OfType().Select(Convert).ToArray(length[0], length[1]);
-                    case var rank:
-                        throw new NotSupportedException($"最多支持二维数组，但是传入了一个{rank}维数组");
-                }
-            }
-            #endregion
             #region 转换并检查类型的本地函数
-            [return: NotNullIfNotNull("content")]
+            [return: NotNullIfNotNull(nameof(content))]
             static object? Convert(object? content)
-                => content switch
+            {
+                #region 转换数组的本地函数
+                static Array ConvertArray(Array array)
+                {
+                    switch (array.Rank)
+                    {
+                        case 1:
+                            return array.OfType().Select(Convert).ToArray();
+                        case 2:
+                            var length = array.GetLength();
+                            return array.OfType().Select(Convert).ToArray(length[0], length[1]);
+                        case var rank:
+                            throw new NotSupportedException($"最多支持二维数组，但是传入了一个{rank}维数组");
+                    }
+                }
+                #endregion
+                return content switch
                 {
                     null or string or int or double or DateTime => content,
                     RangeValue r => r.Content,
@@ -90,6 +91,7 @@ public readonly struct RangeValue
                     typeof(string), typeof(Num), typeof(double), typeof(DateTime),
                     typeof(Array), typeof(DateTimeOffset), typeof(IEnumerable)),
                 };
+            }
             #endregion
             ContentField = Convert(value);
         }
@@ -130,7 +132,13 @@ public readonly struct RangeValue
     /// 否则返回<see langword="null"/>
     /// </summary>
     public DateTime? ToDateTime
-        => Content.To<DateTime?>(false);
+       => Content switch
+       {
+           DateTime date => date,
+           double days => new DateTime(1900, 1, 1).AddDays(Math.Max(0, days - 2)),
+           string text when DateTime.TryParse(text, out var date) => date,
+           _ => null
+       };
     #endregion
     #endregion
     #region 重写ToString
@@ -144,7 +152,6 @@ public readonly struct RangeValue
     /// <param name="content">待封装的单元格的值</param>
     public RangeValue(object? content)
     {
-        ContentField = default;
         this.Content = content;
     }
     #endregion

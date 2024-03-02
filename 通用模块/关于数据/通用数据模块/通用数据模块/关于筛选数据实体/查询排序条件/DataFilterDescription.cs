@@ -12,10 +12,10 @@ public sealed record DataFilterDescription<Obj>
     /// 描述查询实体的条件，
     /// 这些条件之间使用与逻辑
     /// </summary>
-    public IEnumerable<QueryCondition<Obj>> QueryCondition { get; init; } = Array.Empty<QueryCondition<Obj>>();
+    public IEnumerable<QueryCondition<Obj>> QueryCondition { get; init; } = [];
     #endregion
     #region 排序条件
-    private IEnumerable<SortCondition<Obj>> SortConditionField { get; init; } = Array.Empty<SortCondition<Obj>>();
+    private IEnumerable<SortCondition<Obj>> SortConditionField { get; init; } = [];
 
     /// <summary>
     /// 描述排序实体的条件，
@@ -24,7 +24,7 @@ public sealed record DataFilterDescription<Obj>
     public IEnumerable<SortCondition<Obj>> SortCondition
     {
         get => SortConditionField;
-        init => SortConditionField = value.OrderBy(x => x.Priority).ToArray();
+        init => SortConditionField = [.. value.OrderBy(x => x.Priority)];
     }
     #endregion
 }

@@ -53,8 +53,8 @@ public static class ToolBit
     /// <returns></returns>
     public static Num ToDecimal(int bit, IEnumerable<int>? numInteger, IEnumerable<int>? numDecimal)
     {
-        numInteger ??= new[] { 0 };
-        numDecimal ??= Array.Empty<int>();
+        numInteger ??= [0];
+        numDecimal ??= [];
         var maxBit = numInteger.Count();
         return numInteger.Union(false, numDecimal).Aggregate((Num)0, (seed, source) =>
         {

@@ -66,7 +66,7 @@ public interface IRandom
     Num[] RandDistribute(Num num, int count, double discrete = 2)
     {
         ExceptionIntervalOut.Check(1d, null, discrete);
-        var weight = Enumerable.Range(1, count).Select(x => RandRange(1, discrete)).ToArray();
+        var weight = Enumerable.Range(1, count).Select(_ => RandRange(1, discrete)).ToArray();
         return ToolArithmetic.Segmentation(num, weight);
     }
     #endregion
@@ -122,7 +122,7 @@ public interface IRandom
         var list = collections.Distinct().ToList();
         var c = list.Count;
         if (c is 0)
-            return Array.Empty<Obj>();
+            return [];
         if (count >= c)
             return list;
         var index = new HashSet<int>();

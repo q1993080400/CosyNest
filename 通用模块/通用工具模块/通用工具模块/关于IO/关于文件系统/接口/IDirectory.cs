@@ -22,11 +22,16 @@ public interface IDirectory : IIO, IDirectoryBase
         }
     }
     #endregion
-    #region 创建文件或目录时触发的事件
+    #region 搜索文件或目录
     /// <summary>
-    /// 当在该目录下创建文件或目录时，触发这个事件，
-    /// 事件的参数就是新创建的文件或目录
+    /// 搜索此目录下的所有文件或目录，
+    /// 并返回结果
     /// </summary>
-    event Action<IIO>? OnCreate;
+    /// <param name="condition">搜索条件，以文件或目录的名称为准，
+    /// 它可以使用通配符，*匹配零个或多个字符，?匹配零个或一个字符</param>
+    /// <param name="isRecursion">如果这个值为<see langword="true"/>，
+    /// 则递归搜索所有子文件或目录，否则仅搜索直接子文件或目录</param>
+    /// <returns></returns>
+    IEnumerable<IIO> Search(string condition, bool isRecursion = false);
     #endregion
 }

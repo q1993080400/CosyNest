@@ -15,19 +15,6 @@ public interface IDirectoryBase : IIOBase
     void Clear()
         => Son.ForEach(x => x.Delete());
     #endregion
-    #region 搜索文件或目录
-    /// <summary>
-    /// 从目录下搜索具有指定名称的文件或目录
-    /// </summary>
-    /// <typeparam name="IO">要搜索的文件或目录的类型</typeparam>
-    /// <param name="name">要搜索的文件或目录全名</param>
-    /// <param name="isRecursive">如果这个值为<see langword="true"/>，
-    /// 则执行递归搜索，否则只搜索直接子节点</param>
-    /// <returns>搜索到的文件或目录，如果没有找到，则返回默认值</returns>
-    IO? Find<IO>(string name, bool isRecursive = false)
-        where IO : IIOBase
-        => (isRecursive ? SonAll : Son).OfType<IO>().FirstOrDefault(x => x.NameFull == name);
-    #endregion
     #region 直达子文件或目录
     /// <summary>
     /// 尝试直达子文件或目录

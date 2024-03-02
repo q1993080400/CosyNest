@@ -60,12 +60,12 @@ sealed class ExcelCellMultipleNpoi(IExcelSheet sheet, (int, int, int, int) addre
         get
         {
             var addressMath = Interface.AddressMath;
-            var (address, index, _) = SheetNpoi.MergedRegions.Select(x =>
+            var (address, index) = SheetNpoi.MergedRegions.Select(x =>
               {
                   var br = x.MinRow;
                   var bc = x.MinColumn;
                   return CreateMath.SizePosPixel(bc, br, x.MaxColumn - bc + 1, x.MaxRow - br + 1);
-              }).PackIndex().FirstOrDefault(x => x.Elements.Contains(addressMath));
+              }).Index().FirstOrDefault(x => x.Elements.Contains(addressMath));
             return (address, address is null ? -1 : index);
         }
     }

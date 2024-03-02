@@ -44,7 +44,7 @@ sealed class ExcelSheetEPPlus : ExcelSheet
         => Sheets.Delete(Sheet);
     #endregion
     #region 复制工作表
-    public override IExcelSheet Copy(Func<string, int, string>? renamed = null, IExcelSheetCollection? collection = null)
+    public override IExcelSheet Copy(IExcelSheetCollection? collection = null, Func<string, int, string>? renamed = null)
     {
         collection ??= Book.Sheets;
         var sheets = collection.To<ExcelSheetCollectionEPPlus>().Sheets;

@@ -147,7 +147,7 @@ public static partial class ExtendEnumerable
         #region 适用于IList
         void RemoveIList(IList<Obj> collections)
         {
-            var index = collections.PackIndex().
+            var index = collections.Index().
                 Where(x => @delegate(x.Elements)).
                 Select(x => x.Index).Reverse().ToArray();
             index.ForEach(collections.RemoveAt);

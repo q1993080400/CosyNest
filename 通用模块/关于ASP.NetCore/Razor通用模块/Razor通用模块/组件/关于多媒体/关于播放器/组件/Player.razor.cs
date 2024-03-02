@@ -75,6 +75,7 @@ public sealed partial class Player : ComponentBase, IContentComponent<RenderFrag
     #region 重写SetParametersAsync方法
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var extension = parameters.ToDictionary().ToDictionary();
         var initialState = parameters.GetValueOrDefault<Func<Task<RenderPlayerStateOperational>>>(nameof(InitialState)) ??
             throw new NullReferenceException($"{nameof(InitialState)}参数必须显式指定，且不能为null");
         var onlyExplicitlyChangingState = parameters.GetValueOrDefault<bool>(nameof(OnlyExplicitlyChangingState));
@@ -123,7 +124,7 @@ public sealed partial class Player : ComponentBase, IContentComponent<RenderFrag
             PlayerComponent = this
         } : RenderPlayerInfo!;
         StatusChanged = statusChanged;
-        await base.SetParametersAsync(parameters);
+        await base.SetParametersAsync(ParameterView.FromDictionary(extension));
     }
     #endregion
     #region 重写OnAfterRenderAsync

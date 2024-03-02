@@ -20,11 +20,11 @@ public sealed record MailDraft : IMailDraft
         => Attachment;
 
     public IList<IBitRead> Attachment { get; }
-    = new List<IBitRead>();
+    = [];
     #endregion
     #region 收件人
     public IList<string> To { get; }
-    = new List<string>();
+    = [];
     #endregion
     #endregion
 }

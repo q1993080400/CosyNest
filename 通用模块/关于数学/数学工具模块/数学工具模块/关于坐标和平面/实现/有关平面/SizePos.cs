@@ -13,13 +13,13 @@ sealed record SizePos(IPoint Position, Num Width, Num Height) : SizeRealize(Widt
         {
             var (w, h) = this.To<ISizePos>();
             h = -h;
-            return new[]
-            {
+            return
+            [
                     Position,
                     Position.Move(w,0),
                     Position.Move(w,h),
                     Position.Move(0,h)
-                };
+                ];
         }
     }
     #endregion

@@ -1,4 +1,4 @@
-﻿using System.Maths;
+﻿using System.MathFrancis;
 
 namespace System.Mapping.Settlement;
 
@@ -22,7 +22,7 @@ public sealed record SettlementRootBuild
     /// <inheritdoc cref="SettlementPointRoot.Known"/>
     public Dictionary<string, IUnit<IUTLength>> Known
     {
-        get => KnownField ??= new();
+        get => KnownField ??= [];
         init => KnownField = new(value);
     }
     #endregion

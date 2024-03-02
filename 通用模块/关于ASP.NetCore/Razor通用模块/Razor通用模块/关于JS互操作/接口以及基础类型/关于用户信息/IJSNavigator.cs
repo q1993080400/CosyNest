@@ -29,4 +29,14 @@ public interface IJSNavigator
     /// </summary>
     IPosition Geolocation { get; }
     #endregion
+    #region 获取唤醒锁
+    /// <summary>
+    /// 获取一个唤醒锁，
+    /// 它可以阻止屏幕变暗，
+    /// 当释放它的时候，唤醒锁自动解除，
+    /// 警告：由于浏览器限制，不能保证生效
+    /// </summary>
+    /// <returns></returns>
+    Task<IAsyncDisposable> GetWakeLock();
+    #endregion
 }

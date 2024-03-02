@@ -32,9 +32,9 @@ public interface IFileBase : IIOBase
     IEnumerable<IFileType> FileTypes
         => NameExtension switch
         {
-            null => Array.Empty<IFileType>(),
+            null => [],
             var n => IFileType.RegisteredFileType.
-            TryGetValue(n).Value ?? Array.Empty<IFileType>()
+            TryGetValue(n).Value ?? []
         };
     #endregion
     #region 判断文件类型是否兼容

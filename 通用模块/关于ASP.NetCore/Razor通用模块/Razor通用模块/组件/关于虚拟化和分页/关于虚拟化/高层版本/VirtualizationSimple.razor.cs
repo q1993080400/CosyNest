@@ -35,11 +35,6 @@ public sealed partial class VirtualizationSimple<Element> : ComponentBase
     [Parameter]
     public int Plus { get; set; } = 5;
     #endregion
-    #region 初始渲染的数量
-    /// <inheritdoc cref="Virtualization{Element}.Initial"/>
-    [Parameter]
-    public int Initial { get; set; } = 35;
-    #endregion
     #region 是否为倒序容器
     /// <inheritdoc cref="Virtualization{Element}.IsReverse"/>
     [Parameter]

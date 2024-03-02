@@ -61,14 +61,7 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// 它控制新增渲染元素的数量
     /// </summary>
     [Parameter]
-    public int Plus { get; set; } = 5;
-    #endregion
-    #region 初始渲染的数量
-    /// <summary>
-    /// 初始渲染元素的数量
-    /// </summary>
-    [Parameter]
-    public int Initial { get; set; } = 35;
+    public int Plus { get; set; } = 15;
     #endregion
     #region 是否为倒序容器
     /// <summary>
@@ -188,8 +181,6 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
                 await RenderElements.DisposeAsync();
             RenderElements = elements.GetAsyncEnumerator();
             ElementList = [];
-            var isReverse = parameters.GetValueOrDefault<bool>(nameof(IsReverse));
-            await AddElement(Initial, isReverse);
         }
         await base.SetParametersAsync(parameters);
     }

@@ -40,7 +40,7 @@ sealed class PagesIText(DocumentIText pdf) : IPDFCollect
     #region 复制到数组
     public void CopyTo(IPDFPage[] array, int arrayIndex)
     {
-        foreach (var (item, count, _) in this.PackIndex())
+        foreach (var (item, count) in this.Index())
         {
             array[count + arrayIndex] = item;
         }
@@ -75,7 +75,7 @@ sealed class PagesIText(DocumentIText pdf) : IPDFCollect
     {
         if (Contains(item) && item is PageIText { Page: var sp })
         {
-            foreach (var (page, index, _) in this.PackIndex())
+            foreach (var (page, index) in this.Index())
             {
                 if (page is PageIText { Page: var cp } && cp.Equals(sp))
                     return index;

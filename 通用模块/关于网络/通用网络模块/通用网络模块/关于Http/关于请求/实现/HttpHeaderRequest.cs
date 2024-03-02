@@ -38,7 +38,7 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
     public string? Host
     {
         get => GetHeader("Host", v => v.First());
-        init => SetHeader("Host", value, v => new[] { v });
+        init => SetHeader("Host", value, v => [v]);
     }
     #endregion
     #endregion

@@ -4,13 +4,18 @@ using OfficeOpenXml;
 
 namespace System.Office.Excel;
 
-sealed class ExcelColumnEPPlus : ExcelRC
+/// <summary>
+/// 使用指定的参数初始化对象
+/// </summary>
+/// <param name="column">列对象，本对象的功能就是通过它实现的</param>
+/// <inheritdoc cref="ExcelRC(IExcelSheet, bool, int, int)"/>
+sealed class ExcelColumnEPPlus(IExcelSheet sheet, IEnumerable<ExcelColumn> column, int begin, int end) : ExcelRC(sheet, false, begin, end)
 {
     #region 封装的列对象
     /// <summary>
     /// 获取封装的列对象，本对象的功能就是通过它实现的
     /// </summary>
-    private IEnumerable<ExcelColumn> Column { get; }
+    private IEnumerable<ExcelColumn> Column { get; } = column.ToArray();
     #endregion
     #region 是否隐藏
     public override bool? IsHide
@@ -38,17 +43,8 @@ sealed class ExcelColumnEPPlus : ExcelRC
     }
 
     public override IRangeStyle Style { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="column">列对象，本对象的功能就是通过它实现的</param>
-    /// <inheritdoc cref="ExcelRC(IExcelSheet, bool, int, int)"/>
-    public ExcelColumnEPPlus(IExcelSheet sheet, IEnumerable<ExcelColumn> column, int begin, int end)
-        : base(sheet, false, begin, end)
-    {
-        this.Column = column.ToArray();
-    }
     #endregion
 }

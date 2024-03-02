@@ -72,6 +72,7 @@ public static partial class ExtendWebApi
       它发生在单例服务初始化之后*/
     #endregion
     #region 配置AuthorizationOptions
+    #region 通过静态方法验证
     /// <summary>
     /// 通过约定先于配置的方式，
     /// 为授权策略配置验证方式
@@ -92,5 +93,6 @@ public static partial class ExtendWebApi
             options.AddPolicy(name, x => x.RequireAssertion(fun));
         }
     }
+    #endregion
     #endregion
 }

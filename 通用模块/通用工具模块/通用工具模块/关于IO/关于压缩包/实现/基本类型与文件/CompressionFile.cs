@@ -45,7 +45,7 @@ sealed class CompressionFile(ZipArchiveEntry zip, INode father) : CompressionIte
     #endregion
     #endregion
     #region 子节点
-    public override IEnumerable<INode> Son => Array.Empty<INode>();
+    public override IEnumerable<INode> Son => [];
     #endregion
     #region 删除文件
     public override void Delete()

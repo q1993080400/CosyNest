@@ -102,6 +102,18 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
       直接添加链接和使用HYPERLINK函数，
       这个属性应该能够同时识别这两种链接方式*/
     #endregion
+    #region 是否为空单元格
+    /// <summary>
+    /// 返回这个单元格是否为空单元格
+    /// </summary>
+    bool IsVoid
+        => this is
+        {
+            Value.Content: null or "" or 0,
+            FormulaA1: null,
+            FormulaR1C1: null
+        };
+    #endregion
     #endregion
     #region 关于单元格地址
     #region 获取完整地址

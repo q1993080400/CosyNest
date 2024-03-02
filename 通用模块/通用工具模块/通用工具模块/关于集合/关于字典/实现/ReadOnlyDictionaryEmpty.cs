@@ -29,10 +29,10 @@ sealed class ReadOnlyDictionaryEmpty<Key, Value> : IReadOnlyDictionary<Key, Valu
             $"它不存在也不能添加任何元素");
     #endregion
     #region 枚举键
-    public IEnumerable<Key> Keys => Array.Empty<Key>();
+    public IEnumerable<Key> Keys => [];
     #endregion
     #region 枚举值
-    public IEnumerable<Value> Values => Array.Empty<Value>();
+    public IEnumerable<Value> Values => [];
     #endregion
     #region 获取键值对数量
     public int Count => 0;

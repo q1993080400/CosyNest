@@ -13,28 +13,16 @@ sealed class ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell) : ExcelCellNpoi(
     #region 公开成员
     #region 关于单元格本身
     #region 获取或设置值
-    #region 辅助方法
-    /// <summary>
-    /// 当单元格的值是数字时，根据它的格式，
-    /// 将其转换为日期或数字类型
-    /// </summary>
-    /// <param name="cell">待转换的单元格</param>
-    /// <returns></returns>
-    private static RangeValue GetDateOrNum(ICell cell)
-        => DateTime.TryParse(cell.CellStyle.GetDataFormatString(), out _) ?
-            new(cell.DateCellValue) : new(cell.NumericCellValue);
-    #endregion
-    #region 正式方法
     public override RangeValue Value
     {
         get
         {
-            var type = Cell.CellType;
-            return (type is CellType.Formula ? Cell.CachedFormulaResultType : type) switch
+            var type = cell.CellType;
+            return (type is CellType.Formula ? cell.CachedFormulaResultType : type) switch
             {
                 CellType.Blank => new(null),
-                CellType.Numeric or CellType.Formula => GetDateOrNum(Cell),
-                _ => new(Cell.StringCellValue),
+                CellType.Numeric or CellType.Formula => new(cell.NumericCellValue),
+                _ => new(cell.StringCellValue),
             };
         }
         set
@@ -44,13 +32,13 @@ sealed class ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell) : ExcelCellNpoi(
             switch (v)
             {
                 case null or string:
-                    Cell.SetCellValue(v?.ToString());
+                    cell.SetCellValue(v?.ToString());
                     break;
                 case int or double or Num:
-                    Cell.SetCellValue(v.To<double>());
+                    cell.SetCellValue(v.To<double>());
                     break;
                 case DateTime t:
-                    Cell.SetCellValue(t);
+                    cell.SetCellValue(t);
                     Style.Format = "yyyy/M/d";
                     break;
                 case Array { Length: 1 } a:             //单个单元格只允许写入只有一个元素的数组
@@ -66,12 +54,11 @@ sealed class ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell) : ExcelCellNpoi(
         }
     }
     #endregion
-    #endregion
     #region 单元格公式（A1格式）
     public override string? FormulaA1
     {
-        get => Cell.CellType is CellType.Formula ? Cell.CellFormula : null;
-        set => SetFormulaAssist(value, value => Cell.CellFormula = value, false);
+        get => cell.CellType is CellType.Formula ? cell.CellFormula : null;
+        set => SetFormulaAssist(value, value => cell.CellFormula = value, false);
     }
     #endregion
     #region 单元格地址
@@ -79,8 +66,8 @@ sealed class ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell) : ExcelCellNpoi(
     {
         get
         {
-            var br = Cell.RowIndex;
-            var bc = Cell.ColumnIndex;
+            var br = cell.RowIndex;
+            var bc = cell.ColumnIndex;
             return (br, bc, br, bc);
         }
     }
@@ -88,7 +75,7 @@ sealed class ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell) : ExcelCellNpoi(
     #region 单元格样式
     public override IRangeStyle Style
     {
-        get => new ExcelCellStyleSingleNpoi(Cell);
+        get => new ExcelCellStyleSingleNpoi(cell);
         set => throw new NotImplementedException();
     }
     #endregion
@@ -128,14 +115,6 @@ sealed class ExcelCellSingleNpoi(IExcelSheet sheet, ICell cell) : ExcelCellNpoi(
     #endregion
     #endregion 
     #region 内部成员
-    #region 封装的单元格
-    /// <summary>
-    /// 获取封装的单元格，
-    /// 本对象的功能就是通过它实现的
-    /// </summary>
-    private ICell Cell { get; } = cell;
-
-    #endregion
     #endregion
     #region 构造函数
     #endregion

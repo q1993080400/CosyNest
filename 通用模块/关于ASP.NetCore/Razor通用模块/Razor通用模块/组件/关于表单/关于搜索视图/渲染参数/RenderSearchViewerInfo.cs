@@ -17,8 +17,8 @@ public sealed record RenderSearchViewerInfo<Obj>
     public DataFilterDescription<Obj> Generate()
         => new()
         {
-            QueryCondition = QueryCondition.Values.ToArray(),
-            SortCondition = SortCondition.Values.ToArray(),
+            QueryCondition = [.. QueryCondition.Values],
+            SortCondition = [.. SortCondition.Values],
         };
     #endregion
     #region 关于查询条件

@@ -13,10 +13,4 @@
   <link href="_content/ToolRazor/css/style.css" rel="stylesheet" />
   <script src="_content/ToolRazor/js/ToolRazor.js"></script>
 
- 2.如果你需要使用Video.js相关的类型，
- 还需要将下面的代码添加到根页面：
- 
- <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet" />
- <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-
- */
+  */

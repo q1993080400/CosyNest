@@ -19,7 +19,7 @@ public static class CreateCollection
     /// 它的唯一目的在于推断数组的元素类型</param>
     /// <returns></returns>
     public static Obj[] EmptyArray<Obj>(IEnumerable<Obj>? infer)
-       => Array.Empty<Obj>();
+       => [];
 #pragma warning restore
     #endregion
     #region 创建空哈希表

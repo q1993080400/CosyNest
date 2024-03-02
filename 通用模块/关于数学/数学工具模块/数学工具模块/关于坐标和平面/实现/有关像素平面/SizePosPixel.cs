@@ -21,13 +21,13 @@ sealed record SizePosPixel : SizePixel, ISizePosPixel
             var (h, v) = this.To<ISizePosPixel>();
             h = ToolArithmetic.Limit(true, h - 1, 0);
             v = -ToolArithmetic.Limit(true, v - 1, 0);
-            return VertexField = new[]
-            {
+            return VertexField =
+            [
                     FirstPixel,
                     FirstPixel.Move(h,0),
                     FirstPixel.Move(h,v),
                     FirstPixel.Move(0,v)
-                };
+                ];
         }
     }
     #endregion

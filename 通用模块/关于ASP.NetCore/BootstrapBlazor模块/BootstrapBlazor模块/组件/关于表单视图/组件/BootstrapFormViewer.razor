@@ -9,7 +9,7 @@
                     IsValueReference=IsValueReference Delete="Delete" Cancellation="Cancellation"
                     RefreshTarget="RefreshTarget" ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
                     Submit="Submit" VerifyFail="VerifyFail">
-    <ChildContent>
+    <RenderComponent>
         @if (ChildContent is null)
         {
             <div class="bootstrapFormViewerContainer">
@@ -22,7 +22,7 @@
         {
             @ChildContent(context)
         }
-    </ChildContent>
+    </RenderComponent>
     <RenderMain>
         @if (RenderMain is null)
         {
@@ -51,7 +51,7 @@
     <RenderSubmit>
         @if (RenderSubmit is null)
         {
-            <CompactCentered>
+            <Center>
                 <Button Text="@(context.ExistingForms?"修改":"提交")" OnClick="context.Submit"></Button>
                 <Button Text="重置" OnClick="context.Resetting"></Button>
                 @if (context.Delete is { } deleteValue)
@@ -62,7 +62,7 @@
                 {
                     <Button Text="取消" OnClick="cancellationValue"></Button>
                 }
-            </CompactCentered>
+            </Center>
         }
         else
         {

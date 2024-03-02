@@ -51,7 +51,7 @@ public static class ToolArithmetic
     /// <param name="num">如果还有更多的整数，则在这里传入</param>
     /// <returns></returns>
     public static Num GCD(Num first, Num second, params Num[] num)
-        => num.Concat(new[] { first, second }).Sort(false).Aggregate((a, b) =>
+        => num.Concat(new[] { first, second }).OrderDescending().Aggregate((a, b) =>
              {
                  //注意：本方法使用的算法是辗转相除法
 
@@ -133,7 +133,7 @@ public static class ToolArithmetic
     /// <returns></returns>
     public static Num[] Segmentation(Num num, params Num[] weight)
     {
-        var atomic = num / weight.Sum();
+        var atomic = num / weight.Sum(x => x.Value);
         return weight.Select(x => atomic * x).ToArray();
     }
     #endregion
@@ -233,8 +233,8 @@ public static class ToolArithmetic
     /// <param name="returnMax">如果这个值为<see langword="true"/>，返回集合的最大值，为<see langword="false"/>，返回最小值</param>
     /// <param name="objs">要返回极限的对象</param>
     /// <returns></returns>
-    public static Obj Limit<Obj>(bool returnMax, params Obj[] objs)
-        => objs.Limit(returnMax);
+    public static Obj? Limit<Obj>(bool returnMax, params Obj[] objs)
+        => returnMax ? objs.Max() : objs.Min();
     #endregion
     #endregion
     #region 关于相对值
@@ -249,23 +249,5 @@ public static class ToolArithmetic
     /// <returns></returns>
     public static Num Rel(Num numA, Num numB, bool isAbs)
         => isAbs ? numB : numA + numB;
-    #endregion
-    #region 使数字处于区间中
-    /// <summary>
-    /// 如果一个数字小于区间的最小值，则返回最小值，
-    /// 大于区间的最大值，则返回最大值，
-    /// 正好位于区间中，则返回它本身
-    /// </summary>
-    /// <param name="num">待检查的数字</param>
-    /// <param name="interval">对数字的区间约束</param>
-    /// <returns></returns>
-    public static Num InInterval(Num num, IIntervalSpecific<Num> interval)
-        => interval.CheckInInterval(num) switch
-        {
-            IntervalPosition.Insufficient => interval.Min!.Value,
-            IntervalPosition.Overflow => interval.Max!.Value,
-            IntervalPosition.Located => num,
-            var e => throw new NotSupportedException($"无法识别{e}类型的枚举")
-        };
     #endregion
 }

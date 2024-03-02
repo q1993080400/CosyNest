@@ -1,6 +1,4 @@
-﻿using System.Maths;
-
-namespace System.Mapping.Settlement;
+﻿namespace System.Mapping.Settlement;
 
 /// <summary>
 /// 表示一个<see cref="ISettlement"/>的投影，

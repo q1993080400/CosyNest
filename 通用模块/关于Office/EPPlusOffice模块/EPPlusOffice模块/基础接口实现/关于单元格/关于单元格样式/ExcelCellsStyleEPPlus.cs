@@ -8,7 +8,11 @@ namespace System.Office.Excel;
 /// <summary>
 /// 这个类型是底层使用EPPlus实现的单元格样式
 /// </summary>
-sealed class ExcelCellsStyleEPPlus : IRangeStyle
+/// <remarks>
+/// 使用指定的单元格初始化对象
+/// </remarks>
+/// <param name="cell">指定的单元格</param>
+sealed class ExcelCellsStyleEPPlus(ExcelCellsEPPlus cell) : IRangeStyle
 {
     #region 内部成员
     #region 封装的单元格
@@ -16,7 +20,7 @@ sealed class ExcelCellsStyleEPPlus : IRangeStyle
     /// 获取封装的单元格，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private ExcelCellsEPPlus Cell { get; }
+    private ExcelCellsEPPlus Cell { get; } = cell;
     #endregion
     #region 单元格样式
     /// <summary>
@@ -55,15 +59,8 @@ sealed class ExcelCellsStyleEPPlus : IRangeStyle
     public bool AutoLineBreaks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public OfficeAlignment AlignmentVertical { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public OfficeAlignment AlignmentHorizontal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
     #endregion
     #region 构造函数
-    /// <summary>
-    /// 使用指定的单元格初始化对象
-    /// </summary>
-    /// <param name="cell">指定的单元格</param>
-    public ExcelCellsStyleEPPlus(ExcelCellsEPPlus cell)
-    {
-        Cell = cell;
-    }
     #endregion
 }

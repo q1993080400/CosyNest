@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace System.Design.Logging;
+namespace System.Logging;
 
 /// <summary>
 /// 这个类型使用一个函数来记录日志

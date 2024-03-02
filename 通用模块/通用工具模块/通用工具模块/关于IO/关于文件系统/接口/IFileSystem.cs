@@ -33,7 +33,7 @@ public interface IFileSystem : INode
     /// <param name="delegate">通过驱动器获取容量的委托</param>
     /// <returns></returns>
     private IUnit<IUTStorage> SizeAided(Func<IDrive, IUnit<IUTStorage>> @delegate)
-        => Son.Select(@delegate).Sum();
+        => CreateBaseMath.UnitMetric<IUTStorage>(Son.Select(@delegate).Sum(x => x.ValueMetric));
     #endregion
     #region 获取总容量
     /// <summary>

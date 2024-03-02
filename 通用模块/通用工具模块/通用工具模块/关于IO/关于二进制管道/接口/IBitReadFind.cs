@@ -25,6 +25,6 @@ public interface IBitReadFind : IBitRead
     /// <returns></returns>
     /// <inheritdoc cref="Read(Range, long?, CancellationToken)"/>
     async Task<byte[]> ReadComplete(Range range, CancellationToken cancellation = default)
-         => (await Read(range, null, cancellation).Linq(x => x.FirstOrDefault())) ?? [];
+         => (await Read(range, null, cancellation).FirstOrDefaultAsync(cancellation)) ?? [];
     #endregion
 }

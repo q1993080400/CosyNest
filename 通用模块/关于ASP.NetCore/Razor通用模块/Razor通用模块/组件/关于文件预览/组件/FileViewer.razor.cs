@@ -56,7 +56,7 @@ public sealed partial class FileViewer : ComponentBase
                 return Task.CompletedTask;
             });
         #endregion
-        var renderCover = fileSource.PackIndex().Select(x => new RenderCoverInfo()
+        var renderCover = fileSource.Index().Select(x => new RenderCoverInfo()
         {
             FileSource = x.Elements,
             PreviewEvent = Fun(x.Index)

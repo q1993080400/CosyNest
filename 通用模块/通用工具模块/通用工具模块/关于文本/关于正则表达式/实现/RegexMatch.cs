@@ -41,7 +41,7 @@ sealed partial class RegexMatch : IMatch
     private RegexMatch(string match, int index, int length)
     {
         Match = match;
-        Groups = Array.Empty<IMatch>();
+        Groups = [];
         GroupsNamed = CreateCollection.EmptyDictionary<string, IMatch>();
         Index = index;
         Length = length;
@@ -63,7 +63,7 @@ sealed partial class RegexMatch : IMatch
         {
             Match m => m.Groups.OfType<Group>().Skip(1).Where(x => x.Success),
             Group m => (IEnumerable<Capture>)m.Captures,
-            _ => Array.Empty<Capture>()
+            _ => []
         }).
         Select(x => x == match ? new RegexMatch(x.Value, x.Index, x.Length) : (IMatch)new RegexMatch(x, regular)).ToArray();
         var names = MatchGroupName().Matches(regular).Select(x => x.Value[3..^1]).ToHashSet();

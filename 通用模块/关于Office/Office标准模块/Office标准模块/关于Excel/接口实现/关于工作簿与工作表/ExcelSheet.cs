@@ -53,7 +53,7 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     public abstract void Delete();
     #endregion
     #region 复制工作表
-    public abstract IExcelSheet Copy(Func<string, int, string>? renamed = null, IExcelSheetCollection? collection = null);
+    public abstract IExcelSheet Copy(IExcelSheetCollection? collection = null, Func<string, int, string>? renamed = null);
     #endregion
     #endregion
     #region 返回页面
@@ -84,10 +84,20 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     public abstract ICanvas Canvas { get; }
     #endregion
     #endregion
+    #region 重写的方法
+    #region 重写GetHashCode
+    public override int GetHashCode()
+        => ToolEqual.CreateHash(Name, Book);
+    #endregion
+    #region 重写Equals
+    public override bool Equals(object? obj)
+        => obj is IExcelSheet { Book: var book, Name: var name } &&
+        book == Book && name == Name;
+    #endregion
     #region 重写ToString方法
     public override string ToString()
         => Name;
-
+    #endregion
     #endregion
     #region 构造方法
     #endregion

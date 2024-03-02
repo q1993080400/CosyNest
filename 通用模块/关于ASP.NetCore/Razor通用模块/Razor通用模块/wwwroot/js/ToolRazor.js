@@ -18,6 +18,34 @@ function LoadCSS(uri) {
     head.insertBefore(link, head.firstChild);
 }
 
+//创建一个唤醒锁，它阻止屏幕变暗
+async function CreateWakeLock(key) {
+    await navigator.wakeLock.request("screen").
+        then(lock => {
+            window[key] = lock;
+        });
+}
+
+//释放一个唤醒锁
+async function ReleaseWakeLock(key) {
+    var lock = window[key];
+    if (lock)
+        await lock.release();
+}
+
+const volumeKey = "TotalPlayVolume";
+
+//初始化播放器音量
+function InitializationPlayVolume() {
+    var volume = localStorage.getItem(volumeKey);
+    return parseFloat(volume ?? 0.5);
+}
+
+//记录播放器音量
+function RecordPlayVolume(volume) {
+    localStorage.setItem(volumeKey, volume);
+}
+
 //打开模式对话框
 function OpenModelDialog(id) {
     document.getElementById(id).showModal();
@@ -121,10 +149,27 @@ function GetPlayerProgress(player) {
 
 //观察虚拟化容器
 function ObservingVirtualizationContainers(netMethod, endID) {
+    var isIntersecting = true;
+    var inAdd = false;
     var observe = CacheObservation(endID + 'Observe',
         () => new IntersectionObserver(x => {
-            if (x[0].isIntersecting)
-                netMethod(0);
+            var first = x[0];
+            isIntersecting = first.isIntersecting;
+            if (inAdd)
+                return;
+            inAdd = true;
+            var intervalID = 0;
+            function onInterval() {
+                if (isIntersecting) {
+                    netMethod(0)
+                }
+                else {
+                    clearInterval(intervalID);
+                    inAdd = false;
+                }
+            }
+            onInterval();
+            intervalID = setInterval(onInterval, 1000);
         }));
     observe.observe(document.getElementById(endID));
 }

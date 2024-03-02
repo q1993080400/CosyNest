@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace System.Design.Logging;
+namespace System.Logging;
 
 /// <summary>
 /// 本类型可以提供一个单一的<see cref="ILogger"/>，
@@ -33,7 +33,6 @@ sealed class LoggerProviderFunction(Func<IServiceProvider, Exception, object?, T
     /// 获取唯一的一个日志记录对象
     /// </summary>
     private ILogger Logger { get; } = new LoggerFunction(setLog, serviceProvider);
-
     #endregion
     #endregion
 }

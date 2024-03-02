@@ -30,7 +30,7 @@ public static class ToolTemporaryFile
     /// 它会被删除，注意，它不受<see cref="TemporaryLimit"/>属性的影响
     /// </summary>
     public static IList<IDirectory> Temporary { get; }
-    = new List<IDirectory>();
+    = [];
     #endregion
     #region 指定临时文件上限
     /// <summary>

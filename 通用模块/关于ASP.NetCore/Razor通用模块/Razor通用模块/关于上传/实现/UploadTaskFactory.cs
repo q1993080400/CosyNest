@@ -39,7 +39,7 @@ sealed class UploadTaskFactory(IServiceProvider serviceProvider, UploadTaskFacto
                 {
                     Content = []
                 };
-                foreach (var (item, index, _) in files.PackIndex())
+                foreach (var (item, index) in files.Index())
                 {
                     #region 本地函数
                     async Task Fun()
@@ -112,7 +112,7 @@ sealed class UploadTaskFactory(IServiceProvider serviceProvider, UploadTaskFacto
             CancellationToken = token,
             ServiceProvider = ServiceProvider,
             Upload = Fun,
-            Index = new[] { index },
+            Index = [index],
             TrueName = file.Name,
             Path = path,
             ProcessedPath = processedPath,

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7</TargetFramework>
+		<TargetFramework>net8</TargetFramework>
 		<AssemblyName>OfficeRealizeEPPlus</AssemblyName>
 		<RootNamespace>System.Office.Excel</RootNamespace>
 		<LangVersion>preview</LangVersion>
@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EPPlus" Version="6.2.8" PrivateAssets="compile" />
+		<PackageReference Include="EPPlus" Version="7.0.9" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

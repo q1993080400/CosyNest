@@ -58,7 +58,7 @@ public static class ToolTrigonometric
     /// <returns>一个元组，它的项分别是斜边，较长的直角边和较短的直角边的长度</returns>
     public static (Num H, Num LLong, Num LShort) DistinguishSide(Num sideA, Num sideB, Num sideC)
     {
-        var array = new[] { sideA, sideB, sideC }.Sort(false);
+        var array = new[] { sideA, sideB, sideC }.OrderDescending().ToArray();
         return (array[0], array[1], array[2]);
     }
     #endregion

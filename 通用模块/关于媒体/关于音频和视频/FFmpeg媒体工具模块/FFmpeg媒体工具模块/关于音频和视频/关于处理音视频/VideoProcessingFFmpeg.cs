@@ -52,14 +52,15 @@ sealed class VideoProcessingFFmpeg : IVideoProcessing
     #region 视频截图
     public async Task Screenshot(ScreenshotInfo info)
     {
-        var allFragment = info.Fragment.OrderBy(x => x.Fragment).PackIndex(true).ToArray();
-        if (allFragment.Length is 0)
+        var allFragment = info.Fragment.OrderBy(x => x.Fragment).Index().ToArray();
+        var count = allFragment.Length;
+        if (count is 0)
             return;
         var snippet = FFmpeg.Conversions.FromSnippet;
         var reportProgress = info.ReportProgress ?? new Func<decimal, Task>(_ => Task.CompletedTask);
         var mediaPath = info.MediaPath;
         var cancellationToken = info.CancellationToken;
-        foreach (var ((fragment, output), index, count) in allFragment)
+        foreach (var ((fragment, output), index) in allFragment)
         {
             ToolIO.CreateFather(output);
             var conversion = await snippet.Snapshot(mediaPath, output, fragment);

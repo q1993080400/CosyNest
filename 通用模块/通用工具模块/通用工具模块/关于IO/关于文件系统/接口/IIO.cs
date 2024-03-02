@@ -52,6 +52,14 @@ public interface IIO : IIOBase
         => this.To<INode>().Son.Cast<IIO>();
     #endregion
     #endregion
+    #region 用来监视文件系统的对象
+    /// <summary>
+    /// 这个对象可以用来监视文件系统的更改，
+    /// 如果本对象是文件，它作用于单个文件，
+    /// 是目录，作用于所有子目录和孙目录
+    /// </summary>
+    IFileSystemWatcher FileSystemWatcher { get; }
+    #endregion
     #region 是否隐藏文件或目录
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
@@ -132,49 +140,6 @@ public interface IIO : IIOBase
             return null;
         });
     #endregion
-    #endregion
-    #endregion
-    #region 有关事件
-    #region 说明文档
-    /*实现这些事件时，请遵循以下规范：
-      #由于仅在少数情况下需要对文件目录进行监听，
-      因此，这些事件仅在第一次被注册时初始化
-
-      #在文件或目录被删除，移动时，自动停止监听*/
-    #endregion
-    #region 停止监听所有事件
-    /// <summary>
-    /// 停止监听文件或目录，
-    /// 所有有关事件都将不再触发
-    /// </summary>
-    void WatcherStop();
-    #endregion
-    #region 在被删除时触发
-    /// <summary>
-    /// 当该文件，或该目录的子文件目录被删除后执行这个事件，
-    /// 事件的参数就是被删除的路径
-    /// </summary>
-    event Action<string>? OnDelete;
-    #endregion
-    #region 在被修改时触发
-    /// <summary>
-    /// 当该文件，或该目录下的子文件被修改后执行这个事件，
-    /// 修改的项目包括名称，写入，最后访问时间，
-    /// 事件的参数就是被修改的文件
-    /// </summary>
-    event Action<IFile>? OnFileChange;
-
-    /*说明文档
-      由于修改项目包括最后访问时间，
-      所以它同样可以监听文件被访问，但是这种监听是不完美的，体现在：
-      
-      #最后访问时间似乎并不是指的文件被打开的时间，
-      它有这方面的成分，但是具体含义不明，如果有人精通Win32，麻烦向我赐教下
-    
-      #出于性能考虑，Windows默认不会自动更新最后访问时间，
-      如果想要开启这个功能，需要在CMD中输入以下命令：
-     
-      fsutil behavior set disablelastaccess 0*/
     #endregion
     #endregion
 }

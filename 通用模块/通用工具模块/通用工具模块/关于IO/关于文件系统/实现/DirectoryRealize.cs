@@ -24,10 +24,12 @@ sealed class DirectoryRealize : IORealize, IDirectory
     #endregion
     #endregion
     #region 关于目录的信息
-    #region 枚举子目录
-    public override IEnumerable<INode> Son
-        => PackFS.EnumerateFileSystemInfos().
-        Where(x =>
+    #region 搜索文件或目录
+    public IEnumerable<IIO> Search(string condition, bool isRecursion = false)
+    {
+        var searchOption = isRecursion ? SearchOption.TopDirectoryOnly : SearchOption.AllDirectories;
+        var son = PackFS.EnumerateFileSystemInfos(condition, searchOption);
+        return son.Where(x =>
         {
             #region 说明文档
             /*问：这个地方为什么有一个奇怪的过滤？
@@ -38,22 +40,22 @@ sealed class DirectoryRealize : IORealize, IDirectory
             #endregion
             if (x is DirectoryInfo { FullName: var path })
             {
-                path = ToolPath.Trim(path);
-                return path != Path && path != (Path + "\\");
+                var newPath = ToolPath.Trim(path);
+                return newPath != Path && newPath != (Path + "\\");
             }
             return true;
-        }).Select(x => x switch
-         {
-             FileInfo a => (INode)new FileRealize(a.FullName),
-             DirectoryInfo a => new DirectoryRealize(a.FullName),
-             _ => throw new Exception("无法识别的类型")
-         });
+        }).Select(x => CreateIO.IO(x.FullName)!);
+    }
+    #endregion
+    #region 枚举子目录
+    public override IEnumerable<INode> Son
+        => Search("*");
     #endregion
     #region 获取目录的大小
     public override IUnit<IUTStorage> Size
         => this.To<INode>().Father is IDrive d ?
         d.SizeUsed :
-        Directory.Son.Select(x => x.Size).Sum();
+        CreateBaseMath.UnitMetric<IUTStorage>(Directory.Son.Select(x => x.Size).Sum(x => x.ValueMetric));
     #endregion
     #endregion
     #region 关于对目录的操作
@@ -87,7 +89,6 @@ sealed class DirectoryRealize : IORealize, IDirectory
     public override void Delete()
     {
         PackFS.Delete(true);
-        WatcherStop();
     }
     #endregion
     #endregion
@@ -97,14 +98,6 @@ sealed class DirectoryRealize : IORealize, IDirectory
     {
         var path = System.IO.Path.Combine(Path, relativelyPath);
         return CreateIO.IO(path).To<IO>(false);
-    }
-    #endregion
-    #region 创建文件或目录时触发的事件
-    public event Action<IIO>? OnCreate
-    {
-        add => Watcher.Created +=
-            (_, e) => value!(CreateIO.IO(e.FullPath)!);
-        remove => throw CreateException.NotSupportedEventRemove;
     }
     #endregion
     #region 构造函数

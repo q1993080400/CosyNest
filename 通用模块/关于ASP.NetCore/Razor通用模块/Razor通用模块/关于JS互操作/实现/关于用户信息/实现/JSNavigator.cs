@@ -28,6 +28,14 @@ sealed class JSNavigator : JSRuntimeBase, IJSNavigator
     #region 剪切板对象
     public IJSClipboard Clipboard { get; }
     #endregion
+    #region 获取唤醒锁
+    public async Task<IAsyncDisposable> GetWakeLock()
+    {
+        var id = ToolASP.CreateJSObjectName();
+        await JSRuntime.InvokeVoidAsync("CreateWakeLock", id);
+        return new JSWakeLock(JSRuntime, id);
+    }
+    #endregion
     #region 构造函数
     /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
     public JSNavigator(IJSRuntime jsRuntime)

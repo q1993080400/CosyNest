@@ -70,6 +70,8 @@ public static class CreateIO
         {
             PathState.ExistDirectory => new DirectoryRealize(path),
             PathState.ExistFile => new FileRealize(path),
+            PathState.NotPermissions => throw new NotSupportedException($"{path}存在，但是没有权限访问"),
+            PathState.NotLegal => throw new NotSupportedException($"{path}不是合法的文件或目录路径"),
             _ => null
         };
     #endregion

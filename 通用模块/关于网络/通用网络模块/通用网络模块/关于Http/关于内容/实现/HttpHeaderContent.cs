@@ -20,7 +20,7 @@ public sealed record HttpHeaderContent : HttpHeader, IHttpHeaderContent
     public MediaTypeHeaderValue? ContentType
     {
         get => GetHeader("Content-Type", x => MediaTypeHeaderValue.Parse(x.Join(";")));
-        init => SetHeader("Content-Type", value, x => x.ToString().Split(";").ToArray());
+        init => SetHeader("Content-Type", value, x => [.. x.ToString().Split(";")]);
     }
     #endregion
     #region 构造函数

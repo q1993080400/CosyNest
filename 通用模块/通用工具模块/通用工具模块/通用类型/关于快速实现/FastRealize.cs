@@ -101,7 +101,7 @@ public static class FastRealize
                 default:
                     Regex ??=/*language=regex*/@"\d+".Op().Regex();
                     compareString ??= Collections.Generic.Comparer<string>.Default;
-                    foreach (var (match, index, _) in Regex.Matches(x).Matches.Zip(Regex.Matches(y).Matches, false).PackIndex())
+                    foreach (var (match, index) in Regex.Matches(x).Matches.Zip(Regex.Matches(y).Matches, false).Index())
                     {
                         #region 本地函数
                         static int Fun(string a, string b)

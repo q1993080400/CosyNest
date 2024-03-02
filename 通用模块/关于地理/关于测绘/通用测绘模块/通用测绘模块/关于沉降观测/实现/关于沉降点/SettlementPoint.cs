@@ -1,5 +1,5 @@
-﻿using System.Maths;
-using System.Maths.Tree;
+﻿using System.MathFrancis;
+using System.MathFrancis.Tree;
 
 namespace System.Mapping.Settlement;
 
@@ -66,13 +66,13 @@ sealed class SettlementPoint : SettlementPointBase
             {
                 list.AddLast(item);
                 if (item is SettlementPointBase p && (p.Name == Name || (IsKnown && p.IsKnown)))        //检查是否为闭合或附合
-                    return list.ToArray();
+                    return [.. list];
             }
             return CreateCollection.EmptyArray(list);
         }
         #endregion
         var closed = Closed();
-        if (closed.Any())
+        if (closed.Length != 0)
         {
             ClosedField = (ISettlementPoint)closed[^1];
             var settlements = closed[..^1].Append(this).ToArray();

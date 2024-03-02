@@ -38,14 +38,7 @@
                                                         <img src="@uri" class="mediaPreview" />
                                                         break;
                                                     case MediaSource { MediaSourceType: FileSourceType.WebVideo }:
-                                                        var options = new RenderVideoJS()
-                                                {
-                                                    Source = [MediumSource.CreateSingle(uri)],
-                                                    Controls = true,
-                                                    Loop = true
-                                                };
-                                                        <VideoJS RenderVideoJS="options" />
-                                                        break;
+                                                        throw new Exception("暂时不支持预览视频，请等待后续开发");
                                                 }
                                             </Center>
                                         </CarouselItem>
@@ -63,9 +56,9 @@
                                 await context.QuitPreview.InvokeAsync();
                             }
                         }
-                        <CompactCentered>
+                        <Center>
                             <Button OnClick="OnClickWithoutRender">关闭</Button>
-                        </CompactCentered>
+                        </Center>
                     </FooterTemplate>
                 </BootstrapBlazor.Components.ModalDialog>
             </Modal>

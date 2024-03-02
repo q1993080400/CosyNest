@@ -35,7 +35,7 @@ public interface IDataPipeTo
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, Func{Guid, bool}?, CancellationToken)"/>
     Task AddOrUpdate<Data>(Data data, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
        where Data : class
-       => AddOrUpdate<Data>(new[] { data }, specifyPrimaryKey, cancellation);
+       => AddOrUpdate<Data>([data], specifyPrimaryKey, cancellation);
     #endregion
     #endregion
     #endregion

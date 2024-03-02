@@ -7,59 +7,6 @@ public static partial class ExtendEnumerable
     /*所有关于集合的转化的方法，全部放在这个部分类中，
       集合的转化指的是：API返回一个新的集合*/
 
-    #region 关于排序
-    #region 不指定比较器
-    /// <summary>
-    /// 对一个泛型集合进行排序，
-    /// 由于该集合的元素自身就是<see cref="IComparable{T}"/>，
-    /// 因此它不需要指定比较器
-    /// </summary>
-    /// <inheritdoc cref="Sort{Obj}(IEnumerable{Obj}, IComparer{Obj}, bool)"/>
-    public static Obj[] Sort<Obj>(this IEnumerable<Obj> collections, bool isAscending = true)
-        where Obj : IComparable<Obj>
-        => (isAscending ? collections.Order() : collections.OrderDescending()).ToArray();
-    #endregion
-    #region 指定比较器
-    /// <summary>
-    /// 通过指定比较器，对一个泛型集合进行排序
-    /// </summary>
-    /// <typeparam name="Obj">泛型集合的类型</typeparam>
-    /// <param name="collections">要排序的泛型集合</param>
-    /// <param name="comparable">用于比较的比较器，
-    /// 如果为<see langword="null"/>，则使用默认比较器</param>
-    /// <param name="isAscending">如果这个值为<see langword="true"/>，则升序排列，为<see langword="false"/>，则降序排列</param>
-    /// <returns></returns>
-    public static Obj[] Sort<Obj>(this IEnumerable<Obj> collections, IComparer<Obj> comparable, bool isAscending = true)
-        => collections.Sort(x => x, isAscending, comparable);
-    #endregion
-    #region 指定键和比较器
-    /// <inheritdoc cref="SortMultiple{Obj, Key}(IEnumerable{Obj}, Func{Obj, Key}, bool, Func{Obj, object}[])"/>
-    /// <inheritdoc cref="Sort{Obj}(IEnumerable{Obj}, IComparer{Obj}?, bool)"/>
-    public static Obj[] Sort<Obj, Key>(this IEnumerable<Obj> collections, Func<Obj, Key> @delegate, bool isAscending = true, IComparer<Key>? comparable = null)
-        => isAscending ?
-        collections.OrderBy(@delegate, comparable).ToArray() :
-        [.. collections.OrderByDescending(@delegate, comparable)];
-    #endregion
-    #region 指定多个键
-    /// <summary>
-    /// 通过指定键，对一个泛型集合进行排序
-    /// </summary>
-    /// <typeparam name="Key">提取的键类型</typeparam>
-    /// <param name="delegate">从集合中提取，用于排序的键的委托</param>
-    /// <param name="secondary">这个数组可通过委托获取次要排序条件，前面的优先级更高</param>
-    /// <inheritdoc cref="Sort{Obj}"/>
-    /// <returns></returns>
-    public static Obj[] SortMultiple<Obj, Key>(this IEnumerable<Obj> collections, Func<Obj, Key> @delegate, bool isAscending = true, params Func<Obj, object>[] secondary)
-    {
-        var list = isAscending ? collections.OrderBy(@delegate) : collections.OrderByDescending(@delegate);
-        foreach (var item in secondary)
-        {
-            list = isAscending ? list.ThenBy(item) : list.ThenByDescending(item);
-        }
-        return [.. list];
-    }
-    #endregion
-    #endregion
     #region 关于并集
     #region 生成并返回多个集合的并集
     #region 以多个元素为参数

@@ -11,7 +11,7 @@ public sealed record RenderPlayerStateOperational
     /// 获取要播放的所有媒体的Uri，
     /// 按照优先级从高到低排序
     /// </summary>
-    public required IEnumerable<string> MediumSource { get; init; }
+    public required IReadOnlyList<string> MediumSource { get; init; }
     #endregion
     #region 是否循环播放
     /// <summary>
@@ -39,10 +39,16 @@ public sealed record RenderPlayerStateOperational
     public double Played { get; init; }
     #endregion
     #region 音量
+    private double VolumeField { get; set; } = 0.6;
+
     /// <summary>
     /// 获取媒体的音量，
     /// 它的合理取值范围是从0到1
     /// </summary>
-    public double Volume { get; init; } = 0.6;
+    public double Volume
+    {
+        get => VolumeField;
+        init => VolumeField = ToolPlayer.RationalizationVolume(value);
+    }
     #endregion
 }

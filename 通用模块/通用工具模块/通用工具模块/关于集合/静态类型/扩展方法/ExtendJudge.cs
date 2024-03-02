@@ -87,7 +87,7 @@ public static partial class ExtendEnumerable
     {
         if (collection is IList<Obj> c && optimization)
             return c.IndexOf(obj);
-        foreach (var (e, index, _) in collection.PackIndex())
+        foreach (var (e, index) in collection.Index())
         {
             if (Equals(e, obj))
                 return index;
@@ -97,20 +97,17 @@ public static partial class ExtendEnumerable
     #endregion
     #region 封装集合的元素和索引
     /// <summary>
-    /// 封装一个集合的元素，索引，和元素数量，并返回一个新集合
+    /// 封装一个集合的元素和索引，并返回一个新集合
     /// </summary>
     /// <typeparam name="Obj">集合的元素类型</typeparam>
     /// <param name="collection">待转换的集合</param>
-    /// <param name="getCount">如果这个值为<see langword="true"/>，则会获取集合元素的数量，但是这会影响性能，
-    /// 如果为<see langword="false"/>，则不会这样做，返回的元组的Count字段为-1</param>
     /// <returns></returns>
-    public static IEnumerable<(Obj Elements, int Index, int Count)> PackIndex<Obj>(this IEnumerable<Obj> collection, bool getCount = false)
+    public static IEnumerable<(Obj Elements, int Index)> Index<Obj>(this IEnumerable<Obj> collection)
     {
         var index = 0;
-        var count = getCount ? collection.Count() : -1;
         foreach (var obj in collection)
         {
-            yield return (obj, index++, count);
+            yield return (obj, index++);
         }
     }
     #endregion
@@ -187,10 +184,10 @@ public static partial class ExtendEnumerable
     #endregion
     #region 转换为Range
     /// <summary>
-    /// 将一个<see cref="Index"/>转换为<see cref="Range"/>，
+    /// 将一个<see cref="System.Index"/>转换为<see cref="Range"/>，
     /// 它仅选取集合中的一个元素
     /// </summary>
-    /// <param name="index">待转换的<see cref="Index"/></param>
+    /// <param name="index">待转换的<see cref="System.Index"/></param>
     /// <returns></returns>
     public static Range ToRange(this Index index)
     {
@@ -259,25 +256,6 @@ public static partial class ExtendEnumerable
     #endregion
     #endregion
     #region 关于累加
-    #region 关于Sum
-    #region 可以对任何对象使用
-    /// <summary>
-    /// 返回一个序列的和，可以对任何对象使用，
-    /// 只要它重载了加法运算符， 或使用委托指定了计算加法的方式
-    /// </summary>
-    /// <typeparam name="Obj">集合元素和返回值的类型</typeparam>
-    /// <param name="collections">要计算总和的集合</param>
-    /// <param name="add">这个委托指定了计算加法的方式，
-    /// 如果为<see langword="null"/>，则尝试调用自带的加法运算符</param>
-    /// <returns></returns>
-    public static Obj Sum<Obj>(this IEnumerable<Obj> collections, Func<Obj, Obj, Obj>? add = null)
-    {
-        var array = collections.ToArray();
-        add ??= new Func<Obj, Obj, Obj>((x, y) => (dynamic?)x + y);
-        return array.Length == 1 ? array[0] : array.Aggregate(add);
-    }
-    #endregion
-    #endregion
     #region 聚合函数
     /// <summary>
     /// 将集合中所有相邻的元素聚合起来，并返回一个新集合，
@@ -387,43 +365,6 @@ public static partial class ExtendEnumerable
     public static string Distinct(this IEnumerable<string> collections, string text)
         => collections.Distinct(text, (x, y) => $"{x}({y})");
     #endregion
-    #endregion
-    #endregion
-    #region 返回一个集合的极限
-    #region 复杂方法
-    /// <summary>
-    /// 返回一个集合的极限，也就是根据一个函数，
-    /// 从元素中提取出键，然后返回键最大或者最小的元素
-    /// </summary>
-    /// <typeparam name="Ret">集合元素的类型，也是返回值类型</typeparam>
-    /// <typeparam name="Key">键的类型，方法会比较键的大小，而不是<typeparamref name="Ret"/>的大小</typeparam>
-    /// <param name="collections">要返回极限的集合</param>
-    /// <param name="returnMax">如果这个值为<see langword="true"/>，返回集合的最大值，为<see langword="false"/>，返回最小值</param>
-    /// <param name="getKey">从元素中提取键的函数</param>
-    /// <param name="comparison">用来比较键的比较器，如果为<see langword="null"/>，则默认为该类型的默认比较器</param>
-    /// <returns></returns>
-    public static Ret Limit<Ret, Key>(this IEnumerable<Ret> collections, bool returnMax, Func<Ret, Key> getKey, Func<Key, Key, int>? comparison = null)
-    {
-        comparison ??= Comparer<Key>.Default.Compare;
-        return collections.Aggregate((x, y) =>
-        comparison(
-            getKey(x), getKey(y)) > 0 == returnMax ?         //根据x是否比y大，以及需要最大值或最小值，获取正确的结果
-            x : y);
-    }
-    /*注释：算法为：
-      每次检查集合中的两个元素，
-      返回其中较大的一个，
-      不断迭代直到集合末尾
-
-      虽然也可以直接排序，
-      然后取排序集合的第一位或最后一位，
-      但是这个算法只需要遍历集合一次，
-      性能有巨大的提高*/
-    #endregion
-    #region 简单方法
-    /// <inheritdoc cref="Limit{Ret, Key}(IEnumerable{Ret}, bool, Func{Ret, Key}, Func{Key, Key, int}?)"/>
-    public static Ret Limit<Ret>(this IEnumerable<Ret> collections, bool returnMax, Func<Ret, Ret, int>? comparison = null)
-        => collections.Limit(returnMax, x => x, comparison);
     #endregion
     #endregion
     #region 返回集合是否不为null且存在元素

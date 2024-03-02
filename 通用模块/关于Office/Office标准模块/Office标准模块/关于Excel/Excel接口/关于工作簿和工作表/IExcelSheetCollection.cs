@@ -58,7 +58,7 @@ public interface IExcelSheetCollection : IList<IExcelSheet>
     /// 如果为<see langword="null"/>，则使用一个默认方法</param>
     /// <returns></returns>
     IExcelSheet CopyLast(Func<string, int, string>? renamed = null)
-        => this.Last().Copy(renamed, this);
+        => this.Last().Copy(this, renamed);
     #endregion
     #endregion
     #region 删除工作表

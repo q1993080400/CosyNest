@@ -30,13 +30,13 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// 将这个工作表复制到新工作簿，
     /// 并放置在工作表集合的末尾
     /// </summary>
+    /// <param name="collection">目标工作簿的工作表容器，
+    /// 如果为<see langword="null"/>，则复制到本工作簿</param>
     /// <param name="renamed">一个用于修改工作表名，使其不重名的委托，
     /// 它的第一个参数是旧名称，第二个参数是尝试失败的次数，从2开始，返回值就是新的名称，
     /// 如果为<see langword="null"/>，则使用一个默认方法</param>
-    /// <param name="collection">目标工作簿的工作表容器，
-    /// 如果为<see langword="null"/>，则复制到本工作簿</param>
     /// <returns>复制后的新工作表</returns>
-    IExcelSheet Copy(Func<string, int, string>? renamed = null, IExcelSheetCollection? collection = null);
+    IExcelSheet Copy(IExcelSheetCollection? collection = null, Func<string, int, string>? renamed = null);
     #endregion
     #region 剪切工作表
     /// <summary>
@@ -49,7 +49,7 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// <returns>剪切后的新工作表</returns>
     IExcelSheet Cut(IExcelSheetCollection collection, Func<string, int, string>? renamed = null)
     {
-        var newSheet = Copy(renamed, collection);
+        var newSheet = Copy(collection, renamed);
         Delete();
         return newSheet;
     }

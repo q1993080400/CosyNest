@@ -6,34 +6,6 @@ public static partial class ExtendEnumerable
 {
     //这个部分类专门用来处理和异步迭代器有关的API
 
-    #region 对异步集合执行Linq查询
-    /// <summary>
-    /// 对一个异步集合执行Linq查询，并返回单个结果
-    /// </summary>
-    /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <typeparam name="Obj">异步集合的元素类型</typeparam>
-    /// <param name="collections">待查询的异步集合</param>
-    /// <param name="fun">用来执行查询的函数，它的第一个参数是一个等效的同步集合，，返回值就是Linq查询的结果</param>
-    /// <returns></returns>
-    public static async Task<Ret> Linq<Ret, Obj>(this IAsyncEnumerable<Obj> collections, Func<IEnumerable<Obj>, Ret> fun)
-        => fun(await collections.ToListAsync());
-    #endregion
-    #region 将同步集合转换为异步集合
-    /// <summary>
-    /// 将同步集合转换为异步集合
-    /// </summary>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="collection">待转换的同步集合</param>
-    /// <returns></returns>
-    public static async IAsyncEnumerable<Obj> ToAsyncEnumerable<Obj>(this IEnumerable<Obj> collection)
-    {
-        foreach (var item in collection)
-        {
-            yield return item;
-        }
-        await Task.CompletedTask;
-    }
-    #endregion
     #region 转换为支持取消的异步迭代器
     /// <summary>
     /// 将一个异步迭代器转换为支持取消的异步迭代器，
@@ -88,23 +60,6 @@ public static partial class ExtendEnumerable
             yield return item;
             progress.Report(report(item));
         }
-    }
-    #endregion
-    #region 将异步集合转换为List
-    /// <summary>
-    /// 将异步集合转换为列表
-    /// </summary>
-    /// <typeparam name="Obj">异步集合的元素类型</typeparam>
-    /// <param name="objs">待转换的异步集合</param>
-    /// <returns></returns>
-    public static async Task<List<Obj>> ToListAsync<Obj>(this IAsyncEnumerable<Obj> objs)
-    {
-        var list = new List<Obj>();
-        await foreach (var item in objs)
-        {
-            list.Add(item);
-        }
-        return list;
     }
     #endregion
 }

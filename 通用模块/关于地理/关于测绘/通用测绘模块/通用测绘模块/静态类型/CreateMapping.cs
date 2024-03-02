@@ -1,5 +1,5 @@
 ﻿using System.Mapping.Settlement;
-using System.Maths;
+using System.MathFrancis;
 
 namespace System.Mapping;
 

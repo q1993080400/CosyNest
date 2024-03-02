@@ -49,8 +49,8 @@ public sealed class BilibiliAPI(Func<IHttpClient>? httpClientProvide = null) : W
         {
             Header = new(new Dictionary<string, IEnumerable<string>>()
             {
-                ["Referer"] = new[] { "https://www.bilibili.com" },
-                ["User-Agent"] = new[] { "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36" }
+                ["Referer"] = ["https://www.bilibili.com"],
+                ["User-Agent"] = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"]
             })
         };
         var id = clear switch

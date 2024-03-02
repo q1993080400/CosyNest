@@ -43,7 +43,7 @@ sealed class ExcelBookEPPlus : ExcelBook, IExcelBook
     {
         var stream = new MemoryStream();
         ExcelPackage.SaveAs(stream);
-        return stream.ToBitPipe(Path is { } p ? ToolPath.SplitPathFile(p).Extended : "").Read;
+        return stream.ToBitPipe(Path is { } p ? ToolPath.SplitFilePath(p).Extended : "").Read;
     }
     #endregion
     #endregion

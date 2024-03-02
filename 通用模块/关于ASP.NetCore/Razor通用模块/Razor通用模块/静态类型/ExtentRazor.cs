@@ -186,7 +186,7 @@ public static class ExtendRazor
         => services.AddScoped(x =>
         {
             var navigationManager = x.GetRequiredService<NavigationManager>();
-            return CreateNet.UriManager(navigationManager.Uri);
+            return CreateNet.UriManager(navigationManager.BaseUri);
         });
     #endregion
     #region 注入携带Cookie的SignalRProvide对象
@@ -274,6 +274,7 @@ public static class ExtendRazor
         return parameters.Where(x => x.Item2 is { }).ToDictionary(true)!;
     }
     #endregion
+    #region 关于ParameterView
     #region 重构ParameterView 
     /// <summary>
     /// 重构一个<see cref="ParameterView"/>，
@@ -289,6 +290,7 @@ public static class ExtendRazor
         reconfiguration(dictionary);
         return ParameterView.FromDictionary(dictionary!);
     }
+    #endregion 
     #endregion
     #region 公开StateHasChanged方法
     /// <summary>

@@ -16,7 +16,7 @@ namespace System.MathFrancis.Plane.Geometric;
 sealed class Line(IGeometricModel<IBessel> model, IPoint begin, IPoint end) : IBessel
 {
     #region 枚举线段的起点和终点
-    public IReadOnlyList<IPoint> Node { get; } = new[] { begin, end };
+    public IReadOnlyList<IPoint> Node { get; } = [begin, end];
     #endregion
     #region 返回线段的长度
     public Num Length

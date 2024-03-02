@@ -1,4 +1,4 @@
-﻿using System.Maths;
+﻿using System.MathFrancis;
 
 namespace System.Mapping.Settlement;
 
@@ -6,10 +6,14 @@ namespace System.Mapping.Settlement;
 /// 该类型是<see cref="ISettlementPoint"/>的实现，
 /// 同时也是沉降观测点的基类
 /// </summary>
-abstract class SettlementPointBase : SettlementBase, ISettlementPoint
+/// <remarks>
+/// 使用指定的名称初始化沉降观测点
+/// </remarks>
+/// <param name="name">观测点的名称</param>
+abstract class SettlementPointBase(string name) : SettlementBase, ISettlementPoint
 {
     #region 名称
-    public string Name { get; }
+    public string Name { get; } = name;
     #endregion
     #region 是否已知
     public abstract bool IsKnown { get; }
@@ -40,15 +44,6 @@ abstract class SettlementPointBase : SettlementBase, ISettlementPoint
     #endregion
     #region 重写ToString
     public override string ToString() => Name;
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的名称初始化沉降观测点
-    /// </summary>
-    /// <param name="name">观测点的名称</param>
-    public SettlementPointBase(string name)
-    {
-        this.Name = name;
-    }
+
     #endregion
 }

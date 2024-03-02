@@ -75,7 +75,7 @@ public static class CreateDesign
     /// 所有应用程序都应该添加这些序列化支持，
     /// 如果需要添加或删除本集合的元素，请在本集合被使用前执行这个操作
     /// </summary>
-    public static IList<JsonConverter> JsonCommon { get; } = new List<JsonConverter>();
+    public static IList<JsonConverter> JsonCommon { get; } = [];
     #endregion
     #region 包含常用Json序列化器的选项
     /// <summary>

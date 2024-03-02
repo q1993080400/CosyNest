@@ -46,11 +46,13 @@ public interface IDirect : IRestrictedDictionary<string, object?>
     Ret? GetValueRecursion<Ret>(string path, bool checkExist = true)
     {
         object? direct = this;
-        foreach (var (item, i, count) in path.Split(".").PackIndex(true))
+        var split = path.Split(".").Index().ToArray();
+        var maxIndex = split.Length - 1;
+        foreach (var (item, i) in split)
         {
             if (direct is null)
             {
-                if (i == (count - 1))
+                if (i == maxIndex)
                     return (dynamic?)null;
                 throw new NullReferenceException($"对象{item}为null，无法递归读取它后面的属性");
             }

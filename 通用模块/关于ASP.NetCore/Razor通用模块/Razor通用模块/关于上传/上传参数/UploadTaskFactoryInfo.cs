@@ -20,10 +20,10 @@ public sealed record UploadTaskFactoryInfo
     /// 函数会按照顺序，
     /// 询问每个中间件是否能够处理上传文件
     /// </summary>
-    public IReadOnlyList<UploadMiddleware> Middlewares { get; init; } = new List<UploadMiddleware>()
-    {
+    public IReadOnlyList<UploadMiddleware> Middlewares { get; init; } =
+    [
         UploadMiddlewareCommon.UploadAll()
-    };
+    ];
     #endregion
     #region 上传后事件
     /// <summary>

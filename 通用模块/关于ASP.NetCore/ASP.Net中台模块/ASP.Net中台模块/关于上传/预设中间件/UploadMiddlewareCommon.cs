@@ -57,7 +57,7 @@ public static class UploadMiddlewareCommon
                     CancellationToken = cancellationToken
                 });
                 var set = info.ProcessedPath;
-                set.Content = set.Content?.Union(new[] { targetPath, converPath });
+                set.Content = set.Content?.Union([targetPath, converPath]);
                 return UploadReturnValue.Success;
             }
             catch (Exception ex)
@@ -98,7 +98,7 @@ public static class UploadMiddlewareCommon
                 await imageProcessing.FormatConversion(filePath, converPath, mediumInfo.MaxImageCoverSize, info.CancellationToken);
                 await imageProcessing.FormatConversion(filePath, imagePath, null, info.CancellationToken);
                 var set = info.ProcessedPath;
-                set.Content = set.Content?.Union(new[] { imagePath, converPath });
+                set.Content = set.Content?.Union([imagePath, converPath]);
                 File.Delete(filePath);
                 return UploadReturnValue.Success;
             }
@@ -139,7 +139,7 @@ public static class UploadMiddlewareCommon
                 var processPictures = UploadImage(mediumInfo);
                 var serviceProvider = info.ServiceProvider;
                 var cancellationToken = info.CancellationToken;
-                foreach (var (item, index, _) in images.PackIndex())
+                foreach (var (item, index) in images.Index())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var imageInfo = new UploadMiddlewareInfo()
@@ -149,7 +149,7 @@ public static class UploadMiddlewareCommon
                             await item.Save(path);
                         },
                         CancellationToken = cancellationToken,
-                        Index = info.Index.Append(index).ToArray(),
+                        Index = [.. info.Index, index],
                         ServiceProvider = serviceProvider,
                         Path = info.Path,
                         TrueName = $"{index}.{item.Format}",

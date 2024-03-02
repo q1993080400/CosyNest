@@ -46,7 +46,7 @@ sealed class FileRealize : IORealize, IFile
     #endregion
     #region 返回文件的子文件
     public override IEnumerable<INode> Son
-        => Array.Empty<INode>();
+        => [];
     #endregion
     #region 获取文件的大小
     public override IUnit<IUTStorage> Size
@@ -73,7 +73,6 @@ sealed class FileRealize : IORealize, IFile
     public override void Delete()
     {
         PackFS.Delete();
-        WatcherStop();
     }
     #endregion
     #region 创建数据管道

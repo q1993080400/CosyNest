@@ -1,5 +1,5 @@
-﻿using System.Maths;
-using System.Maths.Tree;
+﻿using System.MathFrancis;
+using System.MathFrancis.Tree;
 
 namespace System.Mapping.Settlement;
 
@@ -54,7 +54,7 @@ abstract class SettlementBase : ISettlement
     /// <summary>
     /// 枚举该沉降观测点或观测站的所有后代
     /// </summary>
-    protected LinkedList<SettlementBase> SonField { get; } = new();
+    protected LinkedList<SettlementBase> SonField { get; } = [];
 
     public IEnumerable<INode> Son => SonField;
     #endregion

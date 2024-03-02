@@ -24,17 +24,19 @@ sealed class TimedHostedService(Timer timer, Func<CancellationToken, Task> expir
     private Timer Timer { get; } = timer;
     #endregion
     #region 抽象类实现
+    #region 启动服务
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
             await Timer();
             if (stoppingToken.IsCancellationRequested)
-                return;
+                break;
             await Expire(stoppingToken);
         }
+        await StopAsync(stoppingToken);
     }
-
+    #endregion
     #endregion
     #endregion
 }

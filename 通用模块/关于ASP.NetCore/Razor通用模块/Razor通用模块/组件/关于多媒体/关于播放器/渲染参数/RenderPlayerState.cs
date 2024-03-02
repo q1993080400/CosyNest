@@ -30,6 +30,7 @@ public sealed record RenderPlayerState
     public bool InPlay { get; init; }
     #endregion
     #region 正在播放的媒体名称
+    #region 正式属性
     private string? MediaNameFiled { get; init; }
 
     /// <summary>
@@ -39,11 +40,35 @@ public sealed record RenderPlayerState
     /// </summary>
     public string? MediaName
     {
-        get => MediaNameFiled;
-        init => MediaNameFiled =
-            value.IsVoid() ? null :
-            ToolPath.SplitFilePath(WebUtility.UrlDecode(value)).Simple;
+        get => GetMediaName(MediaNameFiled);
+        init => MediaNameFiled = value;
     }
+    #endregion
+    #region 内部成员：获取媒体名称
+    /// <summary>
+    /// 获取媒体名称，
+    /// 如果它为<see langword="null"/>，
+    /// 尝试自动获取
+    /// </summary>
+    /// <param name="mediaName">输入的媒体名称</param>
+    /// <returns></returns>
+    private string? GetMediaName(string? mediaName)
+    {
+        var newMediaName = mediaName switch
+        {
+            var name when name.IsVoid()
+            => RenderPlayerStateOperational.MediumSource switch
+            {
+                [{ } uri, ..] => uri,
+                _ => null
+            },
+            var name => name
+        };
+        return newMediaName is null ?
+            null :
+            ToolPath.SplitFilePath(WebUtility.UrlDecode(newMediaName)).Simple;
+    }
+    #endregion
     #endregion
     #region 允许用户控制的部分
     /// <summary>

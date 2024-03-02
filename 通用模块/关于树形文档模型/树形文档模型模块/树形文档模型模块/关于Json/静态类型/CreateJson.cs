@@ -45,7 +45,7 @@ public static class CreateJson
     /// <inheritdoc cref="JsonConvertPolymorphic{Obj}"/>
     public static JsonConverter<Obj> JsonPolymorphic<Obj>(IEnumerable<Assembly>? assemblies = null)
         where Obj : class
-        => new JsonConvertPolymorphic<Obj>(assemblies ?? new[] { typeof(Obj).Assembly });
+        => new JsonConvertPolymorphic<Obj>(assemblies ?? [typeof(Obj).Assembly]);
     #endregion
     #region 创建IDirect转换器
     /// <summary>

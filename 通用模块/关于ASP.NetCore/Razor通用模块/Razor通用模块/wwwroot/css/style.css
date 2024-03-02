@@ -105,6 +105,26 @@ dialog
     padding: unset;
 }
 
+/*瀑布流布局样式*/
+.waterfallFlow
+{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+    /*瀑布流直接子元素样式*/
+    .waterfallFlow > *
+    {
+        flex-grow: 1;
+    }
+
+    /*瀑布流伪元素*/
+    .waterfallFlow::after
+    {
+        content: '';
+        flex-grow: 99999;
+    }
+
 /*占满屏幕，并且在横屏时自动旋转*/
 .horizontalScreen
 {

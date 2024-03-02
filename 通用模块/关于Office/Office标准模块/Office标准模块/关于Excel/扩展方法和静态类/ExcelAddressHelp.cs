@@ -39,8 +39,9 @@ public static partial class ExcelRealizeHelp
     {
         ExceptionIntervalOut.Check(0, null, column);
         const int begin = 'A';
-        return ToolBit.FromDecimal(column, 26).Integer.PackIndex(true).
-            Select(x => (char)(begin + (x.Index == 0 && x.Count > 1 ? x.Elements - 1 : x.Elements))).Join();
+        var packIndex = ToolBit.FromDecimal(column, 26).Integer.Index().ToArray();
+        var count = packIndex.Length;
+        return packIndex.Select(x => (char)(begin + (x.Index == 0 && count > 1 ? x.Elements - 1 : x.Elements))).Join();
     }
     #endregion
     #region 根据行列号

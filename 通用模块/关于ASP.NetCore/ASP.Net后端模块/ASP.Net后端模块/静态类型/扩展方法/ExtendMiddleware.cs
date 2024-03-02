@@ -105,7 +105,8 @@ public static partial class ExtendWebApi
         => application.UseConfigurationService<Tag<IUriManager>>((http, server) =>
         {
             var path = http.Request.GetEncodedUrl();
-            server.Content = CreateNet.UriManager(path);
+            var uri = new UriComplete(path).UriHost!;
+            server.Content = CreateNet.UriManager(uri);
             return Task.CompletedTask;
         });
     #endregion
