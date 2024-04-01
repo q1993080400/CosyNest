@@ -1,0 +1,49 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+@typeparam BusinessInterface where BusinessInterface : class, IGetRenderAllFilterCondition
+@inject IHttpClient HttpClient
+
+<SearchPanel GetRenderCondition="@(GetRenderCondition??IGetRenderAllFilterCondition.GetConditionFunction<BusinessInterface>(HttpClient))"
+             SearchViewerState="SearchViewerState" Submit="Submit" OnClear="OnClear">
+    <RenderComponent>
+        @if (RenderComponent is null)
+        {
+            <div class="commonContainers">
+                <div class="perfectContainer">
+                    @foreach (var item in context.RenderCondition)
+                    {
+                        @item
+                    }
+                </div>
+                @context.RenderSubmit
+            </div>
+        }
+        else
+        {
+            @RenderComponent(context)
+        }
+    </RenderComponent>
+    <RenderProperty>
+        @if (RenderProperty is null)
+        {
+            <BootstrapSearchPanelProperty RenderPropertyInfo="context" />
+        }
+        else
+        {
+            @RenderProperty(context)
+        }
+    </RenderProperty>
+    <RenderSubmit>
+        @if (RenderSubmit is null)
+        {
+            <div class="compactCentered">
+                <Button Text="搜索" OnClick="@context.Submit" />
+                <Button Text="清除" OnClick="@context.Clear" />
+            </div>
+        }
+        else
+        {
+            @RenderSubmit(context)
+        }
+    </RenderSubmit>
+</SearchPanel>

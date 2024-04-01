@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 这个枚举表示文件源的类型

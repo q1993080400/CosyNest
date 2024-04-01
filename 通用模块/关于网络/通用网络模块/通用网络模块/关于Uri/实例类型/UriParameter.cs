@@ -20,7 +20,7 @@ public sealed record UriParameter : UriBase
     /// <summary>
     /// 获取按照参数名称枚举参数值的字典
     /// </summary>
-    public IReadOnlyDictionary<string, string> Parameter { get; init; }
+    public IReadOnlyDictionary<string, string?> Parameter { get; init; }
     #endregion
     #endregion
     #region 构造函数
@@ -28,7 +28,7 @@ public sealed record UriParameter : UriBase
     /// <summary>
     /// 获取用来匹配参数字符串的正则表达式
     /// </summary>
-    private static IRegex Regex { get; } =/*language=regex*/@"(?<key>(\w|-|\.)+)=(?<value>([^# ])+)".
+    private static IRegex Regex { get; } =/*language=regex*/@"(?<key>(\w|-|\.)+)=(?<value>([^#& ]+))?".
         Op().Regex(RegexOptions.IgnoreCase);
     #endregion
     #region 使用键值对集合
@@ -36,7 +36,7 @@ public sealed record UriParameter : UriBase
     /// 使用键值对集合初始化对象
     /// </summary>
     /// <param name="parameter">这个键值对集合枚举参数的名称和值</param>
-    public UriParameter(IEnumerable<KeyValuePair<string, string>> parameter)
+    public UriParameter(IEnumerable<KeyValuePair<string, string?>> parameter)
     {
         Parameter = parameter.ToDictionary(true);
     }
@@ -46,7 +46,7 @@ public sealed record UriParameter : UriBase
     /// 使用元组集合初始化对象
     /// </summary>
     /// <param name="parameter">这个元组集合枚举参数的名称和值</param>
-    public UriParameter(IEnumerable<(string Name, string Value)> parameter)
+    public UriParameter(IEnumerable<(string Name, string? Value)> parameter)
     {
         Parameter = parameter.ToDictionary(true);
     }
@@ -64,7 +64,7 @@ public sealed record UriParameter : UriBase
         Parameter = matches.Select(x =>
         {
             var key = x["key"].Match;
-            var value = x["value"].Match;
+            var value = x.GroupsNamed.GetValueOrDefault("value")?.Match;
             return (key, value);
         }).ToDictionary(true);
     }

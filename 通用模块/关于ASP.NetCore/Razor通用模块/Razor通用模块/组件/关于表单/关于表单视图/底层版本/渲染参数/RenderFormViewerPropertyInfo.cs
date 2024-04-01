@@ -29,6 +29,38 @@ public sealed record RenderFormViewerPropertyInfo<Model>
     /// </summary>
     public required string PropertyName { get; init; }
     #endregion
+    #region 属性的值
+    /// <summary>
+    /// 获取属性的值
+    /// </summary>
+    public object? Value
+    {
+        get
+        {
+            var value = Property.GetValue(FormModel);
+            return IsReadOnlyProperty ?
+                ReadOnlyConvert(Property.PropertyType, value) :
+                value;
+        }
+    }
+    #endregion
+    #region 仅显示转换函数
+    private Func<Type, object?, object?> ReadOnlyConvertField { get; init; }
+        = static (_, value) => value;
+
+    /// <summary>
+    /// 这个函数的第一个参数是值的类型，
+    /// 第二个参数是真正的值，
+    /// 返回值是渲染的时候应该渲染的值，
+    /// 它仅在<see cref="IsReadOnlyProperty"/>为<see langword="true"/>的时候有效
+    /// </summary>
+    public Func<Type, object?, object?> ReadOnlyConvert
+    {
+        get => ReadOnlyConvertField;
+        init => ReadOnlyConvertField = (type, oldValue)
+            => value(type, oldValue).To(type);
+    }
+    #endregion
     #region 创建属性绑定对象
     /// <summary>
     /// 创建一个属性绑定对象，
@@ -36,15 +68,17 @@ public sealed record RenderFormViewerPropertyInfo<Model>
     /// </summary>
     /// <typeparam name="Value">属性的类型</typeparam>
     /// <returns></returns>
-    public BindPropertyInfo<Value> Value<Value>()
-        => new(FormModel, Property, () => OnPropertyChangeed(this));
+    public IBindPropertyInfo<Value> BindValue<Value>()
+        => IsReadOnlyProperty ?
+        new BindPropertyInfoStatic<Value>((Value)this.Value!) :
+        new BindPropertyInfo<Value>(FormModel, Property, () => OnPropertyChangeed(this));
     #endregion
     #region 是否仅显示
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
     /// 表示仅提供数据显示功能，不提供数据编辑功能
     /// </summary>
-    public required bool IsReadOnly { get; init; }
+    public required bool IsReadOnlyProperty { get; init; }
     #endregion
     #region 数据属性改变时的委托
     /// <summary>

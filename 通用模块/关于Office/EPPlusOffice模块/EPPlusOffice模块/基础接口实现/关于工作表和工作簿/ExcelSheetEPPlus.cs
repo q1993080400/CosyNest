@@ -1,8 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.Media.Drawing;
-using System.Media.Drawing.Graphics;
-using System.Office.Chart;
-using System.Office.Excel.Realize;
+﻿using System.Office.Excel.Realize;
 
 using OfficeOpenXml;
 
@@ -20,7 +16,7 @@ sealed class ExcelSheetEPPlus : ExcelSheet
     /// 获取封装的工作表，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private ExcelWorksheet Sheet { get; }
+    internal ExcelWorksheet Sheet { get; }
     #endregion
     #region 工作表集合
     /// <summary>
@@ -39,16 +35,24 @@ sealed class ExcelSheetEPPlus : ExcelSheet
         set => Sheet.Name = value;
     }
     #endregion
+    #region 工作表的索引
+    public override int Index
+    {
+        get => Sheet.Index;
+        set => Sheet.Workbook.Worksheets.MoveBefore(Index, value);
+    }
+    #endregion
     #region 删除工作表
     public override void Delete()
         => Sheets.Delete(Sheet);
     #endregion
     #region 复制工作表
-    public override IExcelSheet Copy(IExcelSheetCollection? collection = null, Func<string, int, string>? renamed = null)
+    public override IExcelSheet Copy(IExcelSheetManage? collection = null, Func<string, int, string>? renamed = null)
     {
-        collection ??= Book.Sheets;
-        var sheets = collection.To<ExcelSheetCollectionEPPlus>().Sheets;
-        var newSheet = sheets.Add(ExcelRealizeHelp.SheetRepeat(Book.Sheets, Name, renamed), Sheet);
+        collection ??= Book.SheetManage;
+        var sheets = collection.To<ExcelSheetManageEPPlus>().EPPlusSheets;
+        var newName = ExcelRealizeHelp.SheetRepeat(sheets.Select(x => x.Name), Name, renamed);
+        var newSheet = sheets.Add(newName, Sheet);
         return new ExcelSheetEPPlus(collection.Book, newSheet);
     }
     #endregion
@@ -77,28 +81,8 @@ sealed class ExcelSheetEPPlus : ExcelSheet
     #region 获取页面对象
     public override IPageSheet Page => throw new NotImplementedException();
     #endregion
-    #region 获取图表创建器
-    public override ICreateExcelChart CreateChart => throw new NotImplementedException();
-    #endregion
-    #region 获取图表集合
-    public override IEnumerable<IExcelObj<IOfficeChart>> Charts => throw new NotImplementedException();
-    #endregion
-    #region 获取图片集合
-    public override IEnumerable<IExcelObj<IImage>> Images => throw new NotImplementedException();
-    #endregion
-    #region 创建图片
-    public override IExcelObj<IImage> CreateImage(IImage image)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override IExcelObj<IImage> CreateImage(PathText path)
-    {
-        throw new NotImplementedException();
-    }
-    #endregion
-    #region 获取画布
-    public override ICanvas Canvas => throw new NotImplementedException();
+    #region 返回图表管理对象
+    public override IOfficeChartManage ChartManage { get; }
     #endregion
     #endregion
     #region 构造函数
@@ -109,6 +93,7 @@ sealed class ExcelSheetEPPlus : ExcelSheet
     {
         Sheet = sheet;
         Cell = new ExcelCellsEPPlus(this, Sheet.Cells);
+        ChartManage = new ExcelChartManageEPPlus(sheet.Drawings);
     }
     #endregion
 }

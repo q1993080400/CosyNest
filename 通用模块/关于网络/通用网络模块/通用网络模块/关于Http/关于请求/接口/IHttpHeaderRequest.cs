@@ -30,7 +30,8 @@ public interface IHttpHeaderRequest : IHttpHeader
     #endregion
     #region Host标头
     /// <summary>
-    /// Host标头
+    /// Host标头，
+    /// 它控制要请求的域名
     /// </summary>
     string? Host { get; }
     #endregion

@@ -1,4 +1,5 @@
 ﻿using System.IOFrancis;
+using System.IOFrancis.FileSystem;
 using System.MathFrancis;
 using System.Office;
 using System.Office.Excel;
@@ -34,7 +35,7 @@ static class Test
     private static async IAsyncEnumerable<DateTime> BaseDate(string excelPath)
     {
         await using var excel = CreateOfficeEPPlus.ExcelBook(excelPath);
-        foreach (var sheet in excel.Sheets)
+        foreach (var sheet in excel.SheetManage)
         {
             if (DateTime.TryParse(sheet.Name, out var date))
                 yield return date;
@@ -51,46 +52,32 @@ static class Test
     private static async Task Additional(string exclePath, IEnumerable<DateTime> baseDate)
     {
         await using var excel = CreateOfficeEPPlus.ExcelBook(exclePath);
-        var dates = excel.Sheets.Select(x =>
+        var minBaseDate = baseDate.Min();
+        var dates = excel.SheetManage.Select(x =>
         {
             _ = DateTime.TryParse(x.Name, out var date);
             return date;
-        }).Where(x => x != default).ToArray();
+        }).Where(x => x >= minBaseDate).Order().ToArray();
         var enumeratorDate = dates.To<IList<DateTime>>().GetEnumerator();
         enumeratorDate.MoveNext();
-        var min = enumeratorDate.Current;
-        var additionalDate = new List<DateTime>();
-        foreach (var item in baseDate)
+        var min = dates[0];
+        foreach (var item in dates)
         {
-            var sheetDate = enumeratorDate.Current;
-            if (sheetDate > item)
+            var need = baseDate.Where(x => x > min && x < item).ToArray();
+            if (need.Length > 0)
             {
-                additionalDate.Add(item);
-                continue;
+                Interpolation(excel, min, item, need);
             }
-            if (sheetDate < item)
-            {
-                additionalDate.Add(item);
-                continue;
-            }
-            if (sheetDate == item)
-            {
-                if (additionalDate.Count > 0)
-                {
-                    Interpolation(excel, min, item, additionalDate);
-                }
-                additionalDate = [];
-                min = item;
-                enumeratorDate.MoveNext();
-                continue;
-            }
+            min = item;
         }
-        var sheets = excel.Sheets.Where(x => DateTime.TryParse(x.Name, out _)).Index().ToArray();
+        var sheets = excel.SheetManage.Where(x => DateTime.TryParse(x.Name, out _)).Index().ToArray();
+        var excelName = ToolPath.SplitFilePath(excel.Path!).Simple;
         foreach (var (sheet, index) in sheets)
         {
             sheet[1, 8].Value = $"第 {index + 1} 次";
             if (index > 0)
             {
+                var maxRow = 0;
                 var error = 0;
                 var lastName = sheets[index - 1].Elements.Name;
                 for (int row = 4; true; row++)
@@ -107,7 +94,12 @@ static class Test
                     sheet[row, 2].FormulaA1 = $"B{r}-'{lastName}'!B{r}";
                     sheet[row, 3].FormulaA1 = $"C{r}+'{lastName}'!D{r}";
                     sheet[row, 4].FormulaA1 = $"C{r}/(B2-'{lastName}'!B2)";
+                    maxRow = row + 1;
                 }
+                var series = sheet.ChartManage.Single().Series.Single();
+                series.XData = $"'{lastName}'!$D$5:$D${maxRow}";
+                series.YData = $"='{lastName}'!$A$5:$A${maxRow}";
+                series.Name = excelName;
             }
         }
     }
@@ -126,17 +118,18 @@ static class Test
         static string Format(DateTime date)
             => date.ToString("yyyy.M.d");
         #endregion
-        var minSheet = book[Format(min)] ?? throw new Exception($"在{book.Path}中未找到名为{min}的工作表");
-        var maxSheet = book[Format(max)] ?? throw new Exception($"在{book.Path}中未找到名为{max}的工作表");
+        var sheetManage = book.SheetManage;
+        var minSheet = sheetManage.GetSheetOrNull(Format(min)) ?? throw new Exception($"在{book.Path}中未找到名为{min}的工作表");
+        var maxSheet = sheetManage.GetSheetOrNull(Format(max)) ?? throw new Exception($"在{book.Path}中未找到名为{max}的工作表");
         var rand = CreateBaseMath.RandomShared;
         var zip = middle.Zip(rand.RandDistribute(1, middle.Count() + 1, 1.5)).ToArray();
-        var index = book.Sheets.IndexOf(minSheet) + 1;
+        var index = minSheet.Index + 1;
         var column = 1;
         var laseDate = Format(min);
         foreach (var (date, weight) in zip)
         {
-            book.Sheets.Insert(index, minSheet);
-            var sheet = book[index];
+            sheetManage.Add(minSheet, index);
+            var sheet = sheetManage.GetSheet(index);
             sheet.Name = Format(date);
             sheet[1, 1].Value = date.ToString("D");
             var error = 0;
@@ -155,7 +148,7 @@ static class Test
                     => sheet[row, column].Value.ToDouble ??
                     throw new Exception($"{sheet.Name}R{row}C{column}出现问题");
                 #endregion
-                var currentValue = Fun(book[laseDate]);
+                var currentValue = Fun(sheetManage.GetSheet(laseDate));
                 var maxValue = Fun(maxSheet);
                 var minValue = Fun(minSheet);
                 displacement.Value = currentValue +

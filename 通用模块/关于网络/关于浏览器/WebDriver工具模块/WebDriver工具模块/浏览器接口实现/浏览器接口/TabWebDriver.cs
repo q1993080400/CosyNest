@@ -19,7 +19,6 @@ sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : Relea
     public void Select()
     {
         WebDriver.SwitchTo().Window(WindowHandle);
-        Browser.CurrentTab = this;
     }
     #endregion
     #endregion
@@ -31,21 +30,20 @@ sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : Relea
     /// 本标签所隶属的浏览器对象
     /// </summary>
     internal BrowserWebDriver Browser { get; } = browser;
-    #endregion
 
     /// <summary>
     /// 获取封装的浏览器对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
     private WebDriver WebDriver => Browser.WebDriver;
+    #endregion
     #region 释放对象
     protected override void DisposeRealize()
     {
         Select();
         WebDriver.Close();
         var tabs = Browser.Tabs;
-        tabs.Remove(this);
-        if (tabs.Count != 0)
+        if (tabs.Count > 0)
             tabs[^1].Select();
     }
     #endregion
@@ -56,7 +54,5 @@ sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : Relea
     private string WindowHandle { get; } = windowHandle;
 
     #endregion
-    #endregion
-    #region 构造函数
     #endregion
 }

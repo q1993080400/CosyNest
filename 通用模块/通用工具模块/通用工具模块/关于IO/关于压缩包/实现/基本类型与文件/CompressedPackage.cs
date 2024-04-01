@@ -66,6 +66,9 @@ sealed class CompressedPackage : FromIO, ICompressedPackage
     #endregion
     #endregion
     #region 内部成员
+    #region 默认格式
+    protected override string DefaultFormat => "zip";
+    #endregion
     #region 压缩包对象
     /// <summary>
     /// 获取封装的压缩包对象，
@@ -82,7 +85,7 @@ sealed class CompressedPackage : FromIO, ICompressedPackage
     /// <param name="path">压缩包所在的路径，
     /// 如果不存在，则创建一个新的压缩包</param>
     public CompressedPackage(PathText path)
-        : base(path, ICompressedPackage.FileTypeZip)
+        : base(path)
     {
         Stream = CreateIO.FileStream(path);
         Zip = new(Stream, ZipArchiveMode.Update, true, Encoding.UTF8);
@@ -95,7 +98,7 @@ sealed class CompressedPackage : FromIO, ICompressedPackage
     /// </summary>
     /// <param name="stream">一个用来读取压缩包的流</param>
     public CompressedPackage(Stream stream)
-        : base(null, ICompressedPackage.FileTypeZip)
+        : base(null)
     {
         Stream = stream;
         Zip = new(Stream, ZipArchiveMode.Update, true, Encoding.UTF8);

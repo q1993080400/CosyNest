@@ -17,7 +17,7 @@ public sealed record UriHost : UriBase
     /// <summary>
     /// 获取主机的协议
     /// </summary>
-    public string Agreement { get; init; }
+    public string? Agreement { get; init; }
     #endregion
     #region 域名
     /// <summary>
@@ -46,7 +46,10 @@ public sealed record UriHost : UriBase
     {
         get
         {
-            var text = $"{Agreement}://{DomainName}";
+            var text = "";
+            if (Agreement is { })
+                text += $"{Agreement}://";
+            text += DomainName;
             if (PortExplicit is { })
                 text += $":{PortExplicit}";
             return text;
@@ -68,7 +71,7 @@ public sealed record UriHost : UriBase
     /// <summary>
     /// 获取用来匹配主机地址的正则表达式
     /// </summary>
-    private static IRegex Regex { get; } =/*language=regex*/@"^(?<agreement>[a-z]+)://(?<domainName>(\w|\.|-)+)(:(?<port>\d+))?/?$".
+    private static IRegex Regex { get; } =/*language=regex*/@"^((?<agreement>[a-z]+)://)?(?<domainName>([^:/])+)(:(?<port>\d+))?/?$".
         Op().Regex(RegexOptions.IgnoreCase);
     #endregion
     #region 正式方法
@@ -80,7 +83,7 @@ public sealed record UriHost : UriBase
     public UriHost(string host)
     {
         var match = Regex.MatcheSingle(host) ?? throw new ArgumentException($"{host}不是合法的主机字符串");
-        Agreement = match["agreement"].Match;
+        Agreement = match.GroupsNamed.TryGetValue("agreement").Value?.Match;
         DomainName = match["domainName"].Match;
         if (match.GroupsNamed.TryGetValue("port", out var port))
             PortExplicit = port.Match.To<int>();

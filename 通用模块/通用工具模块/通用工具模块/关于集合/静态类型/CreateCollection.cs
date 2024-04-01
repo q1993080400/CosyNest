@@ -1,5 +1,4 @@
-﻿using System.Design;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace System.Collections.Generic;
 
@@ -8,33 +7,8 @@ namespace System.Collections.Generic;
 /// </summary>
 public static class CreateCollection
 {
-    #region 创建空数组
-#pragma warning disable IDE0060
-    /// <summary>
-    /// 创建一个空数组，它与<see cref="Array.Empty{T}"/>唯一的不同在于，
-    /// 数组的元素类型是通过推断得出的
-    /// </summary>
-    /// <typeparam name="Obj">数组的元素类型</typeparam>
-    /// <param name="infer">这个参数不会被实际使用，
-    /// 它的唯一目的在于推断数组的元素类型</param>
-    /// <returns></returns>
-    public static Obj[] EmptyArray<Obj>(IEnumerable<Obj>? infer)
-       => [];
-#pragma warning restore
-    #endregion
-    #region 创建空哈希表
-    /// <summary>
-    /// 创建一个空的只读哈希表
-    /// </summary>
-    /// <typeparam name="Obj">哈希表的元素类型</typeparam>
-    /// <returns></returns>
-    public static IReadOnlySet<Obj> EmptySet<Obj>()
-        => CreateDesign.Single<HashSet<Obj>>();
-    #endregion
     #region 创建迭代器
     #region 创建包含指定数量元素的迭代器
-    #region 指定开始位置和元素数量
-    #region 复杂方法
     /// <summary>
     /// 创建一个包含指定数量元素的迭代器
     /// </summary>
@@ -50,13 +24,6 @@ public static class CreateCollection
             yield return getElements(begin + i);
         }
     }
-    #endregion
-    #region 简单方法
-    /// <inheritdoc cref="Range{Obj}(int, int, Func{int, Obj})"/>
-    public static IEnumerable<int> Range(int begin, int count)
-        => Range(begin, count, x => x);
-    #endregion
-    #endregion
     #region 指定开始位置和结束位置
     #region 复杂方法
     /// <param name="end">结束位置的索引</param>
@@ -77,7 +44,7 @@ public static class CreateCollection
     /// 当它迭代完最后一个元素以后，会重新迭代第一个元素
     /// </summary>
     /// <typeparam name="Obj">迭代器中的元素类型</typeparam>
-    /// <param name="enumerable">环形迭代器的元素实际由这个迭代器提供<</param>
+    /// <param name="enumerable">环形迭代器的元素实际由这个迭代器提供</param>
     /// <returns></returns>
     public static IEnumerable<Obj> Ring<Obj>(IEnumerable<Obj> enumerable)
     {
@@ -102,6 +69,7 @@ public static class CreateCollection
     #endregion
     #region 创建异步迭代器
     #region 创建合页迭代器
+    #region 使用异步集合
     /// <summary>
     /// 创建一个合页异步迭代器，
     /// 它是分页的逆操作，将被分页的集合重新还原为一个完整的集合
@@ -111,35 +79,39 @@ public static class CreateCollection
     /// <returns></returns>
     public static async IAsyncEnumerable<Obj> MergePage<Obj>(Func<int, IAsyncEnumerable<Obj>> fun)
     {
-        for (int i = 0; true; i++)
+        for (int i = 0; ; i++)
         {
-            var list = await fun(i).ToListAsync();
-            if (list.Count == 0)
-                yield break;
-            foreach (var item in list)
+            var @break = true;
+            await foreach (var item in fun(i))
+            {
+                @break = false;
+                yield return item;
+            }
+            if (@break)
+                break;
+        }
+    }
+    #endregion
+    #region 使用同步集合
+    /// <inheritdoc cref="MergePage{Obj}(Func{int, IAsyncEnumerable{Obj}})"/>
+    public static IAsyncEnumerable<Obj> MergePage<Obj>(Func<int, Task<IEnumerable<Obj>>> fun)
+    {
+        #region 本地函数
+        async IAsyncEnumerable<Obj> Fun(int index)
+        {
+            var objs = await fun(index);
+            foreach (var item in objs)
             {
                 yield return item;
             }
         }
+        #endregion
+        return MergePage(Fun);
     }
     #endregion
     #endregion
-    #region 创建字典
-    #region 创建空字典
-#pragma warning disable IDE0060
-    /// <summary>
-    /// 创建一个空的只读字典
-    /// </summary>
-    /// <typeparam name="Key">字典的键类型</typeparam>
-    /// <typeparam name="Value">字典的值类型</typeparam>
-    /// <param name="infer">这个参数不会被实际使用，
-    /// 它的唯一目的在于推断字典的泛型类型</param>
-    /// <returns></returns>
-    public static IReadOnlyDictionary<Key, Value> EmptyDictionary<Key, Value>(IEnumerable<KeyValuePair<Key, Value>>? infer = null)
-        where Key : notnull
-        => CreateDesign.Single<ReadOnlyDictionaryEmpty<Key, Value>>();
-#pragma warning restore
     #endregion
+    #region 创建字典
     #region 创建反射字典
     /// <summary>
     /// 创建一个反射字典，它通过反射属性来读写值

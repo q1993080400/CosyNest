@@ -1,6 +1,25 @@
 ﻿
-/*PC平台*/
-@media only screen and (min-width : 1224px)
+/*超大屏PC平台*/
+@media only screen and (min-width : 2448px)
+{
+    /*全局样式*/
+    :root
+    {
+        /*长度基准，它用来自适应不同平台的长度*/
+        --lengthReference: 2.25;
+        /*最顶层组件的左边和右边大小*/
+        --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2.5);
+        /*列表容器的较少数量*/
+        --arrangeParticleMinority: 4;
+        /*列表容器的中等数量*/
+        --arrangeParticleMedium: 5;
+        /*列表容器的较多数量*/
+        --arrangeParticleMost: 6;
+    }
+}
+
+/*普通屏PC平台*/
+@media only screen and (min-width : 1224px) and (max-width : 2448px)
 {
     /*全局样式*/
     :root
@@ -9,6 +28,12 @@
         --lengthReference: 1.75;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2);
+        /*列表容器的较少数量*/
+        --arrangeParticleMinority: 3;
+        /*列表容器的中等数量*/
+        --arrangeParticleMedium: 4;
+        /*列表容器的较多数量*/
+        --arrangeParticleMost: 5;
     }
 }
 
@@ -22,6 +47,12 @@
         --lengthReference: 1.25;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 1.5);
+        /*列表容器的较少数量*/
+        --arrangeParticleMinority: 2;
+        /*列表容器的中等数量*/
+        --arrangeParticleMedium: 3;
+        /*列表容器的较多数量*/
+        --arrangeParticleMost: 4;
     }
 }
 
@@ -35,6 +66,12 @@
         --lengthReference: 1;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: var(--topLayoutPaddingVertical);
+        /*列表容器的较少数量*/
+        --arrangeParticleMinority: 1;
+        /*列表容器的中等数量*/
+        --arrangeParticleMedium: 1;
+        /*列表容器的较多数量*/
+        --arrangeParticleMost: 2;
     }
 }
 
@@ -61,6 +98,7 @@
         transform: translateX(100dvw) rotate(90deg);
     }
 }
+
 
 /*全局样式*/
 :root
@@ -105,21 +143,22 @@ dialog
     padding: unset;
 }
 
-/*瀑布流布局样式*/
-.waterfallFlow
+/*完美容器样式，它的子元素依次排列，且平分所有剩余空间，但最后一个元素除外*/
+.perfectContainer
 {
     display: flex;
     flex-wrap: wrap;
+    gap: var(--gapMedium);
 }
 
-    /*瀑布流直接子元素样式*/
-    .waterfallFlow > *
+    /*完美容器直接子元素样式*/
+    .perfectContainer > *
     {
         flex-grow: 1;
     }
 
-    /*瀑布流伪元素*/
-    .waterfallFlow::after
+    /*完美容器伪元素*/
+    .perfectContainer::after
     {
         content: '';
         flex-grow: 99999;
@@ -160,7 +199,15 @@ dialog
     padding: var(--topLayoutPaddingVertical) var(--topLayoutPaddingHorizontal);
 }
 
-/*简单虚拟化容器的CSS样式*/
+/*虚拟化容器页头样式*/
+.virtualizationContainerHead
+{
+    position: sticky;
+    top: 0px;
+    z-index: 1;
+}
+
+/*简单虚拟化容器样式*/
 .virtualizationSimpleContainer
 {
     display: grid;
@@ -276,6 +323,7 @@ div.autoPlayButtonCntainer > *:first-child
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    gap: var(--gapBig);
 }
 
 /*全屏蒙版容器样式*/

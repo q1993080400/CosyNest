@@ -1,4 +1,6 @@
-﻿namespace System.Text.RegularExpressions;
+﻿using System.Collections.Immutable;
+
+namespace System.Text.RegularExpressions;
 
 /// <summary>
 /// 这个结构是<see cref="IMatch"/>的实现，
@@ -42,7 +44,7 @@ sealed partial class RegexMatch : IMatch
     {
         Match = match;
         Groups = [];
-        GroupsNamed = CreateCollection.EmptyDictionary<string, IMatch>();
+        GroupsNamed = ImmutableDictionary<string, IMatch>.Empty;
         Index = index;
         Length = length;
     }

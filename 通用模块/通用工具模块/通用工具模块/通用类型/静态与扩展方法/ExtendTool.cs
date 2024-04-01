@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.MathFrancis;
 using System.Reflection;
@@ -46,15 +46,13 @@ public static partial class ExtendTool
     /// 获取枚举的描述，
     /// 如果没有描述，返回<see langword="null"/>
     /// </summary>
-    /// <typeparam name="Enum">枚举的类型</typeparam>
     /// <param name="enum">待返回描述的枚举</param>
     /// <returns></returns>
-    public static string? GetDescription<Enum>(this Enum @enum)
-        where Enum : struct, System.Enum
+    public static string? GetDescription(this Enum @enum)
     {
-        var description = typeof(Enum).GetField(@enum.ToString())?.
-            GetCustomAttributes<DescriptionAttribute>(true)?.SingleOrDefaultSecure();
-        return description is { Description: { } d } ? d : null;
+        var description = @enum.GetType().GetField(@enum.ToString())?.
+            GetCustomAttribute<DisplayAttribute>();
+        return description is { Name: { } d } ? d : null;
     }
     #endregion
     #endregion
@@ -103,5 +101,5 @@ public static partial class ExtendTool
         return MemberwiseCloneCache.Invoke<Ret>(obj)!;
     }
     #endregion
-    #endregion 
+    #endregion
 }

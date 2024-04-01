@@ -127,7 +127,7 @@ public static partial class ExtendWebApi
         {
             var pipe = http.RequestServices.GetRequiredService<IDataPipe>();
             var log = createLog(http);
-            await pipe.AddOrUpdate(log);
+            await pipe.AddOrUpdate([log]);
             await follow();
         });
     #endregion

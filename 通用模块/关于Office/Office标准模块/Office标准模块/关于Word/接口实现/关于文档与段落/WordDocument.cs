@@ -1,6 +1,5 @@
 ﻿using System.IOFrancis;
 using System.IOFrancis.FileSystem;
-using System.Media.Drawing;
 using System.Performance;
 
 namespace System.Office.Word.Realize;
@@ -14,8 +13,7 @@ namespace System.Office.Word.Realize;
 /// </remarks>
 /// <param name="path">文档所在的文件路径，
 /// 如果文档不是通过文件创建的，则为<see langword="null"/></param>
-/// <param name="supported">这个Word实现所支持的文件类型</param>
-public abstract class WordDocument(PathText? path, IFileType supported) : FromIO(path, supported), IWordDocument
+public abstract class WordDocument(PathText? path) : FromIO(path), IWordDocument
 {
     #region 返回IWordDocument接口
     /// <summary>
@@ -161,30 +159,6 @@ public abstract class WordDocument(PathText? path, IFileType supported) : FromIO
         remove => LengthChangeWeak?.Remove(value);
     }
     #endregion
-    #endregion
-    #endregion
-    #region 关于Office对象
-    #region 返回图表创建器
-    public abstract ICreateWordChart CreateChart { get; }
-    #endregion
-    #region 创建图片
-    public abstract IWordParagraphObj<IImage> CreateImage(IImage image, Index? pos = null);
-    #endregion
-    #endregion
-    #region 构造函数与创建对象
-    #region 提取Word文档
-    /// <summary>
-    /// 通过路径获取Word文档，不会引发路径被占用的异常
-    /// </summary>
-    /// <param name="path">Word文档的路径</param>
-    /// <param name="delegate">如果缓存中没有使用该路径的文档，
-    /// 则通过这个委托创建新文档，参数就是路径</param>
-    /// <returns></returns>
-    public static IWordDocument GetDocument(PathText path, Func<PathText, WordDocument> @delegate)
-        => GetFromIO(path, @delegate);
-
-    #endregion
-    #region 指定路径与受支持文件类型
     #endregion
     #endregion
 }

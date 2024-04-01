@@ -17,6 +17,6 @@ public interface IConvertStatic<in From, out To>
     /// <param name="serviceProvider">服务请求者对象，
     /// 如果不需要，可以为<see langword="null"/></param>
     /// <returns></returns>
-    abstract static To Convert(From from, IServiceProvider? serviceProvider);
+    abstract static To Convert(From from, IServiceProvider? serviceProvider = null);
     #endregion
 }

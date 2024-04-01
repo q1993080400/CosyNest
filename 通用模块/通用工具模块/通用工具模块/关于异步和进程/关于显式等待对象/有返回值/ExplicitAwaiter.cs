@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 
 namespace System.Threading.Tasks;
 
@@ -19,12 +20,17 @@ public sealed class ExplicitAwaiter<T> : INotifyCompletion
     /// <summary>
     /// 这个属性保存延续任务的委托
     /// </summary>
-    private Action? Continuation { get; set; }
+    private ImmutableQueue<Action> Continuation { get; set; } = [];
     #endregion
     #region 正式方法
     public void OnCompleted(Action continuation)
     {
-        Continuation ??= continuation;
+        if (IsCompleted)
+        {
+            continuation();
+            return;
+        }
+        Continuation = Continuation.Enqueue(continuation);
     }
     #endregion 
     #endregion
@@ -60,8 +66,11 @@ public sealed class ExplicitAwaiter<T> : INotifyCompletion
         Result = result;
         IsCompleted = true;
         var continuation = Continuation;
-        Continuation = null;
-        continuation?.Invoke();
+        Continuation = [];
+        foreach (var item in continuation)
+        {
+            item();
+        }
     }
     #endregion
     #region 结果返回值

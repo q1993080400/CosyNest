@@ -50,8 +50,7 @@ public interface IFromIO : IInstruct, IAsyncDisposable
     /// 代表该对象已经保存到硬盘，或是从硬盘文件中加载的，
     /// 否则代表它只存在于内存中
     /// </summary>
-    bool IsExist
-        => Path is { } p && File.Exists(p);
+    bool IsExist { get; }
     #endregion
     #endregion
     #region 关于保存

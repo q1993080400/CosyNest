@@ -60,18 +60,18 @@ public static class ExtenEFCoreDB
     /// 值是该实体的所有依赖实体导航属性
     /// </summary>
     private static ICache<IEntityType, IEnumerable<INavigation>> NavigationsCache { get; }
-    = CreatePerformance.CacheThreshold(entityType =>
-    {
-        var collectionType = typeof(ICollection<>);
-        return entityType.GetNavigations().Where(x =>
+        = CreatePerformance.MemoryCache<IEntityType, IEnumerable<INavigation>>((entityType, _) =>
         {
-            var property = x.PropertyInfo ??
-            throw new NullReferenceException($"实体类型{x.DeclaringEntityType.Name}的导航属性{x.Name}是一个字段，请使用属性");
-            var type = property.PropertyType;
-            return type.IsGenericRealize(collectionType) &&
-                !collectionType.MakeGenericType(property.GetBaseDefinition().DeclaringType!).IsAssignableFrom(type);
-        }).ToArray();
-    }, 150, NavigationsCache);
+            var collectionType = typeof(ICollection<>);
+            return entityType.GetNavigations().Where(x =>
+            {
+                var property = x.PropertyInfo ??
+                throw new NullReferenceException($"实体类型{x.DeclaringEntityType.Name}的导航属性{x.Name}是一个字段，请使用属性");
+                var type = property.PropertyType;
+                return type.IsGenericRealize(collectionType) &&
+                    !collectionType.MakeGenericType(property.GetBaseDefinition().DeclaringType!).IsAssignableFrom(type);
+            }).ToArray();
+        });
 
     /*说明文档
       排除property.GetBaseDefinition().DeclaringType，

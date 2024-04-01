@@ -75,7 +75,7 @@ public sealed record UriComplete : UriBase
     /// <summary>
     /// 获取用于匹配Uri的正则表达式
     /// </summary>
-    private static IRegex Regex { get; } =/*language=regex*/@"^(?<host>[a-z]+://(\w|\.|-)+(:\d+)?)?(/?(?<extend>[^#?]+)(\?(?<parameter>((\w|-|\.)+=([^# ])+&?)+))?)?(#(?<anchor>\S+))?$".
+    private static IRegex Regex { get; } =/*language=regex*/@"^(?<host>([a-z]+://)?[^/]+)?(/?(?<extend>[^#\?]+)(\?(?<parameter>[^#]+))?)?(#(?<anchor>\S+))?$".
         Op().Regex(RegexOptions.IgnoreCase);
     #endregion
     #region 正式方法

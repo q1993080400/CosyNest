@@ -15,10 +15,11 @@ public static class ExtenException
     /// </summary>
     /// <param name="exception">要记录的异常</param>
     /// <param name="serviceProvider">服务请求者对象</param>
-    public static void Log(this Exception exception, IServiceProvider serviceProvider)
+    /// <param name="additionalMessage">额外附加的消息</param>
+    public static void Log(this Exception exception, IServiceProvider serviceProvider, string additionalMessage = "")
     {
         var log = serviceProvider.GetService<ILoggerProvider>();
-        log?.CreateLogger("").Log(LogLevel.Error, exception, "");
+        log?.CreateLogger("").Log(LogLevel.Error, default, additionalMessage, exception, (_, _) => "");
     }
     #endregion
 }

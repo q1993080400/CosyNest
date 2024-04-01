@@ -5,14 +5,13 @@ namespace System.DataFrancis;
 /// <summary>
 /// 这个记录是用来重构数据查询表达式的参数
 /// </summary>
-/// <typeparam name="Obj">实体类的类型</typeparam>
-public sealed record QueryConditionReconsitutionInfo<Obj>
+public sealed record QueryConditionReconsitutionInfo
 {
     #region 要重构的查询条件
     /// <summary>
     /// 获取要重构的查询条件
     /// </summary>
-    public required QueryCondition<Obj> QueryCondition { get; init; }
+    public required QueryCondition QueryCondition { get; init; }
     #endregion
     #region 为查询条件生成的表达式
     /// <summary>

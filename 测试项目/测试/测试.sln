@@ -51,8 +51,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FFmpeg媒体工具模块", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Office标准模块", "..\..\通用模块\关于Office\Office标准模块\Office标准模块\Office标准模块.csproj", "{64137388-F40C-4A0F-9260-8EBBB628FE40}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NpoiOffice模块", "..\..\通用模块\关于Office\NpoiOffice模块\NpoiOffice模块\NpoiOffice模块.csproj", "{E4BAF119-431A-4147-BF96-7DDD1F126C38}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPPlusOffice模块", "..\..\通用模块\关于Office\EPPlusOffice模块\EPPlusOffice模块\EPPlusOffice模块.csproj", "{C860E9D2-EB31-4AB5-AE6D-3D410C2953E3}"
 EndProject
 Global
@@ -206,12 +204,6 @@ Global
 		{64137388-F40C-4A0F-9260-8EBBB628FE40}.DevTest|Any CPU.Build.0 = Debug|Any CPU
 		{64137388-F40C-4A0F-9260-8EBBB628FE40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64137388-F40C-4A0F-9260-8EBBB628FE40}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4BAF119-431A-4147-BF96-7DDD1F126C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4BAF119-431A-4147-BF96-7DDD1F126C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4BAF119-431A-4147-BF96-7DDD1F126C38}.DevTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4BAF119-431A-4147-BF96-7DDD1F126C38}.DevTest|Any CPU.Build.0 = Debug|Any CPU
-		{E4BAF119-431A-4147-BF96-7DDD1F126C38}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4BAF119-431A-4147-BF96-7DDD1F126C38}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C860E9D2-EB31-4AB5-AE6D-3D410C2953E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C860E9D2-EB31-4AB5-AE6D-3D410C2953E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C860E9D2-EB31-4AB5-AE6D-3D410C2953E3}.DevTest|Any CPU.ActiveCfg = Debug|Any CPU

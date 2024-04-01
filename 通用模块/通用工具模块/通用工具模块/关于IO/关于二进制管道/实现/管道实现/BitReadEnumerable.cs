@@ -7,10 +7,7 @@ namespace System.IOFrancis.Bit;
 /// 这个类型是<see cref="IBitRead"/>的实现，
 /// 它可以通过<see cref="IAsyncEnumerable{T}"/>来读取二进制数据
 /// </summary>
-/// <typeparam name="Byte">迭代器枚举的二进制数据的类型，
-/// 它只能是<see cref="byte"/>或枚举<see cref="byte"/>的集合</typeparam>
-sealed class BitReadEnumerable<Byte> : IBitRead
-    where Byte : notnull
+sealed class BitReadEnumerable : IBitRead
 {
     #region 公开成员
     #region 管道的信息
@@ -27,49 +24,51 @@ sealed class BitReadEnumerable<Byte> : IBitRead
     #endregion
     #region 转换为流
     public Stream ToStream()
-        => Bytes switch
-        {
-            IAsyncEnumerable<byte> bytes => CreateIO.StreamEnumerable(bytes),
-            IAsyncEnumerable<IEnumerable<byte>> bytes => CreateIO.StreamEnumerable(bytes),
-            var bytes => throw new NotSupportedException($"{bytes.GetType()}既不是byte，也不是枚举byte的集合")
-        };
+        => CreateIO.StreamEnumerable(Bytes);
     #endregion
     #region 读取数据
     public async IAsyncEnumerable<byte[]> Read(int bufferSize = 1024, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        #region 本地函数
-        async IAsyncEnumerable<byte> Fun()
+        ExceptionIntervalOut.Check(1, null, bufferSize);
+        var cache = new byte[bufferSize];
+        var cachePos = 0;
+        await foreach (var array in Bytes)
         {
-            await foreach (var b in Bytes)
+            var len = array.Length;
+            var sum = cachePos + len;
+            if (sum < bufferSize)
             {
-                switch (b)
+                Array.Copy(array, 0, cache, cachePos, len);
+                cachePos += len;
+                continue;
+            }
+            var arrayPos = 0;
+            while (true)
+            {
+                var surplus = len - arrayPos;
+                if (surplus <= bufferSize)
                 {
-                    case byte single:
-                        yield return single;
+                    Array.Copy(array, arrayPos, cache, cachePos, surplus);
+                    if (surplus == bufferSize)
+                    {
+                        yield return cache;
+                        cache = new byte[bufferSize];
+                        cachePos = 0;
                         break;
-                    case IEnumerable<byte> list:
-                        foreach (var item in list)
-                        {
-                            yield return item;
-                        }
-                        break;
-                    default:
-                        throw new NotSupportedException($"{b.GetType()}既不是byte，也不是byte的集合");
+                    }
+                    cachePos = surplus;
+                    break;
                 }
+                var copySize = bufferSize - cachePos;
+                Array.Copy(array, arrayPos, cache, cachePos, copySize);
+                yield return cache;
+                arrayPos += copySize;
+                cachePos = 0;
+                cache = new byte[bufferSize];
             }
         }
-        #endregion
-        ExceptionIntervalOut.Check(1, null, bufferSize);
-        await using var enumerator = Fun().GetAsyncEnumerator(cancellation);
-        while (true)
-        {
-            var (element, toEnd) = await enumerator.MoveRange(bufferSize);
-            var array = element.ToArray();
-            if (array.Length != 0)
-                yield return array;
-            if (toEnd)
-                yield break;
-        }
+        if (cachePos > 0 && cachePos < bufferSize)
+            yield return cache[..cachePos];
     }
     #endregion
     #region 关于释放对象
@@ -98,7 +97,7 @@ sealed class BitReadEnumerable<Byte> : IBitRead
     /// 获取封装的异步迭代器对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private IAsyncEnumerable<Byte> Bytes { get; }
+    private IAsyncEnumerable<byte[]> Bytes { get; }
     #endregion
     #region 数据的来源
     /// <summary>
@@ -118,7 +117,7 @@ sealed class BitReadEnumerable<Byte> : IBitRead
     /// <param name="describe">对数据的描述，如果没有描述，则为<see langword="null"/></param>
     /// <param name="source">如果此属性不为<see langword="null"/>，
     /// 代表这个管道的数据来自于这个可释放对象，它可以使本对象得到正确地释放</param>
-    public BitReadEnumerable(IAsyncEnumerable<Byte> bytes, string? format, string? describe, IInstruct? source)
+    public BitReadEnumerable(IAsyncEnumerable<byte[]> bytes, string? format, string? describe, IInstruct? source)
     {
         Bytes = bytes;
         Format = format;

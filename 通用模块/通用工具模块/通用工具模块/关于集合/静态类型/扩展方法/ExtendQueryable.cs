@@ -10,10 +10,10 @@ public static partial class ExtendEnumerable
     /// </summary>
     /// <typeparam name="Obj">分页的元素类型</typeparam>
     /// <param name="query">要执行分页的数据源</param>
-    /// <param name="pageIndex">分页索引</param>
     /// <param name="pageSize">每一页的最大数量</param>
+    /// <param name="pageIndex">分页索引</param>
     /// <returns></returns>
-    public static IQueryable<Obj> Paging<Obj>(this IQueryable<Obj> query, int pageIndex, int pageSize)
+    public static IQueryable<Obj> Paging<Obj>(this IQueryable<Obj> query, int pageSize, int pageIndex)
         => query.Skip(pageSize * pageIndex).Take(pageSize);
     #endregion
 }

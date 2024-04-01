@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Components;
 
 namespace BootstrapBlazor.Components;
 
@@ -70,7 +71,7 @@ public sealed partial class BootstrapFileViewer : ComponentBase
         if (index < 0)
             return [];
         var medias = info.Files.ToArray();
-        return medias[index..].Concat(medias[..index]).ToArray();
+        return [.. medias[index..], .. medias[..index]];
     }
     #endregion
     #region 转换封面渲染参数

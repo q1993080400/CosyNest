@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EPPlus" Version="7.0.9" PrivateAssets="compile" />
+		<PackageReference Include="EPPlus" Version="7.0.10" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -22,4 +22,5 @@
 		<ProjectReference Include="..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
 		<ProjectReference Include="..\..\Office标准模块\Office标准模块\Office标准模块.csproj" />
 	</ItemGroup>
+
 </Project>

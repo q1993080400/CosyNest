@@ -32,17 +32,20 @@ public sealed record RenderVirtualizationInfo<Obj>
     /// 当存在要渲染的元素时，它依次渲染<see cref="RenderElement"/>，
     /// 否则，它渲染<see cref="RenderEmpty"/>
     /// </summary>
-    public RenderFragment RenderElementAuto => x =>
-    {
-        if (AnyElement)
-        {
-            foreach (var item in RenderElement)
-            {
-                item(x);
-            }
-        }
-        else
-            RenderEmpty(x);
-    };
+    public required RenderFragment RenderElementAuto { get; init; }
+    #endregion
+    #region 回到顶部的委托
+    /// <summary>
+    /// 调用这个委托，可以回到容器
+    /// </summary>
+    public required Func<Task> GoTop { get; init; }
+    #endregion
+    #region 跳转到顶的元素的ID
+    /// <summary>
+    /// 获取跳转到顶的元素的ID，
+    /// 当调用<see cref="GoTop"/>的时候，会跳转到这个元素身上，
+    /// 如果不设置这个属性，则不能使用这个功能
+    /// </summary>
+    public required string GoTopID { get; init; }
     #endregion
 }

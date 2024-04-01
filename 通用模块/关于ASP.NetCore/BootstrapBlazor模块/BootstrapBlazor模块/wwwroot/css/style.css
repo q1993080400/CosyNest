@@ -1,8 +1,53 @@
 ﻿
-:root
+/*超大屏PC平台*/
+@media only screen and (min-width : 2448px)
 {
-    /*媒体视图容器的gap*/
-    --mediaViewerContainerGap: 0.5ch;
+}
+
+/*普通屏PC平台*/
+@media only screen and (min-width : 1224px) and (max-width : 2448px)
+{
+}
+
+/*平板平台*/
+@media only screen and (min-width : 667px) and (max-width : 1224px)
+{
+}
+
+/*手机平台*/
+@media only screen and (max-width : 667px)
+{
+    /*表单视图容器样式*/
+    .bootstrapFormViewerContainer
+    {
+        flex-wrap: nowrap;
+        flex-direction: column;
+    }
+
+    /*属性渲染容器样式*/
+    .bootstrapFormViewerPropertyContainer
+    {
+        flex-wrap: nowrap;
+        flex-direction: column;
+    }
+}
+
+/*紧凑表单属性容器样式*/
+.bootstrapSearchPanelPropertyContainerSmall
+{
+    width: 25ic;
+}
+
+/*中等表单属性容器样式*/
+.bootstrapSearchPanelPropertyContainerMedium
+{
+    width: 35ic;
+}
+
+/*宽松表单属性容器样式*/
+.bootstrapSearchPanelPropertyContainerBig
+{
+    width: 45ic;
 }
 
 /*媒体视图容器的样式*/
@@ -34,23 +79,16 @@
 .bootstrapFormViewerContainer
 {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--gapMedium);
-    flex-wrap: nowrap;
-    flex-direction: column;
 }
-
-    /*表单视图容器的第一个元素样式*/
-    .bootstrapFormViewerContainer > :first-child
-    {
-        margin-top: var(--gapMedium);
-    }
 
 /*属性渲染容器样式*/
 .bootstrapFormViewerPropertyContainer
 {
     display: flex;
     flex-grow: 1;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: var(--gapMedium);
 }
 
@@ -58,6 +96,19 @@
 .bootstrapFormViewerPropertyItem
 {
     flex-grow: 1;
+    flex-wrap: wrap;
+}
+
+/*属性渲染容器属性标签样式*/
+.bootstrapFormViewerPropertyLabel
+{
+    white-space: nowrap;
+}
+
+/*属性渲染容器属性文字样式*/
+.bootstrapFormViewerPropertyText
+{
+    white-space: pre-wrap;
 }
 
 /*属性渲染容器元素说明样式*/
@@ -76,4 +127,12 @@
 .alert
 {
     margin-bottom: 0;
+}
+
+/*搜索面板容器样式*/
+.bootstrapSearchPanelContainer
+{
+    display: flex;
+    gap: var(--gapMedium);
+    flex-wrap: nowrap;
 }

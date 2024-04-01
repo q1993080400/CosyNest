@@ -20,7 +20,7 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     [Parameter]
     public RenderFragment<RenderFormViewerPropertyInfo<Model>>? RenderProperty { get; set; }
     #endregion
-    #region 用来渲染组件的委托
+    #region 用来渲染整个组件的委托
     [Parameter]
     public RenderFragment<RenderFormViewerInfo<Model>>? ChildContent { get; set; }
     #endregion
@@ -35,9 +35,9 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     public RenderFragment<RenderBusinessFormViewerInfo<Model>>? RenderSubmit { get; set; }
     #endregion
     #region 是否仅显示
-    /// <inheritdoc cref="FormViewer{Model}.IsReadOnly"/>
+    /// <inheritdoc cref="FormViewer{Model}.IsReadOnlyProperty"/>
     [Parameter]
-    public Func<PropertyInfo, Model, bool> IsReadOnly { get; set; } = (_, _) => false;
+    public Func<PropertyInfo, Model, bool> IsReadOnlyProperty { get; set; } = (_, _) => false;
     #endregion
     #region 是否显示提交部分
     /// <inheritdoc cref="FormViewer{Model}.ShowSubmit"/>

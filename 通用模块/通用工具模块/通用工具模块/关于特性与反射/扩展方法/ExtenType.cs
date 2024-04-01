@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace System;
 
@@ -68,14 +69,23 @@ public static partial class ExtenReflection
     #endregion
     #region 判断类型是否为数字
     /// <summary>
-    /// 返回一个类型是否为数字
+    /// 返回一个类型是否为数字,
+    /// 注意：它将可空数字视为数字
     /// </summary>
     /// <param name="type">待检查的类型</param>
     /// <returns></returns>
     public static bool IsNum(this Type type)
-        => !type.IsEnum && Type.GetTypeCode(type) is not (TypeCode.Object or TypeCode.DBNull or
-        TypeCode.Empty or TypeCode.DateTime or
-        TypeCode.Char or TypeCode.String or TypeCode.Boolean);
+    {
+        #region 本地函数
+        static bool Fun(Type type)
+              => !type.IsEnum && Type.GetTypeCode(type) is not (TypeCode.Object or TypeCode.DBNull or
+          TypeCode.Empty or TypeCode.DateTime or
+          TypeCode.Char or TypeCode.String or TypeCode.Boolean);
+        #endregion
+        return type.IsGenericRealize(typeof(Nullable<>)) ?
+            Fun(type.GetGenericArguments()[0]) :
+            Fun(type);
+    }
     #endregion
     #region 判断一个类型是否为通用类型
     /// <summary>
@@ -163,6 +173,24 @@ public static partial class ExtenReflection
     }
     #endregion
     #endregion
+    #endregion
+    #region 获取枚举的值和描述
+    /// <summary>
+    /// 获取一个迭代器，它枚举枚举的值以及描述
+    /// </summary>
+    /// <param name="type">枚举的类型，
+    /// 如果它不是枚举，则返回一个空集合</param>
+    /// <returns></returns>
+    public static IEnumerable<(Enum Value, string Describe)> GetEnumDescription(this Type type)
+        => type.IsEnum ?
+        type.GetFields().Select(x =>
+        {
+            var display = x.GetCustomAttribute<DisplayAttribute>();
+            return display is { Name: { } d } ?
+            ((Enum)x.GetValue(null)!, d) : default;
+        }).
+        Where(x => x != default) :
+        [];
     #endregion
     #region 获取一个对象的类型数据
     /// <summary>

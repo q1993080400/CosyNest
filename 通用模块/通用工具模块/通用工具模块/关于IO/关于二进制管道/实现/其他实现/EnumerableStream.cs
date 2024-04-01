@@ -7,7 +7,7 @@
 /// 使用指定的参数初始化对象
 /// </remarks>
 /// <param name="bytes">一个枚举所有数据的枚举器，本对象的功能就是通过它实现的</param>
-sealed class EnumerableStream(IEnumerator<IEnumerable<byte>> bytes) : Stream
+sealed class EnumerableStream(IEnumerator<byte[]> bytes) : Stream
 {
     #region 公开成员
     #region 不支持的成员
@@ -106,7 +106,7 @@ sealed class EnumerableStream(IEnumerator<IEnumerable<byte>> bytes) : Stream
     /// 获取一个枚举所有数据的枚举器，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private IEnumerator<IEnumerable<byte>> Bytes { get; } = bytes;
+    private IEnumerator<byte[]> Bytes { get; } = bytes;
     #endregion
     #region 剩余数据
     /// <summary>
@@ -115,7 +115,6 @@ sealed class EnumerableStream(IEnumerator<IEnumerable<byte>> bytes) : Stream
     /// 由于缓冲区的限制没有返回的部分
     /// </summary>
     private byte[] OldData { get; set; } = [];
-
     #endregion
     #endregion
 }

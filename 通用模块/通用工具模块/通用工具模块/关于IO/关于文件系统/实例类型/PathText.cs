@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Performance;
 
 namespace System.IOFrancis.FileSystem;
 
@@ -41,19 +40,6 @@ public sealed record PathText
     public static PathText operator +(PathText a, PathText b)
         => IO.Path.Combine(a, b);
     #endregion
-    #region 缓存字典
-    /// <summary>
-    /// 这个字典缓存Trim后的路径文本，
-    /// 以避免不必要的性能损失
-    /// </summary>
-    private static ICache<string, string> Cache { get; }
-    = CreatePerformance.CacheThreshold(x =>
-    {
-        x = ToolPath.Trim(x);
-        IOExceptionFrancis.CheckNotLegal(x);
-        return x;
-    }, 150, Cache);
-    #endregion
     #endregion
     #region 路径文本
     /// <summary>
@@ -73,9 +59,10 @@ public sealed record PathText
     /// <param name="path">指定的路径文本</param>
     public PathText(string path)
     {
-        Path = path.IsVoid() ?
-               throw new ArgumentException("路径文本不能为null或空字符串") :
-               Cache[path];
+        if (path.IsVoid())
+            throw new ArgumentException("路径文本不能为null或空字符串");
+        Path = ToolPath.Trim(path);
+        IOExceptionFrancis.CheckNotLegal(Path);
     }
     #endregion
 }

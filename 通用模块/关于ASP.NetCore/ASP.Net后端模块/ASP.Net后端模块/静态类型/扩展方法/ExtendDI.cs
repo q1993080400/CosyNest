@@ -16,24 +16,18 @@ public static partial class ExtendWebApi
     /// 它必须和<see cref="UseConfigurationUriManager(IApplicationBuilder)"/>配合使用
     /// </summary>
     /// <param name="services">待注入的服务容器</param>
+    /// <param name="configuration">配置对象，它可以用来寻找回退路径</param>
     /// <returns></returns>
-    public static IServiceCollection AddUriManagerServer(this IServiceCollection services)
+    public static IServiceCollection AddUriManagerServer(this IServiceCollection services, IConfiguration configuration)
     {
+        const string key = "FallbackUri";
+        var fallbackUri = configuration.GetValue<string>(key) ??
+            throw new KeyNotFoundException($"请在配置文件中设置回退路径，它名叫{key}");
         services.AddScoped<Tag<IUriManager>>();
         services.AddScoped(x =>
         {
-            var tag = x.GetRequiredService<Tag<IUriManager>>();
-            if (tag.Content is { } content)
-                return content;
-            var configuration = x.GetRequiredService<IConfiguration>();
-            var fallbackUri = configuration.GetValue<string>("FallbackUri");
-            return fallbackUri is { } ?
-            CreateNet.UriManager(fallbackUri) :
-            throw new NullReferenceException($"""
-                请求到的{nameof(IUriManager)}为null，您可以使用以下手段排查问题：
-                1.检查是否忘记调用{nameof(UseConfigurationUriManager)}中间件
-                2.在appsettings.json中设置FallbackUri子节点，它给予程序一个回退Uri
-                """);
+            var uri = x.GetRequiredService<Tag<IUriManager>>().Content?.Uri.Text;
+            return CreateNet.UriManager(uri ?? fallbackUri);
         });
         return services;
     }

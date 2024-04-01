@@ -34,9 +34,9 @@ public interface IJSNavigator
     /// 获取一个唤醒锁，
     /// 它可以阻止屏幕变暗，
     /// 当释放它的时候，唤醒锁自动解除，
-    /// 警告：由于浏览器限制，不能保证生效
+    /// 如果返回<see langword="null"/>，表示获取失败
     /// </summary>
     /// <returns></returns>
-    Task<IAsyncDisposable> GetWakeLock();
+    Task<IAsyncDisposable?> GetWakeLock();
     #endregion
 }

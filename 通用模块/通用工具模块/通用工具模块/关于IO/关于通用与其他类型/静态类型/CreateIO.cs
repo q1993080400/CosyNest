@@ -195,32 +195,20 @@ public static class CreateIO
     #region 创建流
     #region 通过迭代器枚举数据
     #region 同步迭代器
-    #region 适配枚举字节集合的迭代器
     /// <summary>
     /// 创建一个<see cref="Stream"/>，
     /// 它通过迭代器获取二进制数据
     /// </summary>
     /// <param name="data">用来获取数据的迭代器</param>
     /// <returns></returns>
-    public static Stream StreamEnumerable(IEnumerable<IEnumerable<byte>> data)
+    public static Stream StreamEnumerable(IEnumerable<byte[]> data)
         => new EnumerableStream(data.GetEnumerator());
-    #endregion
-    #region 适配枚举字节的迭代器
-    /// <inheritdoc cref="StreamEnumerable(IEnumerable{IEnumerable{byte}})"/>
-    public static Stream StreamEnumerable(IEnumerable<byte> data)
-        => StreamEnumerable(data.Chunk(1024));
-    #endregion
     #endregion
     #region 异步迭代器
     #region 适配枚举字节集合的迭代器
-    /// <inheritdoc cref="StreamEnumerable(IEnumerable{IEnumerable{byte}})"/>
-    public static Stream StreamEnumerable(IAsyncEnumerable<IEnumerable<byte>> data)
+    /// <inheritdoc cref="StreamEnumerable(IEnumerable{byte[]})"/>
+    public static Stream StreamEnumerable(IAsyncEnumerable<byte[]> data)
         => new EnumerableStream(data.ToBlockingEnumerable().GetEnumerator());
-    #endregion
-    #region 适配枚举字节的迭代器
-    /// <inheritdoc cref="StreamEnumerable(IEnumerable{IEnumerable{byte}})"/>
-    public static Stream StreamEnumerable(IAsyncEnumerable<byte> data)
-        => new EnumerableStream(data.ToBlockingEnumerable().Chunk(1024).GetEnumerator());
     #endregion
     #endregion
     #endregion

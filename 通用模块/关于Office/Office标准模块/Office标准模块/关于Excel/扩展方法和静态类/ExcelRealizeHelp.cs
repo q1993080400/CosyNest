@@ -16,16 +16,16 @@ public static partial class ExcelRealizeHelp
     /// 则不断的修改它，直到没有重复的名称为止，
     /// 这个方法可以避免由于工作表重名导致的异常
     /// </summary>
-    /// <param name="sheets">要检查的工作薄的工作表容器</param>
+    /// <param name="sheetNames">要检查的工作表名集合</param>
     /// <param name="sheetName">要检查的工作表名称</param>
     /// <param name="renamed">一个用于修改工作表名，使其不重名的委托，
     /// 它的第一个参数是旧名称，第二个参数是尝试失败的次数，从2开始，返回值就是新的名称，
     /// 如果为<see langword="null"/>，则使用一个默认方法</param>
     /// <returns>新的工作表名称，保证不重复</returns>
-    public static string SheetRepeat(IExcelSheetCollection sheets, string sheetName, Func<string, int, string>? renamed = null)
+    public static string SheetRepeat(IEnumerable<string> sheetNames, string sheetName, Func<string, int, string>? renamed = null)
     {
         renamed ??= (x, y) => $"{x}({y})";
-        return sheets.Select(x => x.Name).Distinct(sheetName, renamed);
+        return sheetNames.ToArray().Distinct(sheetName, renamed);
     }
     #endregion
     #endregion
@@ -111,34 +111,6 @@ public static partial class ExcelRealizeHelp
         return GetPosition(t, r, (v, h));
     }
     #endregion
-    #endregion
-    #endregion
-    #region 估算打印时间
-    #region 传入纸张数量
-    /// <summary>
-    /// 估算打印完成所需要的时间
-    /// </summary>
-    /// <param name="count">打印的纸张数量</param>
-    /// <param name="isPrintFromPaper">如果这个值为<see langword="true"/>，
-    /// 则打印到纸张，否则为打印到文件</param>
-    /// <returns></returns>
-    public static Task EstimatedPrintingTime(int count, bool isPrintFromPaper)
-    {
-        var time = 100 * count;
-        return Task.Delay(300 + (isPrintFromPaper ? time * 5 : time));
-    }
-
-    /*算法如下：
-      300毫秒是与打印机通讯的延迟
-      打印到纸张是物理打印，较慢，所以打印每张纸的时间需增加5倍*/
-    #endregion
-    #region 传入起始页和份数
-    /// <param name="begin">起始页</param>
-    /// <param name="end">结束页</param>
-    /// <param name="num">打印份数</param>
-    /// <inheritdoc cref="EstimatedPrintingTime(int, bool)"/>
-    public static Task EstimatedPrintingTime(int begin, int end, int num, bool isPrintFromPaper)
-        => EstimatedPrintingTime((end - begin + 1) * num, isPrintFromPaper);
     #endregion
     #endregion
 }

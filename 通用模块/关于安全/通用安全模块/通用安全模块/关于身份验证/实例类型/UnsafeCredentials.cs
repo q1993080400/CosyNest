@@ -4,9 +4,7 @@
 /// 代表一个不安全的凭据，
 /// 它直接封装了用户名和密码
 /// </summary>
-/// <param name="ID">凭据的用户名</param>
-/// <param name="Password">凭据的密码</param>
-public record UnsafeCredentials(string ID, string Password)
+public record UnsafeCredentials
 {
     #region 重要说明
     /*注意：根据net规范，不应该明文存储密码，
@@ -21,12 +19,12 @@ public record UnsafeCredentials(string ID, string Password)
     /// <summary>
     /// 获取凭据的用户名
     /// </summary>
-    public string ID { get; init; } = ID;
+    public required string ID { get; init; }
     #endregion
     #region 密码
     /// <summary>
     /// 获取凭据的密码
     /// </summary>
-    public string Password { get; init; } = Password;
+    public required string Password { get; init; }
     #endregion
 }

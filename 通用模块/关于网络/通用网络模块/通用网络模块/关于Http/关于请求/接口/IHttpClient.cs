@@ -64,13 +64,13 @@ public interface IHttpClient
     /// <param name="uri">请求的Uri</param>
     /// <param name="parameters">枚举请求的参数名称和值（如果有）</param>
     /// <inheritdoc cref="Request(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
-    Task<IHttpResponse> Request(string uri, (string Parameter, string Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
+    Task<IHttpResponse> Request(string uri, (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
         => Request(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region 返回IBitRead
     /// <inheritdoc cref="RequestDownload(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
     /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],HttpRequestTransform?,CancellationToken)"/>
-    Task<IBitRead> RequestDownload(string uri, (string Parameter, string Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
+    Task<IBitRead> RequestDownload(string uri, (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
         => RequestDownload(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region Post请求
@@ -84,7 +84,7 @@ public interface IHttpClient
     /// 是的，即便是Post请求，它也可以包含Uri参数</param>
     /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],HttpRequestTransform?, CancellationToken)"/>
     async Task<IHttpResponse> RequestPost(string uri, object content, JsonSerializerOptions? options = null,
-        (string Parameter, string Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
+        (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
     {
         var json = JsonContent.Create(content, options: options ?? CreateDesign.JsonCommonOptions);
 #if DEBUG
@@ -131,7 +131,7 @@ public interface IHttpClient
     /// <typeparam name="Ret">返回值类型</typeparam>
     /// <returns></returns>
     /// <inheritdoc cref="Request{API}(Expression{Func{API, object?}},HttpRequestTransform?,JsonSerializerOptions?, CancellationToken)"/>
-    async Task<Ret?> Request<API, Ret>(Expression<Func<API, Task<Ret>>> request, HttpRequestTransform? transformation = null,
+    async Task<Ret> Request<API, Ret>(Expression<Func<API, Task<Ret>>> request, HttpRequestTransform? transformation = null,
         JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         where API : class
     {

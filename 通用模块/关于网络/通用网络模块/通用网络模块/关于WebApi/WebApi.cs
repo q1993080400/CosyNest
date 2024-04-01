@@ -19,8 +19,12 @@ public abstract class WebApi(Func<IHttpClient>? httpClientProvide)
     /// 它提供用于发起请求的<see cref="IHttpClient"/>
     /// </summary>
     protected Func<IHttpClient> HttpClientProvide { get; } = httpClientProvide ??= () => CreateNet.HttpClientShared;
-
     #endregion
-    #region 构造函数
+    #region 无参数构造函数
+    public WebApi()
+        : this(null)
+    {
+
+    }
     #endregion
 }

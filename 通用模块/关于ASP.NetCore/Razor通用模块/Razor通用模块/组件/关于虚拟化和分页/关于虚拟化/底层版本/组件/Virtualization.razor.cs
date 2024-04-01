@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json;
 
+using Microsoft.AspNetCore.Components.Rendering;
+
 namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
@@ -34,9 +36,8 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// 当用户滚动到末尾元素时，
     /// 会延迟加载新的元素
     /// </summary>
-    [EditorRequired]
     [Parameter]
-    public RenderFragment<string> RenderEnd { get; set; }
+    public RenderFragment<string>? RenderEnd { get; set; }
     #endregion
     #region 渲染空集合时的委托
     /// <summary>
@@ -49,11 +50,12 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// <summary>
     /// 获取枚举元素的迭代器，
     /// 警告：如果它和以前的迭代器是两个不同的引用，
-    /// 那么就会重新进行迭代
+    /// 那么就会重新进行迭代，如果为<see langword="null"/>，
+    /// 则不加载任何元素
     /// </summary>
     [EditorRequired]
     [Parameter]
-    public IAsyncEnumerable<Element> Elements { get; set; }
+    public IAsyncEnumerable<Element>? Elements { get; set; }
     #endregion
     #region 每次渲染增加的数量
     /// <summary>
@@ -91,6 +93,12 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// </summary>
     private bool IsDispose { get; set; }
     #endregion
+    #region 封送到JS的Net对象
+    /// <summary>
+    /// 获取封送到JS的Net对象
+    /// </summary>
+    private IDisposable? PackNet { get; set; }
+    #endregion
     #endregion
     #endregion
     #region 内部成员
@@ -107,21 +115,62 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// </summary>
     private IAsyncEnumerator<Element> RenderElements { get; set; }
     #endregion
-    #region 向元素集合添加元素
+    #region 渲染阻塞
     /// <summary>
-    /// 向元素集合添加元素
+    /// 这个对象允许在上一个渲染未完成前，阻塞下一个渲染
     /// </summary>
-    /// <param name="elementCount">要添加的元素的数量</param>
-    /// <param name="isReverse">如果这个值<see langword="true"/>，
-    /// 表示该容器为倒序容器，它和<see cref="IsReverse"/>属性不等同，
-    /// 因为执行这个方法时，组件未必已经初始化</param>
-    /// <returns>集合是否已经全部枚举完毕</returns>
-    private async Task<bool> AddElement(int elementCount, bool isReverse)
+    private ImmutableDictionary<Guid, ExplicitTask> RenderBlock { get; set; }
+        = ImmutableDictionary<Guid, ExplicitTask>.Empty;
+    #endregion
+    #region 是否需要继续渲染
+    /// <summary>
+    /// 尝试向集合添加元素，
+    /// 并返回是否需要继续渲染
+    /// </summary>
+    /// <returns></returns>
+    private async Task<bool> NeedRender()
     {
-        var (element, toEnd) = await RenderElements.MoveRange(elementCount);
-        var newElement = isReverse ? element.Reverse() : element;
-        ElementList = isReverse ? ElementList.InsertRange(0, newElement) : ElementList.AddRange(newElement);
-        return toEnd;
+        #region 本地函数
+        async Task<bool> Fun()
+        {
+            if (IsComplete)
+                return false;
+            (var element, IsComplete) = await RenderElements.MoveRange(Plus);
+            var newElement = (IsReverse ? element.Reverse() : element).ToArray();
+            if (newElement.Length is 0)
+            {
+                await RenderElements.DisposeAsync();
+                return false;
+            }
+            ElementList = IsReverse ? ElementList.InsertRange(0, newElement) : ElementList.AddRange(newElement);
+            return true;
+        }
+        #endregion
+        var id = Guid.NewGuid();
+        var block = new ExplicitTask();
+        var renderStack = RenderBlock.Values.ToArray();
+        RenderBlock = RenderBlock.Add(id, block);
+        foreach (var item in renderStack)
+        {
+            await item;
+        }
+        var needRender = await Fun();
+        RenderBlock = RenderBlock.Remove(id);
+        block.Completed();
+        return needRender;
+    }
+    #endregion
+    #region 集合是否已枚举完毕
+    private bool IsCompleteField { get; set; }
+
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示集合已经枚举完毕
+    /// </summary>
+    private bool IsComplete
+    {
+        get => IsCompleteField || IsDispose;
+        set => IsCompleteField = value;
     }
     #endregion
     #endregion
@@ -132,11 +181,13 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// </summary>
     private string ContainerID { get; } = ToolASP.CreateJSObjectName();
     #endregion
-    #region 封送到JS的Net对象
+    #region 跳转到顶的元素的ID
     /// <summary>
-    /// 获取封送到JS的Net对象
+    /// 获取跳转到顶的元素的ID，
+    /// 当调用<see cref="RenderVirtualizationInfo{Obj}.GoTop"/>的时候，
+    /// 会跳转到这个元素身上
     /// </summary>
-    private IDisposable? PackNet { get; set; }
+    private string GoTopID { get; } = ToolASP.CreateJSObjectName();
     #endregion
     #region 末尾元素的ID
     /// <summary>
@@ -150,7 +201,7 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// 它和<see cref="EndID"/>是两个概念，
     /// 因为要考虑到倒序容器的可能性
     /// </summary>
-    private string BottomID => EndID + "Bottom";
+    private string BottomID { get; } = ToolASP.CreateJSObjectName();
     #endregion
     #region 新增元素并渲染
     /// <summary>
@@ -160,11 +211,10 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     private Task AddElementAndRender()
         => this.InvokeAsync(async () =>
         {
-            if (IsDispose)
+            if (IsDispose || IsComplete)
                 return;
-            var count = ElementList.Count;
-            await AddElement(Plus, IsReverse);
-            if (!IsDispose && count != ElementList.Count)
+            var needRedner = await NeedRender();
+            if (needRedner)
                 this.StateHasChanged();
         });
     #endregion
@@ -173,13 +223,21 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     #region 重写SetParametersAsync
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        var elements = parameters.GetValueOrDefault<IAsyncEnumerable<Element>>(nameof(Elements)) ??
-            throw new NullReferenceException($"必须指定组件的{nameof(Elements)}参数，它对组件的渲染非常重要");
-        if (!ReferenceEquals(elements, Elements))
+        var elements = parameters.GetValueOrDefault<IAsyncEnumerable<Element>>(nameof(Elements));
+        if (elements is null || !ReferenceEquals(elements, Elements))
         {
             if (RenderElements is { })
-                await RenderElements.DisposeAsync();
-            RenderElements = elements.GetAsyncEnumerator();
+            {
+                try
+                {
+                    await RenderElements.DisposeAsync();
+                }
+                catch (NotSupportedException)
+                {
+                }
+            }
+            RenderElements = (elements ?? Array.Empty<Element>().ToAsyncEnumerable()).GetAsyncEnumerator();
+            IsComplete = elements is null;
             ElementList = [];
         }
         await base.SetParametersAsync(parameters);
@@ -190,20 +248,24 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     {
         if (IsReverse)
             await JSWindow.Document.ScrollIntoView(BottomID);
-        (var methodName, PackNet) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AddElementAndRender());
-        await JSWindow.InvokeCodeVoidAsync($"""
-                ObservingVirtualizationContainers({methodName},'{EndID}');
-                """);
     }
     #endregion
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!IsReverse)
+        if (firstRender)
+        {
+            (var methodName, PackNet) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AddElementAndRender());
+            await JSWindow.InvokeCodeVoidAsync($"""
+                ObservingVirtualizationContainers({methodName},'{EndID}');
+                """);
             return;
-        var lastElementindex = Math.Min(ElementList.Count, Plus) - 1;
-        if (lastElementindex > 0)
-            await JSWindow.Document.ScrollIntoView(GetElementID(lastElementindex));
+        }
+        if (IsComplete)
+            return;
+        var intersecting = await JSWindow.InvokeAsync<bool>("CheckIntersecting", EndID);
+        if (intersecting && await NeedRender())
+            this.StateHasChanged();
     }
     #endregion
     #endregion
@@ -229,24 +291,57 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             Index = index,
             ID = GetElementID(index),
             Delete = new(this, () => ElementList = ElementList.RemoveAt(index))
-        });
+        }).ToArray();
         var renderElement = renderElementInfo.Select(x => RenderElement(x)).Append(x =>
         {
             x.OpenElement(0, "div");
             x.AddAttribute(1, "id", BottomID);
+            x.SetKey(BottomID);
             x.CloseElement();
         });
-        var renderEnd = RenderEnd(EndID);
-        var finalRenderElement = (IsReverse ? renderElement.Prepend(renderEnd) : renderElement.Append(renderEnd)).ToArray();
+        var renderEnd = RenderEnd is null ? x =>
+        {
+            x.OpenElement(0, "div");
+            x.AddAttribute(1, "id", EndID);
+            x.SetKey(EndID);
+            x.AddAttribute(2, "style", "height:15dvh");
+            x.CloseElement();
+        }
+        : RenderEnd(EndID);
+        var finalRenderElement = (IsReverse ?
+            renderElement.Prepend(renderEnd) :
+            renderElement.Append(renderEnd)).ToArray();
+        #region 用来渲染空集合的本地函数
+        void RenderEmpty(RenderTreeBuilder x)
+        {
+            this.RenderEmpty(x);
+            renderEnd(x);
+        }
+        #endregion
+        var anyElement = !ElementList.IsEmpty;
+        #region 回到顶部的委托
+        async Task GoTop()
+            => await JSWindow.InvokeVoidAsync("GoVirtualizationTop", GoTopID);
+        #endregion
         return new()
         {
-            AnyElement = !ElementList.IsEmpty,
-            RenderEmpty = x =>
+            AnyElement = anyElement,
+            RenderEmpty = RenderEmpty,
+            RenderElement = finalRenderElement,
+            GoTop = GoTop,
+            GoTopID = GoTopID,
+            RenderElementAuto = x =>
             {
-                RenderEmpty(x);
-                renderEnd(x);
-            },
-            RenderElement = finalRenderElement
+                if (anyElement)
+                {
+                    foreach (var item in finalRenderElement)
+                    {
+                        item(x);
+                    }
+                }
+                else
+                    RenderEmpty(x);
+            }
         };
     }
     #endregion

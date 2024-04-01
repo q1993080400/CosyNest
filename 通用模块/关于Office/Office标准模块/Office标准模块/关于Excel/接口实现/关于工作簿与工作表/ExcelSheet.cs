@@ -1,9 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.Media.Drawing;
-using System.Media.Drawing.Graphics;
-using System.Office.Chart;
-
-namespace System.Office.Excel.Realize;
+﻿namespace System.Office.Excel.Realize;
 
 /// <summary>
 ///  在实现<see cref="IExcelSheet"/>时，可以继承自本类型，
@@ -15,13 +10,6 @@ namespace System.Office.Excel.Realize;
 /// <param name="book">指定的工作簿</param>
 public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
 {
-    #region 返回IExcelSheet接口
-    /// <summary>
-    /// 返回本对象的接口形式，
-    /// 通过它可以访问一些显式实现的成员
-    /// </summary>
-    protected IExcelSheet Interface => this;
-    #endregion
     #region 关于单元格
     #region 返回工作表的所有单元格
     public abstract IExcelCells Cell { get; }
@@ -48,12 +36,15 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     #region 获取或设置工作表的名称
     public abstract string Name { get; set; }
     #endregion
+    #region 工作表的索引
+    public abstract int Index { get; set; }
+    #endregion
     #region 对工作表的操作
     #region 删除工作表
     public abstract void Delete();
     #endregion
     #region 复制工作表
-    public abstract IExcelSheet Copy(IExcelSheetCollection? collection = null, Func<string, int, string>? renamed = null);
+    public abstract IExcelSheet Copy(IExcelSheetManage? collection = null, Func<string, int, string>? renamed = null);
     #endregion
     #endregion
     #region 返回页面
@@ -61,27 +52,8 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     #endregion
     #endregion
     #region 关于Excel对象
-    #region 关于图表
-    #region 获取图表创建器
-    public abstract ICreateExcelChart CreateChart { get; }
-    #endregion
-    #region 枚举工作表中的图表
-    public abstract IEnumerable<IExcelObj<IOfficeChart>> Charts { get; }
-    #endregion
-    #endregion
-    #region 关于图像
-    #region 枚举工作表中的图像
-    public abstract IEnumerable<IExcelObj<IImage>> Images { get; }
-    #endregion
-    #region 向工作表中添加图像
-    public abstract IExcelObj<IImage> CreateImage(IImage image);
-    #endregion
-    #region 指定图像路径
-    public abstract IExcelObj<IImage> CreateImage(PathText path);
-    #endregion
-    #endregion
-    #region 返回画布
-    public abstract ICanvas Canvas { get; }
+    #region 返回用来管理图表的对象
+    public abstract IOfficeChartManage ChartManage { get; }
     #endregion
     #endregion
     #region 重写的方法
@@ -98,7 +70,5 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     public override string ToString()
         => Name;
     #endregion
-    #endregion
-    #region 构造方法
     #endregion
 }

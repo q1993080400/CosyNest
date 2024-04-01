@@ -29,11 +29,13 @@ sealed class JSNavigator : JSRuntimeBase, IJSNavigator
     public IJSClipboard Clipboard { get; }
     #endregion
     #region 获取唤醒锁
-    public async Task<IAsyncDisposable> GetWakeLock()
+    public async Task<IAsyncDisposable?> GetWakeLock()
     {
         var id = ToolASP.CreateJSObjectName();
-        await JSRuntime.InvokeVoidAsync("CreateWakeLock", id);
-        return new JSWakeLock(JSRuntime, id);
+        var success = await JSRuntime.InvokeAsync<bool>("CreateWakeLock", id);
+        return success ?
+            new JSWakeLock(JSRuntime, id) :
+            null;
     }
     #endregion
     #region 构造函数

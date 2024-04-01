@@ -1,4 +1,5 @@
-﻿using System.IOFrancis;
+﻿using System.DataFrancis;
+using System.IOFrancis;
 using System.IOFrancis.BaseFileSystem;
 
 using Microsoft.AspNetCore;
@@ -45,5 +46,21 @@ public static class ExtendASP
         var son = directory.Son.OfType<IFileBase>().Select(x => x.Path).ToArray();
         return analysis(son);
     }
+    #endregion
+    #region 转换渲染逻辑运算符和逻辑运算符
+    /// <summary>
+    /// 将<see cref="RenderLogicalOperator"/>转换为等效的<see cref="LogicalOperator"/>，
+    /// 警告：<see cref="RenderLogicalOperator.Interval"/>不能转换
+    /// </summary>
+    /// <param name="renderLogicalOperator">待转换的<see cref="RenderLogicalOperator"/></param>
+    /// <returns></returns>
+    public static LogicalOperator ToLogicalOperator(this RenderLogicalOperator renderLogicalOperator)
+        => renderLogicalOperator switch
+        {
+            RenderLogicalOperator.Equal => LogicalOperator.Equal,
+            RenderLogicalOperator.NotEqual => LogicalOperator.NotEqual,
+            RenderLogicalOperator.Contain => LogicalOperator.Contain,
+            var @operator => throw new NotSupportedException($"不能转换{@operator}"),
+        };
     #endregion
 }

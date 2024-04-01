@@ -13,6 +13,6 @@ public interface IProjection<out Obj>
     /// <param name="serviceProvider">一个用于提供服务的对象，
     /// 如果不需要，可以为<see langword="null"/></param>
     /// <returns></returns>
-    Obj Projection(IServiceProvider? serviceProvider);
+    Obj Projection(IServiceProvider? serviceProvider = null);
     #endregion
 }

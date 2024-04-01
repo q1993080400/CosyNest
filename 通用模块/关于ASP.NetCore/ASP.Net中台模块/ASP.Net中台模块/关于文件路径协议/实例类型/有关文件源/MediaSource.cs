@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 这个记录封装了媒体的封面和路径

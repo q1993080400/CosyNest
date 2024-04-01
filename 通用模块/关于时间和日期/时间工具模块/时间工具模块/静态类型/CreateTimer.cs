@@ -8,37 +8,51 @@ namespace System.TimeFrancis;
 public static class CreateTimer
 {
     #region 创建定时器
+    #region 创建周期定时器
     #region 按照时间周期
     /// <summary>
-    /// 创建一个<see cref="TimeFrancis.Timer"/>，
+    /// 创建一个<see cref="Timer"/>，
     /// 它从指定的时间开始，按照指定的周期触发
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="TimerDefault(TimeSpan, DateTimeOffset?)"/>
-    public static Timer Timer(TimeSpan interval, DateTimeOffset? startTime = null)
-        => new TimerDefault(interval, startTime).Timer;
+    /// <inheritdoc cref="TimeFrancis.TimerCycle(TimeSpan, DateTimeOffset, bool)"/>
+    public static Timer TimerCycle(TimeSpan interval, DateTimeOffset startTime, bool immediately = false)
+        => new TimerCycle(interval, startTime, immediately).Timer;
     #endregion
-    #region 按照小时分钟触发
+    #region 按照小时分钟触发，且可指定天数间隔
     /// <summary>
-    /// 创建一个<see cref="TimeFrancis.Timer"/>，
-    /// 它在指定的小时和分钟触发，并按照指定的天数进行重复
+    /// 创建一个<see cref="Timer"/>，
+    /// 它在指定的时间触发，并按照指定的天数进行重复
     /// </summary>
-    /// <param name="hour">定时器在这个小时数触发</param>
-    /// <param name="minute">定时器在这个分钟数触发</param>
+    /// <param name="time">定时器触发的时间</param>
     /// <param name="intervalDays">定时器按照这个天数间隔进行重复</param>
     /// <returns></returns>
-    public static Timer Timer(int hour, int minute, int intervalDays = 1)
+    /// <inheritdoc cref="TimeFrancis.TimerCycle(TimeSpan, DateTimeOffset, bool)"/>
+    public static Timer TimerFromTime(TimeOnly time, int intervalDays = 1, bool immediately = false)
     {
-        ExceptionIntervalOut.Check(0, 24, hour);
-        ExceptionIntervalOut.Check(0, 60, minute);
         ExceptionIntervalOut.Check(1, null, intervalDays);
-        var timeSpan = new TimeSpan(hour, minute, 0);
+        var timeSpan = time.ToTimeSpan();
         var startTime = DateTimeOffset.Now.ToDay() + timeSpan;
-        var finalStartTime = startTime < DateTimeOffset.Now ? startTime.AddDays(1) : startTime;
-        return Timer(TimeSpan.FromDays(intervalDays), finalStartTime);
+        var finalStartTime =
+            startTime < DateTimeOffset.Now ? startTime.AddDays(1) : startTime;
+        return TimerCycle(TimeSpan.FromDays(intervalDays), finalStartTime, immediately);
     }
     #endregion
+    #region 按照小时分钟触发，且可通过委托跳过天数
+    /// <summary>
+    /// 创建一个定时器的实现，
+    /// 它每天在指定的时间触发定时器
+    /// </summary>
+    /// <returns></returns>
+    /// <param name="canTrigger">这个委托的第一个参数是当前日期，
+    /// 第二个参数是已经有多少天没有触发定时器，返回值是那一天是否应该触发定时器，
+    /// 通过指定它，可以跳过某一天，如果为<see langword="null"/>，表示每天触发</param>
+    /// <inheritdoc cref="TimerFromTime.TimerFromTime(TimeOnly[], Func{DateOnly, int, bool})"/>
+    public static Timer TimerFromTime(IEnumerable<TimeOnly> times, Func<DateOnly, int, bool>? canTrigger = null)
+        => new TimerFromTime(times.ToArray(), canTrigger ??= (_, _) => true).Timer;
     #endregion
+    #endregion
+    #endregion 
     #region 创建触发器
     #region 在硬件启动时执行
     /// <summary>

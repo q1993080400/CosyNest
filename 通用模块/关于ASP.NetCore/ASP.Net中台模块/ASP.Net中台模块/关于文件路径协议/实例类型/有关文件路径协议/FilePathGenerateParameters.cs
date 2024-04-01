@@ -1,6 +1,6 @@
 ﻿using System.IOFrancis.FileSystem;
 
-namespace Microsoft.AspNetCore.Components;
+namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 这个类型是文件路径生成的参数

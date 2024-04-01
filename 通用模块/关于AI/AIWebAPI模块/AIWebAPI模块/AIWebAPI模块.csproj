@@ -1,15 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<RootNamespace>System.AI</RootNamespace>
 		<AssemblyName>AIWebAPI</AssemblyName>
 		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="TencentCloudSDK.Nlp" Version="3.0.831" PrivateAssets="compile" />
-	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj" />
 		<ProjectReference Include="..\..\..\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />

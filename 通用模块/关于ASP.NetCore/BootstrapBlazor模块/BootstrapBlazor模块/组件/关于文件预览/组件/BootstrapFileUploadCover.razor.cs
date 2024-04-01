@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Components;
 
 namespace BootstrapBlazor.Components;
 

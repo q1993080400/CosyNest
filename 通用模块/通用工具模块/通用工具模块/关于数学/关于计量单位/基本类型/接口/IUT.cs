@@ -42,23 +42,23 @@ public interface IUT : IComparable<IUT>, IEquatable<IUT>
     /// 只有第一次读取公制单位时，才需要使用反射获取特性
     /// </summary>
     private static ICache<Type, IUT> MetricCache { get; }
-        = CreatePerformance.CacheThreshold(x =>
+        = CreatePerformance.MemoryCache<Type, IUT>((key, _) =>
         {
             #region 用来检查类型的本地函数
             static bool Check(Type type)
             => typeof(IUT).IsAssignableFrom(type)!;
             #endregion
-            if (!Check(x))
-                throw new NotSupportedException($"{x}没有实现{nameof(IUT)}");
+            if (!Check(key))
+                throw new NotSupportedException($"{key}没有实现{nameof(IUT)}");
             var regex = /*language=regex*/"Metric$".Op().Regex();
-            var pro = x.GetTypeData().Propertys.Where(x => x.IsStatic() && regex.IsMatch(x.Name) && Check(x.PropertyType) && x.IsPublic()).ToArray();
+            var pro = key.GetTypeData().Propertys.Where(x => x.IsStatic() && regex.IsMatch(x.Name) && Check(x.PropertyType) && x.IsPublic()).ToArray();
             return pro.Length switch
             {
-                0 => throw new Exception($"{x}中没有符合约定的公制单位"),
+                0 => throw new Exception($"{key}中没有符合约定的公制单位"),
                 1 => pro[0].GetValue<IUT>() ?? throw new NullReferenceException("储存公制单位的静态属性返回null"),
-                _ => throw new Exception($"{x}中存在多个符合约定的公制单位，它们是：{pro.Select(p => p.Name).Join("，")}")
+                _ => throw new Exception($"{key}中存在多个符合约定的公制单位，它们是：{pro.Select(p => p.Name).Join("，")}")
             };
-        }, 75, MetricCache);
+        });
     #endregion
     #endregion
     #region 有关单位换算

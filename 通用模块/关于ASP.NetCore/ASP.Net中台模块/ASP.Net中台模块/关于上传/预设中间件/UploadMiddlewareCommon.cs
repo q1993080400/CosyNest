@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.IOFrancis.FileSystem;
 using System.IOFrancis;
-using Microsoft.AspNetCore.Components;
 using System.Media.Play;
 using System.Media.Drawing;
 using System.Media.Drawing.PDF;

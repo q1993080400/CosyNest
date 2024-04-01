@@ -19,4 +19,11 @@ public static class Tool
         obj = set :
         throw new NotSupportedException("要写入的对象不为null，不允许再次写入");
     #endregion
+    #region 常见的格式化数字字符串
+    /// <summary>
+    /// 获取一个常见的格式化数字字符串，
+    /// 它将数字格式化为普通人习惯的格式
+    /// </summary>
+    public const string FormattedNumCommon = "###############0.#########";
+    #endregion
 }

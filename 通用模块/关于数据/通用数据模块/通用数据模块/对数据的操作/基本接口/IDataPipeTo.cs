@@ -28,14 +28,7 @@ public interface IDataPipeTo
     /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, Func{Guid, bool}?, CancellationToken)"/>
     async Task AddOrUpdate<Data>(IAsyncEnumerable<Data> datas, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
         where Data : class
-        => await AddOrUpdate(await datas.ToListAsync(), specifyPrimaryKey, cancellation);
-    #endregion
-    #region 传入单个数据
-    /// <param name="data">待添加或更新的数据</param>
-    /// <inheritdoc cref="AddOrUpdate{Data}(IEnumerable{Data}, Func{Guid, bool}?, CancellationToken)"/>
-    Task AddOrUpdate<Data>(Data data, Func<Guid, bool>? specifyPrimaryKey = null, CancellationToken cancellation = default)
-       where Data : class
-       => AddOrUpdate<Data>([data], specifyPrimaryKey, cancellation);
+        => await AddOrUpdate(await datas.ToListAsync(cancellation), specifyPrimaryKey, cancellation);
     #endregion
     #endregion
     #endregion
@@ -55,14 +48,7 @@ public interface IDataPipeTo
     /// <inheritdoc cref="Delete{Data}(IEnumerable{Data}, CancellationToken)"/>
     async Task Delete<Data>(IAsyncEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class
-        => await Delete(await datas.ToListAsync(), cancellation);
-    #endregion
-    #region 传入单个数据
-    /// <param name="data">要删除的数据</param>
-    /// <inheritdoc cref="Delete{Data}(IEnumerable{Data}, CancellationToken)"/>
-    Task Delete<Data>(Data data, CancellationToken cancellation = default)
-        where Data : class
-        => Delete(new[] { data }, cancellation);
+        => await Delete(await datas.ToListAsync(cancellation), cancellation);
     #endregion
     #region 按条件删除数据
     /// <summary>

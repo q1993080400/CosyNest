@@ -1,0 +1,7 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@if (GetRenderInfo() is { } render)
+{
+    @RenderComponent(render)
+}

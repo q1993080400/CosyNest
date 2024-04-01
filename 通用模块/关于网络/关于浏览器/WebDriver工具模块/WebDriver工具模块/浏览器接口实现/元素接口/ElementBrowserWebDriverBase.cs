@@ -31,6 +31,14 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     #region 元素的显示文本
     public string Text => Element.Text;
     #endregion
+    #region 点击并创建一个新选项卡
+    public async Task<IDisposable> ClickWithCreateTab()
+    {
+        await Click();
+        Browser.Tabs[^1].Select();
+        return FastRealize.Disposable(null, () => Browser.Tabs[^1].Dispose());
+    }
+    #endregion
     #endregion 
     #region 搜索子元素
     #region 指定CSS选择器
@@ -39,18 +47,21 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     {
         try
         {
-            var wait = new WebDriverWait(WebDriver, Browser.TimeOut);
+            var wait = new WebDriverWait(WebDriver, Browser.Options.TimeOut);
             var elements = wait.Until(x =>
             {
                 var e = this.Element.FindElements(By.CssSelector(cssSelect));
-                return e.Count != 0 ? e : null;
+                return e.Count > 0 ? e : null;
             });
-            return elements?.Where(x => x is { }).Select(x => new ElementBrowserWebDriver(Browser, x)).
-                OfType<Element>().ToArray() ?? [];
+            return elements?.Where(x => x is { }).Select(x => x.TagName switch
+            {
+                "input" => new ElementBrowserInputWebDriver(Browser, x),
+                _ => new ElementBrowserWebDriver(Browser, x),
+            }).OfType<Element>().ToArray() ?? [];
         }
         catch (WebDriverTimeoutException) when (ignoreException)
         {
-            return Array.Empty<Element>();
+            return [];
         }
     }
     #endregion
@@ -63,13 +74,6 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     #endregion
     #endregion
     #region 关于元素交互
-    #region 输入字符串
-    public ValueTask Input(string input, CancellationToken cancellationToken = default)
-    {
-        Element.SendKeys(input);
-        return ValueTask.CompletedTask;
-    }
-    #endregion
     #region 提交表单
     public ValueTask Submit(CancellationToken cancellationToken = default)
     {
@@ -113,7 +117,5 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
 
     public string CssClass => throw new NotImplementedException();
 
-    #endregion
-    #region 构造函数
     #endregion
 }

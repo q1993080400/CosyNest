@@ -145,8 +145,8 @@ public static partial class ExtenReflection
     /// <param name="source">属性所依附的对象，如果是静态属性，直接忽略</param>
     /// <param name="parameters">属性的参数，如果这个属性不是索引器，则应忽略</param>
     /// <returns></returns>
-    public static Ret? GetValue<Ret>(this PropertyInfo property, object? source = null, params object[] parameters)
-        => (Ret?)property.GetValue(source, parameters);
+    public static Ret GetValue<Ret>(this PropertyInfo property, object? source = null, params object[] parameters)
+        => (Ret)property.GetValue(source, parameters)!;
     #endregion
     #region 打包属性的Get和Set访问器
     /// <summary>

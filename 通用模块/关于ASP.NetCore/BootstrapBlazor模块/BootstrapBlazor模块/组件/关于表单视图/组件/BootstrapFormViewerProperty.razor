@@ -26,13 +26,29 @@
         @{
             var format = GetRenderAttribute<FormatAttribute>()?.Format;
         }
-        @if (RenderInfo.IsReadOnly)
+        @if (RenderInfo.IsReadOnlyProperty)
         {
-            var value = property.GetValue(RenderInfo.FormModel);
-            var text = value is IFormattable f ? f.ToString(format, null) : value?.ToString();
+            #region 获取文本值的本地函数
+            string? GetText()
+            {
+                var value = RenderInfo.Value;
+                return (value, format) switch
+                {
+                    (Enum @enum, _) => @enum.GetDescription(),
+                    (IFormattable formattable, var formatText) => (formattable, formatText) switch
+                    {
+                        (decimal num, null) => num.ToString(Tool.FormattedNumCommon),
+                        (DateTimeOffset date, null) => date.ToString("d"),
+                        (var f, var ff) => formattable.ToString(formatText, null)
+                    },
+                    var (v, _) => v?.ToString()
+                };
+            }
+            #endregion
+            var text = GetText();
             <div class="bootstrapFormViewerPropertyContainer">
-                <div>@(name)：</div>
-                <pre class="wrap">@(text)</pre>
+                <div class="bootstrapFormViewerPropertyLabel">@(name)：</div>
+                <pre class="bootstrapFormViewerPropertyText">@(text)</pre>
             </div>
         }
         else
@@ -40,7 +56,7 @@
             @switch (propertyType)
             {
                 case var t when t == typeof(string):
-                    var valueText = RenderInfo.Value<string>();
+                    var valueText = RenderInfo.BindValue<string>();
                     var stringRender = GetRenderAttribute<FormRenderStringAttribute>();
                     @switch (stringRender?.Render ?? FormStringRender.SingleLineText)
                     {
@@ -72,15 +88,16 @@
                         @switch (renderMode)
                         {
                             case FormNumRender.Num:
-                                var value = RenderInfo.Value<T>();
+                                var value = RenderInfo.BindValue<T>();
                                 <BootstrapInputNumber TValue="T" ShowLabel="true"
                                                       Max="@max" Min="@min"
-                                                      DisplayText="@name" @bind-Value=value.Value FormatString="@format" />
+                                                      DisplayText="@name" @bind-Value=value.Value
+                                                      FormatString="@(format.IsVoid()?Tool.FormattedNumCommon:format)" />
                                 break;
                             case FormNumRender.Grade when typeof(T) == typeof(double):
-                                var v = RenderInfo.Value<double>();
+                                var v = RenderInfo.BindValue<double>();
                                 <div>
-                                    <div class="form-label">@name</div>
+                                    <div class="form-label bootstrapFormViewerPropertyLabel">@name</div>
                                     <Rate @bind-Value=v.Value />
                                 </div>
                                 break;
@@ -112,7 +129,7 @@
                     var trueDescribe = boolDescribe?.DescribeTrue ?? "打开";
                     var flaseDescribe = boolDescribe?.DescribeFalse ?? "关闭";
                     var boolRender = boolDescribe?.Render ?? FormBoolRender.Radio;
-                    var valueBool = RenderInfo.Value<bool>();
+                    var valueBool = RenderInfo.BindValue<bool>();
                     switch (boolRender)
                     {
                         case FormBoolRender.Radio:
@@ -153,23 +170,23 @@
                             Text = x.Item2,
                             Value = x.Item1.ToString()
                         }).ToArray();
-                    var valueEnum = RenderInfo.Value<int>();
+                    var valueEnum = RenderInfo.BindValue<int>();
                     <RadioList Items="enumSelect" TValue="int" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value />
                     break;
                 case var t when t == typeof(DateTimeOffset):
-                    var formatDate = format ?? "yyyy-MM-dd";
-                    var valueDate = RenderInfo.Value<DateTimeOffset>();
+                    var formatDate = format.IsVoid() ? "d" : format;
+                    var valueDate = RenderInfo.BindValue<DateTimeOffset>();
                     var verifyAge = GetRenderAttribute<VerifyAgeAttribute>();
                     if (verifyAge is { })
                     {
                         var now = DateTime.Now;
                         var maxBirthday = now.AddYears((decimal)-verifyAge.MinAge);
                         var minBirthday = now.AddYears((decimal)-verifyAge.MaxAge);
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" MinValue="minBirthday" MaxValue=" maxBirthday" Format="@formatDate" />
+                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" MinValue="minBirthday" MaxValue=" maxBirthday" DateFormat="@formatDate" />
                     }
                     else
                     {
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" Format="@formatDate" />
+                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" DateFormat="@formatDate" />
                     }
                     break;
                 case var t:

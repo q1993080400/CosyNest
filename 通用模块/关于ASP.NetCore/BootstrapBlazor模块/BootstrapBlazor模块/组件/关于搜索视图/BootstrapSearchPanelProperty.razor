@@ -1,0 +1,102 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+
+@{
+    #region 用来提交筛选的本地函数
+    Task OnSubmit<Obj>(Obj value)
+    => RenderPropertyInfo.Submit();
+    #endregion
+    var conditionGroup = RenderPropertyInfo.RenderConditionGroup;
+    var state = RenderPropertyInfo.SearchViewerState;
+    var first = conditionGroup.FirstQueryCondition;
+    var second = conditionGroup.SecondQueryCondition;
+    var sort = conditionGroup.SortCondition;
+    var describe = conditionGroup.Describe;
+    var conditionCount = new bool[] { conditionGroup.SecondQueryCondition is { }, conditionGroup.SortCondition is { } }.
+    Count(x => x);
+    var css = conditionCount switch
+    {
+        _ when conditionGroup.FilterObjectType is FilterObjectType.Bool => "",
+        0 => "bootstrapSearchPanelPropertyContainerSmall",
+        2 => "bootstrapSearchPanelPropertyContainerBig",
+        _ => "bootstrapSearchPanelPropertyContainerMedium"
+    };
+}
+<div class="@css">
+    @switch (conditionGroup.FilterObjectType)
+    {
+        case FilterObjectType.Text:
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="@describe" />
+                <BootstrapInput @bind-Value=@(state.Bind<string>(first).Value) />
+                @if (second is { })
+                {
+                    <BootstrapInputGroupLabel DisplayText="至" />
+                    <BootstrapInput @bind-Value=@(state.Bind<string>(second).Value) />
+                }
+                @if (sort is { })
+                {
+                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
+                }
+            </BootstrapInputGroup>
+            break;
+        case FilterObjectType.Num:
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="@describe" />
+                <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(first).Value) />
+                @if (second is { })
+                {
+                    <BootstrapInputGroupLabel DisplayText="至" />
+                    <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(second).Value) />
+                }
+                @if (sort is { })
+                {
+                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
+                }
+            </BootstrapInputGroup>
+            break;
+        case FilterObjectType.Date:
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="@describe" />
+                <DateTimePicker @bind-Value=@(state.Bind<DateTimeOffset?>(first).Value) />
+                @if (second is { })
+                {
+                    <BootstrapInputGroupLabel DisplayText="至" />
+                    <DateTimePicker @bind-Value=@(state.Bind<DateTimeOffset?>(second).Value) />
+                }
+                @if (sort is { })
+                {
+                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
+                }
+            </BootstrapInputGroup>
+            break;
+        case FilterObjectType.Enum:
+            var bindEnum = GetBindEnum(first);
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="@describe" />
+                <Select TValue="string" OnValueChanged="@(x=>OnEnumChanged(x,first))" Value="@(bindEnum.Value?.ToString())">
+                    <Options>
+                        <SelectOption Text="未选择" Value="@null"/>
+                        @foreach (var item in first.EnumItem)
+                        {
+                            <SelectOption Text="@item.Describe" Value="@item.Value.ToString()" />
+                        }
+                    </Options>
+                </Select>
+                @if (sort is { })
+                {
+                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
+                }
+            </BootstrapInputGroup>
+            break;
+        case FilterObjectType.Bool:
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="@describe" />
+                <NullSwitch @bind-Value=@(state.Bind<bool?>(first).Value)
+                            OnValueChanged="OnSubmit" OnText="开启" OffText="关闭" />
+            </BootstrapInputGroup>
+            break;
+        case var filterObjectType:
+            throw new NotSupportedException($"暂不支持渲染{filterObjectType}类型的属性");
+    }
+</div>

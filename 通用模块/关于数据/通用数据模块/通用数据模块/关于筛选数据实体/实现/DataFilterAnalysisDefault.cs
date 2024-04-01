@@ -12,12 +12,12 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
 {
     #region 公开成员
     #region 解析为查询表达式
-    public IOrderedQueryable<Obj> Analysis<Obj>(IQueryable<Obj> dataSource, DataFilterDescription<Obj> description,
-        Func<IQueryable<Obj>, IOrderedQueryable<Obj>>? sortFunction = null,
-        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution = null)
+    public IOrderedQueryable<Obj> Analysis<Obj>(DataFilterAnalysisInfo<Obj> info)
     {
-        var query = GenerateQueryExpression(description, dataSource, reconsitution);
-        var sort = sortFunction?.Invoke(query) ?? query.OrderBy(x => 0);
+        var description = info.Description;
+        var data = info.DataSource;
+        var query = GenerateQueryExpression(description, data, info.Reconsitution);
+        var sort = info.SortFunction?.Invoke(query) ?? query.OrderBy(x => 0);
         return GenerateSortExpression(description, sort);
     }
     #endregion
@@ -28,15 +28,19 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <summary>
     /// 生成一个用来查询的表达式
     /// </summary>
+    /// <param name="description">这个记录描述查询和排序的条件</param>
+    /// <param name="dataSource">数据源</param>
+    /// <param name="reconsitution">这个委托允许重构生成的每个查询表达式，
+    /// 并返回重构后的表达式，如果为<see langword="null"/>，则不进行重构</param>
     /// <returns></returns>
-    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(IQueryable{Obj}, DataFilterDescription{Obj}, Func{IQueryable{Obj}, IOrderedQueryable{Obj}}?, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
-    private static IQueryable<Obj> GenerateQueryExpression<Obj>(DataFilterDescription<Obj> description, IQueryable<Obj> dataSource,
-        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
+    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(DataFilterAnalysisInfo{Obj})"/>
+    private static IQueryable<Obj> GenerateQueryExpression<Obj>(DataFilterDescription description, IQueryable<Obj> dataSource,
+        Func<QueryConditionReconsitutionInfo, Expression>? reconsitution)
     {
-        var condition = description.QueryCondition.ToArray();
+        var condition = description.QueryCondition.Where(x => !x.IsVirtually).ToArray();
         if (condition.Length != 0)
         {
-            var where = GenerateWhereExpression(condition, reconsitution);
+            var where = GenerateWhereExpression<Obj>(condition, reconsitution);
             return dataSource.Where(where);
         }
         return dataSource;
@@ -46,11 +50,10 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <summary>
     /// 生成一个可以用于<see cref="Queryable.Where{TSource}(IQueryable{TSource}, Expression{Func{TSource, bool}})"/>的表达式树
     /// </summary>
-    /// <typeparam name="Obj">实体类的类型</typeparam>
     /// <param name="condition">查询条件</param>
     /// <returns></returns>
-    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(IQueryable{Obj}, DataFilterDescription{Obj}, Func{IQueryable{Obj}, IOrderedQueryable{Obj}}?, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
-    private static Expression<Func<Obj, bool>> GenerateWhereExpression<Obj>(IEnumerable<QueryCondition<Obj>> condition, Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
+    /// <inheritdoc cref="GenerateQueryExpression{Obj}(DataFilterDescription, IQueryable{Obj}, Func{QueryConditionReconsitutionInfo, Expression}?)"/>
+    private static Expression<Func<Obj, bool>> GenerateWhereExpression<Obj>(IEnumerable<QueryCondition> condition, Func<QueryConditionReconsitutionInfo, Expression>? reconsitution)
     {
         var parameter = Parameter(typeof(Obj));
         var body = GenerateWhereBodyExpression(condition, parameter, reconsitution);
@@ -63,9 +66,9 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// </summary>
     /// <param name="parameter">Where表达式树的参数</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateWhereExpression{Obj}(IEnumerable{QueryCondition{Obj}}, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
-    private static Expression GenerateWhereBodyExpression<Obj>(IEnumerable<QueryCondition<Obj>> condition, ParameterExpression parameter,
-        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
+    /// <inheritdoc cref="GenerateWhereExpression{Obj}(IEnumerable{QueryCondition}, Func{QueryConditionReconsitutionInfo, Expression}?)"/>
+    private static Expression GenerateWhereBodyExpression(IEnumerable<QueryCondition> condition, ParameterExpression parameter,
+        Func<QueryConditionReconsitutionInfo, Expression>? reconsitution)
         => condition.Select(x => GenerateWhereBodySingleExpression(x, parameter, reconsitution)).
         Aggregate((Expression?)null,
             (seed, expression) => seed is null ? expression : AndAlso(seed, expression))!;
@@ -76,15 +79,15 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// </summary>
     /// <param name="condition">要生成表达式树的单个查询条件</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateWhereBodyExpression{Obj}(IEnumerable{QueryCondition{Obj}}, ParameterExpression, Func{QueryConditionReconsitutionInfo{Obj}, Expression}?)"/>
-    private static Expression GenerateWhereBodySingleExpression<Obj>(QueryCondition<Obj> condition, ParameterExpression parameter,
-        Func<QueryConditionReconsitutionInfo<Obj>, Expression>? reconsitution)
+    /// <inheritdoc cref="GenerateWhereBodyExpression(IEnumerable{QueryCondition}, ParameterExpression, Func{QueryConditionReconsitutionInfo, Expression}?)"/>
+    private static Expression GenerateWhereBodySingleExpression(QueryCondition condition, ParameterExpression parameter,
+        Func<QueryConditionReconsitutionInfo, Expression>? reconsitution)
     {
         var propertyAccess = condition.PropertyAccess.Split('.');
         var single = GenerateWhereBodyPartExpression(parameter, propertyAccess, condition.LogicalOperator, condition.CompareValue);
         if (reconsitution is null)
             return single;
-        var info = new QueryConditionReconsitutionInfo<Obj>()
+        var info = new QueryConditionReconsitutionInfo()
         {
             Expression = single,
             QueryCondition = condition,
@@ -108,12 +111,12 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     {
         if (propertyAccess.Length == 0)
             return GenerateCompareExpression(expression, logicalOperator, compareValue);
-        var nextProperty = propertyAccess[1..];
         var propertyName = propertyAccess[0];
         var property = expression.Type.GetProperty(propertyName) ??
             throw new NotSupportedException($"未能在{expression.Type}中找到属性{propertyName}");
         var propertyType = property.PropertyType;
         var propertyAccessExpression = Property(expression, property);
+        var nextProperty = propertyAccess[1..];
         if (propertyType.IsRealizeGeneric(typeof(ICollection<>)).IsRealize)
         {
             var parameter = Parameter(propertyType.GetGenericArguments()[0]);
@@ -136,9 +139,20 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         var @const = Constant(compareValue);
         #region 将转换左右节点的本地函数
         Expression Fun(Func<Expression, Expression, Expression> fun)
-           => left.Type.IsEnum || @const.Type.IsEnum ?
-           fun(Convert(left, typeof(int)), Convert(@const, typeof(int))) :
-           fun(left, Convert(@const, left.Type));
+        {
+            var leftType = left.Type;
+            if (leftType.IsEnum)
+            {
+                var @enum = compareValue switch
+                {
+                    int num => Enum.Parse(leftType, num.ToString()),
+                    string text => Enum.Parse(leftType, text),
+                    var obj => throw new NotSupportedException($"无法将{obj}类型和枚举进行比较")
+                };
+                return fun(left, Constant(@enum, leftType));
+            }
+            return fun(left, Convert(@const, left.Type));
+        }
         #endregion
         return logicalOperator switch
         {
@@ -180,15 +194,13 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// 生成一个用来排序的表达式
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(IQueryable{Obj}, DataFilterDescription{Obj})"/>
-    private static IOrderedQueryable<Obj> GenerateSortExpression<Obj>(DataFilterDescription<Obj> description, IOrderedQueryable<Obj> dataSource)
+    /// <inheritdoc cref="GenerateQueryExpression{Obj}(DataFilterDescription, IQueryable{Obj}, Func{QueryConditionReconsitutionInfo, Expression}?)"/>
+    private static IOrderedQueryable<Obj> GenerateSortExpression<Obj>(DataFilterDescription description, IOrderedQueryable<Obj> dataSource)
     {
-        var condition = description.SortCondition.ToArray();
-        if (condition.Length != 0)
-        {
-            return condition.Aggregate(dataSource, GenerateSortSingleExpression);
-        }
-        return dataSource;
+        var condition = description.SortCondition.Where(x => !x.IsVirtually).ToArray();
+        return condition.Length > 0 ?
+            condition.Aggregate(dataSource, GenerateSortSingleExpression) :
+            dataSource;
     }
     #endregion
     #region 生成处理单个排序条件的表达式
@@ -198,16 +210,20 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <param name="seed">种子对象，也就是上一个被处理的表达式</param>
     /// <param name="condition">执行排序的条件</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateSortExpression{Obj}(DataFilterDescription{Obj}, IOrderedQueryable{Obj})"/>
-    private static IOrderedQueryable<Obj> GenerateSortSingleExpression<Obj>(IOrderedQueryable<Obj> seed, SortCondition<Obj> condition)
+    /// <inheritdoc cref="GenerateSortExpression{Obj}(DataFilterDescription, IOrderedQueryable{Obj})"/>
+    private static IOrderedQueryable<Obj> GenerateSortSingleExpression<Obj>(IOrderedQueryable<Obj> seed, SortCondition condition)
     {
         var propertyAccess = condition.PropertyAccess.Split('.');
         var parameter = Parameter(typeof(Obj));
         var body = propertyAccess.Aggregate((Expression)parameter, Property);
         var lambda = Lambda<Func<Obj, object>>(Convert(body, typeof(object)), parameter);
-        return condition.IsAscending ?
-            seed.ThenBy(lambda) :
-            seed.ThenByDescending(lambda);
+        return condition.SortStatus switch
+        {
+            SortStatus.None => seed,
+            SortStatus.Ascending => seed.ThenBy(lambda),
+            SortStatus.Descending => seed.ThenByDescending(lambda),
+            var sortStatus => throw new NotSupportedException($"未能识别排序模式{sortStatus}")
+        };
     }
     #endregion
     #endregion

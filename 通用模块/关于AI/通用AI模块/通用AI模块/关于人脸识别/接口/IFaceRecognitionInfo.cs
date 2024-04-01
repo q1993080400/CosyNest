@@ -1,4 +1,4 @@
-﻿namespace System.AI.FaceRecognition;
+﻿namespace System.AI;
 
 /// <summary>
 /// 凡是实现这个接口的类型，

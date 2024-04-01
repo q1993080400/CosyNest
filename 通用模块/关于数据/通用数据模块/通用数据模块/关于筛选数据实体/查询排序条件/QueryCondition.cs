@@ -5,8 +5,7 @@ namespace System.DataFrancis;
 /// <summary>
 /// 这个记录描述查询实体的条件
 /// </summary>
-/// <typeparam name="Obj">查询实体的类型</typeparam>
-public sealed record QueryCondition<Obj> : DataCondition<Obj>
+public sealed record QueryCondition : DataCondition
 {
     #region 逻辑运算符
     /// <summary>

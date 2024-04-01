@@ -30,17 +30,16 @@ public static class ExtenData
     /// </summary>
     /// <typeparam name="Log">日志记录的类型</typeparam>
     /// <param name="loggingBuilder">日志记录器</param>
-    /// <param name="createLog">这个委托的参数是发生的错误，
-    /// 返回值是创建好的日志</param>
     /// <returns></returns>
-    public static ILoggingBuilder AddBusinessLoggingSimple<Log>(this ILoggingBuilder loggingBuilder, Func<Exception, Log> createLog)
+    /// <inheritdoc cref="ExtenLogger.AddLoggerFunction{LogObject}(ILoggingBuilder, Func{Exception?, object?, LogObject}, Func{LogObject, IServiceProvider, Task}, bool)"/>
+    public static ILoggingBuilder AddBusinessLoggingSimple<Log>(this ILoggingBuilder loggingBuilder,
+        Func<Exception?, object?, Log> createLog)
         where Log : class
     {
-        loggingBuilder.AddLoggerFunction(async (server, exception, _) =>
+        loggingBuilder.AddLoggerFunction(createLog, async (log, serviceProvider) =>
         {
-            var log = createLog(exception);
-            var pipe = server.GetRequiredService<IDataPipe>();
-            await pipe.AddOrUpdate(log);
+            var pipe = serviceProvider.GetRequiredService<IDataPipe>();
+            await pipe.AddOrUpdate([log]);
         });
         loggingBuilder.SetMinimumLevel(LogLevel.Warning);
         return loggingBuilder;

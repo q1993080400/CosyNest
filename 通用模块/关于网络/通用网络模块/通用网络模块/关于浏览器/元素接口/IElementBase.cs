@@ -64,11 +64,18 @@ public interface IElementBase
         where Element : IElementBase;
     #endregion
     #region 根据CSS选择器
+    #region 泛型方法
     /// <param name="cssSelect">用来匹配后代元素的CSS选择器文本</param>
     /// <returns></returns>
     /// <inheritdoc cref="Find{Element}(Expression{Func{Element, bool}},bool)"/>
     IEnumerable<Element> FindFromCss<Element>(string cssSelect, bool ignoreException = false)
         where Element : IElementBase;
+    #endregion
+    #region 非泛型方法
+    /// <inheritdoc cref="FindFromCss{Element}(string, bool)"/>
+    IEnumerable<IElementBrowser> FindFromCss(string cssSelect, bool ignoreException = false)
+        => FindFromCss<IElementBrowser>(cssSelect, ignoreException);
+    #endregion
     #endregion
     #endregion
 }

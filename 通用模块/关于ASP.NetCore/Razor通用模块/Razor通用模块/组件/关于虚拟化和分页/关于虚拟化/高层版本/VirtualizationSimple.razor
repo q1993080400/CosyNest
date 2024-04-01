@@ -3,20 +3,10 @@
 @typeparam Element
 
 <Virtualization RenderEmpty=RenderEmpty RenderElement=RenderElement
-                Elements=Elements Plus=Plus IsReverse=IsReverse>
+                Elements=Elements Plus=Plus IsReverse=IsReverse RenderEnd="RenderEnd">
     <RenderComponent>
         <div class="virtualizationSimpleContainer">
             @context.RenderElementAuto
         </div>
     </RenderComponent>
-    <RenderEnd>
-        @if (RenderEnd is null)
-        {
-            <div id="@context" style="height:10dvh" />
-        }
-        else
-        {
-            @RenderEnd
-        }
-    </RenderEnd>
 </Virtualization>

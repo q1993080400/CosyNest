@@ -1,9 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.Media.Drawing;
-using System.Media.Drawing.Graphics;
-using System.Office.Chart;
-
-namespace System.Office.Excel;
+﻿namespace System.Office.Excel;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -24,6 +19,12 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// </summary>
     string Name { get; set; }
     #endregion
+    #region 工作表的索引
+    /// <summary>
+    /// 获取或设置工作表在工作簿中的索引
+    /// </summary>
+    int Index { get; set; }
+    #endregion
     #region 对工作表的操作
     #region 复制工作表
     /// <summary>
@@ -36,7 +37,7 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// 它的第一个参数是旧名称，第二个参数是尝试失败的次数，从2开始，返回值就是新的名称，
     /// 如果为<see langword="null"/>，则使用一个默认方法</param>
     /// <returns>复制后的新工作表</returns>
-    IExcelSheet Copy(IExcelSheetCollection? collection = null, Func<string, int, string>? renamed = null);
+    IExcelSheet Copy(IExcelSheetManage? collection = null, Func<string, int, string>? renamed = null);
     #endregion
     #region 剪切工作表
     /// <summary>
@@ -47,7 +48,7 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// 它的第一个参数是旧名称，第二个参数是尝试失败的次数，从2开始，返回值就是新的名称，
     /// 如果为<see langword="null"/>，则使用一个默认方法</param>
     /// <returns>剪切后的新工作表</returns>
-    IExcelSheet Cut(IExcelSheetCollection collection, Func<string, int, string>? renamed = null)
+    IExcelSheet Cut(IExcelSheetManage collection, Func<string, int, string>? renamed = null)
     {
         var newSheet = Copy(collection, renamed);
         Delete();
@@ -98,55 +99,12 @@ public interface IExcelSheet : IExcelCellsCommunity
     IExcelRC GetRC(int begin, int? end, bool isRow);
     #endregion
     #endregion
-    #region 关于Office对象
-    #region 关于图表
-    #region 获取图表创建器
+    #region 关于Excel对象
+    #region 图表管理对象
     /// <summary>
-    /// 获取一个图表创建器，
-    /// 它可以用来帮助创建Excel图表
+    /// 这个对象可以用来管理这个工作表中的所有图表
     /// </summary>
-    ICreateExcelChart CreateChart { get; }
-
-    /*实现本API请遵循以下规范：
-      #在创建图表后，自动将其添加到工作表中*/
-    #endregion
-    #region 枚举工作表中的所有图表
-    /// <summary>
-    /// 枚举该工作表中的所有图表
-    /// </summary>
-    IEnumerable<IExcelObj<IOfficeChart>> Charts { get; }
-    #endregion
-    #endregion
-    #region 关于图像
-    #region 枚举工作表中的所有图像
-    /// <summary>
-    /// 枚举工作表中的所有图像
-    /// </summary>
-    IEnumerable<IExcelObj<IImage>> Images { get; }
-    #endregion
-    #region 向工作表中添加图像
-    #region 指定图像
-    /// <summary>
-    /// 向工作表中添加图像，
-    /// 并返回新添加的图像
-    /// </summary>
-    /// <param name="image">待添加的图像</param>
-    /// <returns></returns>
-    IExcelObj<IImage> CreateImage(IImage image);
-    #endregion
-    #region 指定图像路径
-    /// <param name="path">图像所在的路径</param>
-    /// <inheritdoc cref="CreateImage(IImage)"/>
-    IExcelObj<IImage> CreateImage(PathText path);
-    #endregion
-    #endregion
-    #endregion
-    #region 返回画布
-    /// <summary>
-    /// 返回一个画布，
-    /// 它可以直接在Excel工作表上绘制形状
-    /// </summary>
-    ICanvas Canvas { get; }
+    IOfficeChartManage ChartManage { get; }
     #endregion
     #endregion
 }

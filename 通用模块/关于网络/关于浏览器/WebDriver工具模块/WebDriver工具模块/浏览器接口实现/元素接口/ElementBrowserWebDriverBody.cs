@@ -10,8 +10,5 @@ sealed class ElementBrowserWebDriverBody(BrowserWebDriver browser) : ElementBrow
 {
     #region 浏览器元素
     protected override IWebElement Element => WebDriver.FindElement(By.CssSelector("body"));
-
-    #endregion
-    #region 构造函数
     #endregion
 }

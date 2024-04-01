@@ -1,23 +1,16 @@
 ﻿namespace System.DataFrancis;
 
 /// <summary>
-/// 这个记录描述排序实体的条件
+/// 这个记录描述排序实体的条件，
+/// 如果这个对象在一个集合中，
+/// 那么排序优先级用位置来表示，排在前面的条件优先级高
 /// </summary>
-/// <typeparam name="Obj">排序实体的类型</typeparam>
-public sealed record SortCondition<Obj> : DataCondition<Obj>
+public sealed record SortCondition : DataCondition
 {
-    #region 是否升序
+    #region 排序状态
     /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示排序为升序，否则为降序
+    /// 获取排序的状态
     /// </summary>
-    public required bool IsAscending { get; init; }
-    #endregion
-    #region 排序优先级
-    /// <summary>
-    /// 获取排序的优先级，
-    /// 这个数字越低，代表优先级越高
-    /// </summary>
-    public required int Priority { get; init; }
+    public required SortStatus SortStatus { get; init; }
     #endregion
 }

@@ -22,7 +22,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     [EditorRequired]
     public RenderFragment<RenderFormViewerPropertyInfo<Model>> RenderProperty { get; set; }
     #endregion
-    #region 用来渲染组件的委托
+    #region 用来渲染整个组件的委托
     /// <summary>
     /// 用来渲染整个组件的委托
     /// </summary>
@@ -58,7 +58,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// 本委托是属性级的，而它是模型级的
     /// </summary>
     [Parameter]
-    public Func<PropertyInfo, Model, bool> IsReadOnly { get; set; } = (_, _) => false;
+    public Func<PropertyInfo, Model, bool> IsReadOnlyProperty { get; set; } = (_, _) => false;
     #endregion
     #region 是否显示提交部分
     /// <summary>
@@ -148,6 +148,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
             };
         }).ToArray().OrderBy(x => x.Order).ToArrayIfDeBug();
         var model = formViewer.FormModel;
+        var showSubmit = formViewer.ShowSubmit(model);
         return propertys.Select(x =>
         {
             var property = x.Item;
@@ -156,7 +157,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
                 FormModel = model,
                 Property = property,
                 PropertyName = x.Name,
-                IsReadOnly = !property.IsAlmighty() || formViewer.IsReadOnly(property, model),
+                IsReadOnlyProperty = !showSubmit || !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model),
                 OnPropertyChangeed = formViewer.OnPropertyChangeed
             };
         }).ToArray();

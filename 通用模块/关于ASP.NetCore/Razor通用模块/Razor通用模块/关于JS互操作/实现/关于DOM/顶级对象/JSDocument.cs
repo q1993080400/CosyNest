@@ -146,7 +146,6 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
         {
             Action(obj);
         }
-
         #endregion
     }
     #endregion
@@ -231,21 +230,11 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
     private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodJson(Action<JsonElement> action, string? jsMethodName = null, CancellationToken cancellation = default)
     {
         var springboard = ToolASP.CreateJSObjectName();
-        jsMethodName ??= ToolASP.CreateJSObjectName();
-        var script = $$"""
-            window.{{springboard}}=
-            function(net)
-            {
-                window.{{jsMethodName}}=function(parameter)
-                {
-                    net.invokeMethodAsync('{{nameof(NetMethodPack<JsonElement>.Invoke)}}',parameter);
-                }
-            }
-""";
+        var newJSMethodName = jsMethodName ?? ToolASP.CreateJSObjectName();
         var netMethodPack = DotNetObjectReference.Create(new NetMethodPack<JsonElement>(action));
-        await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
-        await JSRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
-        return (jsMethodName, netMethodPack);
+        await JSRuntime.InvokeVoidAsync("RegisterNetMethod",
+            cancellation, netMethodPack, newJSMethodName, nameof(NetMethodPack<JsonElement>.Invoke));
+        return (newJSMethodName, netMethodPack);
     }
     #endregion
     #region 方法参数为Stream

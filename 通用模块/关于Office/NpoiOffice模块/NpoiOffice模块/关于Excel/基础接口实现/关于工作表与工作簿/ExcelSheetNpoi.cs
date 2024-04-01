@@ -1,8 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.Media.Drawing;
-using System.Media.Drawing.Graphics;
-using System.Office.Chart;
-using System.Office.Excel.Realize;
+﻿using System.Office.Excel.Realize;
 
 using NPOI.SS.UserModel;
 
@@ -48,7 +44,7 @@ sealed class ExcelSheetNpoi : ExcelSheet
         => BookNpoi.RemoveSheetAt(Index);
     #endregion
     #region 复制工作表
-    public override IExcelSheet Copy(IExcelSheetCollection? collection = null, Func<string, int, string>? renamed = null)
+    public override IExcelSheet Copy(IExcelSheetManage? collection = null, Func<string, int, string>? renamed = null)
     {
         collection ??= Book.Sheets;
         if (collection is ExcelSheetCollectionNpoi sheets)
@@ -83,31 +79,8 @@ sealed class ExcelSheetNpoi : ExcelSheet
     }
     #endregion
     #endregion
-    #region 关于页面和Excel对象
     #region 返回页面对象
     public override IPageSheet Page => throw CreateException.NotSupported();
-    #endregion
-    #region 返回图表创建器
-    public override ICreateExcelChart CreateChart => throw CreateException.NotSupported();
-    #endregion
-    #region 返回图表集合
-    public override IEnumerable<IExcelObj<IOfficeChart>> Charts => throw CreateException.NotSupported();
-    #endregion
-    #region 返回图片集合
-    public override IEnumerable<IExcelObj<IImage>> Images => throw CreateException.NotSupported();
-    #endregion
-    #region 创建图片
-    public override IExcelObj<IImage> CreateImage(IImage image)
-        => throw CreateException.NotSupported();
-
-    public override IExcelObj<IImage> CreateImage(PathText path)
-    {
-        throw new NotImplementedException();
-    }
-    #endregion
-    #region 返回画布
-    public override ICanvas Canvas => throw CreateException.NotSupported();
-    #endregion
     #endregion
     #region 构造函数
     /// <summary>

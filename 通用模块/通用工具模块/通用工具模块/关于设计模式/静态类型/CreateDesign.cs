@@ -23,7 +23,8 @@ public static class CreateDesign
     #endregion
     #region 创建单例对象
     private static ICache<Type, object> SingleCache { get; }
-        = CreatePerformance.CacheThreshold<Type, object>(type => type.GetTypeData().ConstructorCreate<object>(), 200);
+        = CreatePerformance.MemoryCache<Type, object>
+        ((type, _) => type.GetTypeData().ConstructorCreate<object>());
 
     /// <summary>
     /// 返回一个类型的实例，

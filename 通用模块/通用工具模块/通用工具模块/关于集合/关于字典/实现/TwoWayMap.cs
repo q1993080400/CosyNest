@@ -70,15 +70,13 @@ sealed class TwoWayMap<A, B> : ITwoWayMap<A, B>
     /// <summary>
     /// 这个表将对象A映射到对象B
     /// </summary>
-    private IDictionary<A, B> AToB { get; }
-    = new Dictionary<A, B>();
+    private Dictionary<A, B> AToB { get; } = [];
     #endregion
     #region 从B映射到A
     /// <summary>
     /// 这个表将对象B映射到对象A
     /// </summary>
-    private IDictionary<B, A> BToA { get; }
-    = new Dictionary<B, A>();
+    private Dictionary<B, A> BToA { get; } = [];
     #endregion
     #endregion 
     #endregion

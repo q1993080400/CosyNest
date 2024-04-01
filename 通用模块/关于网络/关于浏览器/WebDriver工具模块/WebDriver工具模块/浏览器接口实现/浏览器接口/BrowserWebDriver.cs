@@ -23,15 +23,13 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     }
     #endregion
     #region 选项卡的集合
-    IEnumerable<ITab> IBrowser.Tabs => Tabs;
-
-    /// <summary>
-    /// 所有选项卡的集合
-    /// </summary>
-    internal List<ITab> Tabs { get; } = [];
+    public IReadOnlyList<ITab> Tabs
+        => WebDriver.WindowHandles.
+        Select(x => new TabWebDriver(this, x)).ToArray();
     #endregion
     #region 当前选项卡
-    public ITab CurrentTab { get; set; }
+    public ITab CurrentTab
+        => new TabWebDriver(this, WebDriver.CurrentWindowHandle);
     #endregion
     #endregion
     #region 有关浏览器内容
@@ -49,13 +47,22 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     public IKeyBoard KeyboardEmulation
         => new KeyboardWebDriver(WebDriver);
     #endregion
-    #region 执行脚本
-    public ValueTask InvokingScript(string script, CancellationToken cancellationToken = default)
+    #region 关于执行脚本
+    #region 无返回值
+    public ValueTask InvokingScriptVoid(string script, CancellationToken cancellationToken = default)
     {
         WebDriver.ExecuteScript(script);
         return ValueTask.CompletedTask;
     }
     #endregion
+    #region 有返回值
+    public ValueTask<Obj> InvokingScript<Obj>(string script, CancellationToken cancellationToken = default)
+    {
+        var obj = WebDriver.ExecuteScript(script).To<Obj>();
+        return ValueTask.FromResult(obj);
+    }
+    #endregion
+    #endregion 
     #endregion
     #endregion
     #region 内部成员
@@ -66,11 +73,11 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     /// </summary>
     internal WebDriver WebDriver { get; }
     #endregion
-    #region 等待超时
+    #region 浏览器选项
     /// <summary>
-    /// 获取每个操作等待超时的时间限制
+    /// 获取浏览器的配置选项
     /// </summary>
-    internal TimeSpan TimeOut { get; }
+    internal WebDriverOptions Options { get; }
     #endregion
     #region 释放对象
     protected override void DisposeRealize()
@@ -84,16 +91,13 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     /// <summary>
     /// 使用指定的参数初始化对象
     /// </summary>
-    /// <param name="factory">用来创建浏览器实例的工厂</param>
-    /// <param name="timeOut">每个操作等待超时的时间限制，
-    /// 如果为<see langword="null"/>，默认为3秒</param>
-    public BrowserWebDriver(Func<WebDriver> factory, TimeSpan? timeOut)
+    /// <param name="webDriver">浏览器实例</param>
+    /// <param name="options">用来创建浏览器的选项，
+    /// 如果为<see langword="null"/>，则使用默认选项</param>
+    public BrowserWebDriver(WebDriver webDriver, WebDriverOptions options)
     {
-        WebDriver = factory();
-        TimeOut = timeOut ?? TimeSpan.FromSeconds(3);
-        var tab = new TabWebDriver(this, WebDriver.CurrentWindowHandle);
-        Tabs.Add(tab);
-        CurrentTab = tab;
+        WebDriver = webDriver;
+        Options = options;
         Body = new ElementBrowserWebDriverBody(this);
     }
     #endregion

@@ -69,6 +69,19 @@ sealed class ExcelCellsEPPlus : ExcelCells, IExcelCells
     #endregion
     #endregion
     #region 关于子单元格和其他单元格
+    #region 枚举非空单元格
+    public IEnumerable<IExcelCells> CellsNotNull
+    {
+        get
+        {
+            foreach (var item in Range)
+            {
+                if (item.Value is { })
+                    yield return new ExcelCellsEPPlus(Sheet, item);
+            }
+        }
+    }
+    #endregion
     #region 按索引获取子单元格
     protected override IExcelCells IndexTemplate(int beginRow, int beginColumn, int endRow, int endColumn)
     {

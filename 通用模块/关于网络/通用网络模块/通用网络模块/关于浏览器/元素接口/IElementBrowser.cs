@@ -6,14 +6,6 @@
 /// </summary>
 public interface IElementBrowser : IElementBase
 {
-    #region 输入字符串
-    /// <summary>
-    /// 向元素中输入字符串，只对部分元素有效
-    /// </summary>
-    /// <param name="input">输入的字符串</param>
-    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
-    ValueTask Input(string input, CancellationToken cancellationToken = default);
-    #endregion
     #region 提交表单
     /// <summary>
     /// 向元素提交表单，
@@ -21,5 +13,15 @@ public interface IElementBrowser : IElementBase
     /// </summary>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     ValueTask Submit(CancellationToken cancellationToken = default);
+    #endregion
+    #region 点击并创建一个新选项卡
+    /// <summary>
+    /// 触发这个元素的点击事件，
+    /// 并返回一个<see cref="IDisposable"/>，
+    /// 当释放它的时候，关闭浏览器最右边的选项卡，
+    /// 它专门用于已知点击时一定会创建一个新选项卡的元素
+    /// </summary>
+    /// <returns></returns>
+    Task<IDisposable> ClickWithCreateTab();
     #endregion
 }

@@ -6,6 +6,12 @@
 public sealed class ExplicitTask
 {
     #region 公开成员
+    #region 静态属性：已完成的可等待对象
+    /// <summary>
+    /// 获取一个已完成的可等待对象
+    /// </summary>
+    public static ExplicitTask CompletedTask { get; }
+    #endregion
     #region 超时时间
     /// <summary>
     /// 获取超时时间，
@@ -29,8 +35,7 @@ public sealed class ExplicitTask
     #endregion
     #region 提供可等待对象
     /// <summary>
-    /// 提供可等待对象，
-    /// 如果该对象被等待两次，会引发异常
+    /// 提供可等待对象
     /// </summary>
     /// <returns></returns>
     public ExplicitAwaiter GetAwaiter()
@@ -59,5 +64,12 @@ public sealed class ExplicitTask
     /// </summary>
     private ExplicitAwaiter Awaiter { get; } = new();
     #endregion
+    #endregion
+    #region 静态构造函数
+    static ExplicitTask()
+    {
+        CompletedTask = new();
+        CompletedTask.Completed();
+    }
     #endregion
 }

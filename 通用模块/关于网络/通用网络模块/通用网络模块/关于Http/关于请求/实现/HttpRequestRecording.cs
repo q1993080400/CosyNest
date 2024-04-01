@@ -48,7 +48,7 @@ public sealed record HttpRequestRecording
     /// 如果这个值为<see langword="true"/>，
     /// 且响应不成功，则抛出异常
     /// </summary>
-    public bool ThrowIfNotSuccess { get; set; } = true;
+    public bool ThrowIfNotSuccess { get; set; }
     #endregion
     #endregion
     #region 构造函数
@@ -77,7 +77,7 @@ public sealed record HttpRequestRecording
     /// <param name="parameters">Uri的参数，如果它为<see langword="null"/>，
     /// 且<paramref name="uri"/>已经具有参数，则不会改变<paramref name="uri"/>的参数</param>
     [SetsRequiredMembers]
-    public HttpRequestRecording(string uri, (string Parameter, string Value)[]? parameters)
+    public HttpRequestRecording(string uri, (string Parameter, string? Value)[]? parameters)
     {
         var uriComplete = new UriComplete(uri);
         Uri = parameters.AnyAndNotNull() ?

@@ -1,6 +1,4 @@
 ﻿using System.IOFrancis;
-using System.Media.Drawing;
-using System.Office.Chart;
 using System.Office.Word.Realize;
 
 namespace System.Office.Word;
@@ -140,42 +138,6 @@ public interface IWordDocument : IFromIO
     /// <param name="indexActual">待转换的文本位置</param>
     /// <returns></returns>
     int ToIndexText(int indexActual);
-    #endregion
-    #endregion
-    #region 关于Office对象
-    #region 关于图表
-    #region 返回图表创建器
-    /// <summary>
-    /// 这个对象可以用来创建Word图表
-    /// </summary>
-    ICreateWordChart CreateChart { get; }
-    #endregion
-    #region 枚举所有图表
-    /// <summary>
-    /// 获取一个枚举文档中所有图表的枚举器
-    /// </summary>
-    IEnumerable<IWordParagraphObj<IOfficeChart>> Charts
-        => Paragraphs.OfType<IWordParagraphObj<IOfficeChart>>();
-    #endregion
-    #endregion
-    #region 关于图片
-    #region 创建图片
-    /// <summary>
-    /// 将指定的图片添加到文档指定位置
-    /// </summary>
-    /// <param name="image">待添加的图片</param>
-    /// <param name="pos">图片的位置，如果为<see langword="null"/>，
-    /// 代表应该添加到文档的末尾</param>
-    /// <returns>新添加的图片对象</returns>
-    IWordParagraphObj<IImage> CreateImage(IImage image, Index? pos = null);
-    #endregion
-    #region 枚举所有图片
-    /// <summary>
-    /// 获取一个枚举文档中所有图片的枚举器
-    /// </summary>
-    IEnumerable<IWordParagraphObj<IImage>> Images
-        => Paragraphs.OfType<IWordParagraphObj<IImage>>();
-    #endregion
     #endregion
     #endregion
     #region 事件

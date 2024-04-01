@@ -128,8 +128,8 @@ sealed class DocumentIText : FromIO, IPDFDocument
     #endregion
     #endregion
     #endregion
-    #region 对象的格式
-    protected override string FormatTemplate => "pdf";
+    #region 默认格式
+    protected override string DefaultFormat => "pdf";
     #endregion
     #region 有关保存和释放PDF
     #region 保存PDF
@@ -165,7 +165,7 @@ sealed class DocumentIText : FromIO, IPDFDocument
     /// <param name="path">指示PDF所在的文件路径，
     /// 如果它只存在于内存中，则为<see langword="null"/></param>
     public DocumentIText(Stream stream, PathText? path)
-        : base(path, IPDFDocument.FileTypePDF)
+        : base(path)
     {
         ReadField = new(new PdfReader(stream));
         InitializationWrite();

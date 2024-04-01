@@ -23,7 +23,7 @@ public interface IBrowser : IInstruct, IDisposable
     /// <summary>
     /// 获取所有选项卡
     /// </summary>
-    IEnumerable<ITab> Tabs { get; }
+    IReadOnlyList<ITab> Tabs { get; }
     #endregion
     #region 当前选项卡
     /// <summary>
@@ -50,15 +50,27 @@ public interface IBrowser : IInstruct, IDisposable
     /// </summary>
     IKeyBoard KeyboardEmulation { get; }
     #endregion
-    #region 执行脚本
+    #region 关于执行脚本
+    #region 无返回值
     /// <summary>
-    /// 执行JS脚本
+    /// 执行JS脚本，且不返回值
     /// </summary>
     /// <param name="script">要执行的脚本</param>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
-    ValueTask InvokingScript(string script, CancellationToken cancellationToken = default);
+    ValueTask InvokingScriptVoid(string script, CancellationToken cancellationToken = default);
     #endregion
+    #region 有返回值
+    /// <summary>
+    /// 执行JS脚本，
+    /// 并返回JS脚本的返回值
+    /// </summary>
+    /// <returns>JS脚本的返回值</returns>
+    /// <typeparam name="Obj">JS脚本的返回值类型</typeparam>
+    /// <inheritdoc cref="InvokingScriptVoid(string, CancellationToken)"/>
+    ValueTask<Obj> InvokingScript<Obj>(string script, CancellationToken cancellationToken = default);
+    #endregion
+    #endregion 
     #region 当前Uri
     /// <summary>
     /// 获取或设置当前选项卡Uri，

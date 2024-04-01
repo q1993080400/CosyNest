@@ -28,12 +28,12 @@ public sealed partial class VirtualizationSimple<Element> : ComponentBase
     /// <inheritdoc cref="Virtualization{Element}.Elements"/>
     [EditorRequired]
     [Parameter]
-    public IAsyncEnumerable<Element> Elements { get; set; }
+    public IAsyncEnumerable<Element>? Elements { get; set; }
     #endregion
     #region 每次渲染增加的数量
     /// <inheritdoc cref="Virtualization{Element}.Plus"/>
     [Parameter]
-    public int Plus { get; set; } = 5;
+    public int Plus { get; set; } = 15;
     #endregion
     #region 是否为倒序容器
     /// <inheritdoc cref="Virtualization{Element}.IsReverse"/>

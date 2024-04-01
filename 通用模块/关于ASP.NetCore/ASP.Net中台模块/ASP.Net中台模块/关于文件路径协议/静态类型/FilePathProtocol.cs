@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Microsoft.AspNetCore.Components;
+namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 本类型是一个文件路径协议，

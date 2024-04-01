@@ -18,9 +18,8 @@ sealed partial class TypeData : ITypeData
     /// 避免不必要的反射导致的性能损失
     /// </summary>
     internal static ICache<Type, TypeData> TypeCache { get; }
-    = CreatePerformance.CacheThreshold(
-        x => new TypeData(x),
-        100, TypeCache);
+        = CreatePerformance.MemoryCache<Type, TypeData>(
+        (key, _) => new TypeData(key));
     #endregion
     #region 被反射解析的类型
     public Type Type { get; }

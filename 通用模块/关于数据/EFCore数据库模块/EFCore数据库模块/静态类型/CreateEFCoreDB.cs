@@ -75,13 +75,13 @@ public static class CreateEFCoreDB
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="EFDataPipe(Func{Type,DbContextFrancis})"/>
-    public static IDataPipeDB Pipe(Func<Type, DbContextFrancis> createDbContext)
+    public static IDataPipe Pipe(Func<Type, DbContextFrancis> createDbContext)
         => new EFDataPipe(createDbContext);
     #endregion
     #region 指定类型，直接使用无参数构造函数
     /// <typeparam name="DB">数据库上下文的类型</typeparam>
     /// <inheritdoc cref="Pipe(Func{Type,DbContextFrancis})"/>
-    public static IDataPipeDB Pipe<DB>()
+    public static IDataPipe Pipe<DB>()
         where DB : DbContextFrancis, new()
         => Pipe(_ => new DB());
     #endregion

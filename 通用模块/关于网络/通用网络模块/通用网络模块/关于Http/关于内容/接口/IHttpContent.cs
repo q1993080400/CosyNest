@@ -51,34 +51,32 @@ public interface IHttpContent
       1.分块传输
       2.使用更加专业的FTP*/
     #endregion
-    #region 解释为文本
-    /// <summary>
-    /// 将Http内容解释为文本，并返回
-    /// </summary>
-    /// <returns></returns>
-    async Task<string> ToText()
-        => Encoding.UTF8.GetString(await Content.ReadComplete());
-    #endregion
     #region 解释为树形文档对象
     #region 泛型方法
     /// <summary>
-    /// 将Http内容解释为树形文档对象，并将其反序列化后返回
+    /// 将Http内容解释为树形文档对象，并将其反序列化后返回，
+    /// 注意：它支持直接转换<see cref="string"/>
     /// </summary>
     /// <typeparam name="Obj">反序列化的返回类型</typeparam>
     /// <param name="options">用于反序列化的选项，
     /// 如果为<see langword="null"/>，则使用默认选项</param>
     /// <returns></returns>
-    async Task<Obj?> ToObject<Obj>(JsonSerializerOptions? options = null)
+    async Task<Obj> ToObject<Obj>(JsonSerializerOptions? options = null)
     {
         var array = await Content.ReadComplete();
+        if (typeof(Obj) == typeof(string))
+        {
+            var text = Encoding.UTF8.GetString(array);
+            return text.To<Obj>();
+        }
 #if DEBUG
         var json = Encoding.UTF8.GetString(array);
 #endif
         if (options is { })
-            return JsonSerializer.Deserialize<Obj>(array, options);
+            return JsonSerializer.Deserialize<Obj>(array, options)!;
         var commonOptions = CreateDesign.JsonCommonOptions;
         commonOptions.PropertyNameCaseInsensitive = true;
-        return JsonSerializer.Deserialize<Obj>(array, commonOptions);
+        return JsonSerializer.Deserialize<Obj>(array, commonOptions)!;
     }
     #endregion
     #region 非泛型方法

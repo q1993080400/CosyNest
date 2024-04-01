@@ -92,18 +92,20 @@ public static class CreateDataObj
     /// </summary>
     /// <typeparam name="Log">错误日志的类型</typeparam>
     /// <param name="exception">错误日志所记录的错误</param>
+    /// <param name="state">传入的状态对象</param>
     /// <returns></returns>
-    public static Log LogException<Log>(Exception exception)
+    public static Log LogException<Log>(Exception? exception, object? state)
         where Log : LogException, new()
     {
         var ex = exception is { InnerException: { } e } ? e : exception;
-        var method = ex.TargetSite;
+        var method = ex?.TargetSite;
         var log = new Log()
         {
-            Message = ex.Message,
-            Stack = ex.StackTrace ?? "",
+            Message = ex?.Message ?? "",
+            AdditionalMessage = state?.ToString() ?? "",
+            Stack = ex?.StackTrace ?? "",
             Method = method is null ? "" : $"{method.DeclaringType}.{method.Name}",
-            Exception = ex.GetType().Name,
+            Exception = ex?.GetType().Name ?? "",
         };
         return log;
     }

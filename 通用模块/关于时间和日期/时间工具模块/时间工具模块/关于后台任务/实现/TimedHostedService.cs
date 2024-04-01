@@ -29,7 +29,7 @@ sealed class TimedHostedService(Timer timer, Func<CancellationToken, Task> expir
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            await Timer();
+            await Timer().Wait;
             if (stoppingToken.IsCancellationRequested)
                 break;
             await Expire(stoppingToken);

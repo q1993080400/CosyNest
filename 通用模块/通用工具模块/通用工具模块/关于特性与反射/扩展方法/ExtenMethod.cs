@@ -44,7 +44,6 @@ public static partial class ExtenReflection
     #endregion
     #endregion
     #region 关于方法与构造函数
-    #region 
     #region 获取方法所有参数类型
     /// <summary>
     /// 获取一个方法的所有参数类型
@@ -53,7 +52,6 @@ public static partial class ExtenReflection
     /// <returns></returns>
     public static Type[] GetParameterTypes(this MethodBase method)
         => method.GetParameters().Select(p => p.ParameterType).ToArray();
-    #endregion
     #endregion
     #region 关于方法
     #region 关于签名
@@ -74,18 +72,17 @@ public static partial class ExtenReflection
     /// 以确保相同的方法签名只会初始化一次
     /// </summary>
     private static ICache<MethodBase, ISignature> CacheSignature { get; }
-    = CreatePerformance.CacheThreshold(
-        x =>
+    = CreatePerformance.MemoryCache<MethodBase, ISignature>(
+        (key, _) =>
         {
-            var par = x.GetParameters().GetParType();
-            return x switch
+            var par = key.GetParameters().GetParType();
+            return key switch
             {
                 MethodInfo a => CreateReflection.MethodSignature(a.ReturnType, par),
-                ConstructorInfo a => CreateReflection.ConstructSignature(par),
-                _ => throw new Exception($"{x}不是方法也不是构造函数"),
+                ConstructorInfo => CreateReflection.ConstructSignature(par),
+                _ => throw new Exception($"{key}不是方法也不是构造函数"),
             };
-        },
-        500, CacheSignature);
+        });
     #endregion
     #region 返回MethodBase的签名
     /// <summary>

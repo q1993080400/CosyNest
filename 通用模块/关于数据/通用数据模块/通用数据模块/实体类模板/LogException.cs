@@ -14,6 +14,12 @@ public class LogException : Entity, IWithDate
     /// </summary>
     public string Message { get; set; } = "";
     #endregion
+    #region 额外信息
+    /// <summary>
+    /// 额外信息，它储存错误信息以外的信息
+    /// </summary>
+    public string AdditionalMessage { get; set; } = "";
+    #endregion
     #region 异常名称
     /// <summary>
     /// 发生的异常的名称

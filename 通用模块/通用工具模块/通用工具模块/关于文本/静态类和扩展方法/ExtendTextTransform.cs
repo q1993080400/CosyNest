@@ -83,19 +83,20 @@ public static partial class ExtendText
     public static string Trim(this string text, bool trimStart, params string[] trims)
     {
         using var enumerator = trims.To<IEnumerable<string>>().GetEnumerator();
+        var newText = text;
         while (enumerator.MoveNext())
         {
             var current = enumerator.Current;
             if (current.IsVoid())
                 continue;
-            if (trimStart ? text.StartsWith(current) : text.EndsWith(current))
+            if (trimStart ? newText.StartsWith(current) : newText.EndsWith(current))
             {
                 var len = current.Length;
-                text = text[trimStart ? len.. : ..^len];
+                newText = newText[trimStart ? len.. : ..^len];
                 enumerator.Reset();
             }
         }
-        return text;
+        return newText;
     }
     #endregion
     #endregion

@@ -99,31 +99,24 @@ public static class ExtenIO
     }
     #endregion
     #region 转换异步迭代器
-    #region 转换枚举字节集合的迭代器
     /// <summary>
     /// 创建一个<see cref="IBitRead"/>，
     /// 它通过迭代器读取数据
     /// </summary>
-    /// <inheritdoc cref="BitReadEnumerable{Byte}.BitReadEnumerable(IAsyncEnumerable{Byte}, string?, string?, IInstruct?)"/>
-    public static IBitRead ToBitRead(this IAsyncEnumerable<IEnumerable<byte>> bytes, string? format = null, string? describe = null, IInstruct? source = null)
-        => new BitReadEnumerable<IEnumerable<byte>>(bytes, format, describe, source);
-    #endregion
-    #region 转换枚举字节的迭代器
-    ///<inheritdoc cref="ToBitRead(IAsyncEnumerable{IEnumerable{byte}}, string, string?, IInstruct?)"/>
-    public static IBitRead ToBitRead(this IAsyncEnumerable<byte> bytes, string? format = null, string? describe = null, IInstruct? source = null)
-        => new BitReadEnumerable<byte>(bytes, format, describe, source);
-    #endregion
+    /// <inheritdoc cref="BitReadEnumerable(IAsyncEnumerable{byte[]}, string?, string?, IInstruct?)"/>
+    public static IBitRead ToBitRead(this IAsyncEnumerable<byte[]> bytes, string? format = null, string? describe = null, IInstruct? source = null)
+        => new BitReadEnumerable(bytes, format, describe, source);
     #endregion
     #region 转换同步迭代器
     #region 转换枚举字节集合的迭代器
-    ///<inheritdoc cref="ToBitRead(IAsyncEnumerable{IEnumerable{byte}}, string, string?, IInstruct?)"/>
-    public static IBitRead ToBitRead(this IEnumerable<IEnumerable<byte>> bytes, string? format = null, string? describe = null)
-        => new BitReadEnumerable<IEnumerable<byte>>(bytes.ToAsyncEnumerable(), format, describe, null);
+    ///<inheritdoc cref="ToBitRead(IAsyncEnumerable{byte[]}, string?, string?, IInstruct?)"/>
+    public static IBitRead ToBitRead(this IEnumerable<byte[]> bytes, string? format = null, string? describe = null)
+        => new BitReadEnumerable(bytes.ToAsyncEnumerable(), format, describe, null);
     #endregion
     #region 转换枚举字节的迭代器
-    /// <inheritdoc cref="ToBitRead(IAsyncEnumerable{IEnumerable{byte}}, string, string?, IInstruct?)"/>
-    public static IBitRead ToBitRead(this IEnumerable<byte> bytes, string? format = null, string? describe = null)
-        => new BitReadEnumerable<byte>(bytes.ToAsyncEnumerable(), format, describe, null);
+    /// <inheritdoc cref="ToBitRead(IAsyncEnumerable{byte[]}, string?, string?, IInstruct?)"/>
+    public static IBitRead ToBitRead(this byte[] bytes, string? format = null, string? describe = null)
+        => ToBitRead([bytes], format, describe);
     #endregion
     #endregion
     #endregion

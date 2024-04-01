@@ -1,6 +1,6 @@
 ﻿using System.IOFrancis.FileSystem;
 
-namespace Microsoft.AspNetCore.Components;
+namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 本类型封装了一个文件路径，
