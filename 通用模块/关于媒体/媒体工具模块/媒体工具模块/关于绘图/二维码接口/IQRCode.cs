@@ -1,6 +1,5 @@
 ﻿using System.IOFrancis;
 using System.IOFrancis.Bit;
-using System.IOFrancis.FileSystem;
 using System.MathFrancis.Plane;
 
 namespace System.Media.Drawing.Graphics;
@@ -32,7 +31,7 @@ public interface IQRCode
     #region 指定文件
     /// <param name="file">二维码所在的文件</param>
     /// <inheritdoc cref="Read(IBitRead)"/>
-    Task<string?> Read(PathText file)
+    Task<string?> Read(string file)
     {
         using var read = CreateIO.FileStream(file).ToBitPipe().Read;
         return Read(read);

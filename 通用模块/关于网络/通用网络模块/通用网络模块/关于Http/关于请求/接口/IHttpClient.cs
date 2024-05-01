@@ -56,7 +56,7 @@ public interface IHttpClient
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="Request(HttpRequestRecording, HttpRequestTransform?, CancellationToken)"/>
-    Task<IBitRead> RequestDownload(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default);
+    Task<IBitRead> RequestBitRead(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default);
     #endregion
     #endregion
     #region 发起Http请求（指定Uri）
@@ -68,10 +68,10 @@ public interface IHttpClient
         => Request(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region 返回IBitRead
-    /// <inheritdoc cref="RequestDownload(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
+    /// <inheritdoc cref="RequestBitRead(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
     /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],HttpRequestTransform?,CancellationToken)"/>
-    Task<IBitRead> RequestDownload(string uri, (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
-        => RequestDownload(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
+    Task<IBitRead> RequestBitRead(string uri, (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
+        => RequestBitRead(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
     #endregion
     #region Post请求
     /// <summary>

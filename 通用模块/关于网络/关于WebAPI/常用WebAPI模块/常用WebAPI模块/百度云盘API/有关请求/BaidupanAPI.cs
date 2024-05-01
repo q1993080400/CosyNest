@@ -91,7 +91,7 @@ public sealed class BaidupanAPI(string accessToken, string refreshToken,
                     ("access_token",accessToken),
                     ("path",mediumPath),
                     ("type","M3U8_HLS_MP3_128")
-                })
+                }!)
             },
             Header = new()
             {
@@ -103,7 +103,7 @@ public sealed class BaidupanAPI(string accessToken, string refreshToken,
         while (true)
         {
             var response = await HttpClientProvide().Request(request);
-            var text = await response.Content.ToText();
+            var text = await response.Content.ToObject<string>();
             #region 抛出异常的本地函数
             string Fun()
                 => throw new APIException($"""

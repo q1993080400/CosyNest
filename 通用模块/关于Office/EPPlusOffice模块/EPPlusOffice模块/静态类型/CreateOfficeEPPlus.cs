@@ -26,7 +26,7 @@ public static class CreateOfficeEPPlus
     /// <param name="path">Excel工作簿的路径，
     /// 如果为<see langword="null"/>，则不从文件中加载，而是创建一个新的工作簿</param>
     /// <returns></returns>
-    public static IExcelBook ExcelBook(PathText? path = null)
+    public static IExcelBook ExcelBook(string? path = null)
         => new ExcelBookEPPlus(path);
     #endregion
     #region 使用流

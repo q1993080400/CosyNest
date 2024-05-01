@@ -1,6 +1,4 @@
-﻿using System.Design;
-using System.Linq.Expressions;
-using System.Text.Json.Serialization;
+﻿using System.Linq.Expressions;
 
 namespace Microsoft.AspNetCore.SignalR.Client;
 
@@ -83,20 +81,6 @@ public static class ExtendSignalR
     #endregion
     #endregion
     #endregion
-    #region 添加常用Json支持
-    /// <summary>
-    /// 为SignalR中心或连接添加常用Json序列化支持
-    /// </summary>
-    /// <param name="options">一个用于配置SignalR中心或连接的对象</param>
-    /// <returns></returns>
-    public static JsonHubProtocolOptions AddFormatterJson(this JsonHubProtocolOptions options)
-    {
-        var serializerOptions = options.PayloadSerializerOptions;
-        serializerOptions.Converters.Add(CreateDesign.JsonCommon);
-        serializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        return options;
-    }
-    #endregion
     #region 按接口注册客户端方法
     /// <summary>
     /// 将一个接口中的所有方法注册为Hub连接的客户端方法
@@ -114,8 +98,15 @@ public static class ExtendSignalR
                 async (parameter, _) =>
             {
                 var task = method.Invoke(instance, parameter);
-                if (task is Task t)
-                    await t;
+                switch (task)
+                {
+                    case Task t:
+                        await t;
+                        break;
+                    case ValueTask valueTask:
+                        await valueTask;
+                        break;
+                }
             }, new());
         }
     }

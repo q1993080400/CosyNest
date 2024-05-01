@@ -11,6 +11,12 @@ partial class TypeData
     public IEnumerable<FieldInfo> Fields
         => FieldField ??= InitialEnum<FieldInfo>();
     #endregion
+    #region 枚举所有常量
+    private IEnumerable<FieldInfo>? ConstantField;
+
+    public IEnumerable<FieldInfo> Constant
+        => ConstantField ??= Fields.Where(x => x.IsLiteral).ToArray();
+    #endregion
     #region 按名称索引字段
     private ILookup<string, FieldInfo>? FieldDictionaryField;
 

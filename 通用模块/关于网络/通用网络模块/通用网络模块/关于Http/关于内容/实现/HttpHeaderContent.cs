@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Immutable;
+using System.Net.Http.Headers;
 using System.NetFrancis.Http.Realize;
 
 namespace System.NetFrancis.Http;
@@ -20,26 +21,31 @@ public sealed record HttpHeaderContent : HttpHeader, IHttpHeaderContent
     public MediaTypeHeaderValue? ContentType
     {
         get => GetHeader("Content-Type", x => MediaTypeHeaderValue.Parse(x.Join(";")));
-        init => SetHeader("Content-Type", value, x => [.. x.ToString().Split(";")]);
+        init => SetHeader("Content-Type", value, x => [x.ToString()]);
     }
+    #endregion
+    #region 抽象成员实现
+    #region 改变标头
+    public override HttpHeaderContent With
+        (Func<ImmutableDictionary<string, IEnumerable<string>>, ImmutableDictionary<string, IEnumerable<string>>> change)
+        => new(change(HeadersImmutable));
+    #endregion
     #endregion
     #region 构造函数
     #region 无参数构造函数
     public HttpHeaderContent()
+        : this([])
     {
 
     }
     #endregion
-    #region 复制HttpContentHeaders
-    /// <summary>
-    /// 复制一个<see cref="HttpContentHeaders"/>的所有属性，并初始化对象
-    /// </summary>
-    /// <param name="headers">待复制的内容标头</param>
-    internal HttpHeaderContent(HttpContentHeaders headers)
+    #region 传入标头集合
+    /// <inheritdoc cref="HttpHeader(IEnumerable{KeyValuePair{string, IEnumerable{string}}})"/>
+    public HttpHeaderContent(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
         : base(headers)
     {
 
     }
-    #endregion
+    #endregion 
     #endregion
 }

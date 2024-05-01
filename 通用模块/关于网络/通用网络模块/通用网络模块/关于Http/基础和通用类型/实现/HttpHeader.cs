@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Immutable;
+using System.Net.Http.Headers;
 
 namespace System.NetFrancis.Http.Realize;
 
@@ -9,18 +10,17 @@ public abstract record HttpHeader : IHttpHeader
 {
     #region 公开成员
     #region 标头属性
-    #region 不可变字典
-    IReadOnlyDictionary<string, IEnumerable<string>> IHttpHeader.Headers => Headers;
-    #endregion
-    #region 可变字典
-    /// <summary>
-    /// 获取标头字典，它是可变的
-    /// </summary>
-    public Dictionary<string, IEnumerable<string>> Headers { get; } = [];
-    #endregion
+    public IReadOnlyDictionary<string, IEnumerable<string>> Headers => HeadersImmutable;
     #endregion
     #endregion
     #region 内部成员
+    #region 标头字典
+    /// <summary>
+    /// 获取标头字典
+    /// </summary>
+    protected ImmutableDictionary<string, IEnumerable<string>> HeadersImmutable { get; set; }
+        = ImmutableDictionary<string, IEnumerable<string>>.Empty;
+    #endregion
     #region 获取标头
     /// <summary>
     /// 获取标头的模板方法，如果键存在，
@@ -32,7 +32,7 @@ public abstract record HttpHeader : IHttpHeader
     /// <returns></returns>
     protected Header? GetHeader<Header>(string key, Func<IEnumerable<string>, Header> ifExist)
         where Header : class
-        => Headers.TryGetValue(key).Value is { } v ?
+        => HeadersImmutable.TryGetValue(key).Value is { } v ?
         ifExist(v) : null;
     #endregion
     #region 设置标头
@@ -45,24 +45,28 @@ public abstract record HttpHeader : IHttpHeader
     /// <inheritdoc cref="GetHeader{Header}(string, Func{IEnumerable{string}, Header})"/>
     protected void SetHeader<Header>(string key, Header? value, Func<Header, IEnumerable<string>> convertValue)
     {
-        if (value is null)
-            Headers.Remove(key);
-        else
-            Headers[key] = convertValue(value);
+        HeadersImmutable = value is null ?
+            HeadersImmutable.Remove(key) :
+            HeadersImmutable.SetItem(key, convertValue(value));
     }
+    #endregion
+    #endregion
+    #region 抽象成员
+    #region 改变标头
+    /// <summary>
+    /// 改变标头属性，并返回一个新的标头
+    /// </summary>
+    /// <param name="change">这个委托传入旧的标头，返回新的标头</param>
+    /// <returns></returns>
+    public abstract HttpHeader With
+        (Func<ImmutableDictionary<string, IEnumerable<string>>, ImmutableDictionary<string, IEnumerable<string>>> change);
     #endregion
     #endregion
     #region 重写的ToString方法
     public sealed override string ToString()
-        => Headers.Join(x => $"{x.Key}:{x.Value.Join(",")}", Environment.NewLine);
+        => HeadersImmutable.Join(x => $"{x.Key}:{x.Value.Join(",")}", Environment.NewLine);
     #endregion
     #region 构造函数
-    #region 无参数构造函数
-    public HttpHeader()
-    {
-
-    }
-    #endregion
     #region 传入标头集合
     /// <summary>
     /// 使用指定的标头集合初始化对象，
@@ -71,17 +75,10 @@ public abstract record HttpHeader : IHttpHeader
     /// <param name="headers">使用指定的自定义标头集合初始化对象</param>
     public HttpHeader(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
     {
-        var h = headers.Select(x => (x.Key, x.Value.Where(x => !x.IsVoid()).ToArray())).
-            Where(x => (x.Key.IsVoid(), x.Item2.Length) is (false, > 0)).ToArray();
-        foreach (var (k, v) in h)
-        {
-            if (Headers.TryGetValue(k, out var value))
-            {
-                Headers[k] = value.Concat(v).ToArray();
-            }
-            else
-                Headers[k] = v;
-        }
+        var h = headers.Select(x => new KeyValuePair<string, IEnumerable<string>>
+        (x.Key, x.Value.Where(x => !x.IsVoid()).ToArray())).
+            Where(x => (x.Key.IsVoid(), x.Value.Count()) is (false, > 0)).ToArray();
+        HeadersImmutable = ImmutableDictionary<string, IEnumerable<string>>.Empty.AddRange(h);
     }
     #endregion
     #endregion

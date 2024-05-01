@@ -1,5 +1,4 @@
 ﻿using System.DataFrancis;
-using System.DataFrancis.EntityDescribe;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -11,18 +10,6 @@ namespace System;
 /// </summary>
 public static class ExtenData
 {
-    #region 为数据管道添加验证功能
-    /// <summary>
-    /// 为数据管道增加验证功能，
-    /// 并返回支持验证的数据管道
-    /// </summary>
-    /// <param name="pipe">原数据管道</param>
-    /// <param name="verify">用来验证的委托，
-    /// 如果为<see langword="null"/>，则使用一个默认方法</param>
-    /// <returns></returns>
-    public static IDataPipe UseVerify(this IDataPipe pipe, DataVerify? verify = null)
-        => new DataPipeVerify(pipe, verify ??= CreateDataObj.DataVerifyDefault());
-    #endregion
     #region 关于依赖注入
     #region 注入一个简易的日志记录方法
     /// <summary>
@@ -38,7 +25,7 @@ public static class ExtenData
     {
         loggingBuilder.AddLoggerFunction(createLog, async (log, serviceProvider) =>
         {
-            var pipe = serviceProvider.GetRequiredService<IDataPipe>();
+            using var pipe = serviceProvider.RequiredDataPipe();
             await pipe.AddOrUpdate([log]);
         });
         loggingBuilder.SetMinimumLevel(LogLevel.Warning);
@@ -49,12 +36,13 @@ public static class ExtenData
     #region 关于请求服务
     #region 请求IDataPipe
     /// <summary>
-    /// 向服务容器请求一个<see cref="IDataPipe"/>
+    /// 向服务容器请求一个<see cref="IDataContextFactory{Context}"/>，
+    /// 并通过它创建一个<see cref="IDataPipe"/>返回
     /// </summary>
     /// <param name="serviceProvider">要请求的服务容器</param>
     /// <returns></returns>
-    public static IDataPipe RequestDataPipe(this IServiceProvider serviceProvider)
-        => serviceProvider.GetRequiredService<IDataPipe>();
+    public static IDataPipe RequiredDataPipe(this IServiceProvider serviceProvider)
+        => serviceProvider.GetRequiredService<IDataContextFactory<IDataPipe>>().CreateContext();
     #endregion
     #endregion
 }

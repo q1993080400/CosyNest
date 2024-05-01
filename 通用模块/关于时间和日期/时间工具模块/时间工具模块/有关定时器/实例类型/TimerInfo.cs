@@ -14,8 +14,9 @@ public sealed record TimerInfo
     #endregion
     #region 定时器下一次触发的日期
     /// <summary>
-    /// 获取定时器下一次触发的日期
+    /// 获取定时器下一次触发的日期，
+    /// 如果不会有下一次，则返回<see langword="null"/>
     /// </summary>
-    public required DateTimeOffset Next { get; init; }
+    public required DateTimeOffset? Next { get; init; }
     #endregion
 }

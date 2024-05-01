@@ -23,8 +23,8 @@ public static class ExtendNet
     /// <param name="httpClient">待包装的<see cref="HttpClient"/></param>
     /// <returns></returns>
     /// <inheritdoc cref="HttpClientRealize(HttpClient, HttpRequestTransform?)"/>
-    public static IHttpClient ToHttpClient(this HttpClient httpClient, HttpRequestTransform? requestTransform = null)
-        => new HttpClientRealize(httpClient, requestTransform);
+    public static IHttpClient ToHttpClient(this HttpClient httpClient, HttpRequestTransform? defaultTransform = null)
+        => new HttpClientRealize(httpClient, defaultTransform);
     #endregion
     #region 读取IHttpResponse的内容，并将其转换为更高层的类型
     /// <summary>

@@ -11,7 +11,7 @@ namespace System.IOFrancis.Bit;
 /// 使用指定的路径创建临时文件
 /// </remarks>
 /// <param name="path">临时文件的路径，如果它不存在，会引发异常</param>
-sealed class BitReadTemporaryFile(PathText path) : AutoRelease, IBitRead
+sealed class BitReadTemporaryFile(string path) : AutoRelease, IBitRead
 {
     #region 公开成员
     #region 释放对象

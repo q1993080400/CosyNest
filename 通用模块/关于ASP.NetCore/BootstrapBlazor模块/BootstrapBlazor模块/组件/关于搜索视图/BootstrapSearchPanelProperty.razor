@@ -21,6 +21,10 @@
         2 => "bootstrapSearchPanelPropertyContainerBig",
         _ => "bootstrapSearchPanelPropertyContainerMedium"
     };
+    #region 当按下回车键时触发的委托
+    Func<T, Task> OnEnter<T>()
+    => async (_) => await RenderPropertyInfo.Submit();
+    #endregion
 }
 <div class="@css">
     @switch (conditionGroup.FilterObjectType)
@@ -28,11 +32,11 @@
         case FilterObjectType.Text:
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <BootstrapInput @bind-Value=@(state.Bind<string>(first).Value) />
+                <BootstrapInput @bind-Value=@(state.Bind<string>(first).Value) OnEnterAsync="@(OnEnter<string?>())" />
                 @if (second is { })
                 {
                     <BootstrapInputGroupLabel DisplayText="至" />
-                    <BootstrapInput @bind-Value=@(state.Bind<string>(second).Value) />
+                    <BootstrapInput @bind-Value=@(state.Bind<string>(second).Value) OnEnterAsync="@(OnEnter<string?>())" />
                 }
                 @if (sort is { })
                 {
@@ -43,11 +47,11 @@
         case FilterObjectType.Num:
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(first).Value) />
+                <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(first).Value) OnEnterAsync="@(OnEnter<double?>())" />
                 @if (second is { })
                 {
                     <BootstrapInputGroupLabel DisplayText="至" />
-                    <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(second).Value) />
+                    <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(second).Value) OnEnterAsync="@(OnEnter<double?>())" />
                 }
                 @if (sort is { })
                 {
@@ -76,7 +80,7 @@
                 <BootstrapInputGroupLabel DisplayText="@describe" />
                 <Select TValue="string" OnValueChanged="@(x=>OnEnumChanged(x,first))" Value="@(bindEnum.Value?.ToString())">
                     <Options>
-                        <SelectOption Text="未选择" Value="@null"/>
+                        <SelectOption Text="未选择" Value="@null" />
                         @foreach (var item in first.EnumItem)
                         {
                             <SelectOption Text="@item.Describe" Value="@item.Value.ToString()" />

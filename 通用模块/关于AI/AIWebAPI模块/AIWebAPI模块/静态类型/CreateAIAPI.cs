@@ -29,4 +29,15 @@ public static class CreateAIAPI
         => new AIChatBaiDu(appKey, secretKey, httpClientProvide);
     #endregion
     #endregion
+    #region 创建OCR接口
+    #region 阿里接口
+    /// <summary>
+    /// 创建一个由阿里API实现的<see cref="IOCR"/>接口
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="OCRAliYun.OCRAliYun(string, Func{IHttpClient}?)"/>
+    public static IOCR OCRAliYun(string appCode, Func<IHttpClient>? httpClientProvide = null)
+        => new OCRAliYun(appCode, httpClientProvide);
+    #endregion
+    #endregion
 }

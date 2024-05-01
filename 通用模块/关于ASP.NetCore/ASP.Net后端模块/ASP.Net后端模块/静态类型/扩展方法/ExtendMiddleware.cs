@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.Design;
+﻿using System.Design;
 using System.NetFrancis;
 using System.NetFrancis.Http;
 
@@ -125,7 +124,7 @@ public static partial class ExtendWebApi
         where Log : class
         => application.Use(async (http, follow) =>
         {
-            var pipe = http.RequestServices.GetRequiredService<IDataPipe>();
+            using var pipe = http.RequestServices.RequiredDataPipe();
             var log = createLog(http);
             await pipe.AddOrUpdate([log]);
             await follow();

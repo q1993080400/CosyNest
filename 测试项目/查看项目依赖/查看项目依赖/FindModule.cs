@@ -20,9 +20,9 @@ public static class FindModule
     public static Module[] GetModules(string path)
     {
         var moduleDictionary = new Dictionary<string, Module>();
-        var xmlDictionary = CreateIO.Directory(path).SonAll.OfType<IFile>().
-            Where(x => x.NameExtension is "csproj").
-            Select(x =>
+        var files = CreateIO.Directory(path).SonAll.OfType<IFile>().
+            Where(x => x.NameExtension is "csproj");
+        var xmlDictionary = files.Select(x =>
             {
                 var xml = XElement.Load(x.Path);
                 return (x.NameSimple, xml);

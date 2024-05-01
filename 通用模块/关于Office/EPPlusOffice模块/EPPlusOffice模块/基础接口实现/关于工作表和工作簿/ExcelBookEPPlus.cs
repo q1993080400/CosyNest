@@ -91,7 +91,7 @@ sealed class ExcelBookEPPlus : ExcelBook, IExcelBook
     /// </summary>
     /// <param name="path">Excel工作簿的路径，
     /// 如果为<see langword="null"/>，则不从文件中加载，而是创建一个新的工作簿</param>
-    public ExcelBookEPPlus(PathText? path)
+    public ExcelBookEPPlus(string? path)
         : base(path)
     {
         if (path is null || !File.Exists(path))

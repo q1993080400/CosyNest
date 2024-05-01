@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis;
-using System.IOFrancis.FileSystem;
 using System.Performance;
 
 namespace System.Office.Word.Realize;
@@ -13,7 +12,7 @@ namespace System.Office.Word.Realize;
 /// </remarks>
 /// <param name="path">文档所在的文件路径，
 /// 如果文档不是通过文件创建的，则为<see langword="null"/></param>
-public abstract class WordDocument(PathText? path) : FromIO(path), IWordDocument
+public abstract class WordDocument(string? path) : FromIO(path), IWordDocument
 {
     #region 返回IWordDocument接口
     /// <summary>

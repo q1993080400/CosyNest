@@ -1,6 +1,6 @@
-﻿using BootstrapBlazor.Components;
+﻿using System.NetFrancis.Api;
 
-using Microsoft.AspNetCore;
+using BootstrapBlazor.Components;
 
 namespace System;
 

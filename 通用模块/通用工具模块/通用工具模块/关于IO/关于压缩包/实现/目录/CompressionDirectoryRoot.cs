@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.IOFrancis.FileSystem;
 using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.Compressed;
@@ -24,7 +23,7 @@ sealed class CompressionDirectoryRoot(CompressedPackage package) : CompressionDi
         => this.To<ICompressionItem>().Ancestors.Delete();
     #endregion
     #region 解压到指定目录
-    public override Task Decompress(PathText path, bool cover = false)
+    public override Task Decompress(string path, bool cover = false)
     {
         Zip.ExtractToDirectory(path, cover);
         return Task.CompletedTask;

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Design.Direct;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace System.Design;
@@ -66,7 +67,8 @@ sealed class Notes : IDirect
         => GetEnumerator();
     #endregion
     #region 返回Json字符串
-    public string Json => throw new NotImplementedException();
+    public string Json
+        => JsonSerializer.Serialize<IReadOnlyDictionary<string, object?>>(this);
     #endregion
     #endregion
     #region 私有成员

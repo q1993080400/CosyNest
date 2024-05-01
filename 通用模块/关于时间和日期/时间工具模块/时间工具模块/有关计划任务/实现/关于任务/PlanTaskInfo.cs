@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-
-namespace System.TimeFrancis.Plan;
+﻿namespace System.TimeFrancis.Plan;
 
 /// <summary>
 /// 这个类型是<see cref="IPlanTaskInfo"/>的实现，
@@ -27,14 +25,14 @@ sealed record PlanTaskInfo : IPlanTaskInfo
     public bool CanAwaken { get; }
     #endregion
     #region 执行计划任务时的操作
-    IEnumerable<(PathText Path, string? Parameters)> IPlanTaskInfo.Start
+    IEnumerable<(string Path, string? Parameters)> IPlanTaskInfo.Start
         => Start;
 
     /// <summary>
     /// 这个集合枚举执行计划任务时，
     /// 要启动的进程路径，以及传递给进程的参数
     /// </summary>
-    public IList<(PathText Path, string? Parameters)> Start { get; }
+    public IList<(string Path, string? Parameters)> Start { get; }
     #endregion
     #region 构造函数
     #region 直接创建
@@ -45,7 +43,7 @@ sealed record PlanTaskInfo : IPlanTaskInfo
     /// <param name="triggers">计划任务的触发器</param>
     /// <param name="start">这个集合枚举执行计划任务时，
     /// 要启动的进程路径，以及传递给进程的参数</param>
-    public PlanTaskInfo(string name, IEnumerable<IPlanTrigger> triggers, IEnumerable<(PathText Path, string? Parameters)> start)
+    public PlanTaskInfo(string name, IEnumerable<IPlanTrigger> triggers, IEnumerable<(string Path, string? Parameters)> start)
     {
         Name = name;
         Triggers = triggers.ToList();
@@ -60,8 +58,8 @@ sealed record PlanTaskInfo : IPlanTaskInfo
     /// <param name="trigger">计划任务的触发器</param>
     /// <param name="startPath">执行计划任务时要启动的进程路径</param>
     /// <param name="startParameters">执行计划任务时传递给待启动进程的参数</param>
-    public PlanTaskInfo(string name, IPlanTrigger trigger, PathText startPath, string? startParameters = null)
-        : this(name, new[] { trigger }, new[] { (startPath, startParameters) })
+    public PlanTaskInfo(string name, IPlanTrigger trigger, string startPath, string? startParameters = null)
+        : this(name, [trigger], [(startPath, startParameters)])
     {
 
     }

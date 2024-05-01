@@ -32,6 +32,5 @@ sealed class JSLocation(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSLoc
     #region 刷新页面
     public ValueTask Reload(CancellationToken cancellation = default)
         => JSRuntime.InvokeVoidAsync("location.reload", cancellation);
-
     #endregion
 }

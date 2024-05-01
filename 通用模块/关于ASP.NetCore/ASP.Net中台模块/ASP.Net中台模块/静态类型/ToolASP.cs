@@ -2,6 +2,7 @@
 using System.DataFrancis.EntityDescribe;
 using System.IOFrancis;
 using System.IOFrancis.FileSystem;
+using System.NetFrancis.Api;
 
 namespace Microsoft.AspNetCore;
 

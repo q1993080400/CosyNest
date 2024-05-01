@@ -1,4 +1,5 @@
-﻿using System.NetFrancis.Http.Realize;
+﻿using System.Collections.Immutable;
+using System.NetFrancis.Http.Realize;
 
 namespace System.NetFrancis.Http;
 
@@ -14,6 +15,13 @@ sealed record HttpHeaderResponse : HttpHeader, IHttpHeaderResponse
         init => SetHeader("Set-Cookie", value, v => v);
     }
     #endregion
+    #region 抽象成员实现
+    #region 改变标头
+    public override HttpHeaderResponse With
+        (Func<ImmutableDictionary<string, IEnumerable<string>>, ImmutableDictionary<string, IEnumerable<string>>> change)
+        => new(change(HeadersImmutable));
+    #endregion
+    #endregion 
     #region 构造函数
     /// <inheritdoc cref="HttpHeader(IEnumerable{KeyValuePair{string, IEnumerable{string}}})"/>
     public HttpHeaderResponse(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)

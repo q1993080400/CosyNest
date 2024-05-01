@@ -15,16 +15,9 @@ public sealed record HttpContentRecording : IHttpContent
     /// <summary>
     /// 返回Http内容的标头
     /// </summary>
-    public HttpHeaderContent Header { get; init; }
+    public required HttpHeaderContent Header { get; init; }
     #endregion
     #region Http内容
-    public IBitRead Content { get; init; }
-    #endregion
-    #region 构造函数
-    public HttpContentRecording()
-    {
-        Content = Array.Empty<byte>().ToBitRead();
-        Header = new();
-    }
+    public required IBitRead Content { get; init; }
     #endregion
 }

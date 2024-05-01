@@ -58,8 +58,8 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     #region 有返回值
     public ValueTask<Obj> InvokingScript<Obj>(string script, CancellationToken cancellationToken = default)
     {
-        var obj = WebDriver.ExecuteScript(script).To<Obj>();
-        return ValueTask.FromResult(obj);
+        var obj = WebDriver.ExecuteScript(script);
+        return ValueTask.FromResult(obj.To<Obj>());
     }
     #endregion
     #endregion 

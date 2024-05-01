@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>Microsoft.AspNetCore</RootNamespace>
+		<AssemblyName>DingDing.Shared</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\ASP.Net中台模块\ASP.Net中台模块\ASP.Net中台模块.csproj" />
+	</ItemGroup>
+
+</Project>

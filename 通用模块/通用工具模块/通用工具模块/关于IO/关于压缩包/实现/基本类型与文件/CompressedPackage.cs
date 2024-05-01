@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.IOFrancis.FileSystem;
 using System.MathFrancis.Tree;
 using System.Text;
 
@@ -84,7 +83,7 @@ sealed class CompressedPackage : FromIO, ICompressedPackage
     /// </summary>
     /// <param name="path">压缩包所在的路径，
     /// 如果不存在，则创建一个新的压缩包</param>
-    public CompressedPackage(PathText path)
+    public CompressedPackage(string path)
         : base(path)
     {
         Stream = CreateIO.FileStream(path);

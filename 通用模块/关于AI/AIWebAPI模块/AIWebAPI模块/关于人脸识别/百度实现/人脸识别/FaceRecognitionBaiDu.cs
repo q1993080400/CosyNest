@@ -33,7 +33,7 @@ sealed class FaceRecognitionBaiDu(string apiKey, string secretKey, Func<IHttpCli
         Check(response);
         return new FaceRecognitionInfo()
         {
-            FaceCount = response.GetValueRecursion<object>("result.face_num").To<int>(false)
+            FaceCount = response.GetValue<object>("result.face_num").To<int>(false)
         };
     }
     #endregion

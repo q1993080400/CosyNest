@@ -19,7 +19,7 @@ public interface IAsyncDictionary<Key, Value> : IAsyncCollection<KeyValuePair<Ke
     /// <param name="cancellation">用于取消异步任务的令牌</param>
     async IAsyncEnumerable<Key> KeysAsync([EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        foreach (var item in await this.ToListAsync())
+        foreach (var item in await this.ToListAsync(cancellation))
         {
             yield return item.Key;
         }
@@ -32,7 +32,7 @@ public interface IAsyncDictionary<Key, Value> : IAsyncCollection<KeyValuePair<Ke
     /// <param name="cancellation">用于取消异步任务的令牌</param>
     async IAsyncEnumerable<Value> ValuesAsync([EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        foreach (var item in await this.ToListAsync())
+        foreach (var item in await this.ToListAsync(cancellation))
         {
             yield return item.Value;
         }

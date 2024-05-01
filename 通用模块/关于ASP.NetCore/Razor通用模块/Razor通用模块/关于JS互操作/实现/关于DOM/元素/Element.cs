@@ -21,8 +21,12 @@ sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime)
     public string? ID { get; } = id;
     #endregion
     #region 触发鼠标点击事件
-    public ValueTask Click(CancellationToken cancellationToken)
-        => JSRuntime.InvokeCodeVoidAsync($"{Prefix}.click()", cancellation: cancellationToken);
+    public async ValueTask Click(int interval = 0, CancellationToken cancellationToken = default)
+    {
+        await JSRuntime.InvokeCodeVoidAsync($"{Prefix}.click()", cancellation: cancellationToken);
+        if (interval > 0)
+            await Task.Delay(interval, cancellationToken);
+    }
     #endregion
     #region 关于元素的位置和大小
     #region 获取元素的完全高度
@@ -116,12 +120,12 @@ sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime)
 
     public string Text => throw new NotImplementedException();
 
-    public IEnumerable<Element1> Find<Element1>(Expression<Func<Element1, bool>> where, bool ignoreException) where Element1 : IElementBase
+    public IReadOnlyList<Element1> Find<Element1>(Expression<Func<Element1, bool>> where, bool ignoreException) where Element1 : IElementBase
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Element1> FindFromCss<Element1>(string cssSelect, bool ignoreException) where Element1 : IElementBase
+    public IReadOnlyList<Element1> FindFromCss<Element1>(string cssSelect, bool ignoreException) where Element1 : IElementBase
     {
         throw new NotImplementedException();
     }

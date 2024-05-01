@@ -46,9 +46,11 @@ public interface IElementBase
     /// <summary>
     /// 触发这个元素的鼠标点击事件
     /// </summary>
-    /// <returns></returns>
+    /// <param name="interval">点击后等待的时间，以毫秒为单位，
+    /// 如果为0，则不等待</param>
     /// <param name="cancellationToken">用于取消异步操作的令牌</param>
-    ValueTask Click(CancellationToken cancellationToken = default);
+    /// <returns></returns>
+    ValueTask Click(int interval = 0, CancellationToken cancellationToken = default);
     #endregion
     #region 查找后代元素
     #region 根据谓词
@@ -60,7 +62,7 @@ public interface IElementBase
     /// 则在超时的时候，不引发异常，而是返回一个空数组</param>
     /// <typeparam name="Element">浏览器元素的具体类型</typeparam>
     /// <returns></returns>
-    IEnumerable<Element> Find<Element>(Expression<Func<Element, bool>> where, bool ignoreException = false)
+    IReadOnlyList<Element> Find<Element>(Expression<Func<Element, bool>> where, bool ignoreException = false)
         where Element : IElementBase;
     #endregion
     #region 根据CSS选择器
@@ -68,12 +70,12 @@ public interface IElementBase
     /// <param name="cssSelect">用来匹配后代元素的CSS选择器文本</param>
     /// <returns></returns>
     /// <inheritdoc cref="Find{Element}(Expression{Func{Element, bool}},bool)"/>
-    IEnumerable<Element> FindFromCss<Element>(string cssSelect, bool ignoreException = false)
+    IReadOnlyList<Element> FindFromCss<Element>(string cssSelect, bool ignoreException = false)
         where Element : IElementBase;
     #endregion
     #region 非泛型方法
     /// <inheritdoc cref="FindFromCss{Element}(string, bool)"/>
-    IEnumerable<IElementBrowser> FindFromCss(string cssSelect, bool ignoreException = false)
+    IReadOnlyList<IElementBrowser> FindFromCss(string cssSelect, bool ignoreException = false)
         => FindFromCss<IElementBrowser>(cssSelect, ignoreException);
     #endregion
     #endregion

@@ -9,16 +9,14 @@ namespace System;
 /// </summary>
 public static class ExtenTimer
 {
-    #region 为服务容器添加后台任务
+    #region 返回一个限制次数的定时器
     /// <summary>
-    /// 为服务容器添加一个后台任务，
-    /// 它按照指定的时间间隔触发，并执行委托
+    /// 返回一个新的定时器，
+    /// 当原始定时器触发一定次数后，自动停止它
     /// </summary>
-    /// <param name="services">待注册的服务容器</param>
-    /// <param name="expire">定时器到期后触发的委托</param>
     /// <returns></returns>
-    /// <inheritdoc cref="TimedHostedService(Timer, Func{CancellationToken, Task})"/>
-    public static IServiceCollection AddBackgroundService(this IServiceCollection services, Timer timer, Func<IServiceProvider, CancellationToken, Task> expire)
-        => services.AddHostedService(x => new TimedHostedService(timer, y => expire(x, y)));
+    /// <inheritdoc cref="TimerLimitFrequency(Timer, int)"/>
+    public static Timer LimitFrequency(this Timer timer, int maxCount)
+        => new TimerLimitFrequency(timer, maxCount).Timer;
     #endregion
 }

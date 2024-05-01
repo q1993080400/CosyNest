@@ -24,7 +24,7 @@ public interface IBitRead : IBitPipeBase
     /// 则自动为其加上扩展名</param>
     /// <param name="cancellation">用于取消异步任务的令牌</param>
     /// <returns></returns>
-    async Task SaveToFile(PathText path, bool autoName = true, CancellationToken cancellation = default)
+    async Task SaveToFile(string path, bool autoName = true, CancellationToken cancellation = default)
     {
         if (autoName && Format is { } f && !Path.HasExtension(path))        //如果具有扩展名，而且路径忘记加上扩展名
             path = ToolPath.RefactoringPath(path, newExtension: _ => f);         //则将扩展名重构

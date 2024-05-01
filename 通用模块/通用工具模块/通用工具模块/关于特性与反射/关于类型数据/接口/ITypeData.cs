@@ -92,6 +92,12 @@ public interface ITypeData
     /// </summary>
     IEnumerable<FieldInfo> Fields { get; }
     #endregion
+    #region 枚举所有常量
+    /// <summary>
+    /// 获取一个枚举所有常量的枚举器
+    /// </summary>
+    IEnumerable<FieldInfo> Constant { get; }
+    #endregion
     #region 按名称索引字段
     /// <summary>
     /// 获取一个按名称索引字段的字典

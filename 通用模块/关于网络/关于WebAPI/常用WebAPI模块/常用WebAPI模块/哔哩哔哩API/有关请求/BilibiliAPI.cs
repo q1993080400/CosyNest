@@ -67,11 +67,11 @@ public sealed class BilibiliAPI(Func<IHttpClient>? httpClientProvide = null) : W
         var audio = dash.GetValueRecursion<string>("audio[0].base_url")!;
         var video = dash.GetValue<object[]>("video")!.Cast<IDirect>().FirstOrDefault(x => Equals(x["id"], id)) ??
             throw new NotSupportedException($"找不到清晰度为{clear}的视频");
-        return (await http.RequestDownload(request with
+        return (await http.RequestBitRead(request with
         {
             Uri = new(video["base_url"]!.ToString()!)
         }, cancellationToken: cancellationToken),
-        await http.RequestDownload(request with
+        await http.RequestBitRead(request with
         {
             Uri = new(audio)
         }, cancellationToken: cancellationToken));

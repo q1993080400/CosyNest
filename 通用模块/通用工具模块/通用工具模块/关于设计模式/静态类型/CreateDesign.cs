@@ -10,6 +10,19 @@ namespace System.Design;
 /// </summary>
 public static class CreateDesign
 {
+    #region 创建IServiceProvider
+    #region 合并IServiceProvider
+    /// <summary>
+    /// 返回一个<see cref="IServiceProvider"/>，
+    /// 它依次从多个<see cref="IServiceProvider"/>中请求服务，
+    /// 直到请求成功为止
+    /// </summary>
+    /// <param name="serviceProvider">多个服务提供者对象，它们的顺序很重要</param>
+    /// <returns></returns>
+    public static IServiceProvider ServiceProviderMerge(IEnumerable<IServiceProvider> serviceProvider)
+        => new ServiceProviderMerge(serviceProvider.ToArray());
+    #endregion
+    #endregion
     #region 创建独占任务对象
     /// <summary>
     /// 创建一个<see cref="IQueueTask"/>，

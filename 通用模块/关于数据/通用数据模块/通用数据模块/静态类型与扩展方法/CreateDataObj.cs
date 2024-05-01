@@ -17,20 +17,6 @@ public static class CreateDataObj
     public static IDataFilterAnalysis DataFilterAnalysis { get; }
         = new DataFilterAnalysisDefault();
     #endregion
-    #region 创建数据管道
-    #region 使用查询表达式工厂
-    /// <summary>
-    /// 创建一个<see cref="IDataPipeFrom"/>，
-    /// 它使用查询表达式工厂来创建查询，
-    /// 通过它可以创建数据直接来自内存的管道
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="DataPipeFromFactory{Entity}"/>
-    /// <inheritdoc cref="DataPipeFromFactory{Entity}.DataPipeFromFactory(Func{IQueryable{Entity}})"/>
-    public static IDataPipeFrom PipeFromFactory<Entity>(Func<IQueryable<Entity>> factory)
-        => new DataPipeFromFactory<Entity>(factory);
-    #endregion
-    #endregion
     #region 创建数据验证默认委托
     #region 正式方法
     /// <summary>

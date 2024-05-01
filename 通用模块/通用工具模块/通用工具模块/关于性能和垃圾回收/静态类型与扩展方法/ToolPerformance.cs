@@ -7,19 +7,6 @@ namespace System.Performance;
 /// </summary>
 public static class ToolPerformance
 {
-    #region 关于垃圾回收
-    #region 强制进行垃圾回收
-    /// <summary>
-    /// 强制挂起当前线程，并且进行一次垃圾回收，警告：
-    /// 本方法对性能有严重影响，仅用于测试
-    /// </summary>
-    public static void StartGC()
-    {
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-    }
-    #endregion
-    #endregion
     #region 关于弱事件
     #region 向弱事件中注册委托
     /// <summary>

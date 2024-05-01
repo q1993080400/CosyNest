@@ -1,6 +1,5 @@
 ﻿using System.IO.Compression;
 using System.IOFrancis.BaseFileSystem;
-using System.IOFrancis.FileSystem;
 using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.Compressed;
@@ -37,7 +36,7 @@ sealed class CompressionDirectory(string path, INode father) : CompressionDirect
     }
     #endregion
     #region 解压到指定目录
-    public override async Task Decompress(PathText path, bool cover = false)
+    public override async Task Decompress(string path, bool cover = false)
     {
         var directory = IO.Path.Combine(path, this.To<IDirectoryBase>().NameFull);
         Directory.CreateDirectory(directory);

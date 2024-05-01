@@ -25,9 +25,10 @@ sealed class DirectoryRealize : IORealize, IDirectory
     #endregion
     #region 关于目录的信息
     #region 搜索文件或目录
-    public IEnumerable<IIO> Search(string condition, bool isRecursion = false)
+    public IEnumerable<IO> Search<IO>(string condition, bool isRecursion = false)
+        where IO : IIO
     {
-        var searchOption = isRecursion ? SearchOption.TopDirectoryOnly : SearchOption.AllDirectories;
+        var searchOption = isRecursion ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
         var son = PackFS.EnumerateFileSystemInfos(condition, searchOption);
         return son.Where(x =>
         {
@@ -44,12 +45,12 @@ sealed class DirectoryRealize : IORealize, IDirectory
                 return newPath != Path && newPath != (Path + "\\");
             }
             return true;
-        }).Select(x => CreateIO.IO(x.FullName)!);
+        }).Select(x => CreateIO.IO(x.FullName)!).OfType<IO>();
     }
     #endregion
     #region 枚举子目录
     public override IEnumerable<INode> Son
-        => Search("*");
+        => Search<IIO>("*");
     #endregion
     #region 获取目录的大小
     public override IUnit<IUTStorage> Size
@@ -107,13 +108,13 @@ sealed class DirectoryRealize : IORealize, IDirectory
     /// <param name="path">指定的路径</param>
     /// <param name="checkExist">在路径不存在的时候，如果这个值为<see langword="true"/>，会抛出一个异常，
     /// 如果为<see langword="false"/>，则不会抛出异常，而是会创建这个目录</param>
-    public DirectoryRealize(PathText path, bool checkExist = true)
+    public DirectoryRealize(string path, bool checkExist = true)
         : base(path)
     {
         if (!PackFS.Exists)
         {
             if (checkExist)
-                throw IOExceptionFrancis.BecauseExist(path.Path ?? "null");
+                throw IOExceptionFrancis.BecauseExist(path ?? "null");
             PackFS.Create();
         }
     }

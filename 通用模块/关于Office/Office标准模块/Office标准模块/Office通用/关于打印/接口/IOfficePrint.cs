@@ -1,5 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.Underlying;
+﻿using System.Underlying;
 
 namespace System.Office;
 
@@ -36,7 +35,7 @@ public interface IOfficePrint
     /// 函数会根据该路径的扩展名自动判断应使用哪个打印机</param>
     /// <inheritdoc cref="PrintFromPage(Range?, int, IPrinter?)"/>
     /// <returns>一个用于等待打印完成的<see cref="Task"/></returns>
-    Task PrintFromPageToFile(PathText filePath, Range? page = null);
+    Task PrintFromPageToFile(string filePath, Range? page = null);
 
     /*实现本API请遵循以下规范：
       #这个API返回的Task用于等待整个打印过程完成，

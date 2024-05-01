@@ -60,7 +60,7 @@ public interface IFromIO : IInstruct, IAsyncDisposable
     /// </summary>
     /// <param name="path">指定的保存路径，
     /// 如果为<see langword="null"/>，代表原地保存</param>
-    Task Save(PathText? path = null);
+    Task Save(string? path = null);
 
     /*在实现本API时，请遵循以下规范：
       #本API抹平了原地保存和另存为的差异，

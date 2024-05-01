@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Immutable;
+using System.Net.Http.Headers;
 using System.NetFrancis.Http.Realize;
 
 namespace System.NetFrancis.Http;
@@ -42,9 +43,17 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
     }
     #endregion
     #endregion
+    #region 抽象成员实现
+    #region 改变标头
+    public override HttpHeaderRequest With
+        (Func<ImmutableDictionary<string, IEnumerable<string>>, ImmutableDictionary<string, IEnumerable<string>>> change)
+        => new(change(HeadersImmutable));
+    #endregion
+    #endregion
     #region 构造函数
     #region 无参数构造函数
     public HttpHeaderRequest()
+        : this([])
     {
 
     }

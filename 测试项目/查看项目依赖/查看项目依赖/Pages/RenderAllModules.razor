@@ -9,9 +9,9 @@
         <div>2.只显示项目引用，不显示对第三方模块的引用</div>
         <div>3.越底层的模块放在越上面，越高层的模块放在越下面</div>
         <div>4.单击任何一个模块，可以进入专注模式，仅显示它和它引用的模块</div>
-        <CompactCentered NotFill=true>
+        <div class="compactCentered">
             <button @onclick=@(()=>DisplayModule=Modules)>退出专注模式</button>
-        </CompactCentered>
+        </div>
     </div>
     <div class="allModulesContainer">
         @foreach (var item in ModuleStructure())

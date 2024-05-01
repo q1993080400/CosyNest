@@ -1,4 +1,5 @@
-﻿using System.NetFrancis.Http;
+﻿using System.NetFrancis.Api;
+using System.NetFrancis.Http;
 
 namespace Microsoft.AspNetCore;
 

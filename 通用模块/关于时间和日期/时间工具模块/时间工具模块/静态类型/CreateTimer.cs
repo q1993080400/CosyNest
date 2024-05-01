@@ -52,7 +52,28 @@ public static class CreateTimer
         => new TimerFromTime(times.ToArray(), canTrigger ??= (_, _) => true).Timer;
     #endregion
     #endregion
-    #endregion 
+    #region 创建一个立即执行，且仅执行一次的定时器
+    /// <summary>
+    /// 创建一个立即执行，且仅执行一次的定时器
+    /// </summary>
+    /// <returns></returns>
+    public static Timer TimerDisposable()
+    {
+        var execute = false;
+        return cancellationToken =>
+        {
+            if (execute || cancellationToken.IsCancellationRequested)
+                return null;
+            execute = true;
+            return new()
+            {
+                Wait = Task.CompletedTask,
+                Next = null
+            };
+        };
+    }
+    #endregion
+    #endregion
     #region 创建触发器
     #region 在硬件启动时执行
     /// <summary>
@@ -125,5 +146,35 @@ public static class CreateTimer
     public static IPlanTriggerYears TriggerYears(TimeOnly time, IEnumerable<Month> months, IEnumerable<int> days, int? count = null, DateTimeOffset? createDate = null)
         => new PlanTriggerYears(time, months, days, count, createDate);
     #endregion
+    #endregion
+    #region 启动后台服务
+    /// <summary>
+    /// 启动一个后台服务
+    /// </summary>
+    /// <param name="info">创建后台任务的参数</param>
+    public static void StartHostedService(StartHostedInfo info)
+    {
+        #region 用来创建主机的本地函数
+        async Task StartHost()
+        {
+            IHost? host = null;
+            #region 停止主机的本地函数
+            async Task Stop()
+            {
+                if (host is { })
+                    await host.StopAsync();
+            }
+            #endregion
+            var builder = Host.CreateApplicationBuilder();
+            var start = info.Configuration(builder);
+            if (!start)
+                return;
+            builder.Services.AddHostedService(x => new TimedHostedService(info.Timer, x, (x, y) => info.Expire(x, y), Stop));
+            host = builder.Build();
+            await host.RunAsync();
+        }
+        #endregion
+        Task.Factory.StartNew(StartHost, TaskCreationOptions.LongRunning);
+    }
     #endregion
 }

@@ -42,7 +42,7 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     #endregion 
     #region 搜索子元素
     #region 指定CSS选择器
-    public IEnumerable<Element> FindFromCss<Element>(string cssSelect, bool ignoreException)
+    public IReadOnlyList<Element> FindFromCss<Element>(string cssSelect, bool ignoreException)
         where Element : IElementBase
     {
         try
@@ -66,7 +66,7 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     }
     #endregion
     #region 指定表达式
-    public IEnumerable<Element> Find<Element>(Expression<Func<Element, bool>> where, bool ignoreException)
+    public IReadOnlyList<Element> Find<Element>(Expression<Func<Element, bool>> where, bool ignoreException)
         where Element : IElementBase
     {
         throw new NotImplementedException();
@@ -82,10 +82,11 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     }
     #endregion
     #region 单击事件
-    public ValueTask Click(CancellationToken cancellationToken = default)
+    public async ValueTask Click(int interval = 0, CancellationToken cancellationToken = default)
     {
         Element.Click();
-        return ValueTask.CompletedTask;
+        if (interval > 0)
+            await Task.Delay(interval, cancellationToken);
     }
     #endregion
     #endregion 

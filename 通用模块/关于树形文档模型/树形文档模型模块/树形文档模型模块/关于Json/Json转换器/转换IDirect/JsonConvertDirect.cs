@@ -27,9 +27,16 @@ sealed class JsonConvertDirect : JsonConverter<IDirect>
         reader.Read();
         while (true)
         {
-            if (reader.TokenType is JsonTokenType.EndArray)
-                return [.. link];
-            link.AddLast(ReadObject(ref reader, options));
+            switch (reader.TokenType)
+            {
+                case JsonTokenType.EndArray:
+                    return [.. link];
+                case JsonTokenType.Comment:
+                    break;
+                default:
+                    link.AddLast(ReadObject(ref reader, options));
+                    break;
+            }
             reader.Read();
         }
     }

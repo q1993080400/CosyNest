@@ -47,7 +47,7 @@ public static partial class ExtendEnumerable
     public static Obj[] Concat<Obj>(this Obj[] objs, params Obj[][] otherArray)
     {
         var sumArray = otherArray.Prepend(objs).ToArray();
-        var array = new Obj[sumArray.Sum(x => x.Length)];
+        var array = new Obj[sumArray.Sum(x => (long)x.Length)];
         var len = 0L;
         foreach (var item in sumArray)
         {

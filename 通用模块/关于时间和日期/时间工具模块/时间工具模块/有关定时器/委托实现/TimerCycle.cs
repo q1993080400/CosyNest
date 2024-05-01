@@ -9,7 +9,7 @@ sealed class TimerCycle
     #region 公开成员
     #region 等待定时器到期
     /// <inheritdoc cref="TimeFrancis.Timer"/>
-    public TimerInfo Timer(CancellationToken cancellationToken = default)
+    public TimerInfo? Timer(CancellationToken cancellationToken = default)
     {
         #region 进行等待的本地函数
         async Task Wait()
@@ -25,12 +25,13 @@ sealed class TimerCycle
             Next = DateTimeOffset.Now + Interval;
         }
         #endregion
-        cancellationToken.ThrowIfCancellationRequested();
-        return new()
-        {
-            Next = Next,
-            Wait = Wait()
-        };
+        return cancellationToken.IsCancellationRequested ?
+            null :
+            new()
+            {
+                Next = Next,
+                Wait = Wait()
+            };
     }
     #endregion
     #endregion

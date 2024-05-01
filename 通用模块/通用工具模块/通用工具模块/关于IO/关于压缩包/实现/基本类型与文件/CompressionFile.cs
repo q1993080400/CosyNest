@@ -61,7 +61,7 @@ sealed class CompressionFile(ZipArchiveEntry zip, INode father) : CompressionIte
         => ZipEntry.Open().ToBitPipe().Read;
     #endregion
     #region 解压到指定目录
-    public override async Task Decompress(PathText path, bool cover = false)
+    public override async Task Decompress(string path, bool cover = false)
     {
         using var read = Decompress();
         using var file = CreateIO.FileStream(IO.Path.Combine(path, this.To<IFileBase>().NameFull));

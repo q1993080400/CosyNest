@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>Microsoft.AspNetCore</RootNamespace>
+		<AssemblyName>DingDing.Server</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\ASP.Net后端模块\ASP.Net后端模块\ASP.Net后端模块.csproj" />
+		<ProjectReference Include="..\..\钉钉API中台\钉钉API中台\钉钉API中台.csproj" />
+	</ItemGroup>
+
+</Project>

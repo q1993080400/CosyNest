@@ -60,7 +60,7 @@ public static class ExtenIO
     /// <param name="path">要保存到的文件路径</param>
     /// <param name="cancellationToken">一个用来取消异步操作的令牌</param>
     /// <returns></returns>
-    public static async Task SaveFile(this Stream stream, PathText path, CancellationToken cancellationToken = default)
+    public static async Task SaveFile(this Stream stream, string path, CancellationToken cancellationToken = default)
     {
         if (!stream.CanRead)
             throw new NotSupportedException("这个流不可读取");

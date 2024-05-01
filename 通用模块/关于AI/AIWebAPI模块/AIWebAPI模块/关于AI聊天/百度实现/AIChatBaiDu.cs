@@ -31,7 +31,7 @@ sealed class AIChatBaiDu(string appKey, string secretKey, Func<IHttpClient>? htt
                 ])
         };
         var response = await httpClient.RequestPost(uri, new()).Read(x => x.ToObject());
-        return response.GetValueRecursion<string>("access_token", false) is { } accessToken ?
+        return response.GetValue<string>("access_token", false) is { } accessToken ?
             new AIChatContextBaiDu(accessToken, HttpClientProvide) :
             throw new APIException($"""
                 创建百度AI聊天接口时出现异常，错误码：{response["error"]}，消息：

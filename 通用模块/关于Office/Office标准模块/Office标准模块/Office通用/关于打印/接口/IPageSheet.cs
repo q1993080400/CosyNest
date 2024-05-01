@@ -1,5 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.MathFrancis.Plane;
+﻿using System.MathFrancis.Plane;
 using System.Underlying;
 
 namespace System.Office.Excel;
@@ -34,6 +33,6 @@ public interface IPageSheet : IPage
     ///<param name="regional">打印区域，
     /// 如果为<see langword="null"/>，则遵照<see cref="PrintRegional"/>属性设置的打印区域</param>
     /// <inheritdoc cref="IOfficePrint.PrintFromPageToFile(PathText, Range?)"/>
-    Task PrintFromRegionalToFile(ISizePosPixel? regional, PathText filePath);
+    Task PrintFromRegionalToFile(ISizePosPixel? regional, string filePath);
     #endregion
 }

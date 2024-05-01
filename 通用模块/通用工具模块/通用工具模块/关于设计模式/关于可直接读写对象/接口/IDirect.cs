@@ -21,62 +21,46 @@ public interface IDirect : IRestrictedDictionary<string, object?>
     #endregion
     #region 读写属性（强类型版本）
     /// <summary>
-    /// 通过属性名称读取属性，并转换为指定的类型返回
+    /// 通过属性名称读取属性，并转换为指定的类型返回，支持递归
     /// </summary>
     /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <param name="propertyName">要读取属性的名称</param>
+    /// <param name="path">属性的路径，不同层次之间用.分割</param>
     /// <param name="checkExist">当属性名称不存在的时候，
     /// 如果该参数为<see langword="true"/>，则引发异常，否则返回默认值</param>
     /// <exception cref="KeyNotFoundException">要读写的属性名称不存在</exception>
     /// <exception cref="TypeUnlawfulException">无法转换为指定的类型</exception>
     /// <returns></returns>
-    Ret? GetValue<Ret>(string propertyName, bool checkExist = true)
-        => TryGetValue(propertyName, out var value) ?
-        value.To<Ret>() :
-        checkExist ? throw new KeyNotFoundException($"不存在名为{propertyName}的属性") : default;
-    #endregion
-    #region 递归读取属性
-    /// <summary>
-    /// 递归读取属性，并转换为指定的类型返回
-    /// </summary>
-    /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <param name="path">属性的路径，不同层次之间用.分割</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="GetValue{Ret}(string, bool)"/>
-    Ret? GetValueRecursion<Ret>(string path, bool checkExist = true)
+    Ret? GetValue<Ret>(string path, bool checkExist = true)
     {
-        object? direct = this;
-        var split = path.Split(".").Index().ToArray();
-        var maxIndex = split.Length - 1;
-        foreach (var (item, i) in split)
+        var (isMatch, matchs) = /*language=regex*/@"((\[(?<index>\d+)\])|(?<property>[^\[\]\.]+))".Op().Regex().Matches(path);
+        if (!isMatch)
+            throw new NotSupportedException($"{path}是非法的属性访问表达式");
+        var maxIndex = matchs.Length - 1;
+        return matchs.Index().Aggregate((object?)this, (seed, element) =>
         {
-            if (direct is null)
+            var (match, i) = (element.Elements.GroupsNamed.Values.Single(), element.Index);
+            var matchText = match.Match;
+            switch (seed, match.Name)
             {
-                if (i == maxIndex)
-                    return (dynamic?)null;
-                throw new NullReferenceException($"对象{item}为null，无法递归读取它后面的属性");
+                case (null, _):
+                    return i == maxIndex ?
+                    null :
+                    throw new NullReferenceException($"表达式{matchText}的结果为null，无法递归读取它后面的属性");
+                case (IDirect direct, "property"):
+                    var (exist, value) = direct.TryGetValue(matchText);
+                    return (exist, checkExist) switch
+                    {
+                        (true, _) => value,
+                        (_, true) => throw new KeyNotFoundException($"不存在名为{matchText}的属性"),
+                        (_, false) => null
+                    };
+                case (Collections.IEnumerable list, "index"):
+                    var index = matchText.To<int>();
+                    return list.Cast<object>().ElementAt(index);
+                default:
+                    throw new ArgumentException($"递归读取属性只支持{nameof(IDirect)}和{nameof(IEnumerable<object>)}");
             }
-            if (direct is not (IDirect or IEnumerable<object>))
-                throw new ArgumentException($"递归读取属性只支持{nameof(IDirect)}和{nameof(IEnumerable<object>)}");
-            var regex =/*language=regex*/@"(?<property>[^\[]+)(\[(?<index>\d+)\])?".Op().Regex().MatcheSingle(item)!;
-            if (direct is IDirect d)
-            {
-                var key = regex["property"].Match;
-                (bool exist, direct) = d.TryGetValue(key);
-                if (!exist)
-                {
-                    if (checkExist)
-                        throw new KeyNotFoundException($"不存在名为{key}的属性");
-                    return default;
-                }
-            }
-            if (direct is IEnumerable<object> l && regex.GroupsNamed.TryGetValue("index", out var indexMatch))
-            {
-                var index = indexMatch.Match.To<int>();
-                direct = l.ElementAt(index);
-            }
-        }
-        return direct.To<Ret>();
+        }).To<Ret>();
     }
     #endregion
     #region 复制数据（可选转换为强类型版本）

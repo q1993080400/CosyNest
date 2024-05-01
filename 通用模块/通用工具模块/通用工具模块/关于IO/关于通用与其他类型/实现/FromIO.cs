@@ -11,7 +11,7 @@ namespace System.IOFrancis;
 /// 用指定的文件路径初始化文件
 /// </remarks>
 /// <param name="path">文件路径， 如果该对象不是通过文件创建的，则为<see langword="null"/></param>
-public abstract class FromIO(PathText? path) : ReleaseAsync, IFromIO
+public abstract class FromIO(string? path) : ReleaseAsync, IFromIO
 {
     #region 关于文件路径
     #region 返回文件的格式
@@ -37,11 +37,11 @@ public abstract class FromIO(PathText? path) : ReleaseAsync, IFromIO
     public virtual bool AutoSave { get; set; } = true;
     #endregion
     #region 保存文件
-    public async Task Save(PathText? path = null)
+    public async Task Save(string? path = null)
     {
         if (IsFreed)
             return;
-        switch ((Path, path?.Path))
+        switch ((Path, path))
         {
             case (null, null):
                 break;                      //没有路径，则放弃保存

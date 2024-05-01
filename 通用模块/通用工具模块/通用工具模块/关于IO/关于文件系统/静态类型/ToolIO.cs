@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-
-namespace System.IO;
+﻿namespace System.IO;
 
 /// <summary>
 /// 有关IO的工具类
@@ -29,7 +27,7 @@ public static class ToolIO
     /// 它可以避免由于父目录不存在所引发的异常
     /// </summary>
     /// <param name="path">要创建父目录的路径</param>
-    public static void CreateFather(PathText path)
+    public static void CreateFather(string path)
     {
         var father = Path.GetDirectoryName(path);
         if (father is { })

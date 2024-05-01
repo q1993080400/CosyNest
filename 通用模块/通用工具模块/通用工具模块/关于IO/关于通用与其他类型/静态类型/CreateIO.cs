@@ -43,7 +43,7 @@ public static class CreateIO
     /// <param name="path">指定的路径</param>
     /// <param name="checkExist">在文件不存在的时候，如果这个值为<see langword="true"/>，
     /// 则抛出一个异常，为<see langword="false"/>，则不会抛出异常，而是会创建一个新文件</param>
-    public static IFile File(PathText path, bool checkExist = true)
+    public static IFile File(string path, bool checkExist = true)
         => new FileRealize(path, checkExist);
     #endregion
     #region 创建一个目录对象
@@ -53,7 +53,7 @@ public static class CreateIO
     /// <param name="path">指定的路径</param>
     /// <param name="checkExist">在路径不存在的时候，如果这个值为<see langword="true"/>，会抛出一个异常，
     /// 如果为<see langword="false"/>，则不会抛出异常，而是会创建这个目录</param>
-    public static IDirectory Directory(PathText path, bool checkExist = true)
+    public static IDirectory Directory(string path, bool checkExist = true)
         => new DirectoryRealize(path, checkExist);
     #endregion
     #region 根据路径，返回IO对象
@@ -65,7 +65,7 @@ public static class CreateIO
     /// </summary>
     /// <param name="path">要检查的路径</param>
     /// <returns></returns>
-    public static IIO? IO(PathText path)
+    public static IIO? IO(string path)
         => ToolPath.GetPathState(path) switch
         {
             PathState.ExistDirectory => new DirectoryRealize(path),
@@ -78,7 +78,7 @@ public static class CreateIO
     #region 泛型方法
     /// <typeparam name="IO">返回值会被转换为这个类型</typeparam>
     /// <inheritdoc cref="IO(PathText)"/>
-    public static IO? IO<IO>(PathText path)
+    public static IO? IO<IO>(string path)
         where IO : IIO
         => CreateIO.IO(path) is IO i ? i : default;
     #endregion
@@ -104,7 +104,7 @@ public static class CreateIO
     /// <param name="path">文件所在的路径</param>
     /// <param name="mod">指定打开文件的方式</param>
     /// <returns></returns>
-    public static IFullDuplex FullDuplexFile(PathText path, FileMode mod = FileMode.OpenOrCreate)
+    public static IFullDuplex FullDuplexFile(string path, FileMode mod = FileMode.OpenOrCreate)
     {
         var extended = ToolPath.SplitFilePath(path).Extended;
         return new FileStream(path, mod).ToBitPipe(extended);
@@ -117,7 +117,7 @@ public static class CreateIO
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="BitReadTemporaryFile.BitReadTemporaryFile(PathText)"/>
-    public static IBitRead BitReadTemporaryFile(PathText path)
+    public static IBitRead BitReadTemporaryFile(string path)
         => new BitReadTemporaryFile(path);
     #endregion
     #region 创建读写内存的管道
@@ -220,7 +220,7 @@ public static class CreateIO
     /// <param name="path">文件路径</param>
     /// <param name="mod">指定打开文件的方式</param>
     /// <returns></returns>
-    public static FileStream FileStream(PathText path, FileMode mod = FileMode.OpenOrCreate)
+    public static FileStream FileStream(string path, FileMode mod = FileMode.OpenOrCreate)
     {
         ToolIO.CreateFather(path);
         return new(path, mod);
@@ -270,7 +270,7 @@ public static class CreateIO
     /// 根据路径，创建一个压缩包
     /// </summary>
     /// <inheritdoc cref="CompressedPackage(PathText)"/>
-    public static ICompressedPackage Compressed(PathText path)
+    public static ICompressedPackage Compressed(string path)
         => new CompressedPackage(path);
     #endregion
     #region 根据流

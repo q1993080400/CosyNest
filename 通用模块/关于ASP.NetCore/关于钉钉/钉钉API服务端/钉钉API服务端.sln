@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASP.Net后端模块", "..\..\ASP.Net后端模块\ASP.Net后端模块\ASP.Net后端模块.csproj", "{B5B8EA62-A1B0-4487-A6D3-82D35B0793AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "钉钉API中台", "..\钉钉API中台\钉钉API中台\钉钉API中台.csproj", "{745143C2-D2A9-450A-92D3-89DD287DC641}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "钉钉API服务端", "钉钉API服务端\钉钉API服务端.csproj", "{316CBC6C-51BB-4ACB-85D5-BDFC027E9D6A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用网络模块", "..\..\..\关于网络\通用网络模块\通用网络模块\通用网络模块.csproj", "{32583053-BE59-498F-8921-210675BA5122}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5B8EA62-A1B0-4487-A6D3-82D35B0793AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5B8EA62-A1B0-4487-A6D3-82D35B0793AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5B8EA62-A1B0-4487-A6D3-82D35B0793AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5B8EA62-A1B0-4487-A6D3-82D35B0793AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{745143C2-D2A9-450A-92D3-89DD287DC641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{745143C2-D2A9-450A-92D3-89DD287DC641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{745143C2-D2A9-450A-92D3-89DD287DC641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{745143C2-D2A9-450A-92D3-89DD287DC641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{316CBC6C-51BB-4ACB-85D5-BDFC027E9D6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{316CBC6C-51BB-4ACB-85D5-BDFC027E9D6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{316CBC6C-51BB-4ACB-85D5-BDFC027E9D6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{316CBC6C-51BB-4ACB-85D5-BDFC027E9D6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32583053-BE59-498F-8921-210675BA5122}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32583053-BE59-498F-8921-210675BA5122}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32583053-BE59-498F-8921-210675BA5122}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32583053-BE59-498F-8921-210675BA5122}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9A8D06D9-7EF8-443E-B5EE-D926EC9A8892}
+	EndGlobalSection
+EndGlobal

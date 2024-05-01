@@ -33,7 +33,7 @@ public sealed record Module
     public IEnumerable<Module> ReferenceRecursion()
     {
         if (Reference.Count is 0)
-            return Array.Empty<Module>();
+            return [];
         var equalityComparer = FastRealize.EqualityComparer<Module>((x, y) => Equals(x.Name, y.Name), x => x.Name.GetHashCode());
         var rferenceRecursion = Reference.Select(x => x.ReferenceRecursion()).
             SelectMany(x => x).Concat(Reference).Distinct(equalityComparer).ToArray();

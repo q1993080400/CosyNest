@@ -13,11 +13,12 @@ sealed class TimerFromTime(TimeOnly[] times, Func<DateOnly, int, bool> canTrigge
     #region 公开成员
     #region 等待定时器到期
     /// <inheritdoc cref="TimeFrancis.Timer"/>
-    public TimerInfo Timer(CancellationToken cancellationToken = default)
+    public TimerInfo? Timer(CancellationToken cancellationToken = default)
     {
+        if (cancellationToken.IsCancellationRequested)
+            return null;
         if (times.Length is 0)
             throw new NotSupportedException("定时器触发的时间必须至少有一个值");
-        cancellationToken.ThrowIfCancellationRequested();
         var now = DateTimeOffset.Now;
         var dateTime = now.DateTime;
         var date = DateOnly.FromDateTime(dateTime);

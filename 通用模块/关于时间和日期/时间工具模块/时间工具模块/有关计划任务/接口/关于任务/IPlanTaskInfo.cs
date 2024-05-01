@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-
-namespace System.TimeFrancis.Plan;
+﻿namespace System.TimeFrancis.Plan;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -39,6 +37,6 @@ public interface IPlanTaskInfo
     /// 这个集合枚举执行计划任务时，
     /// 要启动的进程路径，以及传递给进程的参数
     /// </summary>
-    IEnumerable<(PathText Path, string? Parameters)> Start { get; }
+    IEnumerable<(string Path, string? Parameters)> Start { get; }
     #endregion
 }

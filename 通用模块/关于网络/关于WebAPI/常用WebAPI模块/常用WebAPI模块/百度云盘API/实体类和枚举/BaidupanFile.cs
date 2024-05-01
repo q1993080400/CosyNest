@@ -27,7 +27,7 @@ public sealed record BaidupanFile : BaidupanFD
     /// <returns></returns>
     public async Task DownloadFile(PathText path, CancellationToken cancellationToken = default)
     {
-        var read = await HttpClientProvide().RequestDownload(Download, cancellationToken: cancellationToken);
+        var read = await HttpClientProvide().RequestBitRead(Download, cancellationToken: cancellationToken);
         await read.SaveToFile(path, cancellation: cancellationToken);
     }
     #endregion

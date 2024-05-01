@@ -66,7 +66,10 @@ public static class CreateBrowserWebDriver
     private static Options CreateOptions<Options>(WebDriverOptions options)
         where Options : DriverOptions, new()
     {
-        var driverOptions = new Options();
+        var driverOptions = new Options()
+        {
+            EnableDownloads = true,
+        };
         AddProxy(driverOptions, options);
         return driverOptions;
     }

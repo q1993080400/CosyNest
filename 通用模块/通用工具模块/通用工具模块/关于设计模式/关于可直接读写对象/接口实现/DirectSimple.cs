@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace System.Design.Direct;
 
@@ -64,7 +65,12 @@ sealed class DirectSimple : IDirect
 
     #endregion
     #region 返回Json字符串
-    public string Json => throw new NotImplementedException();
+    public string Json
+        => JsonSerializer.Serialize<IReadOnlyDictionary<string, object?>>(this);
     #endregion
+    #endregion
+    #region 重写ToString
+    public override string ToString()
+        => this.Join(x => $"{x.Key}:{x.Value}", Environment.NewLine);
     #endregion
 }

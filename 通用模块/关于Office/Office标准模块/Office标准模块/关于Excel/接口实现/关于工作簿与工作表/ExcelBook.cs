@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis;
-using System.IOFrancis.FileSystem;
 
 namespace System.Office.Excel.Realize;
 
@@ -12,7 +11,7 @@ namespace System.Office.Excel.Realize;
 /// </remarks>
 /// <param name="path">工作簿所在的文件路径，
 /// 如果不是通过文件创建的，则为<see langword="null"/></param>
-public abstract class ExcelBook(PathText? path) : FromIO(path), IExcelBook
+public abstract class ExcelBook(string? path) : FromIO(path), IExcelBook
 {
     #region 返回IExcelBook接口
     /// <summary>

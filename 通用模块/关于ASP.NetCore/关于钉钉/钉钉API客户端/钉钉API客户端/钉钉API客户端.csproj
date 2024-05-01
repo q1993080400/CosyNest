@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>Microsoft.AspNetCore</RootNamespace>
+		<AssemblyName>DingDing.Client</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Razor通用模块\Razor通用模块\Razor通用模块.csproj" />
+		<ProjectReference Include="..\..\钉钉API中台\钉钉API中台\钉钉API中台.csproj" />
+	</ItemGroup>
+
+</Project>

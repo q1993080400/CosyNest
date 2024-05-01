@@ -41,7 +41,7 @@ public sealed record HttpRequestRecording
     /// <summary>
     /// 获取Http请求的内容
     /// </summary>
-    public IHttpContent? Content { get; init; }
+    public HttpContentRecording? Content { get; init; }
     #endregion
     #region 如果响应不成功，是否抛出异常
     /// <summary>

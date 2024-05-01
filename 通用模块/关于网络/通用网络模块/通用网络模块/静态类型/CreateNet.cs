@@ -60,7 +60,7 @@ public static class CreateNet
         {
             var build = new HubConnectionBuilder().
              WithUrl(uri).
-             AddJsonProtocol(x => x.AddFormatterJson());
+             AddMessagePackProtocol();
             return (configure is null ? build : await configure(build)).Build();
         };
     #endregion
@@ -88,7 +88,7 @@ public static class CreateNet
     /// <param name="baseUri"></param>
     /// <returns></returns>
     public static HttpRequestTransform TransformBaseUri(string baseUri)
-        => request =>
+        => (request) =>
         {
             var uri = request.Uri;
             return uri.UriHost is { } ?

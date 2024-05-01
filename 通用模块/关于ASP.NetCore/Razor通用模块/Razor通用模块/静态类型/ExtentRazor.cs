@@ -217,7 +217,7 @@ public static class ExtendRazor
                  op.UseStatefulReconnect = true;
                  withUri?.Invoke(op);
              }).
-             AddJsonProtocol(x => x.AddFormatterJson()).
+             AddMessagePackProtocol().
              WithAutomaticReconnect();
             return (configure is null ? connection : await configure(connection)).Build();
         });

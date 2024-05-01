@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis.BaseFileSystem;
-using System.IOFrancis.FileSystem;
 using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.Compressed;
@@ -27,6 +26,6 @@ public interface ICompressionItem : IIOBase
     /// <param name="cover">如果为<see langword="true"/>，
     /// 解压时会覆盖旧文件</param>
     /// <returns></returns>
-    Task Decompress(PathText path, bool cover = true);
+    Task Decompress(string path, bool cover = true);
     #endregion
 }

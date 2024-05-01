@@ -31,7 +31,7 @@ public static class ToolPath
     /// <param name="newExtension">这个委托传入旧扩展名，返回文件重构后的新扩展名，不带点号，
     /// 如果为<see langword="null"/>，代表该路径不是文件，或不更改扩展名</param>
     /// <returns></returns>
-    public static string RefactoringPath(PathText path, Func<string, string>? newSimple = null, Func<string?, string?>? newExtension = null)
+    public static string RefactoringPath(string path, Func<string, string>? newSimple = null, Func<string?, string?>? newExtension = null)
     {
         var (simple, extended, _) = SplitFilePath(path);
         var father = Path.GetDirectoryName(path);
@@ -168,7 +168,7 @@ public static class ToolPath
     /// </summary>
     /// <param name="path">要返回父目录的路径</param>
     /// <returns></returns>
-    public static IEnumerable<string> GetDirectoryNameAll(PathText path)
+    public static IEnumerable<string> GetDirectoryNameAll(string path)
     {
         string? p = path;
         yield return p;

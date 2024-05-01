@@ -1,0 +1,24 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@inject IJSWindow JSWindow
+@inject IUriManager UriManager
+@inject IHttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+@if (AuthenticationState is { })
+{
+    <CascadingValue Value="AuthenticationState" IsFixed=true>
+        <CascadingValue Value="AuthorizationStateChange" TValue="AuthorizationStateChange" IsFixed=true>
+            <CascadingValue Value="AppInfo">
+                @if (AuthorizationPassed && AuthenticationState.Passed)
+                {
+                    @Authorized(AuthenticationState)
+                }
+                else
+                {
+                    @NotAuthorized(LogOut)
+                }
+            </CascadingValue>
+        </CascadingValue>
+    </CascadingValue>
+}

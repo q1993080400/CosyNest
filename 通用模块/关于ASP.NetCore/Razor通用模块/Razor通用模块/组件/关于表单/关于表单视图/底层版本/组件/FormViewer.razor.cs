@@ -201,15 +201,13 @@ public sealed partial class FormViewer<Model> : ComponentBase
     #endregion
     #endregion
     #endregion
-    #region 公开成员
+    #region 内部成员
     #region 表单模型
     /// <summary>
     /// 获取要渲染的表单模型
     /// </summary>
-    public Model FormModel { get; set; }
+    private Model FormModel { get; set; }
     #endregion
-    #endregion
-    #region 内部成员
     #region 获取渲染参数
     /// <summary>
     /// 获取本组件的渲染参数

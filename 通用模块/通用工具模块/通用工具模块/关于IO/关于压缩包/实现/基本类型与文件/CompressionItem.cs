@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis.BaseFileSystem;
-using System.IOFrancis.FileSystem;
 using System.MathFrancis;
 using System.MathFrancis.Tree;
 
@@ -51,11 +50,10 @@ abstract class CompressionItem(INode father) : ICompressionItem
     public IUnit<IUTStorage> Size => throw new NotImplementedException();
     #endregion
     #region 解压到指定目录
-    public abstract Task Decompress(PathText path, bool cover = false);
+    public abstract Task Decompress(string path, bool cover = false);
     #endregion
     #region 重写ToString
     public override string ToString()
         => Path;
-
     #endregion
 }

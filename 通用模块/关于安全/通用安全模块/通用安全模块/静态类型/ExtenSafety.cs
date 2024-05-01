@@ -40,24 +40,18 @@ public static class ExtenSafety
         };
     #endregion
     #region 关于标识Json对象
-    #region ClaimsIdentity中储存对象的键
-    /// <summary>
-    /// 获取在<see cref="ClaimsIdentity"/>中储存对象的键
-    /// </summary>
-    private static string ClaimsPrincipalInfoKey { get; } = "ClaimsPrincipalInfoKey";
-    #endregion
     #region 获取ClaimsIdentity中储存的对象
     /// <summary>
-    /// 获取<see cref="ClaimsPrincipal"/>中储存的对象
+    /// 获取<see cref="ClaimsIdentity"/>中储存的对象
     /// </summary>
     /// <typeparam name="Obj">储存的对象的类型</typeparam>
-    /// <param name="principal">储存对象的<see cref="ClaimsPrincipal"/></param>
+    /// <param name="identity">储存对象的<see cref="ClaimsIdentity"/></param>
+    /// <param name="type">对象的类型，即用来索引对象的键</param>
     /// <param name="options">一个用于控制Json转换的对象</param>
     /// <returns></returns>
-    public static Obj? GetInfo<Obj>(this ClaimsPrincipal principal, JsonSerializerOptions? options = null)
+    public static Obj? GetInfo<Obj>(this ClaimsIdentity identity, string type, JsonSerializerOptions? options = null)
     {
-        var identity = principal.Identity();
-        var first = identity.FindFirst(x => x.Type == ClaimsPrincipalInfoKey);
+        var first = identity.FindFirst(type);
         return first is null ?
             default :
             JsonSerializer.Deserialize<Obj>(first.Value, options ?? CreateDesign.JsonCommonOptions);
@@ -65,21 +59,20 @@ public static class ExtenSafety
     #endregion
     #region 写入ClaimsIdentity中储存的对象
     /// <summary>
-    /// 写入<see cref="ClaimsPrincipal"/>中储存的对象
+    /// 写入<see cref="ClaimsIdentity"/>中储存的对象
     /// </summary>
     /// <param name="obj">待写入的对象，
     /// 如果写入<see langword="null"/>，表示移除对象</param>
-    /// <inheritdoc cref="GetInfo{Obj}(ClaimsPrincipal, JsonSerializerOptions?)"/>
-    public static void SetInfo<Obj>(this ClaimsPrincipal principal, Obj? obj, JsonSerializerOptions? options = null)
+    /// <inheritdoc cref="GetInfo{Obj}(ClaimsIdentity, string, JsonSerializerOptions?)"/>
+    public static void SetInfo<Obj>(this ClaimsIdentity identity, string type, Obj? obj, JsonSerializerOptions? options = null)
     {
-        var identity = principal.Identity();
-        var first = identity.FindFirst(x => x.Type == ClaimsPrincipalInfoKey);
+        var first = identity.FindFirst(type);
         if (first is { })
             identity.RemoveClaim(first);
         if (obj is null)
             return;
         var json = JsonSerializer.Serialize(obj, options ?? CreateDesign.JsonCommonOptions);
-        identity.AddClaim(new(ClaimsPrincipalInfoKey, json));
+        identity.AddClaim(new(type, json));
     }
     #endregion
     #endregion 

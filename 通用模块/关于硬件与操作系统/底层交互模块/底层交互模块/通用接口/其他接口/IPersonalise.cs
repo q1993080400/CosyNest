@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-
-namespace System.Underlying;
+﻿namespace System.Underlying;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -12,6 +10,6 @@ public interface IPersonalise
     /// <summary>
     /// 获取或设置壁纸路径
     /// </summary>
-    PathText Wallpaper { get; set; }
+    string Wallpaper { get; set; }
     #endregion
 }
