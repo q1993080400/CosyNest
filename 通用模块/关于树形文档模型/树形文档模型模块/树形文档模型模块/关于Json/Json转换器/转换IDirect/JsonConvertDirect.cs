@@ -21,7 +21,7 @@ sealed class JsonConvertDirect : JsonConverter<IDirect>
     /// <param name="reader">用来读取Json字符串的反序列化器</param>
     /// <param name="options">用于配置反序列化的选项</param>
     /// <returns></returns>
-    private static object?[] ReadArray(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    private static Array ReadArray(ref Utf8JsonReader reader, JsonSerializerOptions options)
     {
         var link = new LinkedList<object?>();
         reader.Read();
@@ -29,8 +29,20 @@ sealed class JsonConvertDirect : JsonConverter<IDirect>
         {
             switch (reader.TokenType)
             {
+                case JsonTokenType.StartArray:
+                    var nesting = ReadArray(ref reader, options);
+                    link.AddLast(nesting);
+                    break;
                 case JsonTokenType.EndArray:
-                    return [.. link];
+                    var linkArray = link.ToArray();
+                    var onlyType = linkArray.Where(x => x is { }).Select(x => x!.GetType()).
+                        Distinct().SingleOrDefaultSecure();
+                    if (onlyType is null)
+                        return linkArray;
+                    var count = link.Count;
+                    var array = Array.CreateInstance(onlyType, count);
+                    Array.Copy(linkArray, array, count);
+                    return array;
                 case JsonTokenType.Comment:
                     break;
                 default:

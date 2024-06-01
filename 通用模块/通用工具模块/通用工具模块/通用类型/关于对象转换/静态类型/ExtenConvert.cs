@@ -89,6 +89,8 @@ public static partial class ExtendTool
                     return o is string text ?
                         (Ret)Enum.Parse(type, text) :
                         (Ret)Enum.ToObject(type, o.To(Enum.GetUnderlyingType(type)));
+                case string t when type == typeof(DateTimeOffset) || type == typeof(DateTimeOffset?):
+                    return (dynamic)DateTimeOffset.Parse(t);
                 case string t when type == typeof(Guid) || type == typeof(Guid?):        //为Guid做优化
                     return (dynamic)Guid.Parse(t);
                 case IConvertible o:

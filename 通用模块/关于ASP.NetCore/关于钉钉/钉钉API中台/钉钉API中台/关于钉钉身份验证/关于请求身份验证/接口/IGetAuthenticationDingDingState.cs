@@ -1,6 +1,6 @@
 ﻿using System.NetFrancis.Http;
 
-namespace Microsoft.AspNetCore;
+namespace System.DingDing;
 
 /// <summary>
 /// 凡是实现这个接口的类型，

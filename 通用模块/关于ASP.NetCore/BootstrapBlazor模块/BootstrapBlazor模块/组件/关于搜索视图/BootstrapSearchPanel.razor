@@ -4,7 +4,7 @@
 @inject IHttpClient HttpClient
 
 <SearchPanel GetRenderCondition="@(GetRenderCondition??IGetRenderAllFilterCondition.GetConditionFunction<BusinessInterface>(HttpClient))"
-             SearchViewerState="SearchViewerState" Submit="Submit" OnClear="OnClear">
+             SearchViewerState="SearchViewerState" Submit="Submit" OnClear="OnClear" ElementNumber=ElementNumber>
     <RenderComponent>
         @if (RenderComponent is null)
         {

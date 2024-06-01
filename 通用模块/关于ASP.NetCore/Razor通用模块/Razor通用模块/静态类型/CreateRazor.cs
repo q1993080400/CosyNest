@@ -54,6 +54,17 @@ public static class CreateRazor
     #endregion
     #endregion
     #endregion
+    #region 创建IElementNumber
+    /// <summary>
+    /// 创建一个<see cref="IElementNumber"/>，
+    /// 它可以为待渲染的元素编号
+    /// </summary>
+    /// <param name="prefix">编号前缀，如果为<see langword="null"/>，则自动生成一个</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="ElementNumber.ElementNumber(IJSRuntime, string?, string?)"/>
+    public static IElementNumber ElementNumber(IJSRuntime js, string? prefix = null, string? scrollingContextCSS = null)
+        => new ElementNumber(js, prefix ?? CreateASP.JSObjectName(), scrollingContextCSS);
+    #endregion
     #region 创建UploadTaskFactory
     /// <summary>
     /// 创建一个上传任务工厂

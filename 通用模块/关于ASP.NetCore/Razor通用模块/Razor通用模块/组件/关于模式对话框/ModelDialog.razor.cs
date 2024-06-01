@@ -26,7 +26,7 @@ public sealed partial class ModelDialog : ComponentBase, IContentComponent<Rende
     /// <summary>
     /// 获取模式对话框的ID
     /// </summary>
-    private string ID { get; } = ToolASP.CreateJSObjectName();
+    private string ID { get; } = CreateASP.JSObjectName();
     #endregion
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)

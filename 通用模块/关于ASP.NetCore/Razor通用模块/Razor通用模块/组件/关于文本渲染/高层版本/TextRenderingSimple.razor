@@ -1,0 +1,22 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+<TextRendering Value="Value" Highlight=Highlight>
+    @foreach (var (renderTextType, text) in context.RenderText)
+    {
+        @switch (renderTextType)
+        {
+            case RenderTextType.Normal:
+                @text
+                break;
+            case RenderTextType.Uri:
+                <a target="_blank" href="@text">@text</a>
+                break;
+            case RenderTextType.Highlight:
+                <span class="highlight">@text</span>
+                break;
+            case var type:
+                throw new NotSupportedException($"无法识别{type}类型的文本渲染类型");
+        }
+    }
+</TextRendering>

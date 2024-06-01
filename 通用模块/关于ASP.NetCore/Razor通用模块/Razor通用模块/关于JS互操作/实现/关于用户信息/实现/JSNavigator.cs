@@ -31,7 +31,7 @@ sealed class JSNavigator : JSRuntimeBase, IJSNavigator
     #region 获取唤醒锁
     public async Task<IAsyncDisposable?> GetWakeLock()
     {
-        var id = ToolASP.CreateJSObjectName();
+        var id = CreateASP.JSObjectName();
         var success = await JSRuntime.InvokeAsync<bool>("CreateWakeLock", id);
         return success ?
             new JSWakeLock(JSRuntime, id) :

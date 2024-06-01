@@ -1,10 +1,5 @@
-﻿using System.Design;
-using System.NetFrancis;
-using System.NetFrancis.Http;
-
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace System;
 
@@ -58,7 +53,6 @@ public static partial class ExtendWebApi
     }
     #endregion
     #region 添加配置服务中间件
-    #region 通用方法
     /// <summary>
     /// 添加一个配置服务中间件，
     /// 它可以用来配置需要<see cref="HttpContext"/>，
@@ -92,24 +86,6 @@ public static partial class ExtendWebApi
       但是本中间件仅为每个Http请求初始化服务，这会导致可能有的服务无法被初始化，
       作者会根据这个情况评估本方法的必要性，如证实这个问题非常严重，会删除本方法*/
     #endregion
-    #region 专门配置IUriManager
-    /// <summary>
-    /// 添加一个中间件，
-    /// 这个中间件可以用来配置<see cref="IUriManager"/>，
-    /// 它必须与<see cref="AddUriManagerServer(IServiceCollection)"/>配合使用
-    /// </summary>
-    /// <param name="application"></param>
-    /// <returns></returns>
-    public static IApplicationBuilder UseConfigurationUriManager(this IApplicationBuilder application)
-        => application.UseConfigurationService<Tag<IUriManager>>((http, server) =>
-        {
-            var path = http.Request.GetEncodedUrl();
-            var uri = new UriComplete(path).UriHost!;
-            server.Content = CreateNet.UriManager(uri);
-            return Task.CompletedTask;
-        });
-    #endregion
-    #endregion 
     #region 添加访客统计中间件
     /// <summary>
     /// 添加一个访客统计中间件，
@@ -124,9 +100,9 @@ public static partial class ExtendWebApi
         where Log : class
         => application.Use(async (http, follow) =>
         {
-            using var pipe = http.RequestServices.RequiredDataPipe();
+            await using var pipe = http.RequestServices.RequiredDataPipe();
             var log = createLog(http);
-            await pipe.AddOrUpdate([log]);
+            await pipe.Push(context => context.AddOrUpdate([log]));
             await follow();
         });
     #endregion

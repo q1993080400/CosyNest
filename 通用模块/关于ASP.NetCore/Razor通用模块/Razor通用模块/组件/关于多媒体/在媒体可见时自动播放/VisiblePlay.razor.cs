@@ -25,7 +25,7 @@ public sealed partial class VisiblePlay : ComponentBase
     /// <summary>
     /// 获取组件的ID
     /// </summary>
-    private string ID { get; } = ToolASP.CreateJSObjectName();
+    private string ID { get; } = CreateASP.JSObjectName();
     #endregion
     #region 重写OnParametersSetAsync
     protected override async Task OnParametersSetAsync()

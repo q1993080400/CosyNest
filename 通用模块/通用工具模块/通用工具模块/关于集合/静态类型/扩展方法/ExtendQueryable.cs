@@ -1,4 +1,6 @@
-﻿namespace System.Linq;
+﻿using System.Linq.Expressions;
+
+namespace System.Linq;
 
 public static partial class ExtendEnumerable
 {
@@ -15,5 +17,28 @@ public static partial class ExtendEnumerable
     /// <returns></returns>
     public static IQueryable<Obj> Paging<Obj>(this IQueryable<Obj> query, int pageSize, int pageIndex)
         => query.Skip(pageSize * pageIndex).Take(pageSize);
+    #endregion
+    #region 外部差集
+    /// <summary>
+    /// 对集合A和集合B生成键，
+    /// 取A集合键减B集合键的差集，
+    /// 然后返回键对应的值
+    /// </summary>
+    /// <typeparam name="ListAlEment">集合A的元素类型</typeparam>
+    /// <typeparam name="ListBlEment">集合B的元素类型</typeparam>
+    /// <typeparam name="Key">键的类型</typeparam>
+    /// <param name="listA">集合A</param>
+    /// <param name="listB">集合B</param>
+    /// <param name="getListAKey">从集合A获取键的委托</param>
+    /// <param name="getListBKey">从集合B获取键的表达式</param>
+    /// <returns></returns>
+    public static IEnumerable<ListAlEment> ExceptExternal<ListAlEment, ListBlEment, Key>
+        (this IEnumerable<ListAlEment> listA, IQueryable<ListBlEment> listB,
+        Func<ListAlEment, Key> getListAKey, Expression<Func<ListBlEment, Key>> getListBKey)
+    {
+        var keys = listA.Select(getListAKey).ToHashSet();
+        var intersect = listB.Select(getListBKey).Intersect(keys).ToArray();
+        return listA.ExceptBy(intersect, getListAKey).ToArray();
+    }
     #endregion
 }

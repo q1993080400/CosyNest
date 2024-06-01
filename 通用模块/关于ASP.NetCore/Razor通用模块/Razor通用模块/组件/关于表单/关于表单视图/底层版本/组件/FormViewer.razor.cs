@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.DataFrancis;
 using System.DataFrancis.EntityDescribe;
 using System.Reflection;
 
@@ -20,7 +21,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderFormViewerPropertyInfo<Model>> RenderProperty { get; set; }
+    public RenderFragment<RenderFormViewerPropertyInfoBase<Model>> RenderProperty { get; set; }
     #endregion
     #region 用来渲染整个组件的委托
     /// <summary>
@@ -38,7 +39,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public RenderFragment<IEnumerable<RenderFormViewerMainInfo<Model>>> RenderMain { get; set; }
+    public RenderFragment<RenderFormViewerMainInfo<Model>> RenderMain { get; set; }
     #endregion
     #region 用来渲染提交部分的委托
     /// <summary>
@@ -95,70 +96,68 @@ public sealed partial class FormViewer<Model> : ComponentBase
     [Parameter]
     public Func<Model, bool> ExistingForms { get; set; } = _ => false;
     #endregion
-    #region 用来筛选属性的委托
+    #region 用来获取属性渲染参数的委托
     #region 正式属性
     /// <summary>
-    /// 这个委托可以用来筛选表单模型的哪些属性需要渲染，
-    /// 它的参数是要筛选的属性,
-    /// 如果不指定，则使用一个默认方法
-    /// </summary>
-    [Parameter]
-    public Func<PropertyInfo, bool> FilterProperties { get; set; } = FilterPropertiesDefault;
-    #endregion
-    #region 默认方法
-    /// <summary>
-    /// 本方法是<see cref="FilterProperties"/>的默认方法，
-    /// 它选中具有<see cref="DisplayAttribute"/>特性的属性，并将其作为渲染的成员
-    /// </summary>
-    /// <param name="property">要筛选的属性</param>
-    /// <returns></returns>
-    public static bool FilterPropertiesDefault(PropertyInfo property)
-        => property.HasAttributes<DisplayAttribute>();
-    #endregion
-    #endregion
-    #region 用来将属性转换为渲染参数的委托
-    #region 正式属性
-    /// <summary>
-    /// 这个委托的第一个参数是要渲染的属性，
+    /// 这个委托的第一个参数是模型的类型，
     /// 第二个参数是这个组件本身，
-    /// 返回值是将其转换后的渲染参数，
+    /// 返回值是所有属性渲染参数，
     /// 它的顺序非常重要，组件会依次渲染它们
     /// </summary>
     [Parameter]
-    public Func<IEnumerable<PropertyInfo>, FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfo<Model>>> ToPropertyInfo { get; set; } = ToPropertyInfoDefault;
+    public Func<Type, FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfoBase<Model>>> GetRenderPropertyInfo { get; set; } = GetRenderPropertyInfoDefault;
     #endregion
     #region 默认方法
     /// <summary>
-    /// 本方法是<see cref="ToPropertyInfo"/>的默认方法，
+    /// 本方法是<see cref="GetRenderPropertyInfo"/>的默认方法，
     /// 它通过<see cref="DisplayAttribute"/>属性确定如何进行转换
     /// </summary>
-    /// <param name="property">要筛选的属性</param>
+    /// <param name="modelType">模型的类型</param>
     /// <param name="formViewer">当前表单视图组件</param>
     /// <returns></returns>
-    public static IEnumerable<RenderFormViewerPropertyInfo<Model>> ToPropertyInfoDefault(IEnumerable<PropertyInfo> property, FormViewer<Model> formViewer)
+    public static IEnumerable<RenderFormViewerPropertyInfoBase<Model>> GetRenderPropertyInfoDefault(Type modelType, FormViewer<Model> formViewer)
     {
+        var property = modelType.GetProperties().Where(x => !x.IsStatic()).ToArray();
         var propertys = property.Select(x =>
         {
-            var display = x.GetCustomAttribute<DisplayAttribute>();
+            var renderData = x.GetCustomAttribute<RenderDataBaseAttribute>();
             return new
             {
                 Item = x,
-                Name = display?.Name ?? x.Name,
-                Order = display?.GetOrder() ?? 0,
+                Attribute = renderData!,
             };
-        }).ToArray().OrderBy(x => x.Order).ToArrayIfDeBug();
+        }).
+        Where(x => x.Attribute is { }).ToArray().
+        OrderBy(x => x.Attribute.Order).ToArray();
         var model = formViewer.FormModel;
         var showSubmit = formViewer.ShowSubmit(model);
         return propertys.Select(x =>
         {
             var property = x.Item;
-            return new RenderFormViewerPropertyInfo<Model>()
+            var attribute = x.Attribute;
+            var groupName = attribute.GroupName;
+            var isReadOnlyProperty = !showSubmit || !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model);
+            var onPropertyChangeed = formViewer.OnPropertyChangeed;
+            return attribute switch
             {
-                FormModel = model,
-                Property = property,
-                PropertyName = x.Name,
-                IsReadOnlyProperty = !showSubmit || !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model),
-                OnPropertyChangeed = formViewer.OnPropertyChangeed
+                RenderDataAttribute renderDataAttribute => (RenderFormViewerPropertyInfoBase<Model>)new RenderFormViewerPropertyInfo<Model>()
+                {
+                    FormModel = model,
+                    GroupName = groupName,
+                    IsReadOnlyProperty = isReadOnlyProperty,
+                    OnPropertyChangeed = onPropertyChangeed,
+                    Property = property,
+                    PropertyName = renderDataAttribute.Name,
+                },
+                RenderDataCustomAttribute => new RenderFormViewerPropertyInfoCustom<Model>()
+                {
+                    FormModel = model,
+                    GroupName = groupName,
+                    IsReadOnlyProperty = isReadOnlyProperty,
+                    OnPropertyChangeed = onPropertyChangeed,
+                    Property = property,
+                },
+                _ => throw new NotSupportedException("无法识别这个渲染数据特性")
             };
         }).ToArray();
     }
@@ -186,7 +185,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
         => new()
         {
             Data = obj,
-            FailureReason = Array.Empty<(PropertyInfo, string)>()
+            FailureReason = []
         };
     #endregion
     #endregion
@@ -197,7 +196,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// 它的参数就是当前属性渲染参数
     /// </summary>
     [Parameter]
-    public Func<RenderFormViewerPropertyInfo<Model>, Task> OnPropertyChangeed { get; set; } = _ => Task.CompletedTask;
+    public Func<RenderFormViewerPropertyInfoBase<Model>, Task> OnPropertyChangeed { get; set; } = _ => Task.CompletedTask;
     #endregion
     #endregion
     #endregion
@@ -215,17 +214,24 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// <returns></returns>
     private RenderFormViewerInfo<Model> GetRenderInfo()
     {
-        var properties = typeof(Model).GetProperties().Where(x => !x.IsStatic());
-        var renderProperties = properties.Where(FilterProperties).ToArrayIfDeBug();
-        var renderFormViewerPropertyInfo = ToPropertyInfo(renderProperties, this).ToArray();
-        var renderPropertys = renderFormViewerPropertyInfo.Select(x => (x, RenderProperty(x))).ToArray();
-        var renderMain = renderPropertys.Select(x => new RenderFormViewerMainInfo<Model>()
+        var renderFormViewerPropertyInfo = GetRenderPropertyInfo(typeof(Model), this).ToArray();
+        var renderPropertyGroup = renderFormViewerPropertyInfo.GroupBy(x => x.GroupName).ToArray();
+        #region 返回渲染组的本地函数
+        RenderFormViewerRegionInfo<Model> RenderGroup(IGrouping<string?, RenderFormViewerPropertyInfoBase<Model>> renderProperty)
         {
-            Property = x.x.Property,
-            PropertyName = x.x.PropertyName,
-            Render = x.Item2,
+            var renderRegion = renderProperty.Select(x => (x, RenderProperty(x))).ToArray();
+            return new RenderFormViewerRegionInfo<Model>()
+            {
+                GroupName = renderProperty.Key,
+                RenderRegion = renderRegion
+            };
+        }
+        #endregion
+        var renderMain = new RenderFormViewerMainInfo<Model>()
+        {
+            RenderGroup = renderPropertyGroup.Select(RenderGroup).ToArray(),
             FormModel = FormModel
-        }).ToArray();
+        };
         var renderSubmit = ShowSubmit(FormModel) ? new RenderSubmitInfo<Model>()
         {
             Resetting = async () =>

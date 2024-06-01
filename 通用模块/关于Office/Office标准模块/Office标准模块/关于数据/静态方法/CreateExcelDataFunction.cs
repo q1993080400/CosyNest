@@ -18,9 +18,9 @@ public static class CreateExcelDataFunction
             var (reportProgress, cancellationToken) = asynchronousPackage ?? new();
             cancellationToken.ThrowIfCancellationRequested();
             var paths = new List<string>();
-            var split = info.Split(datas).Index().ToArray();
+            var split = info.Split(datas).PackIndex().ToArray();
             var count = split.Length;
-            foreach (var ((path, categorizedData), index) in split)
+            foreach (var (index, (path, categorizedData), _) in split)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var progress = new Progress()

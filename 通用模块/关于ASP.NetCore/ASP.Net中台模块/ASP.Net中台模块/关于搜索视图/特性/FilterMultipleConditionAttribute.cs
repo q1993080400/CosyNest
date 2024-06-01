@@ -47,7 +47,7 @@ public sealed class FilterMultipleConditionAttribute<BusinessInterface> : Filter
     {
         var propertyAccess = GetPropertyAccess(memberInfo);
         var propertyAccessOther = PropertyAccessOther ?? propertyAccess;
-        var filterObjectType = GetFilterObjectType(memberInfo);
+        var filterObjectType = GetFilterObjectType(FilterObjectType, memberInfo);
         var enumItem = GetEnumItem(memberInfo);
         return new()
         {

@@ -38,7 +38,7 @@ public static partial class ExtenReflection
             }
         }
         #endregion
-        return Fun(assembly).ToArrayIfDeBug();
+        return Fun(assembly).ToArray();
     }
 
     /*警告：

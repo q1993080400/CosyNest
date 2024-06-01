@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.Net.SDK">
 
 	<PropertyGroup>
 		<TargetFramework>net8-windows</TargetFramework>

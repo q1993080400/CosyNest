@@ -41,7 +41,7 @@ public sealed partial class DisablePreRendering : ComponentBase, IContentCompone
         if (firstRender)
         {
             ShouldRendered = true;
-            this.StateHasChanged();
+            StateHasChanged();
         }
     }
     #endregion

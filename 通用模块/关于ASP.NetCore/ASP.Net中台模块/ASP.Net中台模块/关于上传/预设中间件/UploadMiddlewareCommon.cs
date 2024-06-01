@@ -29,7 +29,8 @@ public static class UploadMiddlewareCommon
             if (GenerateFileSource(info, mediumInfo.CoverFormat) is not MediaSource { MediaSourceType: FileSourceType.WebVideo, FilePath: { } filePath, CoverPath: var converPath } source)
                 return UploadReturnValue.NotSupported;
             var extended = source.FileInfo.Extended;
-            var temporaryFilesPath = ToolTemporaryFile.CreateTemporaryPath(extended);
+            using var temporaryFile = ToolTemporaryFile.CreateTemporaryPath(extended);
+            var temporaryFilesPath = temporaryFile.TemporaryObj;
             var targetPath = ToolPath.RefactoringPath(filePath, newExtension: _ => "mp4");
             try
             {
@@ -66,10 +67,6 @@ public static class UploadMiddlewareCommon
                 if (ex is not OperationCanceledException)
                     throw;
                 return UploadReturnValue.Fail;
-            }
-            finally
-            {
-                File.Delete(temporaryFilesPath);
             }
         };
     #endregion
@@ -138,7 +135,7 @@ public static class UploadMiddlewareCommon
                 var processPictures = UploadImage(mediumInfo);
                 var serviceProvider = info.ServiceProvider;
                 var cancellationToken = info.CancellationToken;
-                foreach (var (item, index) in images.Index())
+                foreach (var (index, item, _) in images.PackIndex())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var imageInfo = new UploadMiddlewareInfo()

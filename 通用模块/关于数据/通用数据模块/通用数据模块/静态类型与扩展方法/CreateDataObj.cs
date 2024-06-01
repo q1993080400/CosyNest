@@ -33,7 +33,7 @@ public static class CreateDataObj
         var newGetVerifyPropertys = getVerifyPropertys ??= obj =>
          {
              var propertys = obj.GetType().GetProperties().
-             Where(x => x.HasAttributes<DisplayAttribute>()).ToArrayIfDeBug();
+             Where(x => x.HasAttributes<DisplayAttribute>()).ToArray();
              return propertys;
          };
         #region 验证本地函数
@@ -95,5 +95,32 @@ public static class CreateDataObj
         };
         return log;
     }
+    #endregion
+    #region 创建ITableViewerRenderInfoBuild
+    #region 默认实现
+    /// <summary>
+    /// 返回一个默认实现的<see cref="ITableRenderInfoBuild{Model}"/>对象，
+    /// 它可以用于为表格组件提供渲染参数
+    /// </summary>
+    /// <inheritdoc cref="TableRenderInfoBuildDefault{Model}"/>
+    /// <returns></returns>
+    public static ITableRenderInfoBuild<Model> TableViewerRenderInfoBuild<Model>()
+        where Model : class
+        => TableRenderInfoBuildDefault<Model>.Single;
+    #endregion
+    #region 可穿透对象
+    /// <summary>
+    /// 创建一个<see cref="ITableRenderInfoBuild{Model}"/>,
+    /// 它可以穿透模型，实际渲染模型中的某一个属性，
+    /// 它通常用于渲染被外层封装过的类型
+    /// </summary>
+    /// <inheritdoc cref="TableRenderInfoBuildPenetration{OuterModel, TrueModel}(ITableRenderInfoBuild{TrueModel}, Func{OuterModel, TrueModel})"/>
+    /// <inheritdoc cref="TableRenderInfoBuildPenetration{OuterModel, TrueModel}.TableRenderInfoBuildPenetration(ITableRenderInfoBuild{TrueModel}, Func{OuterModel, TrueModel})"/>
+    public static ITableRenderInfoBuild<OuterModel> TableViewerRenderInfoBuildPenetration<OuterModel, TrueModel>
+        (ITableRenderInfoBuild<TrueModel> build, Func<OuterModel, TrueModel> penetration)
+        where OuterModel : class
+        where TrueModel : class
+        => new TableRenderInfoBuildPenetration<OuterModel, TrueModel>(build, penetration);
+    #endregion
     #endregion
 }

@@ -152,7 +152,7 @@ public readonly struct RangeValue
     /// <param name="content">待封装的单元格的值</param>
     public RangeValue(object? content)
     {
-        this.Content = content;
+        Content = content;
     }
     #endregion
 }

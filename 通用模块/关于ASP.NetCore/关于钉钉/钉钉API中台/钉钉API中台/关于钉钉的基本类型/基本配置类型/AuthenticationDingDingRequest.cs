@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore;
+﻿namespace System.DingDing;
 
 /// <summary>
 /// 这个记录可以用来执行钉钉身份验证的请求

@@ -174,21 +174,6 @@ public static class ExtendRazor
     public static IServiceCollection AddJSWindow(this IServiceCollection services)
         => services.AddScoped<IJSWindow, JSWindow>();
     #endregion
-    #region 注入IUriManager
-    /// <summary>
-    /// 以范围模式注入一个<see cref="IUriManager"/>，
-    /// 它可以用于管理本机Uri，本服务依赖于<see cref="NavigationManager"/>，
-    /// 适用于前端
-    /// </summary>
-    /// <param name="services">待注入的服务容器</param>
-    /// <returns></returns>
-    public static IServiceCollection AddUriManagerClient(this IServiceCollection services)
-        => services.AddScoped(x =>
-        {
-            var navigationManager = x.GetRequiredService<NavigationManager>();
-            return CreateNet.UriManager(navigationManager.BaseUri);
-        });
-    #endregion
     #region 注入携带Cookie的SignalRProvide对象
     /// <summary>
     /// 以瞬时模式注入一个<see cref="ISignalRProvide"/>，
@@ -301,6 +286,25 @@ public static class ExtendRazor
     {
         var stateHasChanged = component.GetTypeData().FindMethod("StateHasChanged");
         stateHasChanged.Invoke(component, null);
+    }
+    #endregion
+    #region 合并渲染RenderFragment
+    /// <summary>
+    /// 返回一个新的<see cref="RenderFragment"/>，
+    /// 它依次渲染集合中的所有<see cref="RenderFragment"/>
+    /// </summary>
+    /// <param name="sonRender">要渲染的<see cref="RenderFragment"/>集合</param>
+    /// <returns></returns>
+    public static RenderFragment MergeRender(this IEnumerable<RenderFragment> sonRender)
+    {
+        var newRender = sonRender.ToArray();
+        return builder =>
+        {
+            foreach (var item in newRender)
+            {
+                item(builder);
+            }
+        };
     }
     #endregion
     #endregion

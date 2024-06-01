@@ -5,7 +5,7 @@
     var fileName = Path.GetFileName(Uri);
     var trueFileName = GetFileName?.Invoke(fileName) ?? fileName;
 }
-<a href="@Uri" download="@trueFileName" target="_blank" @attributes=Attributes>
+<a href="@Uri" download="@trueFileName" target="_blank" title="@trueFileName" @attributes=Attributes>
     <Center>
         <TofuCubesSimple Text="@trueFileName" Width="@Width">
             <RenderIcon>

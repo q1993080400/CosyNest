@@ -80,7 +80,7 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
     #region video截图
     public async ValueTask<IBitRead?> VideoScreenshot(string id, string format = "png", CancellationToken cancellation = default)
     {
-        var objName = ToolASP.CreateJSObjectName();
+        var objName = CreateASP.JSObjectName();
         var task = new ExplicitTask<IJSStreamReference>();
         var (methodName, freed) = await PackNetMethod<IJSStreamReference>(task.Completed, cancellation: cancellation);
         try
@@ -203,7 +203,7 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
         var (methodName, freed) = await PackNetMethod(action, cancellation: cancellation);
         const string eventParameter = "event";
         var parameter = getParameter is null ? eventParameter : getParameter(eventParameter).Join(",");
-        var eventMethodName = ToolASP.CreateJSObjectName();
+        var eventMethodName = CreateASP.JSObjectName();
         var script = $"window.{eventMethodName}=function({eventParameter}){{window.{methodName}([{parameter}])}};";
         var targetName = "document";
         if (id is { })
@@ -229,8 +229,8 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
     /// <inheritdoc cref="IJSDocument.PackNetMethod{Obj}(Action{Obj}, string?, CancellationToken)"/>
     private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodJson(Action<JsonElement> action, string? jsMethodName = null, CancellationToken cancellation = default)
     {
-        var springboard = ToolASP.CreateJSObjectName();
-        var newJSMethodName = jsMethodName ?? ToolASP.CreateJSObjectName();
+        var springboard = CreateASP.JSObjectName();
+        var newJSMethodName = jsMethodName ?? CreateASP.JSObjectName();
         var netMethodPack = DotNetObjectReference.Create(new NetMethodPack<JsonElement>(action));
         await JSRuntime.InvokeVoidAsync("RegisterNetMethod",
             cancellation, netMethodPack, newJSMethodName, nameof(NetMethodPack<JsonElement>.Invoke));
@@ -241,9 +241,9 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
     /// <inheritdoc cref="IJSDocument.PackNetMethod{Obj}(Action{Obj}, string?, CancellationToken)"/>
     private async ValueTask<(string MethodName, IDisposable Freed)> PackNetMethodStream(Action<IJSStreamReference> action, string? jsMethodName = null, CancellationToken cancellation = default)
     {
-        var streamName = ToolASP.CreateJSObjectName();
-        var springboard = ToolASP.CreateJSObjectName();
-        jsMethodName ??= ToolASP.CreateJSObjectName();
+        var streamName = CreateASP.JSObjectName();
+        var springboard = CreateASP.JSObjectName();
+        jsMethodName ??= CreateASP.JSObjectName();
         var script = $$"""
             window.{{springboard}}=
             function(net)

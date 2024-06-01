@@ -45,10 +45,10 @@ public static class ExtenPC
     /// </summary>
     /// <param name="io">要创建快捷方式的文件或目录</param>
     /// <param name="pos">快捷方式所在的位置，它指的不是快捷方式的目标，不要加上扩展名lnk</param>
-    public static void Shortcut(this IIO io, PathText pos)
+    public static void Shortcut(this IIO io, string pos)
     {
         var shell = new WshShell();
-        var shortcut = (IWshShortcut)shell.CreateShortcut(pos.Path + ".lnk");
+        var shortcut = (IWshShortcut)shell.CreateShortcut(pos + ".lnk");
         shortcut.TargetPath = io.Path;
         shortcut.Save();
     }

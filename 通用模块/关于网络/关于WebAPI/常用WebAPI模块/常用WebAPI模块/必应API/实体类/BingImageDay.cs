@@ -21,7 +21,7 @@ sealed record BingImageDay : IBingImageDay
     [SetsRequiredMembers]
     public BingImageDay(IDirect data)
     {
-        var uri = data.GetValueRecursion<string>("images[0].url");
+        var uri = data.GetValue<string>("images[0].url");
         Uri = "https://www.bing.com/" + uri;
     }
     #endregion

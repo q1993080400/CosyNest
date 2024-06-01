@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>AliyunOSS</AssemblyName>
+		<RootNamespace>System.NetFrancis</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\通用网络模块\通用网络模块\通用网络模块.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" PrivateAssets="compile" />
+	</ItemGroup>
+
+</Project>

@@ -34,7 +34,7 @@ public sealed class FilterSingleConditionAttribute<BusinessInterface> : FilterCo
     public override RenderConditionGroup ConvertConditioGroup(MemberInfo memberInfo)
     {
         var propertyAccess = GetPropertyAccess(memberInfo);
-        var filterObjectType = GetFilterObjectType(memberInfo);
+        var filterObjectType = GetFilterObjectType(FilterObjectType, memberInfo);
         var enumItem = GetEnumItem(memberInfo);
         return new()
         {

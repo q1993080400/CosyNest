@@ -86,7 +86,8 @@ public interface IFromIO : IInstruct, IAsyncDisposable
     IBitRead Read()
     {
         var format = Path is { } p ? ToolPath.SplitFilePath(p).Extended : null;
-        var file = ToolTemporaryFile.CreateTemporaryFile(format);
+        using var temporaryFile = ToolTemporaryFile.CreateTemporaryFile(format);
+        var file = temporaryFile.TemporaryObj;
         Save(file.Path);
         return file.GetBitPipe().Read;
     }

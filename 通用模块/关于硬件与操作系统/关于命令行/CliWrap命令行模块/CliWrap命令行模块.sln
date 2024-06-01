@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34916.146
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliWrap命令行模块", "CliWrap命令行模块\CliWrap命令行模块.csproj", "{13C079CF-041E-47F0-845E-EE0712BB054A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "底层交互模块", "..\..\底层交互模块\底层交互模块\底层交互模块.csproj", "{685370BC-5485-43FD-AA85-D0F2217CB2CE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "数学工具模块", "..\..\..\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj", "{2ACB2168-5C7F-4F2B-98D6-E051A987EF6D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用地理模块", "..\..\..\关于地理\通用地理模块\通用地理模块\通用地理模块.csproj", "{4C0573CD-EAFD-4389-9BAD-010B20414137}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用工具模块", "..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj", "{BCEAA927-CBBF-4076-AE24-1BBA381807DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13C079CF-041E-47F0-845E-EE0712BB054A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13C079CF-041E-47F0-845E-EE0712BB054A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13C079CF-041E-47F0-845E-EE0712BB054A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13C079CF-041E-47F0-845E-EE0712BB054A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{685370BC-5485-43FD-AA85-D0F2217CB2CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{685370BC-5485-43FD-AA85-D0F2217CB2CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{685370BC-5485-43FD-AA85-D0F2217CB2CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{685370BC-5485-43FD-AA85-D0F2217CB2CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ACB2168-5C7F-4F2B-98D6-E051A987EF6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ACB2168-5C7F-4F2B-98D6-E051A987EF6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ACB2168-5C7F-4F2B-98D6-E051A987EF6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ACB2168-5C7F-4F2B-98D6-E051A987EF6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C0573CD-EAFD-4389-9BAD-010B20414137}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C0573CD-EAFD-4389-9BAD-010B20414137}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C0573CD-EAFD-4389-9BAD-010B20414137}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C0573CD-EAFD-4389-9BAD-010B20414137}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCEAA927-CBBF-4076-AE24-1BBA381807DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCEAA927-CBBF-4076-AE24-1BBA381807DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCEAA927-CBBF-4076-AE24-1BBA381807DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCEAA927-CBBF-4076-AE24-1BBA381807DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F91DD65A-F9CF-442B-AF8B-7AA657092D46}
+	EndGlobalSection
+EndGlobal

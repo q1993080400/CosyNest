@@ -36,7 +36,7 @@ public interface IDirect : IRestrictedDictionary<string, object?>
         if (!isMatch)
             throw new NotSupportedException($"{path}是非法的属性访问表达式");
         var maxIndex = matchs.Length - 1;
-        return matchs.Index().Aggregate((object?)this, (seed, element) =>
+        return matchs.PackIndex().Aggregate((object?)this, (seed, element) =>
         {
             var (match, i) = (element.Elements.GroupsNamed.Values.Single(), element.Index);
             var matchText = match.Match;
@@ -48,9 +48,23 @@ public interface IDirect : IRestrictedDictionary<string, object?>
                     throw new NullReferenceException($"表达式{matchText}的结果为null，无法递归读取它后面的属性");
                 case (IDirect direct, "property"):
                     var (exist, value) = direct.TryGetValue(matchText);
+                    var type = typeof(Ret);
+                    #region 返回数组的本地函数
+                    Array GetArray(object[] objs)
+                    {
+                        var length = objs.Length;
+                        var array = Array.CreateInstance(type.GetElementType()!, length);
+                        Array.Copy(objs, array, length);
+                        return array;
+                    }
+                    #endregion
                     return (exist, checkExist) switch
                     {
-                        (true, _) => value,
+                        (true, _) => value switch
+                        {
+                            object[] objs when type.IsArray && type != typeof(object[]) => GetArray(objs),
+                            var obj => obj
+                        },
                         (_, true) => throw new KeyNotFoundException($"不存在名为{matchText}的属性"),
                         (_, false) => null
                     };

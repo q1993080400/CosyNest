@@ -2,7 +2,7 @@
 @inherits ComponentBase
 @typeparam Model
 
-<BusinessFormViewer FilterProperties=FilterProperties ToPropertyInfo=ToPropertyInfo
+<BusinessFormViewer GetRenderPropertyInfo=GetRenderPropertyInfo
                     Verify=Verify InitializationModel="InitializationModel"
                     ExistingForms=ExistingForms IsReadOnlyProperty=IsReadOnlyProperty
                     OnPropertyChangeed=OnPropertyChangeed ShowSubmit=ShowSubmit
@@ -10,9 +10,9 @@
                     RefreshTarget="RefreshTarget" ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
                     Submit="Submit" VerifyFail="VerifyFail">
     <RenderComponent>
-        @if (ChildContent is null)
+        @if (RenderComponent is null)
         {
-            <div class="bootstrapFormViewerContainer">
+            <div class="bootstrapFormViewerTopContainer">
                 @context.RenderMain
                 <div />
                 @context.RenderSubmit
@@ -20,16 +20,16 @@
         }
         else
         {
-            @ChildContent(context)
+            @RenderComponent(context)
         }
     </RenderComponent>
     <RenderMain>
         @if (RenderMain is null)
         {
             <div class="bootstrapFormViewerContainer">
-                @foreach (var item in context)
+                @foreach (var renderGroup in context.RenderGroup)
                 {
-                    @item.Render
+                    @renderGroup.RenderRegionAll()
                 }
             </div>
         }
@@ -41,7 +41,10 @@
     <RenderProperty>
         @if (RenderProperty is null)
         {
-            <BootstrapFormViewerProperty RenderInfo="context" />
+            @if (context is RenderFormViewerPropertyInfo<Model> renderProperty)
+            {
+                <BootstrapFormViewerProperty RenderInfo="renderProperty" />
+            }
         }
         else
         {

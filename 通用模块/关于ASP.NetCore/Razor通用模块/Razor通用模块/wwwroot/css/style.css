@@ -1,6 +1,6 @@
 ﻿
 /*超大屏PC平台*/
-@media only screen and (min-width : 2448px)
+@media all and (min-width : 2448px)
 {
     /*全局样式*/
     :root
@@ -19,7 +19,7 @@
 }
 
 /*普通屏PC平台*/
-@media only screen and (min-width : 1224px) and (max-width : 2448px)
+@media all and (min-width : 1224px) and (max-width : 2448px)
 {
     /*全局样式*/
     :root
@@ -38,7 +38,7 @@
 }
 
 /*平板平台*/
-@media only screen and (min-width : 667px) and (max-width : 1224px)
+@media all and (min-width : 667px) and (max-width : 1224px)
 {
     /*全局样式*/
     :root
@@ -57,7 +57,7 @@
 }
 
 /*手机平台*/
-@media only screen and (max-width : 667px)
+@media all and (max-width : 667px)
 {
     /*全局样式*/
     :root
@@ -99,6 +99,15 @@
     }
 }
 
+/*打印时的样式*/
+@media print
+{
+    /*打印时隐藏的样式*/
+    .hideDuringPrint
+    {
+        display: none !important;
+    }
+}
 
 /*全局样式*/
 :root
@@ -143,6 +152,14 @@ dialog
     padding: unset;
 }
 
+/*pre元素样式*/
+pre
+{
+    max-width: 100%;
+    word-break: break-all;
+    white-space: normal;
+}
+
 /*完美容器样式，它的子元素依次排列，且平分所有剩余空间，但最后一个元素除外*/
 .perfectContainer
 {
@@ -155,13 +172,6 @@ dialog
     .perfectContainer > *
     {
         flex-grow: 1;
-    }
-
-    /*完美容器伪元素*/
-    .perfectContainer::after
-    {
-        content: '';
-        flex-grow: 99999;
     }
 
 /*占满屏幕，并且在横屏时自动旋转*/
@@ -199,20 +209,12 @@ dialog
     padding: var(--topLayoutPaddingVertical) var(--topLayoutPaddingHorizontal);
 }
 
-/*虚拟化容器页头样式*/
-.virtualizationContainerHead
+/*粘性定位页头样式*/
+.stickyHead
 {
     position: sticky;
     top: 0px;
     z-index: 1;
-}
-
-/*简单虚拟化容器样式*/
-.virtualizationSimpleContainer
-{
-    display: grid;
-    gap: var(--gapMedium);
-    padding: var(--paddingMedium);
 }
 
 /*豆腐块组件容器的CSS样式*/
@@ -232,14 +234,6 @@ dialog
 .tofuCubesText
 {
     text-align: center;
-}
-
-/*文本渲染组件的容器样式*/
-.textRenderingContainer
-{
-    overflow-wrap: break-word;
-    white-space: pre-line;
-    margin: 0;
 }
 
 /*自动播放按钮容器样式*/
@@ -376,4 +370,10 @@ div.autoPlayButtonCntainer > *:first-child
     background: rgba(4, 4, 2, 0.8);
     backdrop-filter: saturate(1.8) blur(20px);
     -webkit-backdrop-filter: saturate(1.8) blur(20px);
+}
+
+/*突出显示样式*/
+.highlight
+{
+    background-color: yellow;
 }

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Performance;
+using System.Reflection;
 
 namespace Microsoft.AspNetCore;
 
@@ -8,6 +9,7 @@ namespace Microsoft.AspNetCore;
 public static class ToolSearchViewer
 {
     #region 根据实体类获取筛选条件
+    #region 正式方法
     /// <summary>
     /// 根据实体类获取筛选条件
     /// </summary>
@@ -18,16 +20,31 @@ public static class ToolSearchViewer
     public static RenderConditionGroup[] GetRenderCondition<Entity, BusinessInterface>()
         where BusinessInterface : class, IGetRenderAllFilterCondition
     {
-        var type = typeof(Entity);
-        var typeAttribute = type.GetCustomAttributes<FilterConditionAttribute<BusinessInterface>>().
-            Select(x => x.ConvertConditioGroup(type));
-        var almightyPropertys = type.GetTypeData().AlmightyPropertys;
-        var ppropertyAttribute = almightyPropertys.Select(x =>
+        var entityType = typeof(Entity);
+        var interfaceType = typeof(BusinessInterface);
+        var key = (entityType, interfaceType);
+        if (CacheRenderCondition.TryGetValue(key, out var renderConditionGroup))
+            return renderConditionGroup ?? throw new NullReferenceException("获取到的缓存为null");
+        var typeAttribute = entityType.GetCustomAttributes<FilterConditionAttribute<BusinessInterface>>().
+            Select(x => x.ConvertConditioGroup(entityType));
+        var almightyPropertys = entityType.GetTypeData().AlmightyPropertys;
+        var propertyAttribute = almightyPropertys.Select(x =>
         {
             var attributes = x.GetCustomAttributes<FilterConditionAttribute<BusinessInterface>>();
             return attributes.Select(y => y.ConvertConditioGroup(x));
         }).SelectMany(x => x);
-        return [.. typeAttribute.Concat(ppropertyAttribute).ToArray().OrderBy(x => x.Order)];
+        RenderConditionGroup[] array = [.. typeAttribute.Concat(propertyAttribute).ToArray().OrderBy(x => x.Order)];
+        CacheRenderCondition.SetValue(key, array);
+        return array;
     }
+    #endregion
+    #region 缓存属性
+    /// <summary>
+    /// 缓存渲染筛选条件
+    /// </summary>
+    private static ICache<(Type Entity, Type BusinessInterface), RenderConditionGroup[]> CacheRenderCondition { get; }
+    = CreatePerformance.MemoryCache<(Type Entity, Type BusinessInterface), RenderConditionGroup[]>
+        ((_, _) => throw new NotSupportedException("不支持自动获取元素，请显式添加元素，然后获取"));
+    #endregion
     #endregion
 }

@@ -44,34 +44,10 @@ sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? defa
     }
     #endregion
     #region 返回IBitRead
-    public async Task<IBitRead> RequestBitRead(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
+    public async Task<IBitRead> RequestBitRead(string uri, CancellationToken cancellationToken = default)
     {
-        var requestMiddle = defaultTransform?.Invoke(request) ?? request;
-        var transformationRequest = transformation?.Invoke(requestMiddle) ?? requestMiddle;
-        if (transformationRequest.HttpMethod != HttpMethod.Get)
-            throw new NotSupportedException($"提供下载的Http请求仅支持Get方法");
-        var uri = transformationRequest.Uri;
-        using var httpClient = new HttpClient();
-        transformationRequest.Header.CopyHeader(httpClient.DefaultRequestHeaders);
-        try
-        {
-            return (await httpClient.GetStreamAsync(uri, cancellationToken)).ToBitPipe().Read;
-        }
-        catch (HttpRequestException ex) when (ex is { StatusCode: HttpStatusCode.Found })       //解决重定向问题
-        {
-            var newUri = (await httpClient.GetAsync(uri, cancellationToken)).Headers.Location;
-            return (await httpClient.GetStreamAsync(newUri, cancellationToken)).ToBitPipe().Read;
-        }
+        return (await httpClient.GetStreamAsync(uri, cancellationToken)).ToBitPipe().Read;
     }
-
-    /*说明文档
-      问：为什么这个方法要重新创建一个HttpClient？Net规范不推荐这种做法
-      答：因为HttpClient有关下载的API只能传入uri，它不支持对标头的自定义，
-      因此作者使用了一个变通方法，创建了一个新的HttpClient，并且设置了它的默认标头，
-      创建新标头的目的在于，防止对原有的HttpClient的干扰
-    
-      但是，它也带来了一些隐患，如果大量地执行下载，
-      会导致HttpClient堆栈耗尽，请尽量避免*/
     #endregion
     #endregion
     #region 发起强类型请求

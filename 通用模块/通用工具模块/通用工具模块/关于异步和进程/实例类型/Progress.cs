@@ -41,7 +41,7 @@ public sealed record Progress
     public Progress TotalProgress(Progress sonProgress)
         => this with
         {
-            CompletedCount = this.CompletedCount + Math.Min(1, sonProgress.CompletedProgress)
+            CompletedCount = CompletedCount + Math.Min(1, sonProgress.CompletedProgress)
         };
     #endregion
 }

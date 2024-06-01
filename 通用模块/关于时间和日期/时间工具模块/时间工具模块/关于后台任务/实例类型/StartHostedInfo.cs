@@ -26,4 +26,12 @@ public sealed record StartHostedInfo
     /// </summary>
     public required Func<IHostApplicationBuilder, bool> Configuration { get; init; }
     #endregion
+    #region 获取是否在出现异常的情况下立即退出
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 在发生异常的时候，会立即退出整个主机，
+    /// 否则只会忽略异常，等待下一个循环
+    /// </summary>
+    public required bool ExitImmediately { get; init; }
+    #endregion
 }

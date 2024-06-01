@@ -55,8 +55,8 @@ public abstract class WordParagraph : IWordParagraph
     /// <param name="begin">段落的开始位置</param>
     public WordParagraph(IWordDocument document, int begin)
     {
-        this.Document = document;
-        this.Begin = Document.GetBookmark(begin);
+        Document = document;
+        Begin = Document.GetBookmark(begin);
     }
     #endregion
 }

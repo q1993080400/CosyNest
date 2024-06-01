@@ -1,5 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Text;
 
 namespace System.Underlying.PC;
@@ -11,7 +10,7 @@ namespace System.Underlying.PC;
 sealed class Personalise : IPersonalise
 {
     #region 壁纸路径
-    public PathText Wallpaper
+    public string Wallpaper
     {
         get
         {

@@ -89,7 +89,6 @@ public static partial class ExtendEnumerable
     #region 关于添加或删除元素
     #region 关于添加元素
     #region 批量添加元素
-    #region 传入迭代器
     /// <summary>
     /// 向一个集合中批量添加元素，由于C#7.2的新语法，
     /// 这个方法可以让集合能够直接用另一个集合进行初始化
@@ -106,75 +105,6 @@ public static partial class ExtendEnumerable
             new List<int>{1}
         };
     */
-    #endregion
-    #region 传入数组
-    /// <summary>
-    /// 向一个集合中批量添加元素
-    /// </summary>
-    /// <typeparam name="Obj">集合元素的类型</typeparam>
-    /// <param name="collections">要添加元素的集合</param>
-    /// <param name="objs">被添加进集合的元素</param>
-    public static void Add<Obj>(this ICollection<Obj> collections, params Obj[] objs)
-        => collections.Add((IEnumerable<Obj>)objs);
-    #endregion
-    #endregion
-    #endregion
-    #region 关于删除元素
-    #region 批量删除元素
-    /// <summary>
-    /// 批量移除元素
-    /// </summary>
-    /// <param name="elements">要移除的元素</param>
-    /// <inheritdoc cref="RemoveWhere{Obj}(ICollection{Obj}, Func{Obj, bool})"/>
-    public static void Remove<Obj>(this ICollection<Obj> collections, IEnumerable<Obj> elements)
-    {
-        foreach (var item in elements)
-        {
-            collections.Remove(item);
-        }
-    }
-    #endregion
-    #region 移除所有符合条件的元素
-    /// <summary>
-    /// 移除集合中所有符合条件的元素
-    /// </summary>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="collections">要移除元素的集合</param>
-    /// <param name="delegate">如果这个委托返回<see langword="true"/>，则将该元素移除</param>
-    public static void RemoveWhere<Obj>(this ICollection<Obj> collections, Func<Obj, bool> @delegate)
-    {
-        #region 本地函数
-        #region 适用于IList
-        void RemoveIList(IList<Obj> collections)
-        {
-            var index = collections.Index().
-                Where(x => @delegate(x.Elements)).
-                Select(x => x.Index).Reverse().ToArray();
-            index.ForEach(collections.RemoveAt);
-        }
-        #endregion
-        #region 适用于ICollection
-        void RemoveICollection()
-            => collections.Where(@delegate).ToArray().
-            ForEach(x => collections.Remove(x));
-        #endregion
-        #endregion
-        switch (collections)
-        {
-            case List<Obj> l:
-                l.RemoveAll(x => @delegate(x)); break;
-            case IList<Obj> l:
-                RemoveIList(l); break;
-            default:
-                RemoveICollection(); break;
-        }
-    }
-
-    /*说明文档：
-       本函数经过优化，如果发现集合是List，或实现了IList接口，
-       则会调用效率更高的方法来移除元素，
-       经测试，集合越大带来的性能提升越明显，
-       但如果集合很小，性能会略微下降*/
     #endregion
     #endregion
     #endregion

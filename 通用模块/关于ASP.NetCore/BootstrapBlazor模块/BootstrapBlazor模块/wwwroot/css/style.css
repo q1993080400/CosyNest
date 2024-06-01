@@ -1,29 +1,49 @@
 ﻿
 /*超大屏PC平台*/
-@media only screen and (min-width : 2448px)
-{
+@container (min-width : 2448px)
+{ /*属性渲染容器属性标签样式*/
+    .bootstrapFormViewerPropertyLabel
+    {
+        white-space: nowrap;
+    }
 }
 
 /*普通屏PC平台*/
-@media only screen and (min-width : 1224px) and (max-width : 2448px)
+@container (min-width : 1224px) and (max-width : 2448px)
 {
+    /*属性渲染容器属性标签样式*/
+    .bootstrapFormViewerPropertyLabel
+    {
+        white-space: nowrap;
+    }
 }
 
 /*平板平台*/
-@media only screen and (min-width : 667px) and (max-width : 1224px)
-{
-}
-
-/*手机平台*/
-@media only screen and (max-width : 667px)
+@container (min-width : 667px) and (max-width : 1224px)
 {
     /*表单视图容器样式*/
-    .bootstrapFormViewerContainer
+    .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
     {
         flex-wrap: nowrap;
         flex-direction: column;
     }
+    /*属性渲染容器样式*/
+    .bootstrapFormViewerPropertyContainer
+    {
+        flex-wrap: nowrap;
+        flex-direction: column;
+    }
+}
 
+/*手机平台*/
+@container (max-width : 667px)
+{
+    /*表单视图容器样式*/
+    .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
+    {
+        flex-wrap: nowrap;
+        flex-direction: column;
+    }
     /*属性渲染容器样式*/
     .bootstrapFormViewerPropertyContainer
     {
@@ -75,8 +95,14 @@
     object-position: center;
 }
 
+/*表单视图顶容器样式*/
+bootstrapFormViewerTopContainer
+{
+    container-type: inline-size;
+}
+
 /*表单视图容器样式*/
-.bootstrapFormViewerContainer
+.bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
 {
     display: flex;
     flex-wrap: wrap;
@@ -102,13 +128,11 @@
 /*属性渲染容器属性标签样式*/
 .bootstrapFormViewerPropertyLabel
 {
-    white-space: nowrap;
 }
 
 /*属性渲染容器属性文字样式*/
 .bootstrapFormViewerPropertyText
 {
-    white-space: pre-wrap;
 }
 
 /*属性渲染容器元素说明样式*/

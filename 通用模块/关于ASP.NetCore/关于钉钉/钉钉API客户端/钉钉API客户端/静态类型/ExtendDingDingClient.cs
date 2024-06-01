@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Microsoft.AspNetCore;
+namespace System;
 
 /// <summary>
 /// 有关钉钉客户端的扩展方法全部放在这里

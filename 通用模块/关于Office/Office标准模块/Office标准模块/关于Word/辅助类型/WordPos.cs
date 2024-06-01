@@ -37,9 +37,9 @@ public sealed record WordPos
     /// <param name="indexUnderlying">用来接收底层实现位置的对象</param>
     public void Deconstruct(out (int Begin, int End) indexText, out (int Begin, int End) indexActual, out (int Begin, int End) indexUnderlying)
     {
-        indexText = this.IndexText;
-        indexActual = this.IndexActual;
-        indexUnderlying = this.IndexUnderlying;
+        indexText = IndexText;
+        indexActual = IndexActual;
+        indexUnderlying = IndexUnderlying;
     }
     #endregion
     #region 构造函数
@@ -51,9 +51,9 @@ public sealed record WordPos
     /// <param name="indexUnderlying">底层位置的开始和结束</param>
     public WordPos((int Begin, int End) iindexText, (int Begin, int End) indexActual, (int Begin, int End) indexUnderlying)
     {
-        this.IndexActual = indexActual;
-        this.IndexText = iindexText;
-        this.IndexUnderlying = indexUnderlying;
+        IndexActual = indexActual;
+        IndexText = iindexText;
+        IndexUnderlying = indexUnderlying;
     }
     #endregion
 }

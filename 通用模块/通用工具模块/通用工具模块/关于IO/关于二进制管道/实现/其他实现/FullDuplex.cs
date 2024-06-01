@@ -21,6 +21,5 @@ sealed class FullDuplex(IBitRead read, IBitWrite write) : Release, IFullDuplex
         Read.Dispose();
         Write.Dispose();
     }
-
     #endregion
 }

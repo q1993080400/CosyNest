@@ -22,6 +22,13 @@ sealed class TimerFromTime(TimeOnly[] times, Func<DateOnly, int, bool> canTrigge
         var now = DateTimeOffset.Now;
         var dateTime = now.DateTime;
         var date = DateOnly.FromDateTime(dateTime);
+        #region 用来等待的本地函数
+        async Task<bool> Wait(TimeSpan delay)
+        {
+            using var timer = new PeriodicTimer(delay);
+            return await timer.WaitForNextTickAsync(cancellationToken);
+        }
+        #endregion
         if (canTrigger(date, 0))
         {
             var time = TimeOnly.FromDateTime(dateTime);
@@ -34,7 +41,7 @@ sealed class TimerFromTime(TimeOnly[] times, Func<DateOnly, int, bool> canTrigge
             return new()
             {
                 Next = dateTime + timeSpan,
-                Wait = Task.Delay(timeSpan, cancellationToken)
+                Wait = Wait(timeSpan)
             };
         }
         var notTriggerDay = 1;
@@ -48,7 +55,7 @@ sealed class TimerFromTime(TimeOnly[] times, Func<DateOnly, int, bool> canTrigge
                 return new()
                 {
                     Next = nextDate,
-                    Wait = Task.Delay(timeSpan, cancellationToken)
+                    Wait = Wait(timeSpan)
                 };
             }
             notTriggerDay++;

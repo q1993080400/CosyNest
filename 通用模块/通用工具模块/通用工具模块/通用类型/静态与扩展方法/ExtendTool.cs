@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.MathFrancis;
 using System.Reflection;
 
@@ -39,20 +38,6 @@ public static partial class ExtendTool
     {
         var bit = ToolBit.RemoveFlag(obj.To<int>(), remove.Select(x => x.To<int>()).ToArray());
         return (Obj)Enum.ToObject(typeof(Obj), bit);
-    }
-    #endregion
-    #region 获取枚举的描述
-    /// <summary>
-    /// 获取枚举的描述，
-    /// 如果没有描述，返回<see langword="null"/>
-    /// </summary>
-    /// <param name="enum">待返回描述的枚举</param>
-    /// <returns></returns>
-    public static string? GetDescription(this Enum @enum)
-    {
-        var description = @enum.GetType().GetField(@enum.ToString())?.
-            GetCustomAttribute<DisplayAttribute>();
-        return description is { Name: { } d } ? d : null;
     }
     #endregion
     #endregion

@@ -55,7 +55,7 @@ public sealed partial class Player : ComponentBase, IContentComponent<RenderFrag
     /// 获取播放器的ID，
     /// 它必须被赋值给指定的video或audio标签
     /// </summary>
-    private string PlayerID { get; } = ToolASP.CreateJSObjectName();
+    private string PlayerID { get; } = CreateASP.JSObjectName();
     #endregion
     #region 错误文本
     /// <summary>

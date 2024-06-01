@@ -6,6 +6,10 @@
 public enum FilterObjectType
 {
     /// <summary>
+    /// 未指定
+    /// </summary>
+    None,
+    /// <summary>
     /// 字符串
     /// </summary>
     Text,

@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<RootNamespace>Microsoft.AspNetCore</RootNamespace>
+		<RootNamespace>System.DingDing</RootNamespace>
 		<AssemblyName>DingDing.Shared</AssemblyName>
 	</PropertyGroup>
 

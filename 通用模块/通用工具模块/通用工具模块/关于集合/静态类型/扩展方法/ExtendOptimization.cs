@@ -141,7 +141,7 @@ public static partial class ExtendEnumerable
         {
             if (!enumerator.MoveNext())
                 return (list, true);
-            list.Add(enumerator.Current);
+            list.AddLast(enumerator.Current);
         }
         return (list, false);
     }
@@ -155,7 +155,7 @@ public static partial class ExtendEnumerable
         {
             if (!await enumerator.MoveNextAsync())
                 return (list, true);
-            list.Add(enumerator.Current);
+            list.AddLast(enumerator.Current);
         }
         return (list, false);
     }

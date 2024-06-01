@@ -12,8 +12,8 @@ public abstract class Release : IInstruct, IDisposable
         if (IsAvailable)
         {
             IsAvailable = false;
-            GC.SuppressFinalize(this);
             DisposeRealize();
+            GC.SuppressFinalize(this);
         }
     }
     #endregion

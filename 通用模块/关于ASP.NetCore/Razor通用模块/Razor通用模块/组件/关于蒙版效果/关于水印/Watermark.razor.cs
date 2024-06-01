@@ -30,7 +30,7 @@ public sealed partial class Watermark : ComponentBase, IContentComponent<RenderF
     /// <summary>
     /// 获取水印SVG容器的ID
     /// </summary>
-    private string SVGContainerID { get; } = ToolASP.CreateJSObjectName();
+    private string SVGContainerID { get; } = CreateASP.JSObjectName();
     #endregion
     #region SVG图片的Uri
     /// <summary>

@@ -18,14 +18,17 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     /// 属性访问表达式，
     /// 通过它可以访问要查询或排序的属性，
     /// 如果为<see langword="null"/>，
-    /// 且这个特性被应用在属性身上，则自动获取
+    /// 且这个特性被应用在属性身上，则自动获取，
+    /// 对于虚拟筛选条件，它作为标识这个筛选条件的ID
     /// </summary>
     public string? PropertyAccess { get; init; }
     #endregion
     #region 类型
     /// <summary>
     /// 描述要筛选的对象的类型，
-    /// 仅当这个特性指定在类身上时，才需要指定这个参数
+    /// 仅当这个特性指定在类身上时，
+    /// 或者与依附的属性类型不一致时，
+    /// 才需要指定这个参数
     /// </summary>
     public FilterObjectType FilterObjectType { get; init; }
     #endregion
@@ -45,7 +48,7 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     /// <summary>
     /// 是否可排序
     /// </summary>
-    public bool CanSort { get; init; } = true;
+    public bool CanSort { get; init; }
     #endregion
     #region 是否虚拟筛选
     /// <summary>
@@ -73,12 +76,14 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     /// <summary>
     /// 获取要筛选对象的类型
     /// </summary>
+    /// <param name="type">原始的筛选类型</param>
     /// <returns></returns>
     /// <inheritdoc cref="ConvertConditioGroup(MemberInfo)"/>
-    private protected FilterObjectType GetFilterObjectType(MemberInfo memberInfo)
-      => memberInfo switch
+    private static protected FilterObjectType GetFilterObjectType(FilterObjectType type, MemberInfo memberInfo)
+      => (type, memberInfo) switch
       {
-          PropertyInfo { PropertyType: { } propertyType } =>
+          (not FilterObjectType.None, _) => type,
+          (_, PropertyInfo { PropertyType: { } propertyType }) =>
           propertyType switch
           {
               { IsEnum: true } => FilterObjectType.Enum,
@@ -89,10 +94,10 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
               {
                   TypeCode.String => FilterObjectType.Text,
                   TypeCode.DateTime => FilterObjectType.Date,
-                  var typeCode => throw new NotSupportedException($"不能识别{typeCode}的{nameof(FilterObjectType)}")
+                  var typeCode => throw new NotSupportedException($"不能识别{typeCode}的{nameof(type)}")
               }
           },
-          _ => FilterObjectType
+          (var filterObjectType, _) => filterObjectType
       };
     #endregion
     #region 获取属性访问表达式

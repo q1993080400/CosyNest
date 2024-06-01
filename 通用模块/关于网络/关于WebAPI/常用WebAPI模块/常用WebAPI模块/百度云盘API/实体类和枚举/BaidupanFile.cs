@@ -1,5 +1,4 @@
 ﻿using System.Design.Direct;
-using System.IOFrancis.FileSystem;
 using System.NetFrancis.Http;
 
 namespace System.NetFrancis.Api.Baidupan;
@@ -25,7 +24,7 @@ public sealed record BaidupanFile : BaidupanFD
     /// <param name="path">保存文件的地址</param>
     /// <param name="cancellationToken">一个用于取消操作的令牌</param>
     /// <returns></returns>
-    public async Task DownloadFile(PathText path, CancellationToken cancellationToken = default)
+    public async Task DownloadFile(string path, CancellationToken cancellationToken = default)
     {
         var read = await HttpClientProvide().RequestBitRead(Download, cancellationToken: cancellationToken);
         await read.SaveToFile(path, cancellation: cancellationToken);

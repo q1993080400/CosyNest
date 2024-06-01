@@ -8,9 +8,11 @@ public sealed record TimerInfo
     #region 等待定时器的Task
     /// <summary>
     /// 获取一个<see cref="Task"/>，
-    /// 等待它就可以等待定时器的下一个周期
+    /// 等待它就可以等待定时器的下一个周期，
+    /// 如果为<see langword="true"/>，表示正常到期，
+    /// 如果为<see langword="false"/>，表示中途取消
     /// </summary>
-    public required Task Wait { get; init; }
+    public required Task<bool> Wait { get; init; }
     #endregion
     #region 定时器下一次触发的日期
     /// <summary>

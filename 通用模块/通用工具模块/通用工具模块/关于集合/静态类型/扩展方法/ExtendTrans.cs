@@ -286,31 +286,4 @@ public static partial class ExtendEnumerable
     }
     #endregion
     #endregion
-    #region 如果处于DeBug状态下，则将集合转换为数组
-    /// <summary>
-    /// 如果处于DeBug状态下，则将集合转换为数组，
-    /// 否则将其原路返回
-    /// </summary>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="objs">待转换的集合</param>
-    /// <returns></returns>
-    public static IEnumerable<Obj> ToArrayIfDeBug<Obj>(this IEnumerable<Obj> objs)
-    {
-#if DEBUG
-        return objs.ToArray();
-#else
-        return objs;
-#endif
-    }
-
-    /*问：这个方法有什么意义？
-      答：在测试阶段，经常需要将延迟迭代的迭代器转换为数组，
-      这是因为数组可以很方便地查看它的所有元素，且不存在任何性能损失，
-      但是在实际运行阶段，这个操作会造成不必要的性能损失，
-      因此作者声明了这个方法，它可以避免这种问题
-    
-      请注意，这个方法不能替代ToArray，
-      只有在一种情况下可以且应当使用本方法，
-      那就是调用ToArray的目的是为了缓存迭代器的元素，为调试提供方便*/
-    #endregion
 }

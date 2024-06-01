@@ -67,7 +67,7 @@ public static class CreateTimer
             execute = true;
             return new()
             {
-                Wait = Task.CompletedTask,
+                Wait = Task.FromResult(true),
                 Next = null
             };
         };
@@ -169,7 +169,7 @@ public static class CreateTimer
             var start = info.Configuration(builder);
             if (!start)
                 return;
-            builder.Services.AddHostedService(x => new TimedHostedService(info.Timer, x, (x, y) => info.Expire(x, y), Stop));
+            builder.Services.AddHostedService(x => new TimedHostedService(info, x, Stop));
             host = builder.Build();
             await host.RunAsync();
         }

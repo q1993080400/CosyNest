@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore;
+﻿namespace System.DingDing;
 
 /// <summary>
 /// 这个记录是钉钉身份验证的状态

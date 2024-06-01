@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore;
+﻿namespace System.DingDing;
 
 /// <summary>
 /// 这个记录是钉钉授权状态

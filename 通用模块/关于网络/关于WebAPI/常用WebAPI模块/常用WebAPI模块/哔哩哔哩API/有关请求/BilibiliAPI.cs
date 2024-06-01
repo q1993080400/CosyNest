@@ -63,8 +63,8 @@ public sealed class BilibiliAPI(Func<IHttpClient>? httpClientProvide = null) : W
         };
         var http = HttpClientProvide();
         var json = await http.Request(request, cancellationToken: cancellationToken).Read(x => x.ToObject());
-        var dash = json!.GetValueRecursion<IDirect>("data.dash")!;
-        var audio = dash.GetValueRecursion<string>("audio[0].base_url")!;
+        var dash = json!.GetValue<IDirect>("data.dash")!;
+        var audio = dash.GetValue<string>("audio[0].base_url")!;
         var video = dash.GetValue<object[]>("video")!.Cast<IDirect>().FirstOrDefault(x => Equals(x["id"], id)) ??
             throw new NotSupportedException($"找不到清晰度为{clear}的视频");
         return (await http.RequestBitRead(request with

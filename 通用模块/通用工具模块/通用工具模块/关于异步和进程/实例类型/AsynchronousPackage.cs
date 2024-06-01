@@ -28,8 +28,8 @@ public sealed record AsynchronousPackage<Progress>
     /// <param name="cancellationToken">取消令牌</param>
     public void Deconstruct(out Func<Progress, Task> reportProgress, out CancellationToken cancellationToken)
     {
-        reportProgress = this.ReportProgress;
-        cancellationToken = this.CancellationToken;
+        reportProgress = ReportProgress;
+        cancellationToken = CancellationToken;
     }
     #endregion
 }

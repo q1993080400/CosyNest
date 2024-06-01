@@ -17,6 +17,18 @@ sealed class MemoryCacheFrancis<Key, Value>(Func<Key, ICacheEntry, Value> getOrC
         => MemoryCache.GetOrCreate(key,
             x => getOrCreate((Key)x.Key, x))!;
     #endregion
+    #region 尝试获取元素
+    public bool TryGetValue(Key key, out Value? value)
+    {
+        var exist = MemoryCache.TryGetValue(key, out var objValue);
+        value = objValue is Value v ? v : default;
+        return exist;
+    }
+    #endregion
+    #region 显式设置元素
+    public void SetValue(Key key, Value value)
+         => MemoryCache.Set(key, value);
+    #endregion
     #endregion
     #region 内部成员
     #region 内存缓存

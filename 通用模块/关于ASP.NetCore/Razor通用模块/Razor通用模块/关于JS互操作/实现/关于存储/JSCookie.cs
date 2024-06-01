@@ -110,7 +110,7 @@ sealed class JSCookie : JSRuntimeBase, ICookie
     {
 #pragma warning disable CS8774
         var cookies = await JSRuntime.InvokeAsync<KeyAndValue[]>("docCookies.keyAndValue", cancellationToken);
-        var range = cookies.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).ToArrayIfDeBug();
+        var range = cookies.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).ToArray();
         CookieField = ImmutableDictionary<string, string>.Empty.AddRange(range);
 #pragma warning restore
     }

@@ -303,7 +303,7 @@ public static class ExtendNet
     #endregion
     #region 注入HttpRequestTransform
     /// <summary>
-    /// 以瞬间模式注入一个<see cref="HttpRequestTransform"/>，
+    /// 以单例模式注入一个<see cref="HttpRequestTransform"/>，
     /// 它可以自动处理相对请求路径，将其视为请求本站，
     /// 本服务依赖于<see cref="IUriManager"/>
     /// </summary>
@@ -311,7 +311,7 @@ public static class ExtendNet
     /// <returns></returns>
     public static IServiceCollection AddHttpRequestTransformUri(this IServiceCollection services)
     {
-        services.AddScoped(x =>
+        services.AddSingleton(x =>
         {
             var uriManager = x.GetRequiredService<IUriManager>();
             var host = uriManager.Uri.UriHost ??

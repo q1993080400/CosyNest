@@ -40,11 +40,17 @@ public sealed partial class BootstrapSearchPanel<BusinessInterface> : ComponentB
     #endregion
     #endregion
     #region 有关业务
+    #region 元素编号对象
+    /// <inheritdoc cref="SearchPanel.ElementNumber"/>
+    [Parameter]
+    [EditorRequired]
+    public IElementNumber ElementNumber { get; set; }
+    #endregion
     #region 提交搜索
     /// <inheritdoc cref="SearchPanel.Submit"/>
     [Parameter]
     [EditorRequired]
-    public Func<SearchViewerState, Task> Submit { get; set; }
+    public Func<SearchPanelSubmitInfo, Task> Submit { get; set; }
     #endregion
     #region 清除搜索
     /// <inheritdoc cref="SearchPanel.OnClear"/>

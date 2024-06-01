@@ -23,17 +23,6 @@ public static class CreateDesign
         => new ServiceProviderMerge(serviceProvider.ToArray());
     #endregion
     #endregion
-    #region 创建独占任务对象
-    /// <summary>
-    /// 创建一个<see cref="IQueueTask"/>，
-    /// 但是它实际上不进行排队，而是独占执行一个任务，
-    /// 在前端开发中，可以用它来避免事件重复触发
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="QueueTaskExclusive(Action?, Func{Task}?)"/>
-    public static IQueueTask QueueExclusive(Action? inSynchronizationLocking = null, Func<Task>? inAsynchronousLocking = null)
-        => new QueueTaskExclusive(inSynchronizationLocking, inAsynchronousLocking);
-    #endregion
     #region 创建单例对象
     private static ICache<Type, object> SingleCache { get; }
         = CreatePerformance.MemoryCache<Type, object>
@@ -82,6 +71,16 @@ public static class CreateDesign
     public static IDirect DirectEmpty()
         => new DirectSimple();
     #endregion
+    #endregion
+    #region 创建Block
+    /// <summary>
+    /// 返回一个<see cref="IBlock"/>，它可以用来阻塞当前线程，
+    /// 通过它可以实现令牌桶限流算法
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="TokenBucket(int, TimeSpan)"/>
+    public static IBlock BlockTokenBucket(int maxToken, TimeSpan resetInterval)
+        => new TokenBucket(maxToken, resetInterval);
     #endregion
     #region 常用Json序列化器
     /// <summary>

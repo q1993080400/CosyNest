@@ -108,6 +108,5 @@ sealed class BitPipeStream(Stream stream, string? format, string? describe) : Au
     #region 释放对象
     protected override void DisposeRealize()
         => Stream.Dispose();
-
     #endregion
 }

@@ -21,7 +21,7 @@ sealed class JsonConvertCollection<CollectionType, ElementType> : JsonConverter<
             if (reader.TokenType is JsonTokenType.Null)
                 return default;
             var element = JsonSerializer.Deserialize<ElementType>(ref reader, options);
-            cache.Add(element);
+            cache.AddLast(element);
         }
         var collectionType = typeof(CollectionType);
         if (collectionType.IsArray)

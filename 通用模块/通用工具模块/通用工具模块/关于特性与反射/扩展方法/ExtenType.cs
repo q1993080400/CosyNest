@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace System;
 
@@ -173,24 +172,6 @@ public static partial class ExtenReflection
     }
     #endregion
     #endregion
-    #endregion
-    #region 获取枚举的值和描述
-    /// <summary>
-    /// 获取一个迭代器，它枚举枚举的值以及描述
-    /// </summary>
-    /// <param name="type">枚举的类型，
-    /// 如果它不是枚举，则返回一个空集合</param>
-    /// <returns></returns>
-    public static IEnumerable<(Enum Value, string Describe)> GetEnumDescription(this Type type)
-        => type.IsEnum ?
-        type.GetFields().Select(x =>
-        {
-            var display = x.GetCustomAttribute<DisplayAttribute>();
-            return display is { Name: { } d } ?
-            ((Enum)x.GetValue(null)!, d) : default;
-        }).
-        Where(x => x != default) :
-        [];
     #endregion
     #region 获取一个对象的类型数据
     /// <summary>

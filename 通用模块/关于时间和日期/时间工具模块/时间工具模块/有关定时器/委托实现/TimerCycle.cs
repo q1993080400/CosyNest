@@ -12,17 +12,20 @@ sealed class TimerCycle
     public TimerInfo? Timer(CancellationToken cancellationToken = default)
     {
         #region 进行等待的本地函数
-        async Task Wait()
+        async Task<bool> Wait()
         {
             if (Immediately)
             {
                 Immediately = false;
-                return;
+                return true;
             }
             var delay = Next - DateTimeOffset.Now;
-            if (delay > TimeSpan.Zero)
-                await Task.Delay(delay, cancellationToken);
+            if (delay <= TimeSpan.Zero)
+                throw new NotSupportedException($"定时器不得在已经过去的时间触发");
+            using var timer = new PeriodicTimer(delay);
+            var success = await timer.WaitForNextTickAsync(cancellationToken);
             Next = DateTimeOffset.Now + Interval;
+            return success;
         }
         #endregion
         return cancellationToken.IsCancellationRequested ?

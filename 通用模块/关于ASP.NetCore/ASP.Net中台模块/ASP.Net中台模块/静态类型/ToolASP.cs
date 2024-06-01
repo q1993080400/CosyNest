@@ -86,19 +86,5 @@ public static class ToolASP
       如果写死的话，后续网络和硬件条件发生改变时会非常不方便，
       因此作者设计了本属性，所有的超时等待都是以它为单位，解决了这个问题*/
     #endregion
-    #region 生成一个不重复的，符合JS规范的对象名称
-    /// <summary>
-    /// 生成一个不重复的，符合JS规范的对象名称，
-    /// 它可以用于生成JS代码
-    /// </summary>
-    /// <param name="existing">如果这个值不为<see langword="null"/>，
-    /// 则通过这个现有ID生成对象名称</param>
-    /// <returns></returns>
-    public static string CreateJSObjectName(Guid? existing = null)
-    {
-        var guid = (existing ?? Guid.NewGuid()).ToString();
-        return $"a{guid.Remove("-")}";
-    }
-    #endregion
     #endregion
 }

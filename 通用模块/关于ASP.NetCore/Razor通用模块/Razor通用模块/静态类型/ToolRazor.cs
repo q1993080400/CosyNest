@@ -14,17 +14,20 @@ public static class ToolRazor
     #region 泛型方法
     #region 会返回null
     /// <typeparam name="Component">组件的类型</typeparam>
-    /// <inheritdoc cref="GetRoute(Type)"/>
-    public static string? GetRoute<Component>()
+    /// <inheritdoc cref="GetRoute(Type, ValueTuple{string, string}[])"/>
+    public static string? GetRoute<Component>(params (string Name, string Value)[] parameter)
         where Component : IComponent
-        => GetRoute(typeof(Component));
+        => GetRoute(typeof(Component), parameter);
     #endregion
     #region 不会返回null
-    /// <inheritdoc cref="GetRouteSafe(Type)"/>
-    /// <inheritdoc cref="GetRoute{Component}"/>
-    public static string GetRouteSafe<Component>()
+    /// <summary>
+    /// 获取一个组件的路由模板，
+    /// 如果它不是可路由组件，则引发异常
+    /// </summary>
+    /// <inheritdoc cref="GetRoute{Component}(ValueTuple{string, string}[])"/>
+    public static string GetRouteSafe<Component>(params (string Name, string Value)[] parameter)
         where Component : IComponent
-        => GetRoute<Component>() ??
+        => GetRoute<Component>(parameter) ??
         throw new NullReferenceException($"{typeof(Component)}没有指定{nameof(RouteAttribute)}特性，它没有路由模板");
     #endregion
     #endregion
@@ -35,9 +38,20 @@ public static class ToolRazor
     /// 如果它不是可路由组件，则返回<see langword="null"/>
     /// </summary>
     /// <param name="componentType">组件的类型</param>
+    /// <param name="parameter">枚举查询字符串参数的名称和值</param>
     /// <returns></returns>
-    public static string? GetRoute(Type componentType)
-        => componentType.GetCustomAttribute<RouteAttribute>()?.Template;
+    public static string? GetRoute(Type componentType, params (string Name, string Value)[] parameter)
+    {
+        if (!typeof(IComponent).IsAssignableFrom(componentType))
+            throw new NotSupportedException($"{componentType}不是一个Blazor组件");
+        var template = componentType.GetCustomAttribute<RouteAttribute>()?.Template;
+        return (template, parameter) switch
+        {
+            (null, _) => null,
+            ({ }, []) => template,
+            _ => $"{template}?{parameter.Join(x => $"{x.Name}={x.Value}", "&")}"
+        };
+    }
     #endregion
     #region 不会返回null
     /// <summary>
@@ -45,9 +59,9 @@ public static class ToolRazor
     /// 如果它不是可路由组件，则引发异常
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="GetRoute(Type)"/>
-    public static string GetRouteSafe(Type componentType)
-        => GetRoute(componentType) ??
+    /// <inheritdoc cref="GetRoute(Type, ValueTuple{string, string}[])"/>
+    public static string GetRouteSafe(Type componentType, params (string Name, string Value)[] parameter)
+        => GetRoute(componentType, parameter) ??
         throw new NullReferenceException($"{componentType}没有指定{nameof(RouteAttribute)}特性，它没有路由模板");
     #endregion
     #endregion
@@ -64,7 +78,7 @@ public static class ToolRazor
     {
         var newScript = appendScript.Select(appendScript =>
         {
-            var jsObjectName = ToolASP.CreateJSObjectName();
+            var jsObjectName = CreateASP.JSObjectName();
             return $$"""
 
             function {{jsObjectName}}()
@@ -73,7 +87,7 @@ public static class ToolRazor
             };
             {{jsObjectName}}();
             """;
-        }).Prepend(script).ToArrayIfDeBug();
+        }).Prepend(script).ToArray();
         return string.Join(Environment.NewLine, newScript);
     }
     #endregion

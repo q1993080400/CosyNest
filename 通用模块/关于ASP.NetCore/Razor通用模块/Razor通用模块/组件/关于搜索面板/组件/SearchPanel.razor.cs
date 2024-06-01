@@ -52,14 +52,25 @@ public sealed partial class SearchPanel : ComponentBase
     #endregion
     #endregion
     #region 有关业务
-    #region 提交搜索
+    #region 元素编号对象
     /// <summary>
-    /// 这个委托可以用来提交搜索，
-    /// 它的参数就是搜索状态
+    /// 获取元素编号对象，
+    /// 它能够保证在提交搜索后，
+    /// 正确地跳转到容器的最顶层，
+    /// 避免不正确的渲染
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public Func<SearchViewerState, Task> Submit { get; set; }
+    public IElementNumber ElementNumber { get; set; }
+    #endregion
+    #region 提交搜索
+    /// <summary>
+    /// 这个委托可以用来提交搜索，
+    /// 它具有一个参数，用来描述搜索条件
+    /// </summary>
+    [Parameter]
+    [EditorRequired]
+    public Func<SearchPanelSubmitInfo, Task> Submit { get; set; }
     #endregion
     #region 清除搜索后触发的事件
     /// <summary>
@@ -68,6 +79,14 @@ public sealed partial class SearchPanel : ComponentBase
     [Parameter]
     public Func<Task>? OnClear { get; set; }
     #endregion
+    #endregion
+    #endregion
+    #region 公开成员
+    #region 高亮文字参数名称
+    /// <summary>
+    /// 获取高亮文字的参数名称
+    /// </summary>
+    public const string HighlightParameter = "4F8A7B08-C197-4D0C-B645-2FC403193F3D";
     #endregion
     #endregion
     #region 内部成员
@@ -129,9 +148,24 @@ public sealed partial class SearchPanel : ComponentBase
                     throw new NotSupportedException($"不能识别筛选对象类型{filterObjectType}");
             }
         }
-        await Submit(SearchViewerState);
+        await SubmitFunction();
         if (OnClear is { })
             await OnClear();
+    }
+    #endregion
+    #region 用来提交搜索的方法
+    /// <summary>
+    /// 这个方法是最终用来提交搜索的方法
+    /// </summary>
+    /// <returns></returns>
+    private async Task SubmitFunction()
+    {
+        var info = new SearchPanelSubmitInfo()
+        {
+            DataFilterDescription = SearchViewerState.GenerateFilter()
+        };
+        await Submit(info);
+        await ElementNumber.JumpToElement(0, false)();
     }
     #endregion
     #region 获取渲染参数
@@ -140,7 +174,8 @@ public sealed partial class SearchPanel : ComponentBase
     /// </summary>
     /// <returns></returns>
     private RenderSearchPanelInfo? GetRenderInfo()
-        => CacheRenderCondition is null ?
+    {
+        return CacheRenderCondition is null ?
         null :
         new()
         {
@@ -153,7 +188,7 @@ public sealed partial class SearchPanel : ComponentBase
                     InitializeDefaultQueryConditions = true;
                     return Task.CompletedTask;
                 },
-                Submit = () => Submit(SearchViewerState)
+                Submit = SubmitFunction
             }),
             RenderCondition = CacheRenderCondition.Select(x =>
             {
@@ -161,11 +196,12 @@ public sealed partial class SearchPanel : ComponentBase
                 {
                     RenderConditionGroup = x,
                     SearchViewerState = SearchViewerState,
-                    Submit = () => Submit(SearchViewerState)
+                    Submit = SubmitFunction
                 };
                 return RenderProperty(renderProperty);
             }).ToArray()
         };
+    }
     #endregion
     #endregion
 }

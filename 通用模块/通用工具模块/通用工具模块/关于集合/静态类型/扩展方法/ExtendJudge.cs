@@ -87,7 +87,7 @@ public static partial class ExtendEnumerable
     {
         if (collection is IList<Obj> c && optimization)
             return c.IndexOf(obj);
-        foreach (var (e, index) in collection.Index())
+        foreach (var (index, e, _) in collection.PackIndex())
         {
             if (Equals(e, obj))
                 return index;
@@ -101,13 +101,30 @@ public static partial class ExtendEnumerable
     /// </summary>
     /// <typeparam name="Obj">集合的元素类型</typeparam>
     /// <param name="collection">待转换的集合</param>
-    /// <returns></returns>
-    public static IEnumerable<(Obj Elements, int Index)> Index<Obj>(this IEnumerable<Obj> collection)
+    /// <returns>一个元组，它的项分别是元素，索引，以及是否为最后一个元素</returns>
+    public static IEnumerable<(int Index, Obj Elements, bool IsLast)> PackIndex<Obj>(this IEnumerable<Obj> collection)
     {
-        var index = 0;
-        foreach (var obj in collection)
+        var index = -1;
+        using var enumerator = collection.GetEnumerator();
+        while (true)
         {
-            yield return (obj, index++);
+            if (!enumerator.MoveNext())
+                yield break;
+            var current = enumerator.Current;
+            index++;
+            var hasNext = enumerator.MoveNext();
+            if (hasNext)
+            {
+                yield return (index, current, false);
+                var next = enumerator.Current;
+                index++;
+                yield return (index, next, false);
+            }
+            else
+            {
+                yield return (index, current, true);
+                yield break;
+            }
         }
     }
     #endregion
@@ -184,10 +201,10 @@ public static partial class ExtendEnumerable
     #endregion
     #region 转换为Range
     /// <summary>
-    /// 将一个<see cref="System.Index"/>转换为<see cref="Range"/>，
+    /// 将一个<see cref="Index"/>转换为<see cref="Range"/>，
     /// 它仅选取集合中的一个元素
     /// </summary>
-    /// <param name="index">待转换的<see cref="System.Index"/></param>
+    /// <param name="index">待转换的<see cref="Index"/></param>
     /// <returns></returns>
     public static Range ToRange(this Index index)
     {

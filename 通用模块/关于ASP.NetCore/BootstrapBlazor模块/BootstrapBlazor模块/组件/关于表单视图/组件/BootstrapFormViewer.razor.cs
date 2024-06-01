@@ -10,7 +10,7 @@ namespace BootstrapBlazor.Components;
 /// 它底层由Bootstrap实现
 /// </summary>
 /// <inheritdoc cref="FormViewer{Model}"/>
-public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContentComponent<RenderFragment<RenderFormViewerInfo<Model>>?>
+public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     where Model : class
 {
     #region 组件参数
@@ -18,16 +18,17 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     #region 用来渲染每个属性的委托
     /// <inheritdoc cref="FormViewer{Model}.RenderProperty"/>
     [Parameter]
-    public RenderFragment<RenderFormViewerPropertyInfo<Model>>? RenderProperty { get; set; }
+    public RenderFragment<RenderFormViewerPropertyInfoBase<Model>>? RenderProperty { get; set; }
     #endregion
     #region 用来渲染整个组件的委托
+    /// <inheritdoc cref="FormViewer{Model}.RenderComponent"/>
     [Parameter]
-    public RenderFragment<RenderFormViewerInfo<Model>>? ChildContent { get; set; }
+    public RenderFragment<RenderFormViewerInfo<Model>>? RenderComponent { get; set; }
     #endregion
     #region 用来渲染主体部分的委托
     /// <inheritdoc cref="FormViewer{Model}.RenderMain"/>
     [Parameter]
-    public RenderFragment<IEnumerable<RenderFormViewerMainInfo<Model>>>? RenderMain { get; set; }
+    public RenderFragment<RenderFormViewerMainInfo<Model>>? RenderMain { get; set; }
     #endregion
     #region 用来渲染提交部分的委托
     /// <inheritdoc cref="FormViewer{Model}.RenderSubmit"/>
@@ -67,20 +68,16 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase, IContent
     [Parameter]
     public Func<Model, bool> ExistingForms { get; set; } = _ => false;
     #endregion
-    #region 用来筛选属性的委托
-    /// <inheritdoc cref="FormViewer{Model}.FilterProperties"/>
+    #region 用来获取属性渲染参数的委托
+    /// <inheritdoc cref="FormViewer{Model}.GetRenderPropertyInfo"/>
     [Parameter]
-    public Func<PropertyInfo, bool> FilterProperties { get; set; } = FormViewer<Modal>.FilterPropertiesDefault;
-    #endregion
-    #region 用来将属性转换为渲染参数的委托
-    /// <inheritdoc cref="FormViewer{Model}.ToPropertyInfo"/>
-    [Parameter]
-    public Func<IEnumerable<PropertyInfo>, FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfo<Model>>> ToPropertyInfo { get; set; } = FormViewer<Model>.ToPropertyInfoDefault;
+    public Func<Type, FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfoBase<Model>>> GetRenderPropertyInfo { get; set; }
+        = FormViewer<Model>.GetRenderPropertyInfoDefault;
     #endregion
     #region 数据属性改变时的委托
     /// <inheritdoc cref="FormViewer{Model}.OnPropertyChangeed"/>
     [Parameter]
-    public Func<RenderFormViewerPropertyInfo<Model>, Task> OnPropertyChangeed { get; set; } = _ => Task.CompletedTask;
+    public Func<RenderFormViewerPropertyInfoBase<Model>, Task> OnPropertyChangeed { get; set; } = _ => Task.CompletedTask;
     #endregion
     #endregion
     #region 关于业务逻辑

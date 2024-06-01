@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore;
+﻿namespace System.DingDing;
 
 /// <summary>
 /// 这个类型是钉钉身份验证的工具类

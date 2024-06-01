@@ -18,5 +18,12 @@ public sealed partial class BootstrapFormViewerProperty<Model> : ComponentBase
     [EditorRequired]
     public RenderFormViewerPropertyInfo<Model> RenderInfo { get; set; }
     #endregion
+    #region 高亮文本
+    /// <summary>
+    /// 获取高亮文本的集合
+    /// </summary>
+    [CascadingParameter(Name = SearchPanel.HighlightParameter)]
+    private IReadOnlySet<string>? Highlight { get; set; }
+    #endregion
     #endregion
 }

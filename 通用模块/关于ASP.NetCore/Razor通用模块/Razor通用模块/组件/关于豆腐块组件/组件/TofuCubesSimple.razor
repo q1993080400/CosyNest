@@ -4,7 +4,9 @@
 <TofuCubes MaxRow="MaxRow" MaxRowLength="MaxRowLength" Text="@Text" Width="@Width">
     <div class="@context.CSSContainer" @attributes=ContainerAttributes>
         <div class="@context.CSSIcon" style="@(context.ContainerWidth)">
-            @RenderIcon(Text)
+            <Center>
+                @RenderIcon(Text)
+            </Center>
         </div>
         <div class="@context.CSSText" style="@(context.TextHeight);@(context.ContainerWidth)">@context.Text</div>
     </div>

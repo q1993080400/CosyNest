@@ -28,11 +28,18 @@ async function ReadCopyText() {
     }
 }
 
-//滚动到虚拟化容器的顶部
-function GoVirtualizationTop(firstElementID) {
-    let container = document.getElementById(firstElementID);
-    if (container)
-        container.scrollIntoView();
+//跳转到指定的元素
+function JumpTo(elementID, smooth, scrollingContextCSS) {
+    document.querySelector(scrollingContextCSS)?.scrollIntoView(
+        {
+            behavior: "instant",
+            block: "start"
+        });
+    document.getElementById(elementID)?.scrollIntoView(
+        {
+            behavior: smooth ? "smooth" : "instant",
+            block: "end"
+        });
 }
 
 //动态加载css文件
@@ -47,6 +54,18 @@ function LoadCSS(uri) {
     link.rel = "stylesheet";
     link.href = uri;
     head.insertBefore(link, head.firstChild);
+}
+
+//固定具有所有特性的粘性定位元素
+function FixedSticky(id, attribute) {
+    let array = Array.from(document.querySelectorAll(`#${id} [${attribute}]`));
+    let top = 0;
+    for (let i = 1; i < array.length; i++) {
+        let back = array[i - 1];
+        let current = array[i];
+        top += back.getBoundingClientRect().height;
+        current.style.top = `${top}px`;
+    }
 }
 
 //创建一个唤醒锁，它阻止屏幕变暗
@@ -195,40 +214,31 @@ function CheckIntersecting(id) {
 
 //观察虚拟化容器
 function ObservingVirtualizationContainers(netMethod, endID) {
-    let observer = new IntersectionObserver(async (entries, observer) => {
-        let first = entries[0];
-        let isIntersecting = first.isIntersecting;
-        if (!isIntersecting)
-            return;
-        try {
-            await netMethod(0);
-        } catch (e) {
-            observer.disconnect();
-            console.error(e);
-        }
-    });
-    let count = 0;
-    function StartObserver() {
-        let element = document.getElementById(endID);
-        if (element || count >= 10) {
-            observer.observe(element);
-            return;
-        }
-        count++;
-        setTimeout(StartObserver, 200);
-    }
-    StartObserver();
+    let observer = CacheObservation(endID,
+        () => new IntersectionObserver(async (entries, observer) => {
+            for (let i of entries) {
+                if (i.isIntersecting) {
+                    try {
+                        await netMethod(0);
+                    } catch (e) {
+                        observer.disconnect();
+                        console.error(e);
+                    }
+                    return;
+                }
+            }
+        }));
+    let element = document.getElementById(endID);
+    observer.observe(element);
 }
 
-//如果页面存在一个观察者的缓存，则将它释放，然后放入新的观察者
-//它可以避免观察者被重复初始化
+//如果页面存在一个观察者的缓存，提取它，否则创建一个新的缓存
 function CacheObservation(key, createObserve) {
     let newKey = key + 'Observe'
-    let old = window[newKey];
-    if (old) {
-        old.disconnect();
-    }
-    let observe = createObserve();
+    let observe = window[newKey];
+    if (observe)
+        return observe;
+    observe = createObserve();
     window[newKey] = observe;
     return observe;
 }

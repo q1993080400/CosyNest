@@ -57,8 +57,8 @@ sealed class WordBookmark : IWordBookmark
     /// <param name="pos">书签的初始位置</param>
     public WordBookmark(IWordDocument document, int pos)
     {
-        this.Document = document;
-        this.Pos = pos;
+        Document = document;
+        Pos = pos;
         document.LengthChange += LengthChange;
     }
     #endregion

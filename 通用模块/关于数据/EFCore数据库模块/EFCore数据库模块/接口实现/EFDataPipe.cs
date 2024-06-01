@@ -1,7 +1,4 @@
-﻿using System.Design;
-using System.Linq.Expressions;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace System.DataFrancis.DB.EF;
 
@@ -9,51 +6,34 @@ namespace System.DataFrancis.DB.EF;
 /// 本类型是使用EF实现的数据管道
 /// </summary>
 /// <param name="dbContext">封装的数据上下文</param>
-sealed class EFDataPipe(DbContext dbContext) : AutoRelease, IDataPipe
+sealed class EFDataPipe(DbContext dbContext) : IDataPipe
 {
-    #region 接口实现
     #region 查询数据源抽象
     public IQueryable<Data> Query<Data>()
         where Data : class
         => dbContext.Set<Data>();
     #endregion
-    #region 添加或更新数据
-    public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Data, bool>? isAdd = null, CancellationToken cancellation = default)
-        where Data : class
+    #region 执行推送上下文
+    #region 无返回值
+    public async Task Push(Func<IDataPipeToContext, Task> execute)
     {
-        if (isAdd is null)
-        {
-            dbContext.UpdateRange(datas);
-            return;
-        }
-        var (add, update) = datas.Split(isAdd);
-        await dbContext.AddRangeAsync(add, cancellation);
-        dbContext.UpdateRange(update);
+        await execute(new EFDataPipeToContext(dbContext));
+        await dbContext.SaveChangesAsync();
     }
     #endregion
-    #region 删除数据
-    #region 按照实体
-    public Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
-        where Data : class
+    #region 有返回值
+    public async Task<Obj> Push<Obj>(Func<IDataPipeToContext, Task<Obj>> execute)
     {
-        dbContext.RemoveRange(datas);
-        return Task.CompletedTask;
+        var @return = await execute(new EFDataPipeToContext(dbContext));
+        await dbContext.SaveChangesAsync();
+        return @return;
     }
-    #endregion
-    #region 按照条件
-    public Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation = default)
-        where Data : class
-        => Query<Data>().Where(expression).ExecuteDeleteAsync(cancellation);
-    #endregion
-    #endregion
-    #endregion
-    #region 抽象类实现
-    #region 释放对象
-    protected override void DisposeRealize()
-    {
-        dbContext.SaveChanges();
-        dbContext.Dispose();
-    }
-    #endregion
     #endregion 
+    #endregion
+    #region 释放对象
+    public async ValueTask DisposeAsync()
+    {
+        await dbContext.DisposeAsync();
+    }
+    #endregion
 }
