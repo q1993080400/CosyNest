@@ -3,7 +3,6 @@ using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Web;
 
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Http.Connections.Client;
 
 namespace System;

@@ -122,7 +122,6 @@ public static class CreateCollection
         => new ReflectionDictionary(target, properties);
     #endregion
     #region 有关ITwoWayMap
-    #region 直接创建双向映射表
     /// <summary>
     /// 创建一个双向映射表，并返回
     /// </summary>
@@ -132,20 +131,6 @@ public static class CreateCollection
         where A : notnull
         where B : notnull
         => new TwoWayMap<A, B>();
-    #endregion
-    #region 创建双向映射表
-    /// <summary>
-    /// 构造双向映射表，
-    /// 并将指定的双向映射添加到表中
-    /// </summary>
-    /// <param name="map">这些元组的项会互相映射</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="ITwoWayMap{A, B}"/>
-    public static ITwoWayMap<A, B> TwoWayMap<A, B>(params (A, B)[] map)
-        where A : notnull
-        where B : notnull
-        => new TwoWayMap<A, B>(map);
-    #endregion
     #endregion
     #endregion
 }

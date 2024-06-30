@@ -87,7 +87,8 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
             await Delay();
             var response = await http.RequestPost("https://api.dingtalk.com/v1.0/workflow/processes/instanceIds/query",
                 postParameter, transformation: TransformAccessToken(accessToken)).Read(x => x.ToObject());
-            var success = response.GetValue<bool>("success");
+            response = VerifyResponse(response);
+            var success = response.GetValue<bool>("success", false);
             if (!success)
                 yield break;
             var list = (response.GetValue<object[]>("result.list") ?? []).Cast<string>().ToArray();
@@ -139,7 +140,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
         {
             ID = instanceID,
             Title = Fun<string>("title"),
-            FinishTime = Fun<DateTimeOffset?>("finishTime"),
+            FinishTime = ConvertDate(Fun<DateTimeOffset?>("finishTime")),
             OriginatorUserID = Fun<string>("originatorUserId"),
             OriginatorDeptID = Fun<string>("originatorDeptId"),
             OriginatorDeptName = Fun<string>("originatorDeptName"),
@@ -170,7 +171,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
             MainProcessInstanceID = Fun<string>("mainProcessInstanceId"),
             FormComponentValues = Fun<object[]>("formComponentValues").Cast<IDirect>().
                 Select(ConvertComponentValue).ToArray(),
-            CreateTime = Fun<DateTimeOffset>("createTime")
+            CreateTime = ConvertDate(Fun<DateTimeOffset>("createTime"))
         };
     }
     #endregion
@@ -189,7 +190,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
         return new()
         {
             OriginatorUserID = Fun<string>("userId"),
-            Date = Fun<DateTimeOffset>("date"),
+            Date = ConvertDate(Fun<DateTimeOffset>("date")),
             OperationType = Fun<string>("type") switch
             {
                 "EXECUTE_TASK_NORMAL" => DingDingOAOperationType.Normal,
@@ -274,8 +275,8 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
                 "NONE" => DingDingOATaskResult.None,
                 var state => throw new NotSupportedException($"无法识别{state}类型的钉钉任务结果")
             },
-            CreateTime = Fun<DateTimeOffset>("createTime"),
-            FinishTime = Fun<DateTimeOffset?>("finishTime"),
+            CreateTime = ConvertDate(Fun<DateTimeOffset>("createTime")),
+            FinishTime = ConvertDate(Fun<DateTimeOffset?>("finishTime")),
             MobileUri = Fun<string>("mobileUrl"),
             PCUri = Fun<string>("pcUrl"),
             InstanceID = Fun<string>("processInstanceId"),

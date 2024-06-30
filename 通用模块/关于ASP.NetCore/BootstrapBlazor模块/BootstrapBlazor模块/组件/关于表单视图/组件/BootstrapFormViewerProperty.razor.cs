@@ -23,7 +23,7 @@ public sealed partial class BootstrapFormViewerProperty<Model> : ComponentBase
     /// 获取高亮文本的集合
     /// </summary>
     [CascadingParameter(Name = SearchPanel.HighlightParameter)]
-    private IReadOnlySet<string>? Highlight { get; set; }
+    private IReadOnlyCollection<string>? Highlight { get; set; }
     #endregion
     #endregion
 }

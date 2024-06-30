@@ -90,13 +90,13 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// <summary>
     /// 从这个工作表返回行或者列
     /// </summary>
+    /// <param name="isRow">如果这个值为<see langword="true"/>，
+    /// 代表返回行，否则返回列</param>
     /// <param name="begin">开始行列号</param>
     /// <param name="end">结束行列号，如果这个值为<see langword="null"/>，
     /// 则默认为与开始行列数相等</param>
-    /// <param name="isRow">如果这个值为<see langword="true"/>，
-    /// 代表返回行，否则返回列</param>
     /// <returns></returns>
-    IExcelRC GetRC(int begin, int? end, bool isRow);
+    IExcelRC GetRC(bool isRow, int begin, int? end = null);
     #endregion
     #endregion
     #region 关于Excel对象

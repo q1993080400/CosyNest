@@ -21,7 +21,7 @@ public sealed partial class BootstrapSearchPanel<BusinessInterface> : ComponentB
     #region 获取如何渲染筛选条件
     /// <inheritdoc cref="SearchPanel.GetRenderCondition"/>
     [Parameter]
-    public Func<Task<RenderConditionGroup[]>>? GetRenderCondition { get; set; }
+    public Func<Task<RenderFilterGroup[]>>? GetRenderCondition { get; set; }
     #endregion
     #region 搜索视图状态
     /// <inheritdoc cref="SearchPanel.SearchViewerState"/>
@@ -51,11 +51,6 @@ public sealed partial class BootstrapSearchPanel<BusinessInterface> : ComponentB
     [Parameter]
     [EditorRequired]
     public Func<SearchPanelSubmitInfo, Task> Submit { get; set; }
-    #endregion
-    #region 清除搜索
-    /// <inheritdoc cref="SearchPanel.OnClear"/>
-    [Parameter]
-    public Func<Task> OnClear { get; set; }
     #endregion
     #endregion
     #endregion

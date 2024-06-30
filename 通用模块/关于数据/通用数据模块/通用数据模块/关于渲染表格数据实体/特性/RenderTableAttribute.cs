@@ -27,7 +27,7 @@ public sealed class RenderTableAttribute : RenderTableBaseAttribute
         var property = GetPropertyInfo(attachment);
         return new RenderTableBodyColumnsInfo<Model>()
         {
-            ColumnsName = HeaderName,
+            Name = HeaderName,
             RowIndex = rowIndex,
             TableModel = model,
             PropertyInfo = property,

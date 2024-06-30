@@ -1,0 +1,13 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+<div class="dividerLineContainer @(IsVertical?"dividerLineContainerVertical":"")">
+    <div class="dividerLine" />
+    <div>
+        @if (RenderDescription is { })
+        {
+            @RenderDescription
+        }
+    </div>
+    <div class="dividerLine" />
+</div>

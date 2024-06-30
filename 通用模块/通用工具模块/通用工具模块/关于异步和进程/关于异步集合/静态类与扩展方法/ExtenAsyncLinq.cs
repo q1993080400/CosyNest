@@ -62,4 +62,35 @@ public static partial class ExtendEnumerable
         }
     }
     #endregion
+    #region 封装集合的元素和索引
+    /// <summary>
+    /// 封装一个异步集合的元素和索引，并返回一个新集合
+    /// </summary>
+    /// <typeparam name="Obj">集合的元素类型</typeparam>
+    /// <param name="collection">待转换的集合</param>
+    /// <returns>一个元组，它的项分别是元素，索引，以及是否为最后一个元素</returns>
+    public static async IAsyncEnumerable<(int Index, Obj Elements, bool IsLast)> PackIndex<Obj>(this IAsyncEnumerable<Obj> collection)
+    {
+        var index = -1;
+        await using var enumerator = collection.GetAsyncEnumerator();
+        if (!await enumerator.MoveNextAsync())
+            yield break;
+        var current = enumerator.Current;
+        while (true)
+        {
+            index++;
+            var hasNext = await enumerator.MoveNextAsync();
+            if (hasNext)
+            {
+                yield return (index, current, false);
+                current = enumerator.Current;
+            }
+            else
+            {
+                yield return (index, current, true);
+                yield break;
+            }
+        }
+    }
+    #endregion
 }

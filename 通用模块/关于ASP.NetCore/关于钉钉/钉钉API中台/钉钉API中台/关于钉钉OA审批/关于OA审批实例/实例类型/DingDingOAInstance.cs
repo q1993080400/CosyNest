@@ -17,6 +17,12 @@ public sealed record DingDingOAInstance
     /// </summary>
     public required string Title { get; init; }
     #endregion
+    #region 创建时间
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    public required DateTimeOffset CreateTime { get; init; }
+    #endregion
     #region 结束时间
     /// <summary>
     /// 结束时间
@@ -112,11 +118,5 @@ public sealed record DingDingOAInstance
     /// 表单组件详情列表
     /// </summary>
     public required IReadOnlyList<DingDingOAFormComponentValueExtend> FormComponentValues { get; init; }
-    #endregion
-    #region 创建时间
-    /// <summary>
-    /// 创建时间
-    /// </summary>
-    public required DateTimeOffset CreateTime { get; init; }
     #endregion
 }

@@ -35,22 +35,11 @@ sealed class TwoWayMap<A, B> : ITwoWayMap<A, B>
     #endregion
     #region 注册映射
     #region 注册双向映射
-    public void RegisteredTwo(params (A a, B b)[] map)
+    public void RegisteredMap(A a, B b)
     {
-        foreach ((var a, var b) in map)
-        {
-            AToB.Add(a, b);
-            BToA.Add(b, a);
-        }
+        AToB.Add(a, b);
+        BToA.Add(b, a);
     }
-    #endregion
-    #region 注册从A到B的单向映射
-    public void RegisteredOne(B to, params A[] from)
-        => from.ForEach(x => AToB.Add(x, to));
-    #endregion
-    #region 注册从B到A的单向映射
-    public void RegisteredOne(A to, params B[] from)
-           => from.ForEach(x => BToA.Add(x, to));
     #endregion
     #endregion
     #region 迭代器
@@ -79,24 +68,5 @@ sealed class TwoWayMap<A, B> : ITwoWayMap<A, B>
     private Dictionary<B, A> BToA { get; } = [];
     #endregion
     #endregion 
-    #endregion
-    #region 构造函数
-    #region 使用指定的双向映射
-    /// <summary>
-    /// 构造双向映射表，
-    /// 并将指定的双向映射添加到表中
-    /// </summary>
-    /// <param name="map">这些元组的项会互相映射</param>
-    public TwoWayMap(IEnumerable<(A a, B b)> map)
-    {
-        RegisteredTwo(map.ToArray());
-    }
-    #endregion
-    #region 无参数构造函数
-    public TwoWayMap()
-    {
-
-    }
-    #endregion
     #endregion
 }

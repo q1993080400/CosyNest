@@ -10,13 +10,25 @@ namespace System.IOFrancis;
 sealed class TemporaryFilePackPathIO<Obj>(Obj io) : ITemporaryFilePack<Obj>
     where Obj : class, IIO
 {
+    #region 公开成员
     #region 封装的IO对象
     public Obj TemporaryObj { get; } = io;
     #endregion
     #region 释放对象
     public void Dispose()
     {
-        TemporaryObj.Delete();
+        CreateIO.IO(OriginalPath)?.Delete();
     }
-    #endregion 
+    #endregion
+    #endregion
+    #region 内部成员
+    #region 原始地址
+    /// <summary>
+    /// 获取IO对象的原始地址，
+    /// 如果<see cref="TemporaryObj"/>被移动了，
+    /// 那么它不会改变
+    /// </summary>
+    private string OriginalPath { get; } = io.Path;
+    #endregion
+    #endregion
 }

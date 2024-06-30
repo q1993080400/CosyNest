@@ -71,40 +71,48 @@ public static partial class ExtendTool
     [return: NotNullIfNotNull(nameof(obj))]
     public static Ret? To<Ret>(this object? obj, bool @throw = true, LazyPro<Ret>? notConvert = default)
     {
-        var type = typeof(Ret);
+        if (obj is Ret ret)
+            return ret;
+        var originalType = typeof(Ret);
+        var type = Nullable.GetUnderlyingType(originalType) ?? originalType;
         try
         {
-            switch (obj)
-            {
-                case Ret o:
-                    return o;
-                case null when type.CanNull():
-                    return default;
-                case var o when type == typeof(string):         //为string做特殊处理，因为任何对象都有ToString方法
-                    return (dynamic?)o?.ToString()!;
-                case { } o when ConvertObject.Conversion.TryGetValue((o.GetType(), type), out var convert) &&       //尝试使用注册的特殊转换方法
-                convert.TryConvert(o) is (true, var result):
-                    return (Ret)result;
-                case { } o when type.IsEnum:                //如果是枚举，则转换它的值或字面量
-                    return o is string text ?
-                        (Ret)Enum.Parse(type, text) :
-                        (Ret)Enum.ToObject(type, o.To(Enum.GetUnderlyingType(type)));
-                case string t when type == typeof(DateTimeOffset) || type == typeof(DateTimeOffset?):
-                    return (dynamic)DateTimeOffset.Parse(t);
-                case string t when type == typeof(Guid) || type == typeof(Guid?):        //为Guid做优化
-                    return (dynamic)Guid.Parse(t);
-                case IConvertible o:
-                    var targetType = type.IsGenericRealize(typeof(Nullable<>)) ?              //如果目标类型是可空值类型，则函数知道应该转换为它的实际类型
-                         type.GenericTypeArguments[0] : type;
-                    return (Ret)Convert.ChangeType(o, targetType);
-                case var o:                                                         //如果以上转换全部失败，则尝试调用类型自身声明的转换运算符
-                    return (Ret?)(dynamic?)o;
-            }
+            #region 本地函数
+            dynamic? DynamicConvert()
+                => obj switch
+                {
+                    null => null,
+                    var o when type == typeof(string) => o?.ToString(),       //为string做特殊处理，因为任何对象都有ToString方法
+                    { } o when type.IsEnum              //如果是枚举，则转换它的值或字面量
+                    => o is string text ?
+                    Enum.Parse(type, text) : Enum.ToObject(type, o.To(Enum.GetUnderlyingType(type))),
+                    string t when type == typeof(DateTimeOffset) => DateTimeOffset.Parse(t),
+                    string t when type == typeof(Guid) => Guid.Parse(t),          //为Guid做优化
+                    IConvertible o => Convert.ChangeType(o, type),
+                    var o => (Ret)(dynamic)o          //如果一切失败，则尝试调用隐式转换以及类型自带的转换
+                };
+            #endregion
+            return DynamicConvert();
         }
         catch (Exception) when (!@throw)
         {
             return notConvert;
         }
+    }
+    #endregion
+    #region 正式高性能方法
+    /// <inheritdoc cref="To{Ret}(object?, bool, LazyPro{Ret}?)"/>
+    [return: NotNullIfNotNull(nameof(obj))]
+    public static Ret? To<Ret>(this string? obj, bool @throw = true, LazyPro<Ret>? notConvert = default)
+        where Ret : IParsable<Ret>
+    {
+        var canConvert = Ret.TryParse(obj, null, out var convert);
+        return (canConvert, @throw) switch
+        {
+            (true, _) => convert,
+            (false, true) => throw new NotSupportedException($"无法将文本{obj}转换为{typeof(Ret)}"),
+            (false, false) => notConvert
+        };
     }
     #endregion
     #endregion

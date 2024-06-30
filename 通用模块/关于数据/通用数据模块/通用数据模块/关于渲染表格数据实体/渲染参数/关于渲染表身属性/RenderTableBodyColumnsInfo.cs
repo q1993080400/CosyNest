@@ -7,7 +7,7 @@ namespace System.DataFrancis;
 /// 它表示有一个真实的属性映射到这个列
 /// </summary>
 /// <inheritdoc cref="RenderBodyColumnsInfoBase{Model}"/>
-public sealed record RenderTableBodyColumnsInfo<Model> : RenderBodyColumnsInfoBase<Model>
+public sealed record RenderTableBodyColumnsInfo<Model> : RenderBodyColumnsInfoBase<Model>, ITitleData
     where Model : class
 {
     #region 要渲染的属性
@@ -16,20 +16,16 @@ public sealed record RenderTableBodyColumnsInfo<Model> : RenderBodyColumnsInfoBa
     /// </summary>
     public required PropertyInfo PropertyInfo { get; init; }
     #endregion
+    #region 获取属性的值的类型
+    public Type ValueType
+         => PropertyInfo.PropertyType;
+    #endregion
     #region 获取属性的值
     #region 非泛型
-    /// <summary>
-    /// 获取这个属性的值
-    /// </summary>
     public object? Value
         => PropertyInfo.GetValue(TableModel);
     #endregion
     #region 泛型方法
-    /// <summary>
-    /// 获取这个属性的值
-    /// </summary>
-    /// <typeparam name="Obj">属性的值的类型</typeparam>
-    /// <returns></returns>
     public Obj? GetValue<Obj>()
         => Value.To<Obj>();
     #endregion

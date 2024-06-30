@@ -26,20 +26,29 @@ public static class ToolPath
     /// 并返回重构后的新完整路径
     /// </summary>
     /// <param name="path">待重构的路径，注意，它是路径，不是文件的名字</param>
+    /// <param name="newDirectory">这个委托传入旧的父目录路径，
+    /// 返回重构后的新父目录路径，如果为<see langword="null"/>，则不改变</param>
     /// <param name="newSimple">这个委托传入旧名称，返回文件或目录重构后的新名称，
     /// 不带扩展名，如果为<see langword="null"/>，代表不更改</param>
     /// <param name="newExtension">这个委托传入旧扩展名，返回文件重构后的新扩展名，不带点号，
     /// 如果为<see langword="null"/>，代表该路径不是文件，或不更改扩展名</param>
     /// <returns></returns>
-    public static string RefactoringPath(string path, Func<string, string>? newSimple = null, Func<string?, string?>? newExtension = null)
+    public static string RefactoringPath(string path,
+        Func<string?, string?>? newDirectory = null,
+        Func<string, string>? newSimple = null,
+        Func<string?, string?>? newExtension = null)
     {
         var (simple, extended, _) = SplitFilePath(path);
         var father = Path.GetDirectoryName(path);
-        var name = GetFullName(newSimple?.Invoke(simple) ?? simple, newExtension?.Invoke(extended) ?? extended);
+        #region 本地函数
+        static string? Fun(string? old, Func<string?, string?>? fun)
+            => fun is null ? old : fun(old);
+        #endregion
+        var name = GetFullName(Fun(simple, newSimple!), Fun(extended, newExtension));
         return father switch
         {
             null or "" => name,
-            var f => Path.Combine(f, name)
+            var f => Path.Combine(Fun(f, newDirectory)!, name)
         };
     }
     #endregion

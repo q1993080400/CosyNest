@@ -1,0 +1,24 @@
+﻿
+/*分割线容器样式*/
+.dividerLineContainer
+{
+    display: flex;
+    flex-wrap: wrap;
+    place-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/*垂直分割线容器样式*/
+.dividerLineContainerVertical
+{
+    flex-direction: column;
+}
+
+/*分割线样式*/
+.dividerLine
+{
+    background-color: #e4e6ef;
+    padding: 2.5px;
+    flex-grow: 1;
+}

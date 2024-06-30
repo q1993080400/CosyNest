@@ -1,0 +1,29 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+
+<PopUp IsOpen="IsOpen" Cancellation="Cancellation" Title="@Title">
+    <RenderComponent>
+        <Card>
+            <HeaderTemplate>
+                <Center>
+                    <div>@context.Title</div>
+                </Center>
+            </HeaderTemplate>
+            <BodyTemplate>
+                @RenderBody
+            </BodyTemplate>
+            <FooterTemplate>
+                @if (RenderFooter is { })
+                {
+                    @RenderFooter(context.Cancellation)
+                }
+                else
+                {
+                    <div class="compactCentered">
+                        <Button Text="取消" OnClick="@context.Cancellation" />
+                    </div>
+                }
+            </FooterTemplate>
+        </Card>
+    </RenderComponent>
+</PopUp>

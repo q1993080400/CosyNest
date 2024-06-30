@@ -106,19 +106,17 @@ public static partial class ExtendEnumerable
     {
         var index = -1;
         using var enumerator = collection.GetEnumerator();
+        if (!enumerator.MoveNext())
+            yield break;
+        var current = enumerator.Current;
         while (true)
         {
-            if (!enumerator.MoveNext())
-                yield break;
-            var current = enumerator.Current;
             index++;
             var hasNext = enumerator.MoveNext();
             if (hasNext)
             {
                 yield return (index, current, false);
-                var next = enumerator.Current;
-                index++;
-                yield return (index, next, false);
+                current = enumerator.Current;
             }
             else
             {

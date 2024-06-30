@@ -1,5 +1,4 @@
-﻿using System.DataFrancis.EntityDescribe;
-using System.Reflection;
+﻿using System.Reflection;
 
 using Microsoft.AspNetCore.Components;
 
@@ -35,20 +34,16 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     [Parameter]
     public RenderFragment<RenderBusinessFormViewerInfo<Model>>? RenderSubmit { get; set; }
     #endregion
+    #region 是否可编辑
+    /// <inheritdoc cref="FormViewer{Model}.CanEdit"/>
+    [Parameter]
+    public bool CanEdit { get; set; }
+    #endregion
     #region 是否仅显示
     /// <inheritdoc cref="FormViewer{Model}.IsReadOnlyProperty"/>
     [Parameter]
-    public Func<PropertyInfo, Model, bool> IsReadOnlyProperty { get; set; } = (_, _) => false;
-    #endregion
-    #region 是否显示提交部分
-    /// <inheritdoc cref="FormViewer{Model}.ShowSubmit"/>
-    [Parameter]
-    public Func<Model, bool> ShowSubmit { get; set; } = _ => true;
-    #endregion
-    #region 刷新目标
-    /// <inheritdoc cref="BusinessFormViewer{Model}.RefreshTarget"/>
-    [Parameter]
-    public IHandleEvent RefreshTarget { get; set; }
+    public Func<PropertyInfo, Model, bool> IsReadOnlyProperty { get; set; }
+        = FormViewer<Model>.PropertyStateJudge;
     #endregion
     #endregion
     #region 关于模型
@@ -66,7 +61,8 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     #region 用来判断是否为现有表单的委托
     /// <inheritdoc cref="FormViewer{Model}.ExistingForms"/>
     [Parameter]
-    public Func<Model, bool> ExistingForms { get; set; } = _ => false;
+    public Func<Model, bool> ExistingForms { get; set; }
+        = FormViewer<Model>.ExistingFormsDefault;
     #endregion
     #region 用来获取属性渲染参数的委托
     /// <inheritdoc cref="FormViewer{Model}.GetRenderPropertyInfo"/>
@@ -81,18 +77,6 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     #endregion
     #endregion
     #region 关于业务逻辑
-    #region 验证业务逻辑
-    #region 用来验证数据的委托
-    /// <inheritdoc cref="FormViewer{Model}.Verify"/>
-    [Parameter]
-    public DataVerify Verify { get; set; } = FormViewer<Model>.VerifyDefault;
-    #endregion
-    #region 验证失败时的委托
-    /// <inheritdoc cref="BusinessFormViewer{Model}.VerifyFail"/>
-    [Parameter]
-    public Func<VerificationResults, Task> VerifyFail { get; set; } = _ => Task.CompletedTask;
-    #endregion
-    #endregion
     #region 用来提交表单的业务逻辑
     /// <inheritdoc cref="BusinessFormViewer{Model}.Submit"/>
     [Parameter]
@@ -119,11 +103,5 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     public Func<Task>? Cancellation { get; set; }
     #endregion
     #endregion 
-    #endregion
-    #region 构造函数
-    public BootstrapFormViewer()
-    {
-        RefreshTarget = this;
-    }
     #endregion
 }

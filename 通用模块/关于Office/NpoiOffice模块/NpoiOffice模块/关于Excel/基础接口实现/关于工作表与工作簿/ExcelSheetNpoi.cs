@@ -29,8 +29,11 @@ sealed class ExcelSheetNpoi : ExcelSheet
     /// <summary>
     /// 返回工作表在工作簿中的索引
     /// </summary>
-    private int Index
-        => BookNpoi.GetSheetIndex(Sheet);
+    public override int Index
+    {
+        get => BookNpoi.GetSheetIndex(Sheet);
+        set => throw new NotImplementedException();
+    }
     #endregion
     #region 工作表名称
     public override string Name
@@ -42,18 +45,6 @@ sealed class ExcelSheetNpoi : ExcelSheet
     #region 删除工作表
     public override void Delete()
         => BookNpoi.RemoveSheetAt(Index);
-    #endregion
-    #region 复制工作表
-    public override IExcelSheet Copy(IExcelSheetManage? collection = null, Func<string, int, string>? renamed = null)
-    {
-        collection ??= Book.Sheets;
-        if (collection is ExcelSheetCollectionNpoi sheets)
-        {
-            Sheet.CopyTo(sheets.ExcelBookNpoi, ExcelRealizeHelp.SheetRepeat(collection, Name, renamed), true, true);
-            return collection[^1];
-        }
-        throw new Exception($"{collection}不是Npoi实现的工作表集合");
-    }
     #endregion
     #endregion
     #region 关于单元格
@@ -79,8 +70,13 @@ sealed class ExcelSheetNpoi : ExcelSheet
     }
     #endregion
     #endregion
+    #region 关于Office对象
     #region 返回页面对象
     public override IPageSheet Page => throw CreateException.NotSupported();
+    #endregion
+    #region 返回图表对象
+    public override IOfficeChartManage ChartManage => throw new NotImplementedException();
+    #endregion
     #endregion
     #region 构造函数
     /// <summary>
@@ -93,6 +89,12 @@ sealed class ExcelSheetNpoi : ExcelSheet
     {
         Sheet = sheet;
         Cell = new ExcelCellUserNpoi(this);
+    }
+    #endregion
+    #region 未实现的成员
+    public override IExcelSheet Copy(IExcelSheetManage? collection = null, Func<string, int, string>? renamed = null)
+    {
+        throw new NotImplementedException();
     }
     #endregion
 }

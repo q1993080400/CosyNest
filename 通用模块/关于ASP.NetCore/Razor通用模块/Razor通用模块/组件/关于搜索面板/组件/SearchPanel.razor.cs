@@ -23,7 +23,7 @@ public sealed partial class SearchPanel : ComponentBase
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public Func<Task<RenderConditionGroup[]>> GetRenderCondition { get; set; }
+    public Func<Task<RenderFilterGroup[]>> GetRenderCondition { get; set; }
     #endregion
     #region 搜索视图状态
     /// <summary>
@@ -72,13 +72,6 @@ public sealed partial class SearchPanel : ComponentBase
     [EditorRequired]
     public Func<SearchPanelSubmitInfo, Task> Submit { get; set; }
     #endregion
-    #region 清除搜索后触发的事件
-    /// <summary>
-    /// 清除搜索后触发的事件
-    /// </summary>
-    [Parameter]
-    public Func<Task>? OnClear { get; set; }
-    #endregion
     #endregion
     #endregion
     #region 公开成员
@@ -101,7 +94,7 @@ public sealed partial class SearchPanel : ComponentBase
     /// <summary>
     /// 这个属性缓存描述如何渲染筛选条件的对象
     /// </summary>
-    private IEnumerable<RenderConditionGroup>? CacheRenderCondition { get; set; }
+    private RenderFilterGroup[]? CacheRenderCondition { get; set; }
     #endregion
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -113,21 +106,12 @@ public sealed partial class SearchPanel : ComponentBase
         var hasDefaultValue = CacheRenderCondition.Where(x => x.HasDefaultValue).ToArray();
         foreach (var item in hasDefaultValue)
         {
+            var filterQuery = item.RenderFilterQuery;
             #region 本地函数
             void Bind<Property>()
-            {
-                BindProperty<Property>(item.FirstQueryCondition);
-                BindProperty<Property>(item.SecondQueryCondition);
-                #region 绑定属性的本地函数
-                void BindProperty<BindProperty>(RenderQueryCondition? renderQuery)
-                {
-                    if (renderQuery is { })
-                        SearchViewerState.Bind<BindProperty>(renderQuery);
-                }
-                #endregion
-            }
+                => SearchViewerState.Bind<Property>(filterQuery);
             #endregion
-            switch (item.FilterObjectType)
+            switch (filterQuery.FilterTarget.FilterObjectType)
             {
                 case FilterObjectType.Bool:
                     Bind<bool?>();
@@ -149,8 +133,6 @@ public sealed partial class SearchPanel : ComponentBase
             }
         }
         await SubmitFunction();
-        if (OnClear is { })
-            await OnClear();
     }
     #endregion
     #region 用来提交搜索的方法
@@ -175,19 +157,22 @@ public sealed partial class SearchPanel : ComponentBase
     /// <returns></returns>
     private RenderSearchPanelInfo? GetRenderInfo()
     {
-        return CacheRenderCondition is null ?
-        null :
-        new()
+        if (CacheRenderCondition is null)
+            return null;
+        #region 用来清除的委托
+        Task Clear()
+        {
+            SearchViewerState.Clear();
+            InitializeDefaultQueryConditions = true;
+            return Task.CompletedTask;
+        }
+        #endregion
+        return new()
         {
             SearchViewerState = SearchViewerState,
             RenderSubmit = RenderSubmit(new()
             {
-                Clear = () =>
-                {
-                    SearchViewerState.Clear();
-                    InitializeDefaultQueryConditions = true;
-                    return Task.CompletedTask;
-                },
+                Clear = Clear,
                 Submit = SubmitFunction
             }),
             RenderCondition = CacheRenderCondition.Select(x =>
@@ -196,7 +181,8 @@ public sealed partial class SearchPanel : ComponentBase
                 {
                     RenderConditionGroup = x,
                     SearchViewerState = SearchViewerState,
-                    Submit = SubmitFunction
+                    Submit = SubmitFunction,
+                    Clear = Clear
                 };
                 return RenderProperty(renderProperty);
             }).ToArray()

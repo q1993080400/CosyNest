@@ -41,18 +41,27 @@ public abstract class FromIO(string? path) : ReleaseAsync, IFromIO
     {
         if (IsFreed)
             return;
+        #region 
+        async Task Fun(string path, bool isSitu)
+        {
+            ToolIO.CreateFather(path);
+            await SaveRealize(path, isSitu);
+        }
+        #endregion
         switch ((Path, path))
         {
             case (null, null):
                 break;                      //没有路径，则放弃保存
             case (string p, null):
-                await SaveRealize(p, IsExist); break;
+                await Fun(p, IsExist);
+                break;
             case (null, string p):
                 Path = p;
-                await SaveRealize(p, false);
+                await Fun(p, false);
                 break;
             case (string selfPath, string p):
-                await SaveRealize(p, selfPath == p); break;
+                await Fun(p, selfPath == p);
+                break;
 
         }
     }

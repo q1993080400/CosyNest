@@ -19,28 +19,47 @@ public sealed partial class BootstrapSearchPanelProperty : ComponentBase
     #endregion
     #endregion
     #region 内部成员
-    #region 获取绑定的枚举
+    #region 是否显示弹窗
     /// <summary>
-    /// 获取绑定的枚举缓存
+    /// 获取是否显示弹窗
     /// </summary>
-    /// <param name="query">渲染查询条件</param>
-    /// <returns></returns>
-    private BindQueryCondition<string?> GetBindEnum(RenderQueryCondition query)
-        => RenderPropertyInfo.SearchViewerState.Bind<string?>(query);
+    private bool IsShow { get; set; }
     #endregion
-    #region 当选择的枚举被改变时触发的委托
+    #region 提交枚举搜索
     /// <summary>
-    /// 当选择的枚举被改变时触发的委托
+    /// 这个高阶函数返回一个函数，
+    /// 它可以用来绑定要筛选的枚举
     /// </summary>
-    /// <param name="enum">枚举的新值</param>
-    /// <param name="query">查询条件</param>
+    /// <param name="bind">要绑定的对象</param>
     /// <returns></returns>
-    private async Task OnEnumChanged(string? @enum, RenderQueryCondition query)
-    {
-        var bind = GetBindEnum(query);
-        bind.Value = @enum.IsVoid() ? null : @enum?.ToString();
-        await RenderPropertyInfo.Submit();
-    }
+    private Func<IReadOnlyCollection<EnumItem>, Task> SubmitEnumItem(IBindProperty<string> bind)
+        => async x =>
+        {
+            bind.Value = x.Single().Value;
+            await RenderPropertyInfo.Submit();
+            IsShow = false;
+        };
+    #endregion
+    #region 清除枚举搜索
+    /// <summary>
+    /// 这个高阶函数返回一个函数，
+    /// 它可以用来清除要筛选的枚举
+    /// </summary>
+    /// <param name="bind">要绑定的对象</param>
+    /// <returns></returns>
+    private Func<Task> ClearEnumItem(IBindProperty<string> bind)
+        => async () =>
+        {
+            bind.Value = null;
+            await RenderPropertyInfo.Submit();
+            IsShow = false;
+        };
+    #endregion
+    #region 捕获的选择器对象
+    /// <summary>
+    /// 获取捕获的选择器对象
+    /// </summary>
+    private Selector<EnumItem>? Selector { get; set; }
     #endregion
     #endregion
 }

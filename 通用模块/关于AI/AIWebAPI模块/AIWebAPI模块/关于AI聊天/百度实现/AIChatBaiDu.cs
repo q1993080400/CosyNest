@@ -14,7 +14,7 @@ sealed class AIChatBaiDu(string appKey, string secretKey, Func<IHttpClient>? htt
 {
     #region 说明文档
     /*如果有问题，请查看文档
-      https://cloud.baidu.com/doc/WENXINWORKSHOP/s/llsr6hjxo
+      https://cloud.baidu.com/doc/WENXINWORKSHOP/s/6ltgkzya5
      */
     #endregion
     #region 公开成员

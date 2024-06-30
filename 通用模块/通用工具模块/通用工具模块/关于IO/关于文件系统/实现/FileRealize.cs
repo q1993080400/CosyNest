@@ -32,15 +32,15 @@ sealed class FileRealize : IORealize, IFile
     {
         get => IO.Path.GetFileNameWithoutExtension(Path);
         set => Path = ToolPath.RefactoringPath(Path,
-            _ => value ?? throw new ArgumentNullException($"{NameSimple}禁止写入null值"), null);
+            newSimple: _ => value ?? throw new ArgumentNullException($"{NameSimple}禁止写入null值"), newExtension: null);
     }
     #endregion
     #region 读写扩展名
     public string NameExtension
     {
         get => ToolPath.SplitFilePath(Path, false).Extended ?? "";
-        set => Path = ToolPath.RefactoringPath(Path, null,
-          _ => value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
+        set => Path = ToolPath.RefactoringPath(Path, newSimple: null,
+          newExtension: _ => value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
     }
     #endregion
     #endregion

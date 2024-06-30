@@ -6,17 +6,21 @@ namespace System.Office.Data;
 /// 这个记录可以作为Excel导入的参数
 /// </summary>
 /// <typeparam name="Data">数据的类型</typeparam>
-/// <typeparam name="CategorizedData">经过归类和转换的数据的类型，
-/// 它经过了初步的清洗，可能比原始数据更适合用来导入</typeparam>
-public sealed record ExcelImportInfo<Data, CategorizedData>
+public sealed record ExcelImportInfo<Data>
 {
-    #region 拆分数据的函数
+    #region 单个工作簿数据的上限
     /// <summary>
-    /// 这个函数输入数据集，输出一个元组集合，
-    /// 它的项分别是用来存放数据的Excel工作簿的路径，
-    /// 以及这个工作簿所对应的数据
+    /// 获取单个工作簿储存的数据的数量上限
     /// </summary>
-    public required Func<IEnumerable<Data>, IEnumerable<(string ExcelPath, IEnumerable<CategorizedData> Datas)>> Split { get; init; }
+    public int MaxBookDataCount { get; init; } = int.MaxValue;
+    #endregion
+    #region 根据页数返回工作簿路径
+    /// <summary>
+    /// 这个委托的第一个参数是工作簿的编号，
+    /// 从0开始，每个工作簿最多有<see cref="MaxBookDataCount"/>条数据，
+    /// 返回值是工作簿的路径
+    /// </summary>
+    public required Func<int, string> GetExcelBookPath { get; init; }
     #endregion
     #region 导入数据的函数
     /// <summary>
@@ -25,7 +29,7 @@ public sealed record ExcelImportInfo<Data, CategorizedData>
     /// 第二个项是要导入的数据，
     /// 第三个项是异步额外功能
     /// </summary>
-    public required Func<IExcelBook, IEnumerable<CategorizedData>, AsynchronousPackage<Progress>, Task> Import { get; init; }
+    public required Func<IExcelBook, IEnumerable<Data>, AsynchronousPackage<Progress>, Task> Import { get; init; }
     #endregion
     #region 用来创建工作簿的函数
     /// <summary>

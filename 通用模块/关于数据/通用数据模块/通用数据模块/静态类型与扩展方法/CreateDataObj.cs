@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.DataFrancis.EntityDescribe;
-using System.ComponentModel.DataAnnotations;
 
 namespace System.DataFrancis;
 
@@ -24,7 +23,7 @@ public static class CreateDataObj
     /// </summary>
     /// <param name="getVerifyPropertys">这个委托的参数是待验证的实体类，
     /// 返回值是需要验证的属性，如果为<see langword="null"/>，
-    /// 则默认筛选所有具有<see cref="DisplayAttribute"/>的属性</param>
+    /// 则默认筛选所有具有<see cref="RenderDataAttribute"/>的属性</param>
     /// <returns></returns>
     public static DataVerify DataVerifyDefault(Func<object, IEnumerable<PropertyInfo>>? getVerifyPropertys = null)
     {
@@ -33,7 +32,7 @@ public static class CreateDataObj
         var newGetVerifyPropertys = getVerifyPropertys ??= obj =>
          {
              var propertys = obj.GetType().GetProperties().
-             Where(x => x.HasAttributes<DisplayAttribute>()).ToArray();
+             Where(x => x.HasAttributes<RenderDataAttribute>()).ToArray();
              return propertys;
          };
         #region 验证本地函数
@@ -42,7 +41,7 @@ public static class CreateDataObj
             var propertys = newGetVerifyPropertys(obj);
             var verify = propertys.Select(x =>
             {
-                var name = x.GetCustomAttribute<DisplayAttribute>()?.Name ?? x.Name;
+                var name = x.GetCustomAttribute<RenderDataAttribute>()?.Name ?? x.Name;
                 var value = x.GetValue(obj);
                 var nullabilityInfo = x.GetNullabilityInfo();
                 if ((nullabilityInfo.ReadState, value) is (NullabilityState.NotNull, null or ""))
@@ -122,5 +121,17 @@ public static class CreateDataObj
         where TrueModel : class
         => new TableRenderInfoBuildPenetration<OuterModel, TrueModel>(build, penetration);
     #endregion
+    #endregion
+    #region 创建带标题数据
+    /// <summary>
+    /// 创建一个携带标题的数据，
+    /// 它直接封装标题，数据的类型，和数据的值
+    /// </summary>
+    /// <param name="name">属性的标题</param>
+    /// <param name="valueType">属性的类型</param>
+    /// <param name="value">属性的值</param>
+    /// <returns></returns>
+    public static ITitleData TitleData(string name, Type valueType, object? value)
+        => new TitleData(name, valueType, value);
     #endregion
 }

@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NPOI" Version="2.6.2" PrivateAssets="compile" />
+	  <PackageReference Include="NPOI" Version="2.7.0" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

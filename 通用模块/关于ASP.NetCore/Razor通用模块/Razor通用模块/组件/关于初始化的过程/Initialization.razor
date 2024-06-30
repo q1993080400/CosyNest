@@ -1,0 +1,21 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Interface where Interface : class, IServerFind<Parameter, Content>
+@typeparam Parameter where Parameter : class
+@typeparam Content where Content : class
+@inject IHttpClient HttpClient
+
+@switch ((InitializationComplete, Obj, NotFind))
+{
+    case (true, { }, _):
+        @Find(Obj)
+        break;
+    case (true, null, { }):
+        @NotFind
+        break;
+    case (true, null, null):
+        <Center>
+            <div>指定的东西不存在，已被删除，或没有权限查看</div>
+        </Center>
+        break;
+}

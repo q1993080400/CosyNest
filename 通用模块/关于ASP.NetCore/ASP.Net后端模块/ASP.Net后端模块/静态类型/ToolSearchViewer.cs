@@ -17,7 +17,7 @@ public static class ToolSearchViewer
     /// <typeparam name="BusinessInterface">业务接口的类型，
     /// 只筛选属于这个业务接口的筛选条件</typeparam>
     /// <returns></returns>
-    public static RenderConditionGroup[] GetRenderCondition<Entity, BusinessInterface>()
+    public static RenderFilterGroup[] GetRenderCondition<Entity, BusinessInterface>()
         where BusinessInterface : class, IGetRenderAllFilterCondition
     {
         var entityType = typeof(Entity);
@@ -33,7 +33,7 @@ public static class ToolSearchViewer
             var attributes = x.GetCustomAttributes<FilterConditionAttribute<BusinessInterface>>();
             return attributes.Select(y => y.ConvertConditioGroup(x));
         }).SelectMany(x => x);
-        RenderConditionGroup[] array = [.. typeAttribute.Concat(propertyAttribute).ToArray().OrderBy(x => x.Order)];
+        RenderFilterGroup[] array = [.. typeAttribute.Concat(propertyAttribute).ToArray().OrderBy(x => x.Order)];
         CacheRenderCondition.SetValue(key, array);
         return array;
     }
@@ -42,8 +42,8 @@ public static class ToolSearchViewer
     /// <summary>
     /// 缓存渲染筛选条件
     /// </summary>
-    private static ICache<(Type Entity, Type BusinessInterface), RenderConditionGroup[]> CacheRenderCondition { get; }
-    = CreatePerformance.MemoryCache<(Type Entity, Type BusinessInterface), RenderConditionGroup[]>
+    private static ICache<(Type Entity, Type BusinessInterface), RenderFilterGroup[]> CacheRenderCondition { get; }
+    = CreatePerformance.MemoryCache<(Type Entity, Type BusinessInterface), RenderFilterGroup[]>
         ((_, _) => throw new NotSupportedException("不支持自动获取元素，请显式添加元素，然后获取"));
     #endregion
     #endregion

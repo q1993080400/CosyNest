@@ -8,8 +8,15 @@ namespace System.Office.Excel;
 /// <param name="chart">封装的Excel图表对象</param>
 sealed class ExcelChartEPPlus(ExcelChart chart) : IOfficeChart
 {
-    #region 枚举所有系列
-    public IEnumerable<IOfficeChartSeries> Series
-        => chart.Series.Select(x => new ExcelChartSeriesEPPlus(x));
+    #region 标题
+    public string Title
+    {
+        get => chart.Title.Text;
+        set => chart.Title.Text = value;
+    }
+    #endregion
+    #region 返回图表所有系列
+    public IOfficeChartSeriesManage Series { get; }
+        = new ExcelChartSeriesManageEPPlus(chart.Series);
     #endregion
 }

@@ -9,6 +9,6 @@ public static class ToolAuthenticationDingDing
     /// <summary>
     /// 获取身份验证字段在Cookie中的名称
     /// </summary>
-    public const string AuthenticationKey = "AuthenticationDingDing";
+    public const string AuthenticationKey = "13E797C9-81FA-40FB-B7B5-4383B1FD6D70";
     #endregion
 }

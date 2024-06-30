@@ -23,7 +23,7 @@ public abstract record RenderBodyColumnsInfoBase<Model>
     /// <summary>
     /// 获取列的名字
     /// </summary>
-    public required string ColumnsName { get; init; }
+    public required string Name { get; init; }
     #endregion
     #region 渲染出的结果是否很长
     /// <summary>

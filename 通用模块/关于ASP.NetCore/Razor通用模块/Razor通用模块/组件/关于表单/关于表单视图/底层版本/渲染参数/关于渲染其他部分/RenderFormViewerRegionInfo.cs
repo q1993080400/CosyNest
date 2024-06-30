@@ -28,7 +28,7 @@ public sealed record RenderFormViewerRegionInfo<Model>
     /// 它可以用来直接渲染全部的属性
     /// </summary>
     /// <returns></returns>
-    public RenderFragment RenderRegionAll()
+    public RenderFragment RenderAllRegion()
         => x =>
         {
             foreach (var (_, render) in RenderRegion)

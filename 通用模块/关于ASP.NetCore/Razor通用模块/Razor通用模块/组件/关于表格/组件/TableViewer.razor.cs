@@ -62,12 +62,6 @@ public sealed partial class TableViewer<Model> : ComponentBase
     #endregion
     #endregion
     #region 内部成员
-    #region 组件的ID
-    /// <summary>
-    /// 获取组件的ID
-    /// </summary>
-    private string ID { get; } = CreateASP.JSObjectName();
-    #endregion
     #region 获取渲染参数
     /// <summary>
     /// 获取本组件的渲染参数

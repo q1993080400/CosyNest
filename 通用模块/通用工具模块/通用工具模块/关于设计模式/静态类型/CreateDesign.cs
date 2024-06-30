@@ -53,15 +53,6 @@ public static class CreateDesign
         => new Pool<Obj>(create);
     #endregion
     #region 创建IDirect
-    #region 创建记事
-    /// <summary>
-    /// 创建一个记事，并返回
-    /// </summary>
-    /// <param name="path">记事所在的路径</param>
-    /// <returns></returns>
-    public static IDirect Notes(string path)
-        => new Notes(path);
-    #endregion
     #region 创建简易实现
     /// <summary>
     /// 创建一个简易的<see cref="IDirect"/>实现，

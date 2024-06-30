@@ -11,41 +11,39 @@ public static class CreateExcelDataFunction
     /// </summary>
     /// <param name="info">用来创建导入函数的参数</param>
     /// <returns></returns>
-    /// <inheritdoc cref="ExcelImportInfo{Data, CategorizedData}"/>
-    public static ExcelImport<Data> ExcelImport<Data, CategorizedData>(ExcelImportInfo<Data, CategorizedData> info)
+    /// <inheritdoc cref="ExcelImportInfo{Data}"/>
+    public static ExcelImport<Data> ExcelImport<Data>(ExcelImportInfo<Data> info)
         => async (datas, asynchronousPackage) =>
         {
-            var (reportProgress, cancellationToken) = asynchronousPackage ?? new();
-            cancellationToken.ThrowIfCancellationRequested();
+            var newAsynchronousPackage = asynchronousPackage ?? new();
+            var newCancellationToken = newAsynchronousPackage.CancellationToken;
+            newCancellationToken.ThrowIfCancellationRequested();
             var paths = new List<string>();
-            var split = info.Split(datas).PackIndex().ToArray();
-            var count = split.Length;
-            foreach (var (index, (path, categorizedData), _) in split)
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                var progress = new Progress()
+                var dataCache = new LinkedList<Data>();
+                await foreach (var (index, elements, isLast) in datas.PackIndex())
                 {
-                    TotalCount = count,
-                    CompletedCount = index
-                };
-                await reportProgress(progress);
-                #region 报告子阶段进度的本地函数
-                Task ReportSonProgress(Progress sonProgress)
-                => reportProgress(progress.TotalProgress(sonProgress));
-                #endregion
-                await using var excel = info.CreateExcelBook(path);
-                await info.Import(excel, categorizedData, new()
-                {
-                    CancellationToken = cancellationToken,
-                    ReportProgress = ReportSonProgress
-                });
-                paths.Add(path);
+                    dataCache.AddLast(elements);
+                    if (isLast || (index + 1) % info.MaxBookDataCount is 0)
+                    {
+                        newCancellationToken.ThrowIfCancellationRequested();
+                        var path = info.GetExcelBookPath(paths.Count);
+                        paths.Add(path);
+                        await using var excel = info.CreateExcelBook(path);
+                        await info.Import(excel, dataCache, newAsynchronousPackage);
+                        dataCache = [];
+                    }
+                }
             }
-            await reportProgress(new Progress()
+            catch (Exception)
             {
-                TotalCount = count,
-                CompletedCount = count
-            });
+                foreach (var filePath in paths)
+                {
+                    File.Delete(filePath);
+                }
+                throw;
+            }
             return paths;
         };
     #endregion

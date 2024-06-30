@@ -56,7 +56,15 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     {
         IsDispose = true;
         if (RenderElements is { })
-            await RenderElements.DisposeAsync();
+        {
+            try
+            {
+                await RenderElements.DisposeAsync();
+            }
+            catch (NotSupportedException)
+            {
+            }
+        }
         PackNet?.Dispose();
     }
     #endregion
@@ -233,6 +241,7 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
         {
             DataSource = ElementList,
             RenderLoadingPoint = renderEnd,
+            IsEmpty = (IsComplete, ElementList.Count) is (true, 0)
         };
     }
     #endregion

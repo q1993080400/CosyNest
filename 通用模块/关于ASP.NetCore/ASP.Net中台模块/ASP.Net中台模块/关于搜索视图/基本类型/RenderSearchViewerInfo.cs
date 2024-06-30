@@ -9,7 +9,7 @@ public sealed record RenderSearchViewerInfo
     /// <summary>
     /// 这个记录描述了如何渲染查询和排序条件
     /// </summary>
-    public required IEnumerable<RenderConditionGroup> RenderAllFilterCondition { get; init; }
+    public required IEnumerable<RenderFilterGroup> RenderAllFilterCondition { get; init; }
     #endregion
     #region 筛选视图状态
     /// <summary>

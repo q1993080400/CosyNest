@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Microsoft.AspNetCore;
 
@@ -12,73 +11,65 @@ namespace Microsoft.AspNetCore;
 public sealed class FilterMultipleConditionAttribute<BusinessInterface> : FilterConditionAttribute<BusinessInterface>
     where BusinessInterface : class, IGetRenderAllFilterCondition
 {
-    #region 另一个属性访问表达式
+    #region 开始属性访问表达式
     /// <summary>
-    /// 另一个属性访问表达式，按照规范，
-    /// <see cref="PropertyAccess"/>被映射为大于等于条件，
-    /// 本属性被映射为小于等于条件，
+    /// 获取作为区间开始的属性访问表达式，
     /// 如果为<see langword="null"/>，
-    /// 表示在同一数据库属性上执行筛选
+    /// 则自动获取
     /// </summary>
-    public string? PropertyAccessOther { get; init; }
+    public string? PropertyAccessStart { get; init; }
     #endregion
-    #region 第一查询条件默认值
+    #region 结束属性访问表达式
     /// <summary>
-    /// 第一查询条件的默认值字面量
+    /// 获取作为区间结束的属性访问表达式，
+    /// 如果为<see langword="null"/>，
+    /// 默认为和<see cref="PropertyAccessStart"/>相同
     /// </summary>
-    public string? PropertyAccessDefaultValue { get; init; }
+    public string? PropertyAccessEnd { get; init; }
     #endregion
-    #region 第二查询条件默认值
+    #region 区间开始查询条件默认值
     /// <summary>
-    /// 第二查询条件的默认值字面量
+    /// 区间开始查询条件的默认值字面量
     /// </summary>
-    public string? PropertyAccessOtherDefaultValue { get; init; }
+    public string? PropertyAccessStartDefaultValue { get; init; }
+    #endregion
+    #region 区间结束查询条件默认值
+    /// <summary>
+    /// 区间结束条件的默认值字面量
+    /// </summary>
+    public string? PropertyAccessEndDefaultValue { get; init; }
     #endregion
     #region 排序依据
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
-    /// 则<see cref="PropertyAccess"/>作为排序依据，
-    /// 否则<see cref="PropertyAccessOther"/>作为排序依据
+    /// 则<see cref="PropertyAccessStart"/>作为排序依据，
+    /// 否则<see cref="PropertyAccessEnd"/>作为排序依据
     /// </summary>
-    public bool SortPropertyAccess { get; init; } = true;
+    public bool SortFromStart { get; init; } = true;
     #endregion
     #region 抽象成员实现：获取渲染条件组
-    public override RenderConditionGroup ConvertConditioGroup(MemberInfo memberInfo)
+    public override RenderFilterGroup ConvertConditioGroup(MemberInfo memberInfo)
     {
-        var propertyAccess = GetPropertyAccess(memberInfo);
-        var propertyAccessOther = PropertyAccessOther ?? propertyAccess;
-        var filterObjectType = GetFilterObjectType(FilterObjectType, memberInfo);
-        var enumItem = GetEnumItem(memberInfo);
-        return new()
+        var propertyAccessStart = PropertyAccessStart ?? GetPropertyAccess(memberInfo);
+        var propertyAccessEnd = PropertyAccessEnd ?? propertyAccessStart;
+        var filterTargets = GetFilterTargets(memberInfo);
+        var filterObjectType = GetFilterObjectType(filterTargets);
+        var enumItem = EnumItem.Create(filterTargets);
+        return new FilterMultipleConditionInfo()
         {
             Describe = Describe,
             FilterObjectType = filterObjectType,
+            PropertyAccessStart = propertyAccessStart,
+            PropertyAccessEnd = propertyAccessEnd,
+            CanSort = CanSort,
+            EnumItem = enumItem,
+            ExcludeFilter = ExcludeFilter,
+            IsVirtually = IsVirtually,
             Order = Order,
-            FirstQueryCondition = new()
-            {
-                LogicalOperator = LogicalOperator.GreaterThanOrEqual,
-                PropertyAccess = propertyAccess,
-                EnumItem = enumItem,
-                DefaultValue = PropertyAccessDefaultValue,
-                ExcludeFilter = null,
-                IsVirtually = IsVirtually
-            },
-            SecondQueryCondition = new()
-            {
-                LogicalOperator = LogicalOperator.LessThanOrEqual,
-                PropertyAccess = propertyAccessOther,
-                EnumItem = enumItem,
-                DefaultValue = PropertyAccessOtherDefaultValue,
-                ExcludeFilter = null,
-                IsVirtually = IsVirtually
-
-            },
-            SortCondition = CanSort ? new()
-            {
-                PropertyAccess = SortPropertyAccess ? propertyAccess : propertyAccessOther,
-                IsVirtually = IsVirtually
-            } : null
-        };
+            PropertyAccessEndDefaultValue = PropertyAccessEndDefaultValue,
+            PropertyAccessStartDefaultValue = PropertyAccessStartDefaultValue,
+            SortFromStart = SortFromStart
+        }.ConvertConditioGroup();
     }
     #endregion
 }

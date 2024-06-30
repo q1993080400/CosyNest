@@ -66,7 +66,7 @@ sealed class ExcelSheetEPPlus : ExcelSheet
     public override IExcelCells Cell { get; }
     #endregion
     #region 返回行或列
-    public override IExcelRC GetRC(int begin, int? end, bool isRow)
+    public override IExcelRC GetRC(bool isRow, int begin, int? end)
     {
         begin++;
         var e = end is { } ev ? ev + 1 : begin;

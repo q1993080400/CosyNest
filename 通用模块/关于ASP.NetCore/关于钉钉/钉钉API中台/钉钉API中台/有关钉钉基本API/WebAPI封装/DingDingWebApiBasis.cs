@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using System.Design.Direct;
 using System.NetFrancis.Http;
@@ -85,17 +84,19 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
                     }, parameters: [("access_token", accessToken)],
                     transformation: TransformAccessToken(accessToken)).
                     Read(x => x.ToObject());
+                response = VerifyResponse(response);
                 var result = response.GetValue<IDirect>("result")!;
                 var list = result.GetValue<object[]>("list")!.Cast<IDirect>().ToArray();
                 foreach (var item in list)
                 {
+                    var avatarUri = item.GetValue<string>("avatar");
                     var info = new DingDingDepartmentRole()
                     {
                         DingDingUserInfo = new()
                         {
                             Name = item.GetValue<string>("name")!,
-                            ID = item.GetValue<string>("userid")!,
-                            IsUnionID = false
+                            UserID = item.GetValue<string>("userid")!,
+                            AvatarUri = avatarUri.IsVoid() ? null : avatarUri,
                         },
                         IsLeader = item.GetValue<bool>("leader")
                     };
@@ -119,7 +120,6 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
     {
         var http = ServiceProvider.GetRequiredService<IHttpClient>();
         var configuration = ServiceProvider.GetRequiredService<DingDingConfiguration>();
-        var dataProtection = GetDataProtection();
         var token = await GetUserToken(parameter);
         if (token is null or { IsToken: false } or { RefreshToken: null })
             return new()
@@ -128,8 +128,7 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
                 {
                     AuthenticationState = new()
                     {
-                        UserInfo = null,
-                        NextRequest = parameter
+                        AuthenticationResult = null
                     },
                     AuthorizationPassed = false
                 }
@@ -142,24 +141,35 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
             {
                 Header = x.Header.With(x => x.Add("x-acs-dingtalk-access-token", [accessToken]))
             }).Read(x => x.ToObject());
+        var companyToken = await GetCompanyToken();
+        var unionId = response["unionId"]?.ToString() ?? "";
+        var userIDResponse = await http.RequestPost("https://oapi.dingtalk.com/topapi/user/getbyunionid",
+            new
+            {
+                unionid = unionId,
+            },
+            parameters: [("access_token", companyToken)]).
+            Read(x => x.ToObject());
+        var authenticationResult = new AuthenticationDingDingResult()
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            IsEncryption = false,
+            UserInfo = new()
+            {
+                Name = response["nick"]?.ToString() ?? "",
+                UserID = userIDResponse.GetValue<string>("result.userid") ??
+                            throw new NotSupportedException("未能获取UserID"),
+                AvatarUri = response.TryGetValue("avatarUrl").Value?.ToString()
+            }
+        }.Encryption(GetDataProtection());
         return new()
         {
             AuthorizationState = new()
             {
                 AuthenticationState = new()
                 {
-                    UserInfo = new()
-                    {
-                        Name = response["nick"]?.ToString() ?? "",
-                        ID = response["unionId"]?.ToString() ?? "",
-                        IsUnionID = true
-                    },
-                    NextRequest = new()
-                    {
-                        Code = dataProtection.Protect(accessToken),
-                        IsToken = true,
-                        RefreshToken = dataProtection.Protect(refreshToken),
-                    }
+                    AuthenticationResult = authenticationResult
                 },
                 AuthorizationPassed = true,
             }

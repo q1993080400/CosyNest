@@ -7,18 +7,28 @@ namespace System;
 /// </summary>
 public static class ExtendDingDingClient
 {
-    #region 通过JS获取钉钉身份验证请求
+    #region 通过JS获取钉钉身份验证结果
     /// <summary>
-    /// 通过JS获取钉钉身份验证请求
+    /// 通过JS获取钉钉身份验证结果
     /// </summary>
     /// <param name="jsWindow">JS运行时对象</param>
     /// <returns></returns>
-    public static async Task<AuthenticationDingDingRequest?> GetAuthenticationRequest(this IJSWindow jsWindow)
+    public static async Task<AuthenticationDingDingResult?> GetAuthenticationResult(this IJSWindow jsWindow)
     {
-        var (_, json) = await jsWindow.LocalStorage.TryGetValueAsync(ToolAuthenticationDingDing.AuthenticationKey);
+        var key = ToolAuthenticationDingDing.AuthenticationKey;
+        var storage = jsWindow.LocalStorage;
+        var (_, json) = await storage.TryGetValueAsync(key);
         if (json is null)
             return null;
-        return JsonSerializer.Deserialize<AuthenticationDingDingRequest>(json);
+        try
+        {
+            return JsonSerializer.Deserialize<AuthenticationDingDingResult>(json);
+        }
+        catch (JsonException)
+        {
+            await storage.RemoveAsync(key);
+            return null;
+        }
     }
     #endregion
     #region 注销钉钉身份验证
@@ -51,9 +61,9 @@ public static class ExtendDingDingClient
             case null:
                 await jsWindow.LogOutDingDing();
                 break;
-            case { AuthenticationState: { Passed: true, NextRequest: { } nextRequest } }:
+            case { AuthenticationState: { Passed: true, AuthenticationResult: { } result } }:
                 var key = ToolAuthenticationDingDing.AuthenticationKey;
-                var json = JsonSerializer.Serialize(nextRequest);
+                var json = JsonSerializer.Serialize(result);
                 await jsWindow.LocalStorage.IndexAsync.Set(key, json);
                 break;
         }

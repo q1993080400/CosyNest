@@ -52,13 +52,26 @@ sealed class ExcelCellsEPPlus : ExcelCells, IExcelCells
     }
     #endregion
     #endregion
-    #endregion 
+    #region 设置单元格链接
+    public override string? Link
+    {
+        get => RangeField.Hyperlink?.ToString();
+        set => RangeField.Hyperlink = value is null ? null : new(value);
+    }
+    #endregion
+    #endregion
     #region 单元格地址
     public override (int BeginRow, int BeginCol, int EndRwo, int EndCol) Address { get; }
     #endregion
     #region 复制单元格
-    public override IExcelCells Copy(IExcelCells cells)
-        => throw new NotImplementedException();
+    public override IExcelCells CopyTo(IExcelCells cells)
+    {
+        var range = cells is ExcelCellsEPPlus { Range: { } r } ?
+            r :
+            throw new NotSupportedException($"{cells}不是EPPlus实现的Excel单元格，无法复制");
+        Range.Copy(range);
+        return cells;
+    }
     #endregion
     #region 单元格样式
     public override IRangeStyle Style
@@ -144,10 +157,7 @@ sealed class ExcelCellsEPPlus : ExcelCells, IExcelCells
     #endregion
     #endregion
     #region 未实现的成员
-    public override string? Link { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
     public override ISizePos VisualPosition => throw new NotImplementedException();
-
     #endregion
     #region 构造函数
     /// <inheritdoc cref="ExcelCells(IExcelSheet)"/>

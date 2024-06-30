@@ -13,7 +13,7 @@
                 <a target="_blank" href="@text">@text</a>
                 break;
             case RenderTextType.Highlight:
-                <span class="highlight">@text</span>
+                <span highlightGroup="@HighlightGroup">@text</span>
                 break;
             case var type:
                 throw new NotSupportedException($"无法识别{type}类型的文本渲染类型");

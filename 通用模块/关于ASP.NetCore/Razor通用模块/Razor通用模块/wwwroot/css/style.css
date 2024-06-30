@@ -15,6 +15,8 @@
         --arrangeParticleMedium: 5;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 6;
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 72ic;
     }
 }
 
@@ -34,6 +36,8 @@
         --arrangeParticleMedium: 4;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 5;
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 54ic;
     }
 }
 
@@ -53,6 +57,8 @@
         --arrangeParticleMedium: 3;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 4;
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 36ic;
     }
 }
 
@@ -72,6 +78,8 @@
         --arrangeParticleMedium: 1;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 2;
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 18ic;
     }
 }
 
@@ -132,6 +140,8 @@
     --radiusMedium: 20px;
     /*紧凑圆角样式*/
     --radiusSmall: calc(var(--radiusMedium) * 0.5);
+    /*极端圆角样式*/
+    --radiusExtremeSmall: calc(var(--radiusMedium) * 0.25);
     /*最顶层组件的上边和下边大小*/
     --topLayoutPaddingVertical: 5dvmin;
     /*屏蔽深色模式，因为作者认为这个需要由开发者自己适配，否则会产生很多意想不到的结果*/
@@ -144,20 +154,20 @@ body
     margin: 0;
 }
 
-/*模态对话框样式*/
-dialog
-{
-    background: unset;
-    border: unset;
-    padding: unset;
-}
-
 /*pre元素样式*/
 pre
 {
     max-width: 100%;
     word-break: break-all;
     white-space: normal;
+}
+
+/*模态对话框样式*/
+dialog
+{
+    background: unset;
+    border: unset;
+    padding: unset;
 }
 
 /*完美容器样式，它的子元素依次排列，且平分所有剩余空间，但最后一个元素除外*/
@@ -183,6 +193,17 @@ pre
     box-sizing: border-box;
 }
 
+/*平等容器样式，它的子元素平分空间*/
+.equalityContainers
+{
+    display: flex;
+}
+
+    /*平等容器直接子元素样式*/
+    .equalityContainers > *
+    {
+        flex-grow: 1;
+    }
 
 /*普通容器样式*/
 .commonContainers
@@ -217,6 +238,12 @@ pre
     z-index: 1;
 }
 
+/*粘性定位父容器样式*/
+:has(> .stickyHead)
+{
+    isolation: isolate;
+}
+
 /*豆腐块组件容器的CSS样式*/
 .tofuCubesContainer
 {
@@ -234,6 +261,9 @@ pre
 .tofuCubesText
 {
     text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 /*自动播放按钮容器样式*/
@@ -282,8 +312,8 @@ div.autoPlayButtonCntainer > *:first-child
     min-height: 100%;
     box-sizing: border-box;
     display: flex;
+    place-content: center;
     align-items: center;
-    justify-content: center;
 }
 
 /*相对于父元素的中部居中布局，水平垂直方向皆居中*/
@@ -293,8 +323,8 @@ div.autoPlayButtonCntainer > *:first-child
     top: 0;
     box-sizing: border-box;
     display: flex;
+    place-content: center;
     align-items: center;
-    justify-content: center;
 }
 
 /*相对于屏幕的中部居中布局，水平垂直方向皆居中*/
@@ -307,16 +337,15 @@ div.autoPlayButtonCntainer > *:first-child
     min-height: 100dvh;
     box-sizing: border-box;
     display: flex;
+    place-content: center;
     align-items: center;
-    justify-content: center;
 }
 
 /*表示一个紧凑居中布局，它一般用来排列按钮*/
 .compactCentered
 {
     display: flex;
-    align-items: center;
-    justify-content: space-evenly;
+    place-content: center;
     gap: var(--gapBig);
 }
 
@@ -341,7 +370,6 @@ div.autoPlayButtonCntainer > *:first-child
 {
     background: rgba(251, 251, 253, 0.4);
     backdrop-filter: saturate(1.8) blur(15px);
-    -webkit-backdrop-filter: saturate(1.8) blur(15px);
     width: 100%;
     height: 100%
 }
@@ -361,7 +389,6 @@ div.autoPlayButtonCntainer > *:first-child
 {
     background-color: rgba(250, 250, 252, 0.8);
     backdrop-filter: saturate(1.8) blur(20px);
-    -webkit-backdrop-filter: saturate(1.8) blur(20px);
 }
 
 /*IOS蒙版深色样式*/
@@ -369,11 +396,29 @@ div.autoPlayButtonCntainer > *:first-child
 {
     background: rgba(4, 4, 2, 0.8);
     backdrop-filter: saturate(1.8) blur(20px);
-    -webkit-backdrop-filter: saturate(1.8) blur(20px);
 }
 
-/*突出显示样式*/
-.highlight
+/*高亮显示样式*/
+[highlightGroup]
 {
     background-color: yellow;
+}
+
+/*被选中的元素的样式*/
+.selectElement
+{
+    background-color: gray;
+    color: white;
+}
+
+    /*被选中的元素下面的高亮元素样式*/
+    .selectElement [highlightGroup]
+    {
+        color: black;
+    }
+
+/*被选择的元素的文本样式*/
+.selectElementText
+{
+    width: max-content;
 }

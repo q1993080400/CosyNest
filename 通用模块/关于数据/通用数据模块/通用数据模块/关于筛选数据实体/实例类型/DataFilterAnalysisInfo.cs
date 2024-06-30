@@ -21,6 +21,30 @@ public sealed record DataFilterAnalysisInfo<Obj>
     /// </summary>
     public required DataFilterDescription Description { get; init; }
     #endregion
+    #region 构造虚拟查询条件的函数
+    /// <summary>
+    /// 构造虚拟查询条件的函数，
+    /// 它的参数是虚拟查询条件，
+    /// 返回值是构造好的查询条件表达式
+    /// </summary>
+    public Func<QueryCondition, Expression<Func<Obj, bool>>>? GenerateVirtuallyQuery { get; init; }
+    #endregion
+    #region 构造虚拟排序条件的函数
+    /// <summary>
+    /// 构造虚拟排序条件的函数，
+    /// 它的第一个参数是虚拟排序条件，
+    /// 第二个参数是当前排序好的表达式，
+    /// 返回值是经过虚拟排序的表达式
+    /// </summary>
+    public Func<SortCondition, IOrderedQueryable<Obj>, IOrderedQueryable<Obj>>? GenerateVirtuallySort { get; init; }
+    #endregion
+    #region 是否跳过虚拟化
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则跳过所有虚拟化条件，由用户自行处理它们
+    /// </summary>
+    public bool SkipVirtualization { get; init; }
+    #endregion
     #region 高优先级排序函数
     /// <summary>
     /// 这个函数允许在执行筛选之后，执行排序之前对<see cref="DataSource"/>进行高优先级的排序，
@@ -30,7 +54,7 @@ public sealed record DataFilterAnalysisInfo<Obj>
     #endregion
     #region 重构函数
     /// <summary>
-    /// 这个委托允许重构生成的每个查询表达式，
+    /// 这个委托允许重构生成的每个真实查询表达式，
     /// 并返回重构后的表达式，如果为<see langword="null"/>，则不进行重构
     /// </summary>
     public Func<QueryConditionReconsitutionInfo, Expression>? Reconsitution { get; init; }

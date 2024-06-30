@@ -8,7 +8,8 @@
 @using System.ComponentModel.DataAnnotations.Schema;
 
 @{
-    var name = RenderInfo.PropertyName;
+    var propertyTitle = RenderInfo.Name;
+    var name = propertyTitle.EndsWith(':') ? propertyTitle : propertyTitle + ":";
     var property = RenderInfo.Property;
     var propertyType = property.PropertyType;
     #region 获取渲染特性
@@ -27,7 +28,7 @@
         @{
             var format = GetRenderAttribute<FormatAttribute>()?.Format;
         }
-        @if (RenderInfo.IsReadOnlyProperty)
+        @if (RenderInfo.IsReadOnly)
         {
             #region 获取文本值的本地函数
             string? GetText()
@@ -48,10 +49,10 @@
             #endregion
             var text = GetText();
             <div class="bootstrapFormViewerPropertyContainer">
-                <div class="bootstrapFormViewerPropertyLabel">@(name)：</div>
+                <div class="bootstrapFormViewerPropertyLabel">@name</div>
                 <pre class="bootstrapFormViewerPropertyText">
-                    <TextRenderingSimple Highlight="Highlight" Value="text" />
-                </pre>
+                <TextRenderingSimple Highlight="Highlight" Value="text" />
+                                                </pre>
             </div>
         }
         else
@@ -185,11 +186,13 @@
                         var now = DateTime.Now;
                         var maxBirthday = now.AddYears((decimal)-verifyAge.MinAge);
                         var minBirthday = now.AddYears((decimal)-verifyAge.MaxAge);
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" MinValue="minBirthday" MaxValue=" maxBirthday" DateFormat="@formatDate" />
+                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name"
+                                        MinValue="minBirthday" MaxValue=" maxBirthday" DateFormat="@formatDate" />
                     }
                     else
                     {
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name" DateFormat="@formatDate" />
+                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true"
+                                        DisplayText="@name" DateFormat="@formatDate" />
                     }
                     break;
                 case var t:

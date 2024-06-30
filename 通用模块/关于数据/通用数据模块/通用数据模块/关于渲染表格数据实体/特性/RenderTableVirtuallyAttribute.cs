@@ -27,7 +27,7 @@ public sealed class RenderTableVirtuallyAttribute : RenderTableBaseAttribute
         CheckMember(attachment);
         return new RenderTableBodyColumnsInfoCustom<Model>()
         {
-            ColumnsName = HeaderName,
+            Name = HeaderName,
             RowIndex = rowIndex,
             TableModel = model,
             IsLong = IsLong

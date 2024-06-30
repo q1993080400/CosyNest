@@ -6,6 +6,10 @@
 public enum RenderLogicalOperator
 {
     /// <summary>
+    /// 表示不能显式指定逻辑运算符
+    /// </summary>
+    None,
+    /// <summary>
     /// 等于
     /// </summary>
     Equal,

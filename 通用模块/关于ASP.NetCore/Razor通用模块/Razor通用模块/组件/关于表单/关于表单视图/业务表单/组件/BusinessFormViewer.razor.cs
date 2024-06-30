@@ -1,5 +1,4 @@
-﻿using System.DataFrancis.EntityDescribe;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Microsoft.AspNetCore.Components;
 
@@ -7,7 +6,7 @@ namespace Microsoft.AspNetCore.Components;
 /// 这个组件是表单视图的特化版本，
 /// 它耦合更强，但是显著增强了渲染提交部分的能力
 /// </summary>
-/// <typeparam name="Model">表单模型的类型</typeparam>
+/// <inheritdoc cref="FormViewer{Model}"/>
 public sealed partial class BusinessFormViewer<Model> : ComponentBase
     where Model : class
 {
@@ -37,23 +36,16 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     [EditorRequired]
     public RenderFragment<RenderBusinessFormViewerInfo<Model>> RenderSubmit { get; set; }
     #endregion
+    #region 是否可编辑
+    /// <inheritdoc cref="FormViewer{Model}.CanEdit"/>
+    [Parameter]
+    public bool CanEdit { get; set; }
+    #endregion
     #region 是否仅显示
     /// <inheritdoc cref="FormViewer{Model}.IsReadOnlyProperty"/>
     [Parameter]
-    public Func<PropertyInfo, Model, bool> IsReadOnlyProperty { get; set; } = (_, _) => false;
-    #endregion
-    #region 是否显示提交部分
-    /// <inheritdoc cref="FormViewer{Model}.ShowSubmit"/>
-    [Parameter]
-    public Func<Model, bool> ShowSubmit { get; set; } = _ => true;
-    #endregion
-    #region 刷新目标
-    /// <summary>
-    /// 获取刷新目标，
-    /// 它决定了在提交，删除，取消表单时，应该刷新哪个组件
-    /// </summary>
-    [Parameter]
-    public IHandleEvent RefreshTarget { get; set; }
+    public Func<PropertyInfo, Model, bool> IsReadOnlyProperty { get; set; }
+        = FormViewer<Model>.PropertyStateJudge;
     #endregion
     #endregion
     #region 关于模型
@@ -71,7 +63,8 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     #region 用来判断是否为现有表单的委托
     /// <inheritdoc cref="FormViewer{Model}.ExistingForms"/>
     [Parameter]
-    public Func<Model, bool> ExistingForms { get; set; } = _ => false;
+    public Func<Model, bool> ExistingForms { get; set; }
+        = FormViewer<Model>.ExistingFormsDefault;
     #endregion
     #region 用来获取属性渲染参数的委托
     /// <inheritdoc cref="FormViewer{Model}.GetRenderPropertyInfo"/>
@@ -86,25 +79,9 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     #endregion
     #endregion
     #region 关于业务逻辑
-    #region 验证业务逻辑
-    #region 用来验证数据的委托
-    /// <inheritdoc cref="FormViewer{Model}.Verify"/>
-    [Parameter]
-    public DataVerify Verify { get; set; } = FormViewer<Model>.VerifyDefault;
-    #endregion
-    #region 验证失败时的委托
-    /// <summary>
-    /// 当验证失败时，执行的委托，
-    /// 它的参数就是验证结果
-    /// </summary>
-    [Parameter]
-    public Func<VerificationResults, Task> VerifyFail { get; set; } = _ => Task.CompletedTask;
-    #endregion
-    #endregion
     #region 用来提交表单的业务逻辑
     /// <summary>
     /// 获取或设置用于提交表单的业务逻辑，
-    /// 它的参数就是当前表单的模型以及验证结果，
     /// 返回值是业务逻辑是否成功
     /// </summary>
     [Parameter]
@@ -154,51 +131,40 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     private RenderBusinessFormViewerInfo<Model> GetRenderSubmitInfo(RenderSubmitInfo<Model> info)
         => new()
         {
-            FormModel = info.FormModel,
-            ExistingForms = info.ExistingForms,
-            Delete = info.ExistingForms ?
-                new(RefreshTarget, async () =>
-                {
-                    var data = info.ModelAndVerify();
-                    var isSuccess = await Delete((Model)data.Data);
-                    if ((isSuccess, Cancellation) is (true, { } cancellation))
-                        await cancellation();
-                }) : null,
-            Resetting = new(this, async () =>
+            BaseRenderInfo = info with
             {
-                await info.Resetting();
-                await Resetting();
-            }),
-            Submit = new(RefreshTarget, async () =>
-            {
-                var data = info.ModelAndVerify();
-                if (!data.IsSuccess)
+                Resetting = async () =>
                 {
-                    await VerifyFail(data);
-                    return;
+                    await info.Resetting();
+                    await Resetting();
                 }
-                var isSuccess = await Submit((Model)data.Data);
+            },
+            Delete = info.ExistingForms ?
+                 async () =>
+                 {
+                     var isSuccess = await Delete(info.FormModel);
+                     if ((isSuccess, Cancellation) is (true, { } cancellation))
+                         await cancellation();
+                 }
+            : null,
+            Submit = async () =>
+            {
+                var model = info.FormModel;
+                var isSuccess = await Submit(model);
                 if (isSuccess)
                 {
                     if (Cancellation is { } cancellation)
                         await cancellation();
-                    else
+                    else if (ResetAfterSubmission)
                     {
-                        if (ResetAfterSubmission)
-                            await info.Resetting();
+                        await info.Resetting();
                     }
                 }
-            }),
+            },
             Cancellation = Cancellation is null ?
                 null :
-                new(RefreshTarget, Cancellation)
+                Cancellation
         };
     #endregion
-    #endregion
-    #region 构造函数
-    public BusinessFormViewer()
-    {
-        RefreshTarget = this;
-    }
     #endregion
 }

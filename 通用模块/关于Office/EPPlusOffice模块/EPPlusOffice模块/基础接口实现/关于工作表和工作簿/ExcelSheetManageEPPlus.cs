@@ -27,8 +27,8 @@ sealed class ExcelSheetManageEPPlus(IExcelBook excelBook) : ExcelSheetManage(exc
         return (sheet, createTable) switch
         {
             ({ } s, _) => s,
-            (null, true) => throw new KeyNotFoundException($"没有找到名称为{name}的工作表"),
-            (null, false) => Add()
+            (null, false) => throw new KeyNotFoundException($"没有找到名称为{name}的工作表"),
+            (null, true) => Add(name)
         };
     }
     #endregion
@@ -54,7 +54,7 @@ sealed class ExcelSheetManageEPPlus(IExcelBook excelBook) : ExcelSheetManage(exc
         var newName = ExcelRealizeHelp.SheetRepeat(EPPlusSheets.Select(x => x.Name), name);
         var sheet = EPPlusSheets.Add(newName);
         var newSheet = PackEPPlusSheet(sheet);
-        var index = (pos ?? Index.End).GetOffset(Count);
+        var index = (pos ?? Index.End).GetOffset(Count) - 1;
         newSheet.Index = index;
         return newSheet;
     }

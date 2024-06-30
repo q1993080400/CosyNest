@@ -9,21 +9,13 @@ public sealed record AuthenticationDingDingState
     /// <summary>
     /// 获取身份验证是否通过
     /// </summary>
-    public bool Passed => UserInfo is { };
+    public bool Passed => AuthenticationResult is { };
     #endregion
-    #region 对钉钉用户的概括
+    #region 身份验证的结果
     /// <summary>
-    /// 获取对钉钉用户的概括，
+    /// 获取身份验证的结果，
     /// 如果为<see langword="null"/>，表示身份验证未通过
     /// </summary>
-    public required DingDingUserInfo? UserInfo { get; init; }
-    #endregion
-    #region 用于下一次请求的身份验证对象
-    /// <summary>
-    /// 获取用于下一次请求的身份验证对象，
-    /// 必须将它写入Cookie，
-    /// 如果为<see langword="null"，请忽略/>
-    /// </summary>
-    public required AuthenticationDingDingRequest? NextRequest { get; init; }
+    public required AuthenticationDingDingResult? AuthenticationResult { get; init; }
     #endregion
 }

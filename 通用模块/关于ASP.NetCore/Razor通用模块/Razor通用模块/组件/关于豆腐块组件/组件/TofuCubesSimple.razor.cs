@@ -18,11 +18,6 @@ public sealed partial class TofuCubesSimple : ComponentBase
     [Parameter]
     public int MaxRowLength { get; set; } = 6;
     #endregion
-    #region 最大行数
-    /// <inheritdoc cref="TofuCubes.MaxRow"/>
-    [Parameter]
-    public int MaxRow { get; set; } = 2;
-    #endregion
     #region 宽度
     /// <inheritdoc cref="TofuCubes.Width"/>
     [Parameter]
@@ -36,6 +31,21 @@ public sealed partial class TofuCubesSimple : ComponentBase
     [Parameter]
     [EditorRequired]
     public RenderFragment<string> RenderIcon { get; set; }
+    #endregion
+    #region 高亮文本
+    /// <summary>
+    /// 获取高亮文本的集合
+    /// </summary>
+    [Parameter]
+    public IReadOnlyCollection<string>? Highlight { get; set; }
+    #endregion
+    #region 高亮组
+    /// <summary>
+    /// 获取高亮组，
+    /// 通过指定它，可以为高亮指定不同的样式
+    /// </summary>
+    [Parameter]
+    public string HighlightGroup { get; set; } = "highlightGroup";
     #endregion
     #region 参数展开
     /// <summary>

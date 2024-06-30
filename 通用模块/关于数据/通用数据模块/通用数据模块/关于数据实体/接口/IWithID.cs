@@ -6,10 +6,10 @@
 /// </summary>
 public interface IWithID
 {
-    #region 数据的ID
+    #region 对象的ID
     /// <summary>
-    /// 获取数据的ID
+    /// 获取对象的ID
     /// </summary>
-    public Guid ID { get; }
+    Guid ID { get; }
     #endregion
 }

@@ -29,7 +29,7 @@ sealed class AIChatContextBaiDu(string accessToken, Func<IHttpClient> httpClient
             role = x.IsHuman ? "user" : "assistant",
             content = x.Message
         }).ToArray();
-        var uri = new UriComplete("https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-3.5-8k-0205")
+        var uri = new UriComplete("https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-speed-128k")
         {
             UriParameter = new([("access_token", accessToken)])
         };

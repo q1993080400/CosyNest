@@ -7,100 +7,190 @@
     => RenderPropertyInfo.Submit();
     #endregion
     var conditionGroup = RenderPropertyInfo.RenderConditionGroup;
+    var filterObjectType = conditionGroup.FilterObjectType;
+    var query = conditionGroup.RenderFilterQuery;
+    var sort = conditionGroup.RenderFilterSort;
     var state = RenderPropertyInfo.SearchViewerState;
-    var first = conditionGroup.FirstQueryCondition;
-    var second = conditionGroup.SecondQueryCondition;
-    var sort = conditionGroup.SortCondition;
     var describe = conditionGroup.Describe;
-    var conditionCount = new bool[] { conditionGroup.SecondQueryCondition is { }, conditionGroup.SortCondition is { } }.
-    Count(x => x);
-    var css = conditionCount switch
-    {
-        _ when conditionGroup.FilterObjectType is FilterObjectType.Bool => "",
-        0 => "bootstrapSearchPanelPropertyContainerSmall",
-        2 => "bootstrapSearchPanelPropertyContainerBig",
-        _ => "bootstrapSearchPanelPropertyContainerMedium"
-    };
     #region 当按下回车键时触发的委托
     Func<T, Task> OnEnter<T>()
     => async (_) => await RenderPropertyInfo.Submit();
     #endregion
-}
-<div class="@css">
-    @switch (conditionGroup.FilterObjectType)
+    #region 绑定查询条件
+    IBind<T> BindQuery<T>()
+    => state.Bind<T>(query);
+    #endregion
+    #region 绑定查询条件
+    IBindProperty<SortStatus>? BindSort()
+    => sort is null ? null : state.Bind(sort);
+    #endregion
+    #region 日期确定时的方法
+    Func<DateTimeRangeValue, Task> OnDateConfirm(BindRange<DateTimeOffset?> dateRange)
+    => async value =>
     {
-        case FilterObjectType.Text:
+        dateRange.Start = value.Start;
+        dateRange.End = value.End;
+        await RenderPropertyInfo.Submit();
+    };
+    #endregion
+    #region 日期清空时的方法
+    Func<DateTimeRangeValue, Task> OnDateClear(BindRange<DateTimeOffset?> dateRange)
+    => async value =>
+    {
+        dateRange.Start = null;
+        dateRange.End = null;
+        await RenderPropertyInfo.Submit();
+    };
+    #endregion
+    var notStretch = filterObjectType is FilterObjectType.Bool ?
+    "notStretch" : "";
+    var @enumItem = query.FilterTarget.EnumItem;
+}
+<div class="bootstrapSearchPanelPropertyContainer @notStretch">
+    @switch ((filterObjectType, enumItem))
+    {
+        case (FilterObjectType.Enum, _) or (_, { Count: > 0 }):
+            var bindQueryEnum = BindQuery<string>().ToBindProperty();
+            var bindSortEnum = BindSort();
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <BootstrapInput @bind-Value=@(state.Bind<string>(first).Value) OnEnterAsync="@(OnEnter<string?>())" />
-                @if (second is { })
+                @if (enumItem.Count >= 10)
                 {
-                    <BootstrapInputGroupLabel DisplayText="至" />
-                    <BootstrapInput @bind-Value=@(state.Bind<string>(second).Value) OnEnterAsync="@(OnEnter<string?>())" />
+                    <BootstrapInput Value="@bindQueryEnum.Value" Readonly="true" />
+                    <Button Text="选择" OnClick="@(()=>IsShow=true)" />
                 }
-                @if (sort is { })
+                else
                 {
-                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
+                    <Select TValue="string" @bind-Value=@(bindQueryEnum.Value) OnValueChanged="OnSubmit">
+                        <Options>
+                            <SelectOption Text="未选择" Value="@null" />
+                            @foreach (var item in enumItem)
+                            {
+                                <SelectOption Text="@item.Describe" Value="@item.Value" />
+                            }
+                        </Options>
+                    </Select>
+                }
+                @if (bindSortEnum is { })
+                {
+                    <Select @bind-Value=@(bindSortEnum.Value) OnValueChanged="OnSubmit" />
+                }
+            </BootstrapInputGroup>
+            @if (IsShow)
+            {
+                <PopUp IsOpen="IsShow" Cancellation="@(()=>IsShow=false)" Title="@($"选择{describe}")">
+                    <RenderComponent Context="renderPopUpInfo">
+                        <Selector Candidates="enumItem.ToHashSet()" Submit="SubmitEnumItem(bindQueryEnum)"
+                                  InitializationSelect="@(x=>x.Value==bindQueryEnum.Value)" @ref=Selector>
+                            <RenderComponent Context="renderSelectorInfo">
+                                <Card>
+                                    <HeaderTemplate>
+                                        <Center>
+                                            <div>@renderPopUpInfo.Title</div>
+                                        </Center>
+                                    </HeaderTemplate>
+                                    <BodyTemplate>
+                                        <div class="bootstrapSearchPanelSelect">
+                                            @foreach (var item in renderSelectorInfo.Candidates)
+                                            {
+                                                var onClick = new EventCallback(Selector!, (MouseEventArgs _) =>
+                                                {
+                                                    renderSelectorInfo.SelectOrCancel(item);
+                                                });
+                                                <div @onclick=onClick>
+                                                    <div class="@(renderSelectorInfo.IsSelect(item)?"selectElement":"") selectElementText">
+                                                        @item.Describe
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </BodyTemplate>
+                                    <FooterTemplate>
+                                        <div class="compactCentered">
+                                            <Button Text="返回页面" OnClick="renderPopUpInfo.Cancellation" />
+                                            <Button Text="提交搜索" OnClick="renderSelectorInfo.Submit" IsDisabled="@(!renderSelectorInfo.AnySelect)" />
+                                            <Button Text="清除条件" OnClick="ClearEnumItem(bindQueryEnum)" />
+                                        </div>
+                                    </FooterTemplate>
+                                </Card>
+                            </RenderComponent>
+                        </Selector>
+                    </RenderComponent>
+                </PopUp>
+            }
+            break;
+        case (FilterObjectType.Text, _):
+            var bindQueryText = BindQuery<string>().ToBindProperty();
+            var bindSortText = BindSort();
+            <BootstrapInputGroup>
+                <BootstrapInputGroupLabel DisplayText="@describe" />
+                <BootstrapInput @bind-Value=@(bindQueryText.Value) OnEnterAsync="@(OnEnter<string?>())" />
+                @if (bindSortText is { })
+                {
+                    <Select @bind-Value=@(bindSortText.Value) OnValueChanged="OnSubmit" />
                 }
             </BootstrapInputGroup>
             break;
-        case FilterObjectType.Num:
+        case (FilterObjectType.Num, _):
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(first).Value) OnEnterAsync="@(OnEnter<double?>())" />
-                @if (second is { })
-                {
-                    <BootstrapInputGroupLabel DisplayText="至" />
-                    <BootstrapInputNumber @bind-Value=@(state.Bind<double?>(second).Value) OnEnterAsync="@(OnEnter<double?>())" />
+                @{
+                    var bindQueryNum = BindQuery<double?>();
+                    var bindSortNum = BindSort();
                 }
-                @if (sort is { })
+                @switch (bindQueryNum)
                 {
-                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
+                    case IBindProperty<double?> bindQueryNumSingle:
+                        <BootstrapInputNumber @bind-Value=@(bindQueryNumSingle.Value) OnEnterAsync="@(OnEnter<double?>())" />
+                        break;
+                    case IBindRange<double?> { Range: { } bindQueryNumRange }:
+                        <BootstrapInputNumber @bind-Value=@(bindQueryNumRange.Start) OnEnterAsync="@(OnEnter<double?>())" />
+                        <BootstrapInputGroupLabel DisplayText="至" />
+                        <BootstrapInputNumber @bind-Value=@(bindQueryNumRange.End) OnEnterAsync="@(OnEnter<double?>())" />
+                        break;
+                }
+                @if (bindSortNum is { })
+                {
+                    <Select @bind-Value=@(bindSortNum.Value) OnValueChanged="OnSubmit" />
                 }
             </BootstrapInputGroup>
             break;
-        case FilterObjectType.Date:
+        case (FilterObjectType.Date, _):
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <DateTimePicker @bind-Value=@(state.Bind<DateTimeOffset?>(first).Value) />
-                @if (second is { })
-                {
-                    <BootstrapInputGroupLabel DisplayText="至" />
-                    <DateTimePicker @bind-Value=@(state.Bind<DateTimeOffset?>(second).Value) />
+                @{
+                    var bindQueryDate = BindQuery<DateTimeOffset?>();
+                    var bindSortDate = BindSort();
                 }
-                @if (sort is { })
+                @switch (bindQueryDate)
                 {
-                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
-                }
-            </BootstrapInputGroup>
-            break;
-        case FilterObjectType.Enum:
-            var bindEnum = GetBindEnum(first);
-            <BootstrapInputGroup>
-                <BootstrapInputGroupLabel DisplayText="@describe" />
-                <Select TValue="string" OnValueChanged="@(x=>OnEnumChanged(x,first))" Value="@(bindEnum.Value?.ToString())">
-                    <Options>
-                        <SelectOption Text="未选择" Value="@null" />
-                        @foreach (var item in first.EnumItem)
+                    case IBindProperty<DateTimeOffset?> bindQueryDateSingle:
+                        <DateTimePicker @bind-Value=@(bindQueryDateSingle.Value) />
+                        break;
+                    case IBindRange<DateTimeOffset?> { Range: { } bindQueryDateRange }:
+                        var dateTimeRangeValue = new DateTimeRangeValue()
                         {
-                            <SelectOption Text="@item.Describe" Value="@item.Value.ToString()" />
-                        }
-                    </Options>
-                </Select>
-                @if (sort is { })
+                            NullStart = bindQueryDateRange.Start?.DateTime,
+                            NullEnd = bindQueryDateRange.End?.DateTime
+                        };
+                        <DateTimeRange ShowToday="true" Value="dateTimeRangeValue" OnConfirm="OnDateConfirm(bindQueryDateRange)" OnClearValue="OnDateClear(bindQueryDateRange)" />
+                        break;
+                }
+                @if (bindSortDate is { })
                 {
-                    <Select @bind-Value=@(state.Bind(sort).SortStatus) OnValueChanged="OnSubmit" />
+                    <Select @bind-Value=@(bindSortDate.Value) OnValueChanged="OnSubmit" />
                 }
             </BootstrapInputGroup>
             break;
-        case FilterObjectType.Bool:
+        case (FilterObjectType.Bool, _):
+            var bindQueryBool = BindQuery<bool?>().ToBindProperty();
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <NullSwitch @bind-Value=@(state.Bind<bool?>(first).Value)
+                <NullSwitch @bind-Value=@(bindQueryBool.Value)
                             OnValueChanged="OnSubmit" OnText="开启" OffText="关闭" />
             </BootstrapInputGroup>
             break;
-        case var filterObjectType:
+        default:
             throw new NotSupportedException($"暂不支持渲染{filterObjectType}类型的属性");
     }
 </div>

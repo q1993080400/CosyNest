@@ -15,27 +15,6 @@ public static partial class ExtendEnumerable
     public static int[] GetLength(this Array array)
         => Enumerable.Range(0, array.Rank).Select(array.GetLength).ToArray();
     #endregion
-    #region 将集合分页
-    /// <summary>
-    /// 将集合分页，并返回特定页的元素
-    /// </summary>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="objs">待分页的集合</param>
-    /// <param name="pageIndex">页的索引，从0开始</param>
-    /// <param name="pageSize">每一页的元素数量</param>
-    /// <returns></returns>
-    public static Obj[] Page<Obj>(this Obj[] objs, int pageIndex, int pageSize)
-    {
-        var maxIndex = (objs.Length + objs.Length % pageSize) / pageSize;
-        var first = pageIndex * pageSize;
-        return pageIndex switch
-        {
-            var i when i == maxIndex => objs[first..],
-            var i when i >= 0 && i < maxIndex => objs[first..(first + pageSize)],
-            _ => [],
-        };
-    }
-    #endregion
     #region 合并数组
     /// <summary>
     /// 合并多个数组
@@ -56,30 +35,6 @@ public static partial class ExtendEnumerable
             len += itemLen;
         }
         return array;
-    }
-    #endregion
-    #endregion
-    #region 为IList<T>优化
-    #region 比较IList<T>的值相等性
-    /// <summary>
-    /// 比较<see cref="IList{T}"/>的值相等性
-    /// </summary>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="collectionA">要比较的第一个集合</param>
-    /// <param name="collectionB">要比较的第二个集合</param>
-    /// <returns>如果两个集合的长度和对应索引的元素完全一致，
-    /// 则返回<see langword="true"/>，否则返回<see langword="false"/></returns>
-    public static bool SequenceEqual<Obj>(this IList<Obj> collectionA, IList<Obj> collectionB)
-    {
-        var len = collectionA.Count;
-        if (len != collectionB.Count)
-            return false;
-        for (int i = 0; i < len; i++)
-        {
-            if (!Equals(collectionA[i], collectionB[i]))
-                return false;
-        }
-        return true;
     }
     #endregion
     #endregion

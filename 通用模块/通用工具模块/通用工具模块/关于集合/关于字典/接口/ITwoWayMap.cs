@@ -6,7 +6,7 @@
 /// </summary>
 /// <typeparam name="A">要映射的第一个对象类型</typeparam>
 /// <typeparam name="B">要映射的第二个对象类型</typeparam>
-public interface ITwoWayMap<A, B> : IEnumerable<(A, B)>
+public interface ITwoWayMap<A, B> : IReadOnlyCollection<(A, B)>
     where A : notnull
     where B : notnull
 {
@@ -53,42 +53,28 @@ public interface ITwoWayMap<A, B> : IEnumerable<(A, B)>
     #endregion
     #endregion
     #region 注册映射
-    #region 注册双向映射
+    #region 注册单个映射
     /// <summary>
     /// 注册一个双向映射，双向映射指的是：
     /// 两个对象的映射只能是一对一的，
     /// 而且能够通过任意一个找到另一个
     /// </summary>
-    /// <param name="map">这个元组的两个项会互相映射</param>
-    void RegisteredTwo(params (A a, B b)[] map);
+    /// <param name="a">映射的A对象</param>
+    /// <param name="b">映射的B对象</param>
+    void RegisteredMap(A a, B b);
     #endregion
-    #region 注册从A到B的单向映射
+    #region 批量注册映射
     /// <summary>
-    /// 注册从A到B的单向映射，单向映射指的是：
-    /// 只能通过A找到B，但是这个映射可以是一对多的
+    /// 批量注册映射
     /// </summary>
-    /// <param name="to">传入下个参数中的任意一个A对象，
-    /// 都会映射到这个B对象</param>
-    /// <param name="from">通过本集合的任意一个A对象，
-    /// 都可以找到上个参数的B对象</param>
-    void RegisteredOne(B to, params A[] from);
+    /// <param name="maps">映射的A对象和B对象</param>
+    void RegisteredMapRange(IEnumerable<(A A, B B)> maps)
+    {
+        foreach (var (a, b) in maps)
+        {
+            RegisteredMap(a, b);
+        }
+    }
     #endregion
-    #region 注册从B到A的单向映射
-    /// <summary>
-    /// 注册从B到A的单项映射，单项映射指的是：
-    /// 只能通过B找到A，但是这个映射可以是一对多的
-    /// </summary>
-    /// <param name="to">传入下个参数中的任意一个B对象，
-    /// 都会映射到这个A对象</param>
-    /// <param name="from">通过本集合的任意一个B对象，
-    /// 都可以找到上个参数的A对象</param>
-    void RegisteredOne(A to, params B[] from);
-    #endregion
-    #endregion
-    #region 映射数量
-    /// <summary>
-    /// 获取所有映射的数量
-    /// </summary>
-    int Count { get; }
     #endregion
 }

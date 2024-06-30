@@ -15,7 +15,7 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     public abstract IExcelCells Cell { get; }
     #endregion
     #region 返回行或者列
-    public abstract IExcelRC GetRC(int begin, int? end, bool isRow);
+    public abstract IExcelRC GetRC(bool isRow, int begin, int? end);
     #endregion
     #region 根据行列号获取单元格
     public abstract IExcelCells this[int beginRow, int beginColumn, int endRow = -1, int endColumn = -1] { get; }

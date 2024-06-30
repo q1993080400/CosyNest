@@ -1,7 +1,6 @@
 ﻿using System.IOFrancis.Bit;
 using System.Net.Http.Json;
 using System.Design.Direct;
-using System.Linq.Expressions;
 using System.Text.Json;
 using System.Design;
 
@@ -95,44 +94,12 @@ public interface IHttpClient
     #endregion
     #endregion
     #region 强类型Http请求
-    #region 返回IHttpResponse
     /// <summary>
-    /// 发起强类型Http请求，并返回结果
+    /// 返回一个对象，它可以用来发起强类型请求
     /// </summary>
-    /// <typeparam name="API">API接口的类型</typeparam>
-    /// <param name="request">用于描述请求路径和参数的表达式</param>
-    /// <param name="options">一个用于执行Json转换的对象</param>
-    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
-    /// <inheritdoc cref="Request(HttpRequestRecording, HttpRequestTransform?, CancellationToken)"/>
-    Task<IHttpResponse> Request<API>(Expression<Func<API, object?>> request, HttpRequestTransform? transformation = null,
-        JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="IHttpStrongTypeRequest{API}"/>
+    IHttpStrongTypeRequest<API> RequestStrongType<API>()
         where API : class;
-
-    /*问：如何使用这个方法？
-      答：泛型参数API一般是一个接口，放在中台，并被控制器实现，
-      然后前端在这个方法中传入这个泛型参数，
-      并在request参数中调用这个接口的方法，
-      函数会将表达式翻译为对WebApi的调用
-    
-      这个接口方法的返回值可以为任意类型，
-      因为该接口方法实际上不会被执行*/
-    #endregion
-    #region 返回Json对象
-    /// <summary>
-    /// 发起强类型Http请求，并将结果反序列化为Json后返回，
-    /// 它只支持Get请求
-    /// </summary>
-    /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <returns></returns>
-    /// <inheritdoc cref="Request{API}(Expression{Func{API, object?}},HttpRequestTransform?,JsonSerializerOptions?, CancellationToken)"/>
-    async Task<Ret> Request<API, Ret>(Expression<Func<API, Task<Ret>>> request, HttpRequestTransform? transformation = null,
-        JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        where API : class
-    {
-        var expression = Expression.Lambda<Func<API, object?>>(request.Body, request.Parameters);
-        return await Request(expression, transformation, options, cancellationToken).Read(x => x.ToObject<Ret>(options));
-    }
-    #endregion
     #endregion
 }

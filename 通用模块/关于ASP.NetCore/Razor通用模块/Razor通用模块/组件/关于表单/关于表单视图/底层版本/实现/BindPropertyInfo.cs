@@ -5,8 +5,8 @@ namespace Microsoft.AspNetCore.Components;
 /// <summary>
 /// 这个记录允许绑定表单属性
 /// </summary>
-/// <inheritdoc cref="IBindPropertyInfo{Obj}"/>
-sealed record BindPropertyInfo<Obj> : IBindPropertyInfo<Obj>
+/// <inheritdoc cref="IBindProperty{Obj}"/>
+sealed record BindPropertyInfo<Obj> : IBindProperty<Obj>
 {
     #region 公开成员
     #region 属性的值

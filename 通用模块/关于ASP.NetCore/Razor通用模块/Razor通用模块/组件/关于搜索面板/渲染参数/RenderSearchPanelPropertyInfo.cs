@@ -15,7 +15,7 @@ public sealed record RenderSearchPanelPropertyInfo
     /// <summary>
     /// 获取渲染条件组，它描述如何渲染单个属性
     /// </summary>
-    public required RenderConditionGroup RenderConditionGroup { get; init; }
+    public required RenderFilterGroup RenderConditionGroup { get; init; }
     #endregion
     #region 提交搜索
     /// <summary>
@@ -23,5 +23,11 @@ public sealed record RenderSearchPanelPropertyInfo
     /// 它通常会被用来排序上面
     /// </summary>
     public required Func<Task> Submit { get; init; }
+    #endregion
+    #region 清除搜索
+    /// <summary>
+    /// 这个委托可以用来清除搜索
+    /// </summary>
+    public required Func<Task> Clear { get; init; }
     #endregion
 }

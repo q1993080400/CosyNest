@@ -152,29 +152,29 @@ public static class CreateTimer
     /// 启动一个后台服务
     /// </summary>
     /// <param name="info">创建后台任务的参数</param>
-    public static void StartHostedService(StartHostedInfo info)
+    public static async void StartHostedService(StartHostedInfo info)
     {
         #region 用来创建主机的本地函数
         async Task StartHost()
         {
-            IHost? host = null;
-            #region 停止主机的本地函数
-            async Task Stop()
-            {
-                if (host is { })
-                    await host.StopAsync();
-            }
-            #endregion
             var builder = Host.CreateApplicationBuilder();
             var start = info.Configuration(builder);
             if (!start)
                 return;
+            using var cancellationTokenSource = new CancellationTokenSource();
+            var token = cancellationTokenSource.Token;
+            #region 停止主机的本地函数
+            async Task Stop()
+            {
+                await cancellationTokenSource.CancelAsync();
+            }
+            #endregion
             builder.Services.AddHostedService(x => new TimedHostedService(info, x, Stop));
-            host = builder.Build();
-            await host.RunAsync();
+            var host = builder.Build();
+            await host.RunAsync(token);
         }
         #endregion
-        Task.Factory.StartNew(StartHost, TaskCreationOptions.LongRunning);
+        await Task.Factory.StartNew(StartHost, TaskCreationOptions.LongRunning);
     }
     #endregion
 }

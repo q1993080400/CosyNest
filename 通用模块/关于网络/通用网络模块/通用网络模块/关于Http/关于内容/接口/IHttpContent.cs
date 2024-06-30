@@ -64,6 +64,8 @@ public interface IHttpContent
     async Task<Obj> ToObject<Obj>(JsonSerializerOptions? options = null)
     {
         var array = await Content.ReadComplete();
+        if (array.Length is 0)
+            return default!;
         if (typeof(Obj) == typeof(string))
         {
             var text = Encoding.UTF8.GetString(array);

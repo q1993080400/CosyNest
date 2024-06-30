@@ -52,22 +52,15 @@
     }
 }
 
-/*紧凑表单属性容器样式*/
-.bootstrapSearchPanelPropertyContainerSmall
+/*表单属性容器样式*/
+.bootstrapSearchPanelPropertyContainer
 {
-    width: 25ic;
 }
 
-/*中等表单属性容器样式*/
-.bootstrapSearchPanelPropertyContainerMedium
+/*完美容器不拉伸的子元素样式*/
+.perfectContainer > .notStretch
 {
-    width: 35ic;
-}
-
-/*宽松表单属性容器样式*/
-.bootstrapSearchPanelPropertyContainerBig
-{
-    width: 45ic;
+    flex-grow: 0;
 }
 
 /*媒体视图容器的样式*/
@@ -159,4 +152,13 @@ bootstrapFormViewerTopContainer
     display: flex;
     gap: var(--gapMedium);
     flex-wrap: nowrap;
+}
+
+/*搜索面板选择器样式*/
+.bootstrapSearchPanelSelect
+{
+    display: grid;
+    gap: var(--gapMedium);
+    grid-template-columns: repeat(auto-fit,14ic);
+    max-width: var(--maxPopUpWidth);
 }

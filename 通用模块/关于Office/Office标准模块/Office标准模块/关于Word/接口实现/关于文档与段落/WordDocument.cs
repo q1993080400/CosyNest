@@ -7,9 +7,6 @@ namespace System.Office.Word.Realize;
 /// 在实现<see cref="IWordDocument"/>的时候，
 /// 可以继承自本类型，以减少重复的工作
 /// </summary>
-/// <remarks>
-/// 用指定的文件路径初始化Word文档
-/// </remarks>
 /// <param name="path">文档所在的文件路径，
 /// 如果文档不是通过文件创建的，则为<see langword="null"/></param>
 public abstract class WordDocument(string? path) : FromIO(path), IWordDocument

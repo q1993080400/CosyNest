@@ -10,53 +10,47 @@ namespace Microsoft.AspNetCore;
 public sealed class FilterSingleConditionAttribute<BusinessInterface> : FilterConditionAttribute<BusinessInterface>
     where BusinessInterface : class, IGetRenderAllFilterCondition
 {
+    #region 访问表达式
+    /// <summary>
+    /// 属性访问表达式，
+    /// 通过它可以访问要查询或排序的属性，
+    /// 如果为<see langword="null"/>，
+    /// 则自动获取
+    /// </summary>
+    public string? PropertyAccess { get; init; }
+    #endregion
+    #region 查询条件默认值
+    /// <summary>
+    /// 查询条件的默认值字面量
+    /// </summary>
+    public string? PropertyAccessDefaultValue { get; init; }
+    #endregion
     #region 逻辑运算符
     /// <summary>
     /// 描述查询条件的逻辑运算符
     /// </summary>
-    public RenderLogicalOperator LogicalOperator { get; init; } = RenderLogicalOperator.Equal;
-    #endregion
-    #region 第一查询条件默认值
-    /// <summary>
-    /// 第一查询条件的默认值字面量
-    /// </summary>
-    public string? PropertyAccessDefaultValue { get; init; }
-    #endregion
-    #region 排除查询条件
-    /// <summary>
-    /// 如果这个值不为<see langword="null"/>，
-    /// 表示当这个条件的值等于这个字面量的时候，
-    /// 排除这个查询条件
-    /// </summary>
-    public string? ExcludeFilter { get; init; }
+    public RenderLogicalOperator LogicalOperator { get; init; }
     #endregion
     #region 抽象成员实现：获取渲染条件组
-    public override RenderConditionGroup ConvertConditioGroup(MemberInfo memberInfo)
+    public override RenderFilterGroup ConvertConditioGroup(MemberInfo memberInfo)
     {
-        var propertyAccess = GetPropertyAccess(memberInfo);
-        var filterObjectType = GetFilterObjectType(FilterObjectType, memberInfo);
-        var enumItem = GetEnumItem(memberInfo);
-        return new()
+        var propertyAccess = PropertyAccess ?? GetPropertyAccess(memberInfo);
+        var filterTargets = GetFilterTargets(memberInfo);
+        var filterObjectType = GetFilterObjectType(filterTargets);
+        var enumItem = EnumItem.Create(filterTargets);
+        return new FilterSingleConditionInfo()
         {
             Describe = Describe,
             FilterObjectType = filterObjectType,
+            LogicalOperator = LogicalOperator,
+            PropertyAccess = propertyAccess,
+            CanSort = CanSort,
+            EnumItem = enumItem,
+            ExcludeFilter = ExcludeFilter,
+            IsVirtually = IsVirtually,
             Order = Order,
-            FirstQueryCondition = new()
-            {
-                LogicalOperator = LogicalOperator.ToLogicalOperator(),
-                PropertyAccess = propertyAccess,
-                EnumItem = enumItem,
-                DefaultValue = PropertyAccessDefaultValue,
-                ExcludeFilter = ExcludeFilter,
-                IsVirtually = IsVirtually
-            },
-            SecondQueryCondition = null,
-            SortCondition = CanSort ? new()
-            {
-                PropertyAccess = propertyAccess,
-                IsVirtually = IsVirtually
-            } : null
-        };
+            PropertyAccessDefaultValue = PropertyAccessDefaultValue
+        }.ConvertConditioGroup();
     }
     #endregion
 }

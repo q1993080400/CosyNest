@@ -27,6 +27,14 @@ public sealed partial class AuthorizeViewDingDing : ComponentBase
     [EditorRequired]
     public RenderFragment<Func<Task>> NotAuthorized { get; set; }
     #endregion
+    #region 是否跳过身份验证
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示应该跳过身份验证，直接显示已授权内容
+    /// </summary>
+    [Parameter]
+    public bool IsAllowAnonymous { get; set; }
+    #endregion
     #region 路由参数：身份验证代码
     /// <summary>
     /// 这个参数用于接收路由身份验证代码
@@ -67,18 +75,18 @@ public sealed partial class AuthorizeViewDingDing : ComponentBase
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (AuthenticationState is { })
+        if (AuthenticationState is { } || IsAllowAnonymous)
             return;
         #region 用于更新组件的本地函数
         async Task Update(AuthenticationDingDingRequest request)
         {
-            var state = (await HttpClient.Request<IGetAuthenticationDingDingState, APIPackDingDing>
-                    (x => x.GetAuthenticationDingDingState(request))).AuthorizationState;
+            var state = (await HttpClient.RequestStrongType<IGetAuthenticationDingDingState>().
+                Request(x => x.GetAuthenticationDingDingState(request))).AuthorizationState;
             await AuthorizationStateChange(state);
         }
         #endregion
-        var request = await JSWindow.GetAuthenticationRequest();
-        switch ((request, AuthCode, AppInfo))
+        var result = await JSWindow.GetAuthenticationResult();
+        switch ((result, AuthCode, AppInfo))
         {
             case (null, null, { }):
                 var loginPageUri = new UriComplete("https://login.dingtalk.com/oauth2/auth")
@@ -97,11 +105,12 @@ public sealed partial class AuthorizeViewDingDing : ComponentBase
                 NavigationManager.NavigateTo(loginPageUri);
                 break;
             case (null, null, null):
-                AppInfo = await HttpClient.Request<IGetAuthenticationDingDingState, DingDingAppInfo>(x => x.GetAppInfo());
+                AppInfo = await HttpClient.RequestStrongType<IGetAuthenticationDingDingState>().
+                    Request(x => x.GetAppInfo());
                 StateHasChanged();
                 break;
             case ({ }, _, _):
-                await Update(request);
+                await Update(result.GetAuthenticationRequest());
                 break;
             case (null, { }, _):
                 var parameter = new AuthenticationDingDingRequest()
@@ -109,6 +118,7 @@ public sealed partial class AuthorizeViewDingDing : ComponentBase
                     Code = AuthCode,
                     IsToken = false,
                     RefreshToken = null,
+                    IsEncryption = false
                 };
                 await Update(parameter);
                 break;
@@ -116,7 +126,11 @@ public sealed partial class AuthorizeViewDingDing : ComponentBase
     }
     #endregion
     #region 当授权状态改变时触发的事件
-    /// <inheritdoc cref="AspNetCore.AuthorizationStateChange"/>
+    /// <summary>
+    /// 当授权状态改变时触发的事件
+    /// </summary>
+    /// <param name="newState">新授权状态</param>
+    /// <returns></returns>
     private async Task AuthorizationStateChange(AuthorizationDingDingState? newState)
     {
         AuthenticationState = newState?.AuthenticationState;

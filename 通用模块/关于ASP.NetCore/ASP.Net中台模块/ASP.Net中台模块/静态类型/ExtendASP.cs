@@ -50,22 +50,6 @@ public static class ExtendASP
         return analysis(son);
     }
     #endregion
-    #region 转换渲染逻辑运算符和逻辑运算符
-    /// <summary>
-    /// 将<see cref="RenderLogicalOperator"/>转换为等效的<see cref="LogicalOperator"/>，
-    /// 警告：<see cref="RenderLogicalOperator.Interval"/>不能转换
-    /// </summary>
-    /// <param name="renderLogicalOperator">待转换的<see cref="RenderLogicalOperator"/></param>
-    /// <returns></returns>
-    public static LogicalOperator ToLogicalOperator(this RenderLogicalOperator renderLogicalOperator)
-        => renderLogicalOperator switch
-        {
-            RenderLogicalOperator.Equal => LogicalOperator.Equal,
-            RenderLogicalOperator.NotEqual => LogicalOperator.NotEqual,
-            RenderLogicalOperator.Contain => LogicalOperator.Contain,
-            var @operator => throw new NotSupportedException($"不能转换{@operator}"),
-        };
-    #endregion
     #region 关于依赖注入
     #region 注入IUriManager
     /// <summary>
@@ -78,5 +62,27 @@ public static class ExtendASP
     public static IServiceCollection AddUriManager(this IServiceCollection services, string baseUri)
         => services.AddSingleton(_ => CreateNet.UriManager(baseUri));
     #endregion
+    #endregion
+    #region 获取逻辑运算符
+    /// <summary>
+    /// 将渲染用逻辑运算符转换为逻辑运算符
+    /// </summary>
+    /// <param name="renderLogicalOperator">待转换的渲染用逻辑运算符</param>
+    /// <param name="filterObjectType">筛选对象的类型，
+    /// 根据它的不同，可用的逻辑运算符也不同</param>
+    /// <returns></returns>
+    public static LogicalOperator ToLogicalOperator(this RenderLogicalOperator renderLogicalOperator, FilterObjectType filterObjectType)
+        => (renderLogicalOperator, filterObjectType) switch
+        {
+            (RenderLogicalOperator.None, FilterObjectType.Text) => LogicalOperator.Contain,
+            (RenderLogicalOperator.None, _) => LogicalOperator.Equal,
+            (RenderLogicalOperator.Equal, _) => LogicalOperator.Equal,
+            (RenderLogicalOperator.NotEqual, _) => LogicalOperator.NotEqual,
+            (RenderLogicalOperator.Contain, _) =>
+            filterObjectType is FilterObjectType.Text ?
+            LogicalOperator.Contain :
+            throw new NotSupportedException($"{filterObjectType}不能使用{RenderLogicalOperator.Contain}逻辑运算符"),
+            _ => throw new NotSupportedException($"无法将{renderLogicalOperator}和{filterObjectType}的组合正确地转换为逻辑运算符")
+        };
     #endregion
 }

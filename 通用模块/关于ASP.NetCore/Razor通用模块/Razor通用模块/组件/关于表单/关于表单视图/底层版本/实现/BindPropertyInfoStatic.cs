@@ -6,8 +6,8 @@
 /// 它适用于只读模式
 /// </summary>
 /// <param name="value">固定返回的值</param>
-/// <inheritdoc cref="IBindPropertyInfo{Obj}"/>
-sealed class BindPropertyInfoStatic<Obj>(Obj value) : IBindPropertyInfo<Obj>
+/// <inheritdoc cref="IBindProperty{Obj}"/>
+sealed class BindPropertyInfoStatic<Obj>(Obj value) : IBindProperty<Obj>
 {
     #region 属性的值
     public Obj? Value

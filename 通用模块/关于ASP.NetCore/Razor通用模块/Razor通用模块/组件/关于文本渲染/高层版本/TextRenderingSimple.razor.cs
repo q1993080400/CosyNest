@@ -23,5 +23,13 @@ public sealed partial class TextRenderingSimple : ComponentBase
     [Parameter]
     public IReadOnlyCollection<string>? Highlight { get; set; }
     #endregion
+    #region 高亮组
+    /// <summary>
+    /// 获取高亮组，
+    /// 通过指定它，可以为高亮指定不同的样式
+    /// </summary>
+    [Parameter]
+    public string HighlightGroup { get; set; } = "highlightGroup";
+    #endregion
     #endregion
 }

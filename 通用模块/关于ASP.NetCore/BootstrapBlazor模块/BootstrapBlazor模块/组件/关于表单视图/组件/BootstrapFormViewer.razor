@@ -3,18 +3,17 @@
 @typeparam Model
 
 <BusinessFormViewer GetRenderPropertyInfo=GetRenderPropertyInfo
-                    Verify=Verify InitializationModel="InitializationModel"
+                    InitializationModel="InitializationModel"
                     ExistingForms=ExistingForms IsReadOnlyProperty=IsReadOnlyProperty
-                    OnPropertyChangeed=OnPropertyChangeed ShowSubmit=ShowSubmit
+                    OnPropertyChangeed=OnPropertyChangeed CanEdit="CanEdit"
                     IsValueReference=IsValueReference Delete="Delete" Cancellation="Cancellation"
-                    RefreshTarget="RefreshTarget" ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
-                    Submit="Submit" VerifyFail="VerifyFail">
+                    ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
+                    Submit="Submit">
     <RenderComponent>
         @if (RenderComponent is null)
         {
             <div class="bootstrapFormViewerTopContainer">
                 @context.RenderMain
-                <div />
                 @context.RenderSubmit
             </div>
         }
@@ -27,10 +26,7 @@
         @if (RenderMain is null)
         {
             <div class="bootstrapFormViewerContainer">
-                @foreach (var renderGroup in context.RenderGroup)
-                {
-                    @renderGroup.RenderRegionAll()
-                }
+                @context.RenderAllGroup()
             </div>
         }
         else
@@ -54,9 +50,10 @@
     <RenderSubmit>
         @if (RenderSubmit is null)
         {
-            <Center>
-                <Button Text="@(context.ExistingForms?"修改":"提交")" OnClick="context.Submit"></Button>
-                <Button Text="重置" OnClick="context.Resetting"></Button>
+            var baseInfo = context.BaseRenderInfo;
+            <div class="compactCentered">
+                <Button Text="@(baseInfo.ExistingForms?"修改":"提交")" OnClick="context.Submit"></Button>
+                <Button Text="重置" OnClick="baseInfo.Resetting"></Button>
                 @if (context.Delete is { } deleteValue)
                 {
                     <Button Text="删除" OnClick="deleteValue"></Button>
@@ -65,7 +62,7 @@
                 {
                     <Button Text="取消" OnClick="cancellationValue"></Button>
                 }
-            </Center>
+            </div>
         }
         else
         {

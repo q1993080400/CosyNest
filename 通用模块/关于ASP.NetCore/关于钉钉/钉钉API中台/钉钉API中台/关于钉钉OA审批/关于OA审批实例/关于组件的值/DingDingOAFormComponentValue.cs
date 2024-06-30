@@ -37,6 +37,6 @@ public record DingDingOAFormComponentValue
     /// </summary>
     public DingDingOAComponentInfo? Info
         => Value is { } ?
-        DingDingOAComponentInfo.Create(ComponentType, Value) : null;
+        DingDingOAComponentInfo.Create(ComponentType, Name, Value) : null;
     #endregion
 }

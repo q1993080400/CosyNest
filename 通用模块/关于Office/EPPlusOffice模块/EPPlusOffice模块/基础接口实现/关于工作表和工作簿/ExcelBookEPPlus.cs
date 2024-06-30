@@ -94,13 +94,8 @@ sealed class ExcelBookEPPlus : ExcelBook, IExcelBook
     public ExcelBookEPPlus(string? path)
         : base(path)
     {
-        if (path is null || !File.Exists(path))
-        {
-            ExcelPackage = new();
-            ExcelWorkbook.Worksheets.Add("Sheet1");
-        }
-        else
-            ExcelPackage = new(new FileInfo(path));
+        ExcelPackage = path is null || !File.Exists(path) ?
+            new() : new(new FileInfo(path));
         SheetManage = new ExcelSheetManageEPPlus(this);
     }
     #endregion

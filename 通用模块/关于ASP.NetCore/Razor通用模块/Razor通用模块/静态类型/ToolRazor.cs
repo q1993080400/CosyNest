@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Microsoft.AspNetCore;
+namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 有关Razor的工具类

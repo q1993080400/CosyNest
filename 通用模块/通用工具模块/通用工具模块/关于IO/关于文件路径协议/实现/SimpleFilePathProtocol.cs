@@ -16,7 +16,7 @@ static class SimpleFilePathProtocol
     /// <param name="filePath"></param>
     /// <returns></returns>
     public static string GenerateFilePathProtocol(string filePath)
-        => ToolPath.RefactoringPath(filePath, x => Guid.NewGuid().ToString() + x);
+        => ToolPath.RefactoringPath(filePath, newSimple: x => Guid.NewGuid().ToString() + x);
     #endregion
     #region 解析文件路径
     #region Guid文本长度

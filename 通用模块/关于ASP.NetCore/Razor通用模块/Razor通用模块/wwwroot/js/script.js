@@ -56,6 +56,25 @@ function LoadCSS(uri) {
     head.insertBefore(link, head.firstChild);
 }
 
+//下载文件
+function Download(uri, fileName) {
+    let downloadDom = document.createElement('a');
+    downloadDom.href = uri;
+    downloadDom.download = fileName;
+    document.body.appendChild(downloadDom);
+    downloadDom.click();
+    document.body.removeChild(downloadDom);
+}
+
+//弹出小窗口
+function ShowSmallWindow(uri, proportion) {
+    const width = screen.width;
+    const height = screen.height;
+    const isVertical = height > width;
+    const windowFeatures = `popup,width=${isVertical ? width : width * proportion},height=${isVertical ? height * proportion : height}`;
+    open(uri, '_blank', windowFeatures);
+}
+
 //固定具有所有特性的粘性定位元素
 function FixedSticky(id, attribute) {
     let array = Array.from(document.querySelectorAll(`#${id} [${attribute}]`));

@@ -29,7 +29,7 @@ sealed class TableRenderInfoBuildPenetration<OuterModel, TrueModel>
             RenderTableBodyColumnsInfo<TrueModel> info =>
             (RenderBodyColumnsInfoBase<OuterModel>)new RenderTableBodyColumnsInfo<OuterModel>()
             {
-                ColumnsName = info.ColumnsName,
+                Name = info.Name,
                 RowIndex = info.RowIndex,
                 TableModel = model,
                 PropertyInfo = info.PropertyInfo,
@@ -38,7 +38,7 @@ sealed class TableRenderInfoBuildPenetration<OuterModel, TrueModel>
             RenderTableBodyColumnsInfoCustom<TrueModel> info =>
             new RenderTableBodyColumnsInfoCustom<OuterModel>()
             {
-                ColumnsName = info.ColumnsName,
+                Name = info.Name,
                 RowIndex = info.RowIndex,
                 TableModel = model,
                 IsLong = info.IsLong,

@@ -22,6 +22,10 @@ sealed class ExcelBookNpoi : ExcelBook
     public IWorkbook WorkBook { get; }
     #endregion
     #region 关于工作簿
+    #region 默认格式
+    protected override string DefaultFormat
+        => "xlsx";
+    #endregion
     #region 是否为2007格式
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
@@ -32,16 +36,17 @@ sealed class ExcelBookNpoi : ExcelBook
     #region 保存工作簿
     protected override Task SaveRealize(string path, bool isSitu)
     {
-        if (Sheets.Count == 0)
+        if (SheetManage.Count is 0)
             return Task.CompletedTask;
         if (isSitu)
         {
-            var cache = ToolTemporaryFile.CreateTemporaryFile();
-            var stream = cache.GetBitPipe().Write.ToStream();
+            using var cache = ToolTemporaryFile.CreateTemporaryFile();
+            var cacheFile = cache.TemporaryObj;
+            using var stream = cacheFile.GetBitPipe().Write.ToStream();
             WorkBook.Write(stream);
             WorkBook.Close();
             stream.Dispose();
-            cache.Path = path;
+            cacheFile.Path = path;
             #region 说明文档
             /*此处可能有Bug，因为在保存工作簿后，会将其释放，
               这是因为Npoi的傻逼设计造成的，它会在释放前一直独占工作簿文件，
@@ -66,7 +71,7 @@ sealed class ExcelBookNpoi : ExcelBook
     }
     #endregion
     #region 获取工作表容器
-    public override ExcelSheetCollectionNpoi Sheets { get; }
+    public override IExcelSheetManage SheetManage { get; }
     #endregion
     #region 获取打印对象
     public override IOfficePrint Print => throw CreateException.NotSupported();
@@ -74,8 +79,11 @@ sealed class ExcelBookNpoi : ExcelBook
     #region 是否启用自动计算
     public override bool AutoCalculation
     {
-        get => Sheets.Sheets.All(x => x.ForceFormulaRecalculation);
-        set => Sheets.Sheets.ForEach(x => x.ForceFormulaRecalculation = value);
+        get => false;
+        set
+        {
+
+        }
     }
 
     /*说明文档
@@ -93,10 +101,10 @@ sealed class ExcelBookNpoi : ExcelBook
     /// <param name="isExcel2007">如果这个值为<see langword="true"/>，
     /// 代表创建Excel2007工作簿，否则代表创建2003工作簿</param>
     public ExcelBookNpoi(Stream stream, bool isExcel2007)
-        : base(null, CreateOfficeNpoi.SupportExcel)
+        : base(null)
     {
         WorkBook = isExcel2007 ? new XSSFWorkbook(stream) : new HSSFWorkbook(stream);
-        Sheets = new ExcelSheetCollectionNpoi(this);
+        SheetManage = new ExcelSheetManageNpoi(this);
         Is2007 = isExcel2007;
     }
     #endregion
@@ -106,8 +114,8 @@ sealed class ExcelBookNpoi : ExcelBook
     /// </summary>
     /// <param name="path">工作簿所在的路径，
     /// 如果为<see langword="null"/>，则创建一个尚未保存到内存的xlsx工作簿</param>
-    public ExcelBookNpoi(PathText? path)
-        : base(path, CreateOfficeNpoi.SupportExcel)
+    public ExcelBookNpoi(string? path)
+        : base(path)
     {
         path = path is null ? null : IO.Path.GetFullPath(path);
         path = File.Exists(path) ? path : null;
@@ -130,7 +138,7 @@ sealed class ExcelBookNpoi : ExcelBook
             (false, { } p) => new HSSFWorkbook(file = new(p, FileMode.Open))
         };
         file?.Dispose();
-        Sheets = new ExcelSheetCollectionNpoi(this);
+        SheetManage = new ExcelSheetManageNpoi(this);
     }
     #endregion
     #endregion

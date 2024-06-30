@@ -1,4 +1,5 @@
 ﻿using System.Design;
+using System.Design.Direct;
 using System.NetFrancis.Api;
 using System.NetFrancis.Http;
 
@@ -26,20 +27,21 @@ public abstract class DingDingWebApi
     /// 返回真正可用于身份验证的Token，
     /// 注意：它仅用于用户身份验证，不用于企业身份验证
     /// </summary>
-    /// <param name="oldAuthenticationRequest">旧的身份验证票证</param>
+    /// <param name="authenticationRequest">旧的身份验证票证</param>
     /// <returns></returns>
-    protected async Task<AuthenticationDingDingRequest?> GetUserToken(AuthenticationDingDingRequest oldAuthenticationRequest)
+    protected async Task<AuthenticationDingDingRequest?> GetUserToken(AuthenticationDingDingRequest authenticationRequest)
     {
+        var dataProtector = GetDataProtection();
+        var newAuthenticationRequest = authenticationRequest.Decryption(dataProtector);
         var configuration = ServiceProvider.GetRequiredService<DingDingConfiguration>();
         var http = ServiceProvider.GetRequiredService<IHttpClient>();
-        var dataProtection = GetDataProtection();
-        object httpParameter = oldAuthenticationRequest switch
+        object httpParameter = newAuthenticationRequest switch
         {
             { IsToken: true, RefreshToken: { } refreshToken } =>
             new
             {
                 clientId = configuration.ClientID,
-                refreshToken = dataProtection.Unprotect(oldAuthenticationRequest.RefreshToken),
+                refreshToken = newAuthenticationRequest.RefreshToken,
                 grantType = "refresh_token",
                 clientSecret = configuration.ClientSecret
             },
@@ -47,7 +49,7 @@ public abstract class DingDingWebApi
             new
             {
                 clientId = configuration.ClientID,
-                code = oldAuthenticationRequest.Code,
+                code = newAuthenticationRequest.Code,
                 grantType = "authorization_code",
                 clientSecret = configuration.ClientSecret
             },
@@ -60,13 +62,26 @@ public abstract class DingDingWebApi
         var refresh = response.GetValueOrDefault("refreshToken")?.ToString();
         if (access is null || refresh is null)
             return null;
-        var newAuthenticationRequest = new AuthenticationDingDingRequest()
+        var returnAuthenticationRequest = new AuthenticationDingDingRequest()
         {
             Code = access,
             RefreshToken = refresh,
-            IsToken = true
+            IsToken = true,
+            IsEncryption = false
         };
-        return newAuthenticationRequest;
+        return returnAuthenticationRequest;
+    }
+    #endregion
+    #region 获取加密对象
+    /// <summary>
+    /// 获取一个钉钉加密对象
+    /// </summary>
+    /// <param name="serviceProvider">服务请求对象</param>
+    /// <returns></returns>
+    protected IDataProtector GetDataProtection()
+    {
+        var dataProtectionProvider = ServiceProvider.GetRequiredService<IDataProtectionProvider>();
+        return dataProtectionProvider.CreateProtector("DingDing");
     }
     #endregion
     #region 获取公司Token
@@ -89,17 +104,6 @@ public abstract class DingDingWebApi
             throw new NotSupportedException("无法获取访问令牌");
     }
     #endregion
-    #region 获取加密对象
-    /// <summary>
-    /// 获取一个钉钉加密对象
-    /// </summary>
-    /// <returns></returns>
-    protected IDataProtector GetDataProtection()
-    {
-        var dataProtectionProvider = ServiceProvider.GetRequiredService<IDataProtectionProvider>();
-        return dataProtectionProvider.CreateProtector("DingDing");
-    }
-    #endregion
     #region 用来添加访问令牌的转换函数
     /// <summary>
     /// 返回一个转换函数，它将访问令牌添加到请求中
@@ -111,6 +115,37 @@ public abstract class DingDingWebApi
         {
             Header = x.Header.With(x => x.Add("x-acs-dingtalk-access-token", [token]))
         };
+    #endregion
+    #region 验证返回值
+    /// <summary>
+    /// 验证钉钉API的响应，
+    /// 如果存在问题，则抛出异常，否则直接返回
+    /// </summary>
+    /// <param name="response"></param>
+    /// <returns></returns>
+    protected static IDirect VerifyResponse(IDirect response)
+    {
+        if (response.TryGetValue("errormessage", out var errormessage))
+            throw new NotSupportedException("请求钉钉API出现异常：" + errormessage?.ToString());
+        return response;
+    }
+    #endregion
+    #region 转换时间
+    #region 返回不可空类型
+    /// <summary>
+    /// 钉钉返回的时间并没有携带时区信息，
+    /// 调用本方法可以将时区信息转换为东8区
+    /// </summary>
+    /// <param name="dateTime">要转换的时间</param>
+    /// <returns></returns>
+    protected static DateTimeOffset ConvertDate(DateTimeOffset dateTime)
+        => new(dateTime.DateTime, TimeSpan.FromHours(8));
+    #endregion
+    #region 返回可空类型
+    /// <inheritdoc cref="ConvertDate(DateTimeOffset)"/>
+    protected static DateTimeOffset? ConvertDate(DateTimeOffset? dateTime)
+        => dateTime is null ? null : ConvertDate(dateTime.Value);
+    #endregion
     #endregion
     #region 限流算法
     #region 用来限流的委托

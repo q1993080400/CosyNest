@@ -26,8 +26,8 @@ public static class CreateOfficeNpoi
         => new ExcelBookNpoi(stream, isExcel2007);
     #endregion
     #region 根据路径
-    /// <inheritdoc cref="ExcelBookNpoi(PathText?)"/>
-    public static IExcelBook ExcelBook(PathText? path = null)
+    /// <inheritdoc cref="ExcelBookNpoi(string?)"/>
+    public static IExcelBook ExcelBook(string? path = null)
         => new ExcelBookNpoi(path);
     #endregion
     #endregion

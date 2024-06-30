@@ -22,15 +22,6 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
     [Parameter]
     public int MaxRowLength { get; set; } = 6;
     #endregion
-    #region 最大行数
-    /// <summary>
-    /// 获取能允许显示的最大行数，
-    /// 结合<see cref="MaxRowLength"/>，
-    /// 无法显示的字符会用省略号代替
-    /// </summary>
-    [Parameter]
-    public int MaxRow { get; set; } = 2;
-    #endregion
     #region 宽度
     /// <summary>
     /// 显式指定组件的宽度，
@@ -50,15 +41,12 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
     #region 获取渲染参数
     private RenderTofuCubesInfo GetRenderInfo()
     {
-        var maxLength = MaxRowLength * MaxRow;
-        var text = Text.Length <= maxLength ?
-            Text :
-            Text[..maxLength] + "..";
+        var width = $"width:{Width ?? $"calc({MaxRowLength}ic + 2ch)"}";
         return new()
         {
-            Text = text,
-            ContainerWidth = $"width:{Width ?? $"calc({MaxRowLength}ic + 2ch)"}",
-            TextHeight = $"height:{MaxRow}lh",
+            Text = Text,
+            TextStyle = width,
+            ContainerWidth = width,
             CSSContainer = "tofuCubesContainer",
             CSSIcon = "tofuCubesIcon",
             CSSText = "tofuCubesText"

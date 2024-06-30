@@ -22,6 +22,17 @@ public sealed record VerificationResults
     /// </summary>
     public required IReadOnlyList<(PropertyInfo Property, string Prompt)> FailureReason { get; init; }
     #endregion
+    #region 验证错误信息
+    /// <summary>
+    /// 获取验证错误信息，
+    /// 如果验证成功，
+    /// 则为<see langword="null"/>
+    /// </summary>
+    public string? ErrorMessage
+        => IsSuccess ?
+        null :
+        FailureReason.Join(x => x.Prompt, Environment.NewLine);
+    #endregion
     #region 是否验证成功
     /// <summary>
     /// 获取是否验证成功

@@ -152,7 +152,7 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
     /// <param name="cells">复制的目标单元格，
     /// 如果它的大小与本单元格不匹配，则从它的左上角开始，复制完整的单元格</param>
     /// <returns>复制后的新单元格</returns>
-    IExcelCells Copy(IExcelCells cells);
+    IExcelCells CopyTo(IExcelCells cells);
 
     /*问：其他框架提供了复制值，复制属性等API，
       为什么本框架仅提供完全复制的API？
@@ -162,9 +162,9 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
     #region 传入位置，仅能复制到同一工作表
     /// <param name="row">复制的目标单元格左上角的行</param>
     /// <param name="col">复制的目标单元格左上角的列</param>
-    /// <inheritdoc cref="Copy(IExcelCells)"/>
-    IExcelCells Copy(int row, int col)
-        => Copy(Sheet[row, col]);
+    /// <inheritdoc cref="CopyTo(IExcelCells)"/>
+    IExcelCells CopyTo(int row, int col)
+        => CopyTo(Sheet[row, col]);
     #endregion
     #endregion
     #endregion
@@ -240,7 +240,7 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
     IExcelRC GetRC(bool isRow)
     {
         var (br, bc, er, ec) = Address;
-        return Sheet.GetRC(isRow ? br : bc, isRow ? er : ec, isRow);
+        return Sheet.GetRC(isRow, isRow ? br : bc, isRow ? er : ec);
     }
     #endregion
     #endregion

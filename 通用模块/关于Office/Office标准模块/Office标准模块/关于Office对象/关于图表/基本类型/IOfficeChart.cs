@@ -6,10 +6,16 @@
 /// </summary>
 public interface IOfficeChart : IOfficeObj
 {
-    #region 枚举所有系列
+    #region 标题
     /// <summary>
-    /// 枚举图表中的所有系列
+    /// 获取或设置图表的标题
     /// </summary>
-    IEnumerable<IOfficeChartSeries> Series { get; }
+    string Title { get; set; }
+    #endregion
+    #region 返回图表所有系列
+    /// <summary>
+    /// 返回一个对象，它可以用来管理图表的系列
+    /// </summary>
+    IOfficeChartSeriesManage Series { get; }
     #endregion
 }

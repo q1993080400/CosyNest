@@ -5,45 +5,28 @@ namespace Microsoft.AspNetCore;
 /// <summary>
 /// 这个类型可以将值绑定到排序条件
 /// </summary>
-/// <param name="render">用来渲染单个排序条件的对象</param>
-public sealed class BindSortCondition(RenderSortCondition render) : IGenerateFilter
+/// <inheritdoc cref="BindFilterCondition{Target, Action, Property}.BindFilterCondition(RenderFilter{Target, Action})"/>
+sealed class BindSortCondition(RenderFilter<FilterTargetSingle, FilterActionSort> renderFilter) :
+   BindFilterCondition<FilterTargetSingle, FilterActionSort, SortStatus>(renderFilter), IBindProperty<SortStatus>
 {
-    #region 公开成员
     #region 排序状态
     /// <summary>
     /// 获取排序状态
     /// </summary>
-    public SortStatus SortStatus { get; set; }
+    public SortStatus Value { get; set; }
     #endregion
     #region 生成排序条件
-    public DataCondition? GenerateFilter()
-        => SortStatus is SortStatus.None ?
-        null :
-        new SortCondition()
+    public override DataCondition[] GenerateFilter()
+        => (Value, RenderFilter.FilterTarget) switch
         {
-            SortStatus = SortStatus,
-            PropertyAccess = Render.PropertyAccess,
-            IsVirtually = Render.IsVirtually
+            (SortStatus.None, _) => [],
+            (_, { } filterTargetSingle) => [new SortCondition()
+            {
+                Identification = filterTargetSingle.PropertyAccess.Name,
+                SortStatus = Value,
+                IsVirtually=filterTargetSingle.IsVirtually
+            }],
+            _ => throw new NotSupportedException("无法生成排序条件")
         };
-    #endregion
-    #endregion
-    #region 重写的成员
-    #region 重写GetHashCode
-    public override int GetHashCode()
-        => Render.PropertyAccess.GetHashCode();
-    #endregion
-    #region 重写Equals
-    public override bool Equals(object? obj)
-        => obj is BindSortCondition bind &&
-        bind.Render.PropertyAccess == Render.PropertyAccess;
-    #endregion
-    #endregion
-    #region 内部成员
-    #region 渲染排序条件的对象
-    /// <summary>
-    /// 用来渲染单个排序条件的对象
-    /// </summary>
-    private RenderSortCondition Render { get; } = render;
-    #endregion
     #endregion
 }

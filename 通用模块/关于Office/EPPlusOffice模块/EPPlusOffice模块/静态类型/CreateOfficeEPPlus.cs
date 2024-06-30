@@ -25,9 +25,14 @@ public static class CreateOfficeEPPlus
     /// </summary>
     /// <param name="path">Excel工作簿的路径，
     /// 如果为<see langword="null"/>，则不从文件中加载，而是创建一个新的工作簿</param>
+    /// <param name="autoSave">如果这个值为<see langword="true"/>，
+    /// 释放工作簿的时候，会自动保存</param>
     /// <returns></returns>
-    public static IExcelBook ExcelBook(string? path = null)
-        => new ExcelBookEPPlus(path);
+    public static IExcelBook ExcelBook(string? path = null, bool autoSave = true)
+        => new ExcelBookEPPlus(path)
+        {
+            AutoSave = autoSave
+        };
     #endregion
     #region 使用流
     /// <summary>
@@ -35,8 +40,12 @@ public static class CreateOfficeEPPlus
     /// </summary>
     /// <param name="stream">Excel工作簿的流</param>
     /// <returns></returns>
-    public static IExcelBook ExcelBook(Stream stream)
-        => new ExcelBookEPPlus(stream);
+    /// <inheritdoc cref="ExcelBook(string?, bool)"/>
+    public static IExcelBook ExcelBook(Stream stream, bool autoSave = true)
+        => new ExcelBookEPPlus(stream)
+        {
+            AutoSave = autoSave
+        };
     #endregion
     #endregion
 }

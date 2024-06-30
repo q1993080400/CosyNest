@@ -17,15 +17,16 @@ public interface IGetRenderAllFilterCondition
     /// <typeparam name="GetRenderAllFilterCondition">后端接口的类型</typeparam>
     /// <param name="httpClient">发起请求的Http客户端</param>
     /// <returns></returns>
-    public static Func<Task<RenderConditionGroup[]>> GetConditionFunction<GetRenderAllFilterCondition>(IHttpClient httpClient)
+    public static Func<Task<RenderFilterGroup[]>> GetConditionFunction<GetRenderAllFilterCondition>(IHttpClient httpClient)
         where GetRenderAllFilterCondition : class, IGetRenderAllFilterCondition
-        => () => httpClient.Request<GetRenderAllFilterCondition, RenderConditionGroup[]>(x => x.GetRenderAllFilterCondition());
+        => () => httpClient.RequestStrongType<GetRenderAllFilterCondition>().
+        Request(x => x.GetRenderAllFilterCondition());
     #endregion
     #region 根据业务，获取搜索条件渲染描述
     /// <summary>
     /// 获取一个对象，它描述如何渲染本业务的搜索条件
     /// </summary>
     /// <returns></returns>
-    Task<RenderConditionGroup[]> GetRenderAllFilterCondition();
+    Task<RenderFilterGroup[]> GetRenderAllFilterCondition();
     #endregion
 }

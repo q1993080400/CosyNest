@@ -43,7 +43,7 @@ public abstract class ExcelRC(IExcelSheet sheet, bool isRow, int begin, int end)
         var (b, e) = Range;
         for (; b <= e; b++)
         {
-            yield return Sheet.GetRC(b, b, IsRow);
+            yield return Sheet.GetRC(IsRow, b, b);
         }
     }
 

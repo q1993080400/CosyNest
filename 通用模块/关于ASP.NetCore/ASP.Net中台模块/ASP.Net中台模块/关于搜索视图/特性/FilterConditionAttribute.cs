@@ -13,16 +13,6 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     where BusinessInterface : class, IGetRenderAllFilterCondition
 {
     #region 公开成员
-    #region 访问表达式
-    /// <summary>
-    /// 属性访问表达式，
-    /// 通过它可以访问要查询或排序的属性，
-    /// 如果为<see langword="null"/>，
-    /// 且这个特性被应用在属性身上，则自动获取，
-    /// 对于虚拟筛选条件，它作为标识这个筛选条件的ID
-    /// </summary>
-    public string? PropertyAccess { get; init; }
-    #endregion
     #region 类型
     /// <summary>
     /// 描述要筛选的对象的类型，
@@ -30,7 +20,7 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     /// 或者与依附的属性类型不一致时，
     /// 才需要指定这个参数
     /// </summary>
-    public FilterObjectType FilterObjectType { get; init; }
+    public Type? FilterType { get; init; }
     #endregion
     #region 描述
     /// <summary>
@@ -50,17 +40,23 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     /// </summary>
     public bool CanSort { get; init; }
     #endregion
-    #region 是否虚拟筛选
+    #region 排除查询条件
+    /// <summary>
+    /// 如果这个值不为<see langword="null"/>，
+    /// 表示当这个条件的值等于这个字面量的时候，
+    /// 排除这个查询条件
+    /// </summary>
+    public string? ExcludeFilter { get; init; }
+    #endregion
+    #region 是否为虚拟筛选
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
-    /// 表示它是一个虚拟筛选条件，
-    /// 它包含比较复杂的逻辑，
-    /// 不映射到具体的一个实体类属性上
+    /// 表示它是一个虚拟筛选，不直接映射到某个具体的属性上
     /// </summary>
     public bool IsVirtually { get; init; }
     #endregion
     #endregion
-    #region  抽象成员
+    #region 抽象成员
     #region 获取渲染条件组
     /// <summary>
     /// 获取本特性所对应的渲染条件组
@@ -68,36 +64,40 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     /// <param name="memberInfo">本特性所依附的对象，
     /// 它可以是一个<see cref="Type"/>或<see cref="PropertyInfo"/></param>
     /// <returns></returns>
-    public abstract RenderConditionGroup ConvertConditioGroup(MemberInfo memberInfo);
+    public abstract RenderFilterGroup ConvertConditioGroup(MemberInfo memberInfo);
     #endregion
     #endregion
     #region 内部成员
+    #region 获取筛选目标
+    /// <summary>
+    /// 根据特性所依附的成员智能获取筛选目标
+    /// </summary>
+    /// <param name="memberInfo">特性所依附的成员</param>
+    /// <returns></returns>
+    protected Type GetFilterTargets(MemberInfo memberInfo)
+        => (FilterType, memberInfo) switch
+        {
+            ({ }, _) => FilterType,
+            (null, PropertyInfo { PropertyType: { } propertyType }) => propertyType,
+            _ => throw new NotSupportedException($"没有显式指定{nameof(FilterType)}，而且{memberInfo}不是属性，无法获取筛选目标")
+        };
+    #endregion
     #region 获取筛选对象类型
     /// <summary>
     /// 获取要筛选对象的类型
     /// </summary>
-    /// <param name="type">原始的筛选类型</param>
+    /// <param name="type">筛选对象的类型</param>
     /// <returns></returns>
-    /// <inheritdoc cref="ConvertConditioGroup(MemberInfo)"/>
-    private static protected FilterObjectType GetFilterObjectType(FilterObjectType type, MemberInfo memberInfo)
-      => (type, memberInfo) switch
+    protected static FilterObjectType GetFilterObjectType(Type type)
+      => type switch
       {
-          (not FilterObjectType.None, _) => type,
-          (_, PropertyInfo { PropertyType: { } propertyType }) =>
-          propertyType switch
-          {
-              { IsEnum: true } => FilterObjectType.Enum,
-              _ when propertyType == typeof(DateTimeOffset) => FilterObjectType.Date,
-              _ when propertyType == typeof(bool) => FilterObjectType.Bool,
-              _ when propertyType.IsNum() => FilterObjectType.Num,
-              var pt => Type.GetTypeCode(pt) switch
-              {
-                  TypeCode.String => FilterObjectType.Text,
-                  TypeCode.DateTime => FilterObjectType.Date,
-                  var typeCode => throw new NotSupportedException($"不能识别{typeCode}的{nameof(type)}")
-              }
-          },
-          (var filterObjectType, _) => filterObjectType
+          { IsEnum: true } => FilterObjectType.Enum,
+          _ when type == typeof(string) => FilterObjectType.Text,
+          _ when type == typeof(DateTimeOffset) || type == typeof(DateTime) => FilterObjectType.Date,
+          _ when type == typeof(bool) => FilterObjectType.Bool,
+          _ when type.IsNum() => FilterObjectType.Num,
+          _ when Nullable.GetUnderlyingType(type) is { } underlyingType => GetFilterObjectType(underlyingType),
+          _ => throw new NotSupportedException($"不能识别{type}的{nameof(FilterObjectType)}")
       };
     #endregion
     #region 获取属性访问表达式
@@ -106,36 +106,12 @@ public abstract class FilterConditionAttribute<BusinessInterface> : Attribute
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="ConvertConditioGroup(MemberInfo)"/>
-    private protected string GetPropertyAccess(MemberInfo memberInfo)
-     => (PropertyAccess, memberInfo) switch
-     {
-         ({ } propertyAccess, _) => propertyAccess,
-         (null, PropertyInfo { Name: { } name }) => name,
-         _ => throw new NotSupportedException($"{memberInfo.Name}不是属性，" +
-             $"而且没有显式指定{nameof(PropertyAccess)}，无法获取属性访问表达式")
-     };
-    #endregion
-    #region 获取枚举的名称和值
-    /// <summary>
-    /// 如果<paramref name="memberInfo"/>是一个枚举，
-    /// 则获取它的描述和值，否则返回一个空集合
-    /// </summary>
-    /// <param name="memberInfo">要获取枚举描述和值的类型成员</param>
-    /// <returns></returns>
-    private protected static EnumItem[] GetEnumItem(MemberInfo memberInfo)
+    protected static string GetPropertyAccess(MemberInfo memberInfo)
+    => memberInfo switch
     {
-        var type = memberInfo switch
-        {
-            PropertyInfo { PropertyType: { } pt } => pt,
-            Type t => t,
-            var member => throw new NotSupportedException($"{member}既不是一个属性也不是一个类型，无法识别它")
-        };
-        return type.GetEnumDescription().Select(x => new EnumItem()
-        {
-            Describe = x.Describe,
-            Value = x.Value.ToString()
-        }).ToArray();
-    }
+        PropertyInfo { Name: { } name } => name,
+        _ => throw new NotSupportedException($"{memberInfo.Name}不是属性，无法获取属性访问表达式")
+    };
     #endregion
     #endregion
 }

@@ -5,20 +5,40 @@
 @inject IHttpClient HttpClient
 @inject NavigationManager NavigationManager
 
-@if (AuthenticationState is { })
+@switch ((IsAllowAnonymous, AuthenticationState))
 {
-    <CascadingValue Value="AuthenticationState" IsFixed=true>
-        <CascadingValue Value="AuthorizationStateChange" TValue="AuthorizationStateChange" IsFixed=true>
-            <CascadingValue Value="AppInfo">
-                @if (AuthorizationPassed && AuthenticationState.Passed)
-                {
-                    @Authorized(AuthenticationState)
-                }
-                else
-                {
-                    @NotAuthorized(LogOut)
-                }
+    case (true, _):
+        var state = new AuthenticationDingDingState()
+                    {
+                        AuthenticationResult = new()
+                        {
+                            AccessToken = "",
+                            RefreshToken = "",
+                            IsEncryption = false,
+                            UserInfo = new()
+                            {
+                                Name = "匿名用户",
+                                UserID = "",
+                                AvatarUri = null
+                            }
+                        }
+                    };
+        @Authorized(state)
+        break;
+    case (false, { }):
+        <CascadingValue Value="AuthenticationState" IsFixed=true>
+            <CascadingValue Value="AuthorizationStateChange" TValue="AuthorizationStateChange" IsFixed=true>
+                <CascadingValue Value="AppInfo">
+                    @if (AuthorizationPassed && AuthenticationState.Passed)
+                    {
+                        @Authorized(AuthenticationState)
+                    }
+                    else
+                    {
+                        @NotAuthorized(LogOut)
+                    }
+                </CascadingValue>
             </CascadingValue>
         </CascadingValue>
-    </CascadingValue>
+        break;
 }

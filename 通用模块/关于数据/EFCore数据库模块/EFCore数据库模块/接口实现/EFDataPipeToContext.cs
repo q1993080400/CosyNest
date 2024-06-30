@@ -19,6 +19,13 @@ sealed class EFDataPipeToContext(DbContext dbContext) : IDataPipeToContext
     public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Data, bool>? isAdd = null, CancellationToken cancellation = default)
         where Data : class
     {
+        if (datas is IEnumerable<IUpdateBusinessProperty> updateBusinessPropertys)
+        {
+            foreach (var item in updateBusinessPropertys)
+            {
+                item.UpdateBusinessProperty([]);
+            }
+        }
         if (isAdd is null)
         {
             dbContext.UpdateRange(datas);

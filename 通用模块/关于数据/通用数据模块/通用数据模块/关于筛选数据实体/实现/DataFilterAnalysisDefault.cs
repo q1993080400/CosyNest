@@ -16,9 +16,9 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     {
         var description = info.Description;
         var data = info.DataSource;
-        var query = GenerateQueryExpression(description, data, info.Reconsitution);
+        var query = GenerateQueryExpression(info);
         var sort = info.SortFunction?.Invoke(query) ?? query.OrderBy(x => 0);
-        return GenerateSortExpression(description, sort);
+        return GenerateSortExpression(description.SortCondition, info.SkipVirtualization, info.GenerateVirtuallySort, sort);
     }
     #endregion
     #endregion
@@ -28,20 +28,29 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <summary>
     /// 生成一个用来查询的表达式
     /// </summary>
-    /// <param name="description">这个记录描述查询和排序的条件</param>
-    /// <param name="dataSource">数据源</param>
-    /// <param name="reconsitution">这个委托允许重构生成的每个查询表达式，
-    /// 并返回重构后的表达式，如果为<see langword="null"/>，则不进行重构</param>
+    /// <param name="info">用来生成查询表达式的参数</param>
     /// <returns></returns>
-    /// <inheritdoc cref="IDataFilterAnalysis.Analysis{Obj}(DataFilterAnalysisInfo{Obj})"/>
-    private static IQueryable<Obj> GenerateQueryExpression<Obj>(DataFilterDescription description, IQueryable<Obj> dataSource,
-        Func<QueryConditionReconsitutionInfo, Expression>? reconsitution)
+    private static IQueryable<Obj> GenerateQueryExpression<Obj>(DataFilterAnalysisInfo<Obj> info)
     {
-        var condition = description.QueryCondition.Where(x => !x.IsVirtually).ToArray();
-        if (condition.Length != 0)
+        var dataSource = info.DataSource;
+        var condition = info.Description.QueryCondition;
+        var (isVirtually, isTrue) = condition.Split(x => x.IsVirtually);
+        if (isTrue.Count > 0)
         {
-            var where = GenerateWhereExpression<Obj>(condition, reconsitution);
-            return dataSource.Where(where);
+            var where = GenerateWhereExpression<Obj>(isTrue, info.Reconsitution);
+            dataSource = dataSource.Where(where);
+        }
+        if (info.SkipVirtualization)
+            return dataSource;
+        if (isVirtually.Count > 0)
+        {
+            var generateVirtuallyQuery = info.GenerateVirtuallyQuery ??
+                throw new NotSupportedException("存在虚拟查询条件，但是没有指定转换虚拟查询条件的函数");
+            foreach (var queryCondition in isVirtually)
+            {
+                var virtuallyQuery = generateVirtuallyQuery(queryCondition);
+                dataSource = dataSource.Where(virtuallyQuery);
+            }
         }
         return dataSource;
     }
@@ -51,8 +60,9 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// 生成一个可以用于<see cref="Queryable.Where{TSource}(IQueryable{TSource}, Expression{Func{TSource, bool}})"/>的表达式树
     /// </summary>
     /// <param name="condition">查询条件</param>
+    /// <param name="reconsitution">这个委托允许重构生成的每个查询表达式，
+    /// 并返回重构后的表达式，如果为<see langword="null"/>，则不进行重构</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateQueryExpression{Obj}(DataFilterDescription, IQueryable{Obj}, Func{QueryConditionReconsitutionInfo, Expression}?)"/>
     private static Expression<Func<Obj, bool>> GenerateWhereExpression<Obj>(IEnumerable<QueryCondition> condition, Func<QueryConditionReconsitutionInfo, Expression>? reconsitution)
     {
         var parameter = Parameter(typeof(Obj));
@@ -83,7 +93,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     private static Expression GenerateWhereBodySingleExpression(QueryCondition condition, ParameterExpression parameter,
         Func<QueryConditionReconsitutionInfo, Expression>? reconsitution)
     {
-        var propertyAccess = condition.PropertyAccess.Split('.');
+        var propertyAccess = condition.Identification.Split('.');
         var single = GenerateWhereBodyPartExpression(parameter, propertyAccess, condition.LogicalOperator, condition.CompareValue);
         if (reconsitution is null)
             return single;
@@ -119,9 +129,12 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         var nextProperty = propertyAccess[1..];
         if (propertyType.IsRealizeGeneric(typeof(ICollection<>)).IsRealize)
         {
-            var parameter = Parameter(propertyType.GetGenericArguments()[0]);
+            var elementType = propertyType.GetGenericArguments()[0];
+            var parameter = Parameter(elementType);
             var body = GenerateWhereBodyPartExpression(parameter, nextProperty, logicalOperator, compareValue);
-            return Call(MethodAny, propertyAccessExpression, body);
+            var lambdaType = typeof(Func<,>).MakeGenericType(elementType, typeof(bool));
+            var lambda = Lambda(lambdaType, body, parameter);
+            return Call(MethodAny.MakeGenericMethod(elementType), propertyAccessExpression, lambda);
         }
         return GenerateWhereBodyPartExpression(propertyAccessExpression, nextProperty, logicalOperator, compareValue);
     }
@@ -193,14 +206,33 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <summary>
     /// 生成一个用来排序的表达式
     /// </summary>
+    /// <typeparam name="Obj">表达式的对象类型</typeparam>
+    /// <param name="sortConditions">这个集合描述所有排序表达式</param>
+    /// <param name="skipVirtualization">如果这个值为<see langword="true"/>，
+    /// 则跳过所有虚拟化条件，由用户自行处理它们</param>
+    /// <param name="generateVirtuallySort">构造虚拟排序条件的函数，
+    /// 它的第一个参数是虚拟排序条件，第二个参数是当前排序好的表达式，返回值是经过虚拟排序的表达式</param>
+    /// <param name="dataSource">数据源对象</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateQueryExpression{Obj}(DataFilterDescription, IQueryable{Obj}, Func{QueryConditionReconsitutionInfo, Expression}?)"/>
-    private static IOrderedQueryable<Obj> GenerateSortExpression<Obj>(DataFilterDescription description, IOrderedQueryable<Obj> dataSource)
+    private static IOrderedQueryable<Obj> GenerateSortExpression<Obj>
+        (IReadOnlyCollection<SortCondition> sortConditions, bool skipVirtualization,
+        Func<SortCondition, IOrderedQueryable<Obj>, IOrderedQueryable<Obj>>? generateVirtuallySort,
+        IOrderedQueryable<Obj> dataSource)
     {
-        var condition = description.SortCondition.Where(x => !x.IsVirtually).ToArray();
-        return condition.Length > 0 ?
-            condition.Aggregate(dataSource, GenerateSortSingleExpression) :
-            dataSource;
+        var (isVirtually, isTrue) = sortConditions.Split(x => x.IsVirtually);
+        dataSource = isTrue.Aggregate(dataSource, GenerateSortSingleExpression);
+        if (skipVirtualization)
+            return dataSource;
+        if (isVirtually.Count > 0)
+        {
+            if (generateVirtuallySort is null)
+                throw new NotSupportedException("存在虚拟排序条件，但是没有指定转换虚拟排序条件的函数");
+            foreach (var sortCondition in isVirtually)
+            {
+                dataSource = generateVirtuallySort(sortCondition, dataSource);
+            }
+        }
+        return dataSource;
     }
     #endregion
     #region 生成处理单个排序条件的表达式
@@ -210,10 +242,9 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <param name="seed">种子对象，也就是上一个被处理的表达式</param>
     /// <param name="condition">执行排序的条件</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GenerateSortExpression{Obj}(DataFilterDescription, IOrderedQueryable{Obj})"/>
     private static IOrderedQueryable<Obj> GenerateSortSingleExpression<Obj>(IOrderedQueryable<Obj> seed, SortCondition condition)
     {
-        var propertyAccess = condition.PropertyAccess.Split('.');
+        var propertyAccess = condition.Identification.Split('.');
         var parameter = Parameter(typeof(Obj));
         var body = propertyAccess.Aggregate((Expression)parameter, Property);
         var lambda = Lambda<Func<Obj, object>>(Convert(body, typeof(object)), parameter);

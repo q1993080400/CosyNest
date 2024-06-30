@@ -71,7 +71,7 @@ public abstract class ExcelCells(IExcelSheet sheet) : ExcelRange(sheet), IExcelC
     public abstract ISizePos VisualPosition { get; }
     #endregion
     #region 复制单元格
-    public abstract IExcelCells Copy(IExcelCells cells);
+    public abstract IExcelCells CopyTo(IExcelCells cells);
     #endregion
     #region 替换单元格
     public abstract void Replace(string content, string replace);

@@ -28,24 +28,24 @@ public enum DingDingOAOperationType
     [RenderData(Name = "后加签任务")]
     PostSigningTask,
     /// <summary>
-    /// 转交任务
+    /// 转交申请
     /// </summary>
-    [RenderData(Name = "转交任务")]
+    [RenderData(Name = "转交申请")]
     Transfer,
     /// <summary>
-    /// 发起流程实例
+    /// 发起申请
     /// </summary>
-    [RenderData(Name = "发起流程实例")]
+    [RenderData(Name = "发起申请")]
     Launch,
     /// <summary>
-    /// 终止（撤销）流程实例
+    /// 终止（撤销）申请
     /// </summary>
-    [RenderData(Name = "终止（撤销）流程实例")]
+    [RenderData(Name = "终止（撤销）申请")]
     Termination,
     /// <summary>
-    /// 结束流程实例
+    /// 结束申请
     /// </summary>
-    [RenderData(Name = "结束流程实例")]
+    [RenderData(Name = "结束申请")]
     Finish,
     /// <summary>
     /// 添加评论

@@ -20,4 +20,20 @@ public sealed record RenderFormViewerMainInfo<Model>
     /// </summary>
     public required IEnumerable<RenderFormViewerRegionInfo<Model>> RenderGroup { get; init; }
     #endregion
+    #region 渲染全部
+    /// <summary>
+    /// 返回一个<see cref="RenderFragment"/>，
+    /// 它可以用来直接渲染全部分组的属性
+    /// </summary>
+    /// <returns></returns>
+    public RenderFragment RenderAllGroup()
+        => x =>
+        {
+            foreach (var render in RenderGroup)
+            {
+                render.RenderAllRegion()(x);
+            }
+        };
+    #endregion
+
 }

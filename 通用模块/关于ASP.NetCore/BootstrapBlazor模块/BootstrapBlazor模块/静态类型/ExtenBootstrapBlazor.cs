@@ -27,7 +27,7 @@ public static class ExtenBootstrapBlazor
     #region 有关SwalService 
     #region 直接显示消息
     /// <summary>
-    /// 直接显示一条消息确认框
+    /// 直接显示一条消息框
     /// </summary>
     /// <param name="swalService">消息确认框服务</param>
     /// <param name="message">要显示的消息</param>
@@ -36,6 +36,20 @@ public static class ExtenBootstrapBlazor
     /// <returns></returns>
     public static Task Show(this SwalService swalService, string message, string title = "提示", SwalCategory category = SwalCategory.Error)
         => swalService.Show(new()
+        {
+            Content = message,
+            Title = title,
+            Category = category
+        });
+    #endregion
+    #region 直接显示一个确认框
+    /// <summary>
+    /// 直接显示一个确认框，并返回确认结果
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="Show(SwalService, string, string, SwalCategory)"/>
+    public static Task<bool> ShowModal(this SwalService swalService, string message, string title = "提示", SwalCategory category = SwalCategory.Question)
+        => swalService.ShowModal(new SwalOption()
         {
             Content = message,
             Title = title,
