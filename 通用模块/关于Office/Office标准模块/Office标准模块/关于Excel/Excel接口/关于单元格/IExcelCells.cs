@@ -136,14 +136,6 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
     }
     #endregion
     #endregion
-    #region 返回视觉位置
-    /// <summary>
-    /// 返回本单元格的视觉位置，
-    /// 也就是单元格在屏幕上的坐标和大小，
-    /// 以像素为单位
-    /// </summary>
-    ISizePos VisualPosition { get; }
-    #endregion
     #region 复制单元格
     #region 传入单元格
     /// <summary>

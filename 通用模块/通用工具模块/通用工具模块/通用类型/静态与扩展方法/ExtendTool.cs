@@ -87,4 +87,13 @@ public static partial class ExtendTool
     }
     #endregion
     #endregion
+    #region 使用常用格式序列化数字
+    /// <summary>
+    /// 将数字序列化为常用格式
+    /// </summary>
+    /// <param name="num">待序列化的数字</param>
+    /// <returns></returns>
+    public static string FormatCommon(this decimal num)
+        => num.ToString(Tool.FormattedNumCommon);
+    #endregion
 }

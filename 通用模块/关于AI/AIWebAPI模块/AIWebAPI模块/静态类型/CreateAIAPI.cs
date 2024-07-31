@@ -24,9 +24,9 @@ public static class CreateAIAPI
     /// 如果因为各种原因无法创建，会引发异常
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="AIChatBaiDu.AIChatBaiDu(string, string, Func{IHttpClient}?)"/>
-    public static IAIChat AIChatBaiDu(string appKey, string secretKey, Func<IHttpClient>? httpClientProvide = null)
-        => new AIChatBaiDu(appKey, secretKey, httpClientProvide);
+    /// <inheritdoc cref="AI.AIChatBaiDu(string, string, string, Func{IHttpClient}?)"/>
+    public static IAIChat AIChatBaiDu(string appKey, string secretKey, string modelUri, Func<IHttpClient>? httpClientProvide = null)
+        => new AIChatBaiDu(appKey, secretKey, modelUri, httpClientProvide);
     #endregion
     #endregion
     #region 创建OCR接口

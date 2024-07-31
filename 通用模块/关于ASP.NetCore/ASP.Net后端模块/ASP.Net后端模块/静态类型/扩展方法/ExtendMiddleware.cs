@@ -7,21 +7,6 @@ public static partial class ExtendWebApi
 {
     //这个部分类专门用来声明有关中间件的扩展方法
 
-    #region 添加审阅中间件
-    /// <summary>
-    /// 添加一个审阅中间件，
-    /// 它可以用来查看<see cref="HttpContext"/>对象，
-    /// 没有其他的功能
-    /// </summary>
-    /// <param name="app">待添加中间件的<see cref="IApplicationBuilder"/>对象</param>
-    /// <param name="review">用来查看<see cref="HttpContext"/>的委托</param>
-    public static void UseReview(this IApplicationBuilder app, Action<HttpContext> review)
-        => app.Use(async (context, next) =>
-        {
-            review(context);
-            await next();
-        });
-    #endregion
     #region 异常善后异常中间件
     /// <summary>
     /// 添加一个异常善后中间件，当发生异常时，

@@ -16,6 +16,10 @@ public abstract class ExcelRange(IExcelSheet sheet) : IExcelRange
     #region 设置或获取样式
     public abstract IRangeStyle Style { get; set; }
     #endregion
+    #region 复制单元格为图片
+    public virtual Task CopyPictureToClipboard()
+         => throw new NotImplementedException($"这个API没有被实现，一般情况下，只有微软COM组件实现的Excel操作对象才会实现这个API");
+    #endregion
     #region 返回单元格地址
     #region 辅助方法
     /// <summary>
@@ -24,20 +28,20 @@ public abstract class ExcelRange(IExcelSheet sheet) : IExcelRange
     /// <param name="isR1C1">如果这个值为<see langword="true"/>，
     /// 代表以R1C1形式返回，否则代表以A1形式返回</param>
     /// <returns></returns>
-    private protected virtual string AddressTextSimple(bool isR1C1)
-         => throw new NotImplementedException();
+    private protected abstract string AddressTextSimple(bool isR1C1);
     #endregion
     #region 正式方法
-    public virtual string AddressText(bool isR1C1 = true, int whole = 0)
+    public string AddressText(bool isR1C1 = true, AddressTextMod whole = 0)
     {
         var address = AddressTextSimple(isR1C1);
         return whole switch
         {
-            <= 0 => address,
-            1 => $"{Sheet.Name}!{address}",
-            _ => ExcelRealizeHelp.GetAddressFull
-            (Sheet.Book.Path ?? throw new ArgumentNullException(nameof(IExcelBook.Path), "该工作簿尚未保存到文件中，无法获取单元格的完全路径"),
-            Sheet.Name, address)
+            AddressTextMod.Simple => address,
+            AddressTextMod.WithSheetName => $"{Sheet.Name}!{address}",
+            AddressTextMod.WithFileName => ExcelRealizeHelp.GetAddressFull
+            (Sheet.Book.Path ?? throw new NullReferenceException("该工作簿尚未保存到文件中，无法获取单元格的完全路径"),
+            Sheet.Name, address),
+            var mod => throw new NotSupportedException($"未能识别地址模式{mod}")
         };
     }
     #endregion
@@ -45,8 +49,5 @@ public abstract class ExcelRange(IExcelSheet sheet) : IExcelRange
     #region 重写的ToString
     public sealed override string ToString()
         => AddressText();
-
-    #endregion
-    #region 构造函数
     #endregion
 }

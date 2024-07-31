@@ -54,7 +54,7 @@ public static class ExtenSafety
         var first = identity.FindFirst(type);
         return first is null ?
             default :
-            JsonSerializer.Deserialize<Obj>(first.Value, options ?? CreateDesign.JsonCommonOptions);
+            JsonSerializer.Deserialize<Obj>(first.Value, options ?? CreateDesign.JsonCommonOptions());
     }
     #endregion
     #region 写入ClaimsIdentity中储存的对象
@@ -71,7 +71,7 @@ public static class ExtenSafety
             identity.RemoveClaim(first);
         if (obj is null)
             return;
-        var json = JsonSerializer.Serialize(obj, options ?? CreateDesign.JsonCommonOptions);
+        var json = JsonSerializer.Serialize(obj, options ?? CreateDesign.JsonCommonOptions());
         identity.AddClaim(new(type, json));
     }
     #endregion

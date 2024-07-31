@@ -1,19 +1,13 @@
 ﻿namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
-/// 这个组件可用于弹窗
+/// 这个组件可用于弹窗，
+/// 它只要渲染，就默认打开，
+/// 如果不需要打开，就应该不渲染它
 /// </summary>
 public sealed partial class PopUp : ComponentBase
 {
     #region 组件参数
-    #region 是否开启
-    /// <summary>
-    /// 获取是否开启
-    /// </summary>
-    [Parameter]
-    [EditorRequired]
-    public bool IsOpen { get; set; }
-    #endregion
     #region 渲染整个组件
     /// <summary>
     /// 获取用来渲染整个组件的委托

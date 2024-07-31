@@ -53,7 +53,7 @@ sealed class ExcelSheetEPPlus : ExcelSheet
         var sheets = collection.To<ExcelSheetManageEPPlus>().EPPlusSheets;
         var newName = ExcelRealizeHelp.SheetRepeat(sheets.Select(x => x.Name), Name, renamed);
         var newSheet = sheets.Add(newName, Sheet);
-        return new ExcelSheetEPPlus(collection.Book, newSheet);
+        return new ExcelSheetEPPlus(collection, newSheet);
     }
     #endregion
     #endregion
@@ -79,17 +79,17 @@ sealed class ExcelSheetEPPlus : ExcelSheet
     #endregion
     #region 关于打印和Excel对象
     #region 获取页面对象
-    public override IPageSheet Page => throw new NotImplementedException();
+    public override ISheetPage Page => throw new NotImplementedException();
     #endregion
     #region 返回图表管理对象
-    public override IOfficeChartManage ChartManage { get; }
+    public override IOfficeObjectManageCommon<IOfficeChart> ChartManage { get; }
     #endregion
     #endregion
     #region 构造函数
-    /// <inheritdoc cref="ExcelSheet(IExcelBook)"/>
+    /// <inheritdoc cref="ExcelSheet(IExcelSheetManage)"/>
     /// <param name="sheet">封装的工作表，本对象的功能就是通过它实现的</param>
-    public ExcelSheetEPPlus(IExcelBook book, ExcelWorksheet sheet)
-        : base(book)
+    public ExcelSheetEPPlus(IExcelSheetManage sheetManage, ExcelWorksheet sheet)
+        : base(sheetManage)
     {
         Sheet = sheet;
         Cell = new ExcelCellsEPPlus(this, Sheet.Cells);

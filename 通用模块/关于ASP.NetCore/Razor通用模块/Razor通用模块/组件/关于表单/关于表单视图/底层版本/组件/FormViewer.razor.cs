@@ -188,7 +188,6 @@ public sealed partial class FormViewer<Model> : ComponentBase
             var attribute = x.Attribute;
             var groupName = attribute.GroupName;
             var isReadOnlyProperty = !formViewer.CanEdit || !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model);
-            var onPropertyChangeed = formViewer.OnPropertyChangeed;
             return attribute switch
             {
                 RenderDataAttribute renderDataAttribute => (RenderFormViewerPropertyInfoBase<Model>)new RenderFormViewerPropertyInfo<Model>()
@@ -196,16 +195,19 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     FormModel = model,
                     GroupName = groupName,
                     IsReadOnly = isReadOnlyProperty,
-                    OnPropertyChangeed = onPropertyChangeed,
                     Property = property,
                     Name = renderDataAttribute.Name,
+                    RenderPreference = new()
+                    {
+                        Format = renderDataAttribute.Format,
+                        RenderLongTextRows = renderDataAttribute.RenderLongTextRows
+                    }
                 },
                 RenderDataCustomAttribute => new RenderFormViewerPropertyInfoCustom<Model>()
                 {
                     FormModel = model,
                     GroupName = groupName,
                     IsReadOnly = isReadOnlyProperty,
-                    OnPropertyChangeed = onPropertyChangeed,
                     Property = property,
                 },
                 _ => throw new NotSupportedException("无法识别这个渲染数据特性")
@@ -230,14 +232,6 @@ public sealed partial class FormViewer<Model> : ComponentBase
         return GetRenderPropertyInfoDefault(typeof(Model), formViewer);
     }
     #endregion
-    #endregion
-    #region 数据属性改变时的委托
-    /// <summary>
-    /// 当数据属性改变时，执行这个委托，
-    /// 它的参数就是当前属性渲染参数
-    /// </summary>
-    [Parameter]
-    public Func<RenderFormViewerPropertyInfoBase<Model>, Task> OnPropertyChangeed { get; set; } = _ => Task.CompletedTask;
     #endregion
     #endregion
     #endregion
@@ -282,7 +276,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
             },
             ExistingForms = ExistingForms(FormModel),
             FormModel = FormModel,
-            AllReadOnly = renderFormViewerPropertyInfo.All(x => x.IsReadOnly)
+            CanEdit = renderFormViewerPropertyInfo.Any(x => !x.IsReadOnly)
         };
         return new()
         {

@@ -70,7 +70,14 @@ public sealed partial class SearchPanel : ComponentBase
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public Func<SearchPanelSubmitInfo, Task> Submit { get; set; }
+    public EventCallback<SearchPanelSubmitInfo> Submit { get; set; }
+    #endregion
+    #region 清除搜索后发生的事件
+    /// <summary>
+    /// 当清除搜索后发生的事件
+    /// </summary>
+    [Parameter]
+    public Func<Task>? OnClear { get; set; }
     #endregion
     #endregion
     #endregion
@@ -146,7 +153,7 @@ public sealed partial class SearchPanel : ComponentBase
         {
             DataFilterDescription = SearchViewerState.GenerateFilter()
         };
-        await Submit(info);
+        await Submit.InvokeAsync(info);
         await ElementNumber.JumpToElement(0, false)();
     }
     #endregion
@@ -160,11 +167,12 @@ public sealed partial class SearchPanel : ComponentBase
         if (CacheRenderCondition is null)
             return null;
         #region 用来清除的委托
-        Task Clear()
+        async Task Clear()
         {
             SearchViewerState.Clear();
             InitializeDefaultQueryConditions = true;
-            return Task.CompletedTask;
+            if (OnClear is { })
+                await OnClear();
         }
         #endregion
         return new()
@@ -173,7 +181,8 @@ public sealed partial class SearchPanel : ComponentBase
             RenderSubmit = RenderSubmit(new()
             {
                 Clear = Clear,
-                Submit = SubmitFunction
+                Submit = SubmitFunction,
+                GoToTop = ElementNumber.JumpToElement(0)
             }),
             RenderCondition = CacheRenderCondition.Select(x =>
             {

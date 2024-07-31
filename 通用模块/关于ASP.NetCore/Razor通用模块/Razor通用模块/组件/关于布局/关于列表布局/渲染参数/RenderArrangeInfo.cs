@@ -5,11 +5,11 @@
 /// </summary>
 public sealed record RenderArrangeInfo
 {
-    #region 容器样式
+    #region 容器CSS
     /// <summary>
-    /// 获取容器的样式，
-    /// 它必须被赋值给容器元素的style
+    /// 获取容器的CSS，
+    /// 它必须被赋值给容器元素的class
     /// </summary>
-    public required string Style { get; init; }
+    public required string CSS { get; init; }
     #endregion
 }

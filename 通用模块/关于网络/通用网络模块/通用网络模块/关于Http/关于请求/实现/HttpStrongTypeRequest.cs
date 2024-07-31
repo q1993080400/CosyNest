@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Net.Http.Json;
 using System.Reflection;
 using System.Text.Json;
 
@@ -14,10 +15,9 @@ namespace System.NetFrancis.Http;
 sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTypeRequest<API>
     where API : class
 {
-    #region 接口实现
     #region 发起强类型请求
     #region 正式方法
-    public async Task<IHttpResponse> RequestResponse<Ret>
+    public async Task<HttpResponseMessage> RequestResponse<Ret>
         (Expression<Func<API, Ret>> request, HttpRequestTransform? transformation = null,
         JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
@@ -55,16 +55,29 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     private static HttpRequestRecording CreateRequest(Type interfaceType, IEnumerable<Expression> arguments, MethodInfo method, JsonSerializerOptions? options = null)
     {
         var callPath = CreateCallPath(interfaceType, method);
-        var isGet = method.GetCustomAttribute<HttpMethodPostAttribute>() is null;
+        var methodParameters = method.GetParameters();
+        var hasUpload = methodParameters.Select(x => x.ParameterType).Any(IsUpload);
+        var isGet = (hasUpload, method.GetCustomAttribute<HttpMethodPostAttribute>()) is (false, null);
         if (isGet)
         {
-            var parameter = method.GetParameters().Zip(arguments,
+            var parameter = methodParameters.Zip(arguments,
             (p, e) => (p.Name!, e.CalValue()?.ToString()!)).
             Where(x => x.Item2 is { });
             return CreateRequestGet(callPath, parameter);
         }
-        return CreateRequestPost(callPath, arguments, options);
+        return hasUpload ?
+            CreateRequestPostHasUpload(callPath, arguments, options) :
+            CreateRequestPost(callPath, arguments, options);
     }
+    #endregion
+    #region 判断一个参数类型是否为上传文件
+    /// <summary>
+    /// 判断一个参数类型是否为上传文件
+    /// </summary>
+    /// <param name="parameterType">待判断的参数类型</param>
+    /// <returns></returns>
+    private static bool IsUpload(Type parameterType)
+        => parameterType == typeof(UploadFile) || parameterType == typeof(IEnumerable<UploadFile>);
     #endregion
     #region 生成调用路径
     /// <summary>
@@ -92,10 +105,13 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     /// <param name="parameter">控制器的参数</param>
     /// <returns></returns>
     private static HttpRequestRecording CreateRequestGet(string callPath, IEnumerable<(string, string)> parameter)
-        => new(new(callPath)
+        => new()
         {
-            UriParameter = new(parameter.ToDictionary(true)!)
-        });
+            Uri = new(callPath)
+            {
+                UriParameter = new(parameter!)
+            }
+        };
     #endregion
     #region 生成Post请求
     /// <summary>
@@ -104,28 +120,37 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     /// <returns></returns>
     /// <inheritdoc cref="CreateRequestGet(string, IEnumerable{ValueTuple{string,string}})"/>
     /// <inheritdoc cref="CreateRequest(Type, IEnumerable{Expression}, MethodInfo, JsonSerializerOptions?)"/>
-    private static HttpRequestRecording CreateRequestPost(string callPath, IEnumerable<Expression> parameter, JsonSerializerOptions? options)
+    private static HttpRequestRecording CreateRequestPost
+        (string callPath, IEnumerable<Expression> parameter, JsonSerializerOptions? options)
     {
         var single = parameter.SingleOrDefaultSecure() ?? throw new NotSupportedException($"使用强类型模式调用Post方法的Http接口时，" +
                 $"参数数量不能大于一个");
         var value = single.CalValue();
-        var json = JsonSerializer.Serialize(value, single.Type, options);
-        var content = new HttpContentRecording()
+        var content = JsonContent.Create(value, value?.GetType() ?? single.Type, null, options);
+        return new()
         {
-            Header = new()
-            {
-                ContentType = new(MediaTypeName.TextJson)
-            },
-            Content = json.ToBytes().ToBitRead()
-        };
-        return new(callPath)
-        {
+            Uri = new(callPath),
             HttpMethod = HttpMethod.Post,
             Content = content
         };
     }
     #endregion
-    #endregion 
+    #region 生成包含上传文件的Post请求
+    /// <summary>
+    /// 生成一个包含上传文件的Post请求的请求体
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="CreateRequestPost(string, IEnumerable{Expression}, JsonSerializerOptions?)"/>
+    private static HttpRequestRecording CreateRequestPostHasUpload
+        (string callPath, IEnumerable<Expression> parameter, JsonSerializerOptions? options)
+    {
+        var (uploadParameter, notUploadParameter) = parameter.Split(x => IsUpload(x.Type));
+        if ((uploadParameter.Count, notUploadParameter.Count) is not (1, <= 1))
+            throw new NotSupportedException($"强类型Http上传请求中，上传文件参数和普通对象参数都不能多于一个");
+        using var content = new MultipartFormDataContent();
+        throw new NotSupportedException("未实现这个功能");
+    }
+    #endregion
     #endregion
     #endregion
 }

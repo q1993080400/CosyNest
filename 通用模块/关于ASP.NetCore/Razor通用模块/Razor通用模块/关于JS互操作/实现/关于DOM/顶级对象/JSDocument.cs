@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore;
 
-using System.IOFrancis.Bit;
 using System.Text.Json;
 
 namespace Microsoft.JSInterop;
@@ -9,33 +8,29 @@ namespace Microsoft.JSInterop;
 /// 这个类型是<see cref="IJSDocument"/>的实现，
 /// 可以视为一个JS中的Document对象
 /// </summary>
-/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDocument
+/// <param name="jsRuntime">封装的JS运行时对象，本对象的功能就是通过它实现的</param>
+sealed class JSDocument(IJSRuntime jsRuntime) : IJSDocument
 {
     #region 返回索引Cookie的字典
-    private JSCookie? CookieField;
-
-    public ICookie Cookie
-        => CookieField ??= new(JSRuntime);
+    public ICookie Cookie { get; }
+        = new JSCookie(jsRuntime);
     #endregion
     #region 获取或设置标题
-    private IAsyncProperty<string>? TitleField;
-
-    public IAsyncProperty<string> Title
-        => TitleField ??= JSRuntime.PackProperty<string>("document.title");
+    public IAsyncProperty<string> Title { get; }
+        = jsRuntime.PackProperty<string>("document.title");
     #endregion
     #region 关于具有ID的控件
     #region 跳转到具有指定ID的元素
     public ValueTask ScrollIntoView(string id, CancellationToken cancellation = default)
-         => JSRuntime.InvokeCodeVoidAsync($"document.getElementById('{id}').scrollIntoView()", cancellation: cancellation);
+         => jsRuntime.InvokeCodeVoidAsync($"document.getElementById('{id}').scrollIntoView()", cancellation: cancellation);
     #endregion
     #region 获取具有指定ID的元素
     public async ValueTask<IElementJS?> GetElementById(string id, CancellationToken cancellation = default)
     {
         var script = $"document.getElementById('{id}')==null";
-        if (await JSRuntime.InvokeCodeAsync<bool>(script, false, cancellation))
+        if (await jsRuntime.InvokeCodeAsync<bool>(script, false, cancellation))
             return null;
-        return new Element(JSRuntime, id);
+        return new Element(jsRuntime, id);
     }
     #endregion
     #region 获取具有焦点的元素
@@ -46,8 +41,8 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
             #region 本地函数
             async ValueTask<IElementJS?> Fun()
             {
-                var id = await JSRuntime.InvokeCodeAsync<string>("document.activeElement.id");
-                return id is null ? null : new Element(JSRuntime, id);
+                var id = await jsRuntime.InvokeCodeAsync<string>("document.activeElement.id");
+                return id is null ? null : new Element(jsRuntime, id);
             }
             #endregion
             return Fun();
@@ -63,7 +58,7 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
             #region 本地函数
             async Task<VisibilityState> Fun()
             {
-                var visibilityState = await JSRuntime.InvokeCodeAsync<string>("document.visibilityState");
+                var visibilityState = await jsRuntime.InvokeCodeAsync<string>("document.visibilityState");
                 return visibilityState switch
                 {
                     "visible" => JSInterop.VisibilityState.Visible,
@@ -74,44 +69,6 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
             }
             #endregion
             return Fun();
-        }
-    }
-    #endregion
-    #region video截图
-    public async ValueTask<IBitRead?> VideoScreenshot(string id, string format = "png", CancellationToken cancellation = default)
-    {
-        var objName = CreateASP.JSObjectName();
-        var task = new ExplicitTask<IJSStreamReference>();
-        var (methodName, freed) = await PackNetMethod<IJSStreamReference>(task.Completed, cancellation: cancellation);
-        try
-        {
-            _ = Task.Run(async () =>
-            {
-                var script = $$"""
-            var player = document.getElementById("{{id}}");  
-            player.setAttribute("crossOrigin", "anonymous");  
-            var canvas = document.createElement("canvas");
-            canvas.width = player.clientWidth;
-            canvas.height = player.clientHeight;
-            canvas.getContext("2d").drawImage(player, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(x=>
-            {
-                window.{{methodName}}(x);
-            },"image/{{format}}");  
-            """;
-                await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
-            }, cancellation);
-            await using var jsStream = await task;
-            if (jsStream is null)
-                return null;
-            using var stream = await jsStream.OpenReadStreamAsync(1024 * 1024 * 50, cancellation);
-            var memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream, cancellation);
-            return memoryStream.ToBitPipe(format).Read;
-        }
-        finally
-        {
-            freed.Dispose();
         }
     }
     #endregion
@@ -160,39 +117,17 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
     /// <param name="script">释放时执行的JS脚本</param>
     /// <param name="disposable">待释放的Net对象封装</param>
     /// <param name="jSRuntime">封装的JS运行时，本对象通过它执行脚本</param>
-    private sealed class JSEventFreed(string script, IDisposable disposable, IJSRuntime jSRuntime) : IDisposable
+    private sealed class JSEventFreed(string script, IDisposable? disposable, IJSRuntime jSRuntime) : IDisposable
     {
         #region 公开成员
         public void Dispose()
         {
-            if (Disposable is null)
+            if (disposable is null)
                 return;
-            Disposable.Dispose();
-            Disposable = null;
-            _ = Task.Run(async () => await JSRuntime.InvokeCodeVoidAsync(Script));
+            disposable.Dispose();
+            disposable = null;
+            _ = Task.Run(async () => await jSRuntime.InvokeCodeVoidAsync(script));
         }
-        #endregion
-        #region 内部成员
-        #region 释放时执行的脚本
-        /// <summary>
-        /// 获取释放时执行的JS脚本
-        /// </summary>
-        private string Script { get; } = script;
-        #endregion
-        #region 待释放的对象
-        /// <summary>
-        /// 获取待释放的Net对象封装
-        /// </summary>
-        private IDisposable? Disposable { get; set; } = disposable;
-        #endregion
-        #region JS运行时
-        /// <summary>
-        /// 获取封装的JS运行时，
-        /// 本对象通过它执行脚本
-        /// </summary>
-        private IJSRuntime JSRuntime { get; } = jSRuntime;
-
-        #endregion
         #endregion
     }
     #endregion
@@ -209,9 +144,9 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
         if (id is { })
             targetName += $".getElementById('{id}')";
         script += $@"{targetName}.addEventListener('{eventName}',{eventMethodName});";
-        await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
+        await jsRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
         var freedScript = $"{targetName}.removeEventListener('{eventName}',{eventMethodName};";
-        return new JSEventFreed(freedScript, freed, JSRuntime);
+        return new JSEventFreed(freedScript, freed, jsRuntime);
     }
     #endregion
     #region 将Net方法注册为JS方法
@@ -232,7 +167,7 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
         var springboard = CreateASP.JSObjectName();
         var newJSMethodName = jsMethodName ?? CreateASP.JSObjectName();
         var netMethodPack = DotNetObjectReference.Create(new NetMethodPack<JsonElement>(action));
-        await JSRuntime.InvokeVoidAsync("RegisterNetMethod",
+        await jsRuntime.InvokeVoidAsync("RegisterNetMethod",
             cancellation, netMethodPack, newJSMethodName, nameof(NetMethodPack<JsonElement>.Invoke));
         return (newJSMethodName, netMethodPack);
     }
@@ -257,14 +192,13 @@ sealed class JSDocument(IJSRuntime jsRuntime) : JSRuntimeBase(jsRuntime), IJSDoc
 """;
         var netMethodPack = DotNetObjectReference.Create(new NetMethodPack<JsonElement>(async _ =>
         {
-            var stream = await JSRuntime.InvokeCodeAsync<IJSStreamReference>(streamName);
+            var stream = await jsRuntime.InvokeCodeAsync<IJSStreamReference>(streamName);
             action(stream);
         }));
-        await JSRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
-        await JSRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
+        await jsRuntime.InvokeCodeVoidAsync(script, cancellation: cancellation);
+        await jsRuntime.InvokeVoidAsync(springboard, cancellation, netMethodPack);
         return (jsMethodName, netMethodPack);
     }
-
     #endregion
     #endregion
     #endregion

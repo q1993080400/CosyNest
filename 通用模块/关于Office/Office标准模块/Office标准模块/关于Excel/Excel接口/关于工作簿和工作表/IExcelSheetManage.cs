@@ -4,7 +4,7 @@
 /// 凡是实现这个接口的类型，
 /// 都可以用来管理工作簿中的工作表
 /// </summary>
-public interface IExcelSheetManage : IReadOnlyCollection<IExcelSheet>
+public interface IExcelSheetManage : IReadOnlyList<IExcelSheet>
 {
     #region 说明文档
     /*实现本接口请遵循以下规范：
@@ -18,28 +18,43 @@ public interface IExcelSheetManage : IReadOnlyCollection<IExcelSheet>
     IExcelBook Book { get; }
     #endregion
     #region 关于返回工作表
-    #region 根据名称返回，不可能返回null
+    #region 为null时引发异常
+    /// <summary>
+    /// 根据工作表名，返回工作表，
+    /// 如果该工作表不存在，则引发异常
+    /// </summary>
+    /// <param name="name">工作表名称</param>
+    /// <returns></returns>
+    IExcelSheet this[string name]
+        => GetSheetOrNull(name) ??
+        throw new KeyNotFoundException($"没有找到名称为{name}的工作表");
+    #endregion
+    #region 不可能返回null
     /// <summary>
     /// 根据工作表名，获取工作表
     /// </summary>
-    /// <param name="name">工作表名称</param>
     /// <param name="createTable">当工作簿内不存在指定名称的工作表的时候，
     /// 如果这个值为<see langword="true"/>，则创建新表，否则抛出异常</param>
     /// <returns>具有指定名称的工作表，它不可能为<see langword="null"/></returns>
-    IExcelSheet GetSheet(string name, bool createTable = false);
+    /// <inheritdoc cref="this[string]"/>
+    IExcelSheet this[string name, bool createTable]
+    {
+        get
+        {
+            var sheet = GetSheetOrNull(name);
+            return (sheet, createTable) switch
+            {
+                ({ } s, _) => s,
+                (null, true) => Add(name),
+                (null, false) => throw new KeyNotFoundException($"没有找到名称为{name}的工作表")
+            };
+        }
+    }
     #endregion
-    #region 根据名称返回，可能返回null
+    #region 可能返回null
     /// <returns>具有指定名称的工作表，如果没有找到，则返回<see langword="null"/></returns>
-    /// <inheritdoc cref="GetSheet(string, bool)"/>
+    /// <inheritdoc cref="this[string, bool]"/>
     IExcelSheet? GetSheetOrNull(string name);
-    #endregion
-    #region 根据索引返回
-    /// <summary>
-    /// 根据索引返回工作表
-    /// </summary>
-    /// <param name="index">工作表的索引，从0开始</param>
-    /// <returns></returns>
-    IExcelSheet GetSheet(int index);
     #endregion
     #endregion
     #region 关于添加工作表

@@ -14,6 +14,10 @@ public enum RenderTextType
     /// </summary>
     Uri,
     /// <summary>
+    /// 换行符
+    /// </summary>
+    LineBreak,
+    /// <summary>
     /// 高亮
     /// </summary>
     Highlight

@@ -45,10 +45,11 @@ public sealed record UriParameter : UriBase
     /// <summary>
     /// 使用元组集合初始化对象
     /// </summary>
-    /// <param name="parameter">这个元组集合枚举参数的名称和值</param>
-    public UriParameter(IEnumerable<(string Name, string? Value)> parameter)
+    /// <param name="parameter">这个元组集合枚举参数的名称和值，
+    /// 如果为<see langword="null"/>，给予一个空集合</param>
+    public UriParameter(IEnumerable<(string Name, string? Value)>? parameter)
     {
-        Parameter = parameter.ToDictionary(true);
+        Parameter = (parameter ?? []).ToDictionary(true);
     }
     #endregion
     #region 使用字符串

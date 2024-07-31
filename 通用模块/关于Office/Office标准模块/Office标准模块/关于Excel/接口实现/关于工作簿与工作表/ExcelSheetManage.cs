@@ -25,14 +25,11 @@ public abstract class ExcelSheetManage(IExcelBook book) : IExcelSheetManage
     public abstract int Count { get; }
     #endregion
     #region 关于返回工作表
-    #region 根据名称返回，不可能返回null
-    public abstract IExcelSheet GetSheet(string name, bool createTable = false);
-    #endregion
     #region 根据名称返回，可能返回null
     public abstract IExcelSheet? GetSheetOrNull(string name);
     #endregion
     #region 根据索引返回
-    public abstract IExcelSheet GetSheet(int index);
+    public abstract IExcelSheet this[int index] { get; }
     #endregion
     #endregion
     #region 关于添加工作表
@@ -42,5 +39,5 @@ public abstract class ExcelSheetManage(IExcelBook book) : IExcelSheetManage
     #region 添加非空白表
     public abstract IExcelSheet Add(IExcelSheet sheet, Index? pos = null);
     #endregion
-    #endregion 
+    #endregion
 }

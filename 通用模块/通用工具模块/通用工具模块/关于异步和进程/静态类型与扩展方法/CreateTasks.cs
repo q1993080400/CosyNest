@@ -25,28 +25,4 @@ public static class CreateTasks
     public static IAsyncIndex<P1, Value> AsyncIndex<P1, Value>(Func<P1, CancellationToken, Task<Value>> getDelegate, Func<P1, Value, CancellationToken, Task> setDelegate)
         => new AsyncIndexP1<P1, Value>(getDelegate, setDelegate);
     #endregion
-    #region 创建ValueTask
-    #region 通过委托返回ValueTask
-    #region 返回ValueTask
-    /// <summary>
-    /// 返回一个<see cref="Tasks.ValueTask"/>，
-    /// 它可以执行并等待一个委托
-    /// </summary>
-    /// <param name="delegate">待执行的委托</param>
-    /// <returns></returns>
-    public static ValueTask ValueTask(Action @delegate)
-        => Task.Run(@delegate).ToValueTask();
-    #endregion
-    #region 返回ValueTask<TResult>
-    /// <summary>
-    /// 返回一个<see cref="Tasks.ValueTask{TResult}"/>，
-    /// 它可以执行并等待一个委托
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="ValueTask(Action)"/>
-    public static ValueTask<TResult> ValueTask<TResult>(Func<TResult> @delegate)
-        => Task.Run(@delegate).ToValueTask();
-    #endregion
-    #endregion
-    #endregion
 }

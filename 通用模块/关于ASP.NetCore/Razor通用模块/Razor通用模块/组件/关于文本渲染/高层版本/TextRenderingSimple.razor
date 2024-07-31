@@ -15,6 +15,9 @@
             case RenderTextType.Highlight:
                 <span highlightGroup="@HighlightGroup">@text</span>
                 break;
+            case RenderTextType.LineBreak:
+                <br />
+                break;
             case var type:
                 throw new NotSupportedException($"无法识别{type}类型的文本渲染类型");
         }

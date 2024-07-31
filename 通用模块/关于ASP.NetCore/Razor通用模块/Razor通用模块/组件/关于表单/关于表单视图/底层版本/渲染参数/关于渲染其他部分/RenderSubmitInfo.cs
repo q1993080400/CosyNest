@@ -7,13 +7,14 @@
 public sealed record RenderSubmitInfo<Model>
     where Model : class
 {
-    #region 获取所有属性是否全部为只读
+    #region 获取组件是否可编辑
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
-    /// 表示这个表单中的所有属性均为只读，
-    /// 它一般情况下不显示提交按钮，但是也有例外
+    /// 表示这个表单可以被编辑，
+    /// 当它为<see langword="false"/>时，
+    /// 一般情况下不显示提交按钮，但是也有例外
     /// </summary>
-    public required bool AllReadOnly { get; init; }
+    public required bool CanEdit { get; init; }
     #endregion
     #region 用来重置表单的委托
     /// <summary>

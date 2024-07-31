@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using System.Design.Direct;
+﻿using System.Design.Direct;
 using System.NetFrancis.Http;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace System.DingDing;
 
@@ -23,13 +23,12 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
     {
         var accessToken = await GetCompanyToken();
         var http = ServiceProvider.GetRequiredService<IHttpClient>();
-        var response = await http.RequestPost("https://oapi.dingtalk.com/topapi/v2/department/listsubid",
+        var response = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/v2/department/listsubid",
             new
             {
                 dept_id = departmentID
             }, parameters: [("access_token", accessToken)],
-            transformation: TransformAccessToken(accessToken)).
-            Read(x => x.ToObject());
+            transformation: TransformAccessToken(accessToken));
         return response.GetValue<Num[]>("result.dept_id_list")?.Select(x => x.ToString()).ToArray() ?? [];
     }
     #endregion
@@ -45,13 +44,12 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
         #region 递归获取所有子部门的本地函数
         async IAsyncEnumerable<DingDingDepartmentInfo> GetSonDepartmentID(string fatherDepartmentID)
         {
-            var response = await http.RequestPost("https://oapi.dingtalk.com/topapi/v2/department/listsub",
+            var response = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/v2/department/listsub",
             new
             {
                 dept_id = fatherDepartmentID
             }, parameters: [("access_token", accessToken)],
-            transformation: TransformAccessToken(accessToken)).
-            Read(x => x.ToObject());
+            transformation: TransformAccessToken(accessToken));
             var departments = response.GetValue<IDirect[]>("result")!;
             foreach (var department in departments)
             {
@@ -75,15 +73,14 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
             var cursor = 0;
             while (true)
             {
-                var response = await http.RequestPost("https://oapi.dingtalk.com/topapi/v2/user/list",
+                var response = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/v2/user/list",
                     new
                     {
                         dept_id = departmentID,
                         cursor,
                         size = 20
                     }, parameters: [("access_token", accessToken)],
-                    transformation: TransformAccessToken(accessToken)).
-                    Read(x => x.ToObject());
+                    transformation: TransformAccessToken(accessToken));
                 response = VerifyResponse(response);
                 var result = response.GetValue<IDirect>("result")!;
                 var list = result.GetValue<object[]>("list")!.Cast<IDirect>().ToArray();
@@ -124,32 +121,27 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
         if (token is null or { IsToken: false } or { RefreshToken: null })
             return new()
             {
-                AuthorizationState = new()
+                AuthenticationState = new()
                 {
-                    AuthenticationState = new()
-                    {
-                        AuthenticationResult = null
-                    },
-                    AuthorizationPassed = false
-                }
+                    AuthenticationResult = null
+                },
             };
         var (accessToken, refreshToken) = (token.Code, token.RefreshToken);
         var uri = $"https://api.dingtalk.com/v1.0/contact/users/me";
         var transform = ServiceProvider.GetService<HttpRequestTransform>();
-        var response = await http.Request(uri, transformation:
-            x => x with
-            {
-                Header = x.Header.With(x => x.Add("x-acs-dingtalk-access-token", [accessToken]))
-            }).Read(x => x.ToObject());
+        var response = await http.RequestJsonGet(uri, transformation:
+           x => x with
+           {
+               Header = x.Header.With(x => x.Add("x-acs-dingtalk-access-token", [accessToken]))
+           });
         var companyToken = await GetCompanyToken();
         var unionId = response["unionId"]?.ToString() ?? "";
-        var userIDResponse = await http.RequestPost("https://oapi.dingtalk.com/topapi/user/getbyunionid",
+        var userIDResponse = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/user/getbyunionid",
             new
             {
                 unionid = unionId,
             },
-            parameters: [("access_token", companyToken)]).
-            Read(x => x.ToObject());
+            parameters: [("access_token", companyToken)]);
         var authenticationResult = new AuthenticationDingDingResult()
         {
             AccessToken = accessToken,
@@ -165,14 +157,10 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
         }.Encryption(GetDataProtection());
         return new()
         {
-            AuthorizationState = new()
+            AuthenticationState = new()
             {
-                AuthenticationState = new()
-                {
-                    AuthenticationResult = authenticationResult
-                },
-                AuthorizationPassed = true,
-            }
+                AuthenticationResult = authenticationResult
+            },
         };
     }
     #endregion

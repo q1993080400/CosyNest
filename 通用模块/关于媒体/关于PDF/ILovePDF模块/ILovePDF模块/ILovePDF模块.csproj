@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<AssemblyName>ToolILovePDF</AssemblyName>
+		<RootNamespace>System.Media.Drawing.PDF</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ILove_PDF" Version="1.4.0" PrivateAssets="compile" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+	</ItemGroup>
+</Project>

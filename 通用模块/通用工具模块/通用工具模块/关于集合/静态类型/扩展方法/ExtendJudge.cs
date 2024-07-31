@@ -69,7 +69,7 @@ public static partial class ExtendEnumerable
         CollectionContains.Equal or CollectionContains.Subset;
     #endregion
     #endregion
-    #region 关于索引和元素位置
+    #region 关于索引，范围和元素位置
     #region 关于Int形式的索引
     #region 按照元素返回索引
     /// <summary>
@@ -149,10 +149,10 @@ public static partial class ExtendEnumerable
     /// <param name="range">待返回开始和结束的范围</param>
     /// <param name="length">集合元素的数量</param>
     /// <returns></returns>
-    public static (int Begin, int End) GetOffsetAndEnd(this Range range, int length)
+    public static (int Start, int End) GetStartAndEnd(this Range range, int length)
     {
-        var (begin, len) = range.GetOffsetAndLength(length);
-        return (begin, begin + len - 1);
+        var (start, len) = range.GetOffsetAndLength(length);
+        return (start, start + len - 1);
     }
     #endregion
     #region 传入集合
@@ -163,14 +163,8 @@ public static partial class ExtendEnumerable
     /// <param name="range">待返回开始和结束的范围</param>
     /// <param name="list">用来计算元素数量的集合</param>
     /// <returns></returns>
-    public static (int Begin, int End) GetOffsetAndEnd<Obj>(this Range range, IEnumerable<Obj> list)
-    {
-        var (b, e) = range;
-        if (!b.IsFromEnd && !e.IsFromEnd)
-            return (b.Value, e.Value);
-        var count = list.Count();           //即便开始和结束索引都是倒着数的，也只需要计算一次元素数量
-        return (b.GetOffset(count), e.GetOffset(count));
-    }
+    public static (int Start, int End) GetStartAndEnd<Obj>(this Range range, IEnumerable<Obj> list)
+        => range.GetStartAndEnd(list.Count());
     #endregion
     #endregion
     #region 返回是否为确定范围

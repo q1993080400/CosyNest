@@ -1,4 +1,6 @@
-﻿using OfficeOpenXml.Drawing.Chart;
+﻿using System.MathFrancis.Plane;
+
+using OfficeOpenXml.Drawing.Chart;
 
 namespace System.Office.Excel;
 
@@ -18,5 +20,13 @@ sealed class ExcelChartEPPlus(ExcelChart chart) : IOfficeChart
     #region 返回图表所有系列
     public IOfficeChartSeriesManage Series { get; }
         = new ExcelChartSeriesManageEPPlus(chart.Series);
+    #endregion
+    #region 未实现的成员
+    public IPoint Pos { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public ISize Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public bool InTextTop { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public IOfficeChartArea Area => throw new NotImplementedException();
+    public IOfficeChartDraw Draw => throw new NotImplementedException();
+    public double Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     #endregion
 }

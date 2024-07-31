@@ -63,7 +63,7 @@ sealed class DriveRealize(DriveInfo drive) : IDrive
     #endregion
     #region 获取子节点
     public IEnumerable<INode> Son
-        => new[] { CreateIO.Directory(PackDrive.RootDirectory.FullName) };
+        => [CreateIO.Directory(PackDrive.RootDirectory.FullName)];
     #endregion
     #endregion
     #region 重写的ToString方法

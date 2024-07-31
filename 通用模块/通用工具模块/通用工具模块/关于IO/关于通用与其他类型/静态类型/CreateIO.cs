@@ -269,17 +269,26 @@ public static class CreateIO
     /// <summary>
     /// 根据路径，创建一个压缩包
     /// </summary>
-    /// <inheritdoc cref="CompressedPackage(PathText)"/>
-    public static ICompressedPackage Compressed(string path)
-        => new CompressedPackage(path);
+    /// <param name="autoSave">如果这个值为<see langword="true"/>，
+    /// 则在释放压缩包的时候，还会自动保存它</param>
+    /// <inheritdoc cref="CompressedPackage(string)"/>
+    public static ICompressedPackage Compressed(string path, bool autoSave)
+        => new CompressedPackage(path)
+        {
+            AutoSave = autoSave
+        };
     #endregion
     #region 根据流
     /// <summary>
     /// 根据流，创建一个压缩包
     /// </summary>
+    /// <inheritdoc cref="Compressed(string, bool)"/>
     /// <inheritdoc cref="CompressedPackage(Stream)"/>
-    public static ICompressedPackage Compressed(Stream stream)
-        => new CompressedPackage(stream);
+    public static ICompressedPackage Compressed(Stream stream, bool autoSave)
+        => new CompressedPackage(stream)
+        {
+            AutoSave = autoSave
+        };
     #endregion
     #endregion
     #region 创建简单文件路径协议

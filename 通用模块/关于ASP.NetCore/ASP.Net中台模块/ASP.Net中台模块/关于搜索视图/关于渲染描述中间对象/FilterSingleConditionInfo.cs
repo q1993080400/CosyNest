@@ -22,7 +22,7 @@ public sealed record FilterSingleConditionInfo : FilterConditionInfo
     /// <summary>
     /// 描述查询条件的逻辑运算符
     /// </summary>
-    public required RenderLogicalOperator LogicalOperator { get; init; }
+    public RenderLogicalOperator LogicalOperator { get; init; }
     #endregion
     #region 抽象成员实现：获取渲染条件组
     public override RenderFilterGroup ConvertConditioGroup()

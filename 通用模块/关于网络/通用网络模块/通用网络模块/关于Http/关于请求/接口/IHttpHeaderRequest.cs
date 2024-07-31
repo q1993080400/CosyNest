@@ -8,7 +8,7 @@ namespace System.NetFrancis.Http;
 /// </summary>
 public interface IHttpHeaderRequest : IHttpHeader
 {
-    #region 获取身份验证标头
+    #region 身份验证标头
     /// <summary>
     /// 获取Authorization标头，
     /// 它被用来执行身份验证

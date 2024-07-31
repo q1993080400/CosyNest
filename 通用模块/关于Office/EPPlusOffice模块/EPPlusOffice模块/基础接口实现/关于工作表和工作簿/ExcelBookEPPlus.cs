@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.Bit;
-using System.IOFrancis.FileSystem;
-using System.Office.Excel.Realize;
+﻿using System.Office.Excel.Realize;
 
 using OfficeOpenXml;
 
@@ -12,16 +10,8 @@ namespace System.Office.Excel;
 sealed class ExcelBookEPPlus : ExcelBook, IExcelBook
 {
     #region 公开成员
-    #region 返回代表Office文件的流
-    public IBitRead Read()
-    {
-        var stream = new MemoryStream();
-        ExcelPackage.SaveAs(stream);
-        return stream.ToBitPipe(Path is { } p ? ToolPath.SplitFilePath(p).Extended : "").Read;
-    }
-    #endregion
     #region 返回打印对象
-    public override IOfficePrint Print => throw new NotImplementedException();
+    public override IWorkBookPage Print => throw new NotImplementedException();
     #endregion
     #region 返回工作表的容器
     public override IExcelSheetManage SheetManage { get; }
@@ -35,6 +25,10 @@ sealed class ExcelBookEPPlus : ExcelBook, IExcelBook
     #endregion
     #endregion
     #region 内部成员
+    #region 检查文件路径的扩展名
+    protected override bool CheckExtensionName(string extensionName)
+        => extensionName is "xlsx";
+    #endregion
     #region Excel封装包
     /// <summary>
     /// 获取Excel封装包对象，

@@ -28,7 +28,7 @@ public static class ToolPWA
     {
         var text = File.ReadAllText(manifestPath);
         InitializationToolTreeObject.Initialization();
-        var options = CreateDesign.JsonCommonOptions;
+        var options = CreateDesign.JsonCommonOptions();
         return JsonSerializer.Deserialize<IDirect>(text, options)!;
     }
     #endregion
@@ -43,7 +43,7 @@ public static class ToolPWA
     {
         var manifest = GetManifest(manifestPath);
         update(manifest);
-        var options = CreateDesign.JsonCommonOptions;
+        var options = CreateDesign.JsonCommonOptions();
         options.WriteIndented = true;
         var json = JsonSerializer.Serialize(manifest, options);
         File.WriteAllText(manifestPath, json);

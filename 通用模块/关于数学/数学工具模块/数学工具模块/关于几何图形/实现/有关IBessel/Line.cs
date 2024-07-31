@@ -39,7 +39,7 @@ sealed class Line(IGeometricModel<IBessel> model, IPoint begin, IPoint end) : IB
     #endregion
     #region 获取这个线段本身
     public IEnumerable<IBessel> Content
-        => new[] { this };
+        => [this];
     #endregion
     #region 获取线段的界限
     public ISizePos Boundaries

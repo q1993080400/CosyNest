@@ -19,7 +19,7 @@ public interface IGetRenderAllFilterCondition
     /// <returns></returns>
     public static Func<Task<RenderFilterGroup[]>> GetConditionFunction<GetRenderAllFilterCondition>(IHttpClient httpClient)
         where GetRenderAllFilterCondition : class, IGetRenderAllFilterCondition
-        => () => httpClient.RequestStrongType<GetRenderAllFilterCondition>().
+        => () => httpClient.StrongType<GetRenderAllFilterCondition>().
         Request(x => x.GetRenderAllFilterCondition());
     #endregion
     #region 根据业务，获取搜索条件渲染描述

@@ -19,6 +19,14 @@ public static class CreateOfficeEPPlus
         OfficeFileCom.Excel2007Macro);
     #endregion
     #region 创建Excel工作簿
+    #region 创建空工作簿
+    /// <summary>
+    /// 创建一个空的工作簿
+    /// </summary>
+    /// <returns></returns>
+    public static IExcelBook ExcelBook()
+        => new ExcelBookEPPlus((string?)null);
+    #endregion
     #region 使用路径
     /// <summary>
     /// 根据路径，创建一个<see cref="IExcelBook"/>
@@ -28,7 +36,7 @@ public static class CreateOfficeEPPlus
     /// <param name="autoSave">如果这个值为<see langword="true"/>，
     /// 释放工作簿的时候，会自动保存</param>
     /// <returns></returns>
-    public static IExcelBook ExcelBook(string? path = null, bool autoSave = true)
+    public static IExcelBook ExcelBook(string? path, bool autoSave)
         => new ExcelBookEPPlus(path)
         {
             AutoSave = autoSave
@@ -41,7 +49,7 @@ public static class CreateOfficeEPPlus
     /// <param name="stream">Excel工作簿的流</param>
     /// <returns></returns>
     /// <inheritdoc cref="ExcelBook(string?, bool)"/>
-    public static IExcelBook ExcelBook(Stream stream, bool autoSave = true)
+    public static IExcelBook ExcelBook(Stream stream, bool autoSave)
         => new ExcelBookEPPlus(stream)
         {
             AutoSave = autoSave

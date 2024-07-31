@@ -22,7 +22,7 @@ public abstract class ExcelBook(string? path) : FromIO(path), IExcelBook
     #endregion
     #region 关于工作簿
     #region 返回打印对象
-    public abstract IOfficePrint Print { get; }
+    public abstract IWorkBookPage Print { get; }
     #endregion
     #region 开启或关闭自动计算
     public abstract bool AutoCalculation { get; set; }

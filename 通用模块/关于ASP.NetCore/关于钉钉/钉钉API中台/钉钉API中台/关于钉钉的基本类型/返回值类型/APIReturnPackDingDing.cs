@@ -7,9 +7,9 @@ namespace System.DingDing;
 /// 它可以额外携带一个内容对象
 /// </summary>
 /// <inheritdoc cref="APIReturnPack{Return}"/>
-public sealed record APIReturnPackDingDing<Return> : APIReturnPack<Return>, IHasAuthorizationDingDingState
+public sealed record APIReturnPackDingDing<Return> : APIReturnPack<Return>, IHasAuthenticationDingDingState
 {
     #region 钉钉身份验证状态
-    public required AuthorizationDingDingState AuthorizationState { get; init; }
+    public required AuthenticationDingDingState AuthenticationState { get; init; }
     #endregion 
 }

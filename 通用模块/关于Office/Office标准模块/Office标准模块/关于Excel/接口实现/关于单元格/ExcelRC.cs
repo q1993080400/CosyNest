@@ -65,6 +65,4 @@ public abstract class ExcelRC(IExcelSheet sheet, bool isRow, int begin, int end)
     public abstract void Delete();
 
     #endregion
-    #region 构造函数
-    #endregion
 }

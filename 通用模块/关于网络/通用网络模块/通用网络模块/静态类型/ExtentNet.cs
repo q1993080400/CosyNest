@@ -1,10 +1,10 @@
 ﻿using System.Net;
-using System.Net.Http.Headers;
 using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Text;
 
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace System;
@@ -14,122 +14,6 @@ namespace System;
 /// </summary>
 public static class ExtendNet
 {
-    #region 有关IHttpClient及其衍生类型
-    #region 公开成员
-    #region 将HttpClient转换为IHttpClient
-    /// <summary>
-    /// 返回一个<see cref="HttpClient"/>的<see cref="IHttpClient"/>包装
-    /// </summary>
-    /// <param name="httpClient">待包装的<see cref="HttpClient"/></param>
-    /// <returns></returns>
-    /// <inheritdoc cref="HttpClientRealize(HttpClient, HttpRequestTransform?)"/>
-    public static IHttpClient ToHttpClient(this HttpClient httpClient, HttpRequestTransform? defaultTransform = null)
-        => new HttpClientRealize(httpClient, defaultTransform);
-    #endregion
-    #region 读取IHttpResponse的内容，并将其转换为更高层的类型
-    /// <summary>
-    /// 读取一个<see cref="IHttpResponse"/>的内容，
-    /// 并将其转换为更高层次的类型返回
-    /// </summary>
-    /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <param name="response">待读取的<see cref="IHttpResponse"/></param>
-    /// <param name="read">这个委托传入待读取的<see cref="IHttpContent"/>，返回转换后的类型</param>
-    /// <returns></returns>
-    public static async Task<Ret> Read<Ret>(this Task<IHttpResponse> response, Func<IHttpContent, Task<Ret>> read)
-    {
-        var r = await response;
-        return await read(r.Content);
-    }
-    #endregion
-    #region HttpContent转换为IHttpContent
-    /// <summary>
-    /// 将<see cref="HttpContent"/>转换为等效的<see cref="IHttpContent"/>
-    /// </summary>
-    /// <param name="content">待转换的<see cref="HttpContent"/></param>
-    /// <returns></returns>
-    public static async Task<HttpContentRecording?> ToHttpContent(this HttpContent? content)
-    {
-        if (content is null)
-            return null;
-        var array = await content.ReadAsByteArrayAsync();
-        return new HttpContentRecording()
-        {
-            Content = array.ToBitRead(),
-            Header = new(content.Headers)
-        };
-    }
-    #endregion
-    #endregion
-    #region 内部成员
-    #region 将HttpRequestRecording转换为HttpRequestMessage
-    /// <summary>
-    /// 将<see cref="HttpRequestRecording"/>转换为等效的<see cref="HttpRequestMessage"/>
-    /// </summary>
-    /// <param name="recording">待转换的<see cref="HttpRequestRecording"/></param>
-    /// <param name="baseAddress">请求目标Uri的基地址</param>
-    /// <returns></returns>
-    internal static async Task<HttpRequestMessage> ToHttpRequestMessage(this HttpRequestRecording recording, Uri? baseAddress)
-    {
-        var uri = recording.Uri;
-        var m = new HttpRequestMessage()
-        {
-            RequestUri = baseAddress is null ? new(uri) : new(baseAddress, uri),
-            Method = recording.HttpMethod,
-            Content = await recording.Content.ToHttpContent(),
-        };
-        recording.Header.CopyHeader(m.Headers);
-        return m;
-    }
-    #endregion
-    #region 将IHttpContent转换为HttpContent
-    /// <summary>
-    /// 将<see cref="IHttpContent"/>转换为<see cref="HttpContent"/>
-    /// </summary>
-    /// <param name="content">待转换的<see cref="HttpContent"/></param>
-    /// <returns></returns>
-    private static async Task<HttpContent?> ToHttpContent(this IHttpContent? content)
-    {
-        if (content is null)
-            return null;
-        var array = await content.Content.ReadComplete();
-        var arrayContent = new ByteArrayContent(array);
-        content.Header.CopyHeader(arrayContent.Headers);
-        return arrayContent;
-    }
-    #endregion
-    #region 将IHttpHeader的标头复制到HttpHeaders
-    /// <summary>
-    /// 将<see cref="IHttpHeader"/>的所有标头复制到另一个<see cref="HttpHeaders"/>中
-    /// </summary>
-    /// <param name="header">待复制标头的<see cref="IHttpHeader"/></param>
-    /// <param name="bclHeader"><paramref name="header"/>的所有标头将被复制到这个参数中</param>
-    internal static void CopyHeader(this IHttpHeader header, HttpHeaders bclHeader)
-    {
-        bclHeader.Clear();
-        foreach (var (key, value) in header.Headers)
-        {
-            bclHeader.Add(key, value);
-        }
-    }
-    #endregion
-    #region 将HttpResponseMessage转换为HttpResponse
-    /// <summary>
-    /// 将<see cref="HttpResponseMessage"/>转换为<see cref="HttpResponse"/>
-    /// </summary>
-    /// <param name="message">待转换的<see cref="HttpResponseMessage"/></param>
-    /// <returns></returns>
-    internal async static Task<HttpResponse> ToHttpResponse(this HttpResponseMessage message)
-        => new HttpResponse()
-        {
-            Status = message.StatusCode,
-            RequestUri = message.RequestMessage?.RequestUri?.AbsoluteUri ??
-            $"这条消息不是通过{nameof(IHttpClient)}发送的，所以无法获取请求地址",
-            Header = new HttpHeaderResponse(message.Headers),
-            Content = (await message.Content.ToHttpContent())!
-        };
-    #endregion
-    #endregion
-    #endregion
     #region 有关字符串互相转换
     #region 转换Base64字符串
     #region 转换为Base64字符串
@@ -305,7 +189,7 @@ public static class ExtendNet
     /// <summary>
     /// 以单例模式注入一个<see cref="HttpRequestTransform"/>，
     /// 它可以自动处理相对请求路径，将其视为请求本站，
-    /// 本服务依赖于<see cref="IUriManager"/>
+    /// 本服务依赖于<see cref="IHostProvide"/>
     /// </summary>
     /// <param name="services">要注入的服务集合</param>
     /// <returns></returns>
@@ -313,10 +197,8 @@ public static class ExtendNet
     {
         services.AddSingleton(x =>
         {
-            var uriManager = x.GetRequiredService<IUriManager>();
-            var host = uriManager.Uri.UriHost ??
-                throw new NotSupportedException("没有找到Uri路径的Host部分");
-            return CreateNet.TransformBaseUri(host);
+            var hostProvide = x.GetRequiredService<IHostProvide>();
+            return CreateNet.TransformBaseUri(hostProvide.Host);
         });
         return services;
     }
@@ -325,19 +207,49 @@ public static class ExtendNet
     /// <summary>
     /// 以瞬间模式注入一个<see cref="ISignalRProvide"/>对象，
     /// 该依赖注入能够自动处理绝对路径和相对路径的转换，
-    /// 它依赖于<see cref="IUriManager"/>服务
+    /// 它依赖于<see cref="IHostProvide"/>服务
     /// </summary>
     /// <param name="services">待注入的容器</param>
     /// <param name="create">该委托传入中心的绝对Uri，以及一个用来提供服务的对象，
-    /// 然后创建一个新的<see cref="HubConnection"/>，如果为<see langword="null"/>，则使用默认方法</param>
+    /// 然后创建一个新的<see cref="IHubConnectionBuilder"/>，如果为<see langword="null"/>，则使用默认方法</param>
     /// <returns></returns>
-    public static IServiceCollection AddSignalRProvide(this IServiceCollection services, Func<string, IServiceProvider, Task<HubConnection>>? create = null)
+    public static IServiceCollection AddSignalRProvide(this IServiceCollection services, Func<string, IServiceProvider, Task<IHubConnectionBuilder>>? create = null)
         => services.AddTransient(server =>
         {
-            var navigation = server.GetRequiredService<IUriManager>();
+            var navigation = server.GetRequiredService<IHostProvide>();
             return CreateNet.SignalRProvide(create is null ? null : uri => create(uri, server),
                 uri => navigation.Convert(uri, true));
         });
+    #endregion
+    #region 注入IHostProvide
+    #region 直接指定Host
+    /// <summary>
+    /// 以单例模式注入一个<see cref="IHostProvide"/>，
+    /// 它可以用于提供本机Host地址
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <param name="baseUri">本地主机的Host地址</param>
+    /// <returns></returns>
+    public static IServiceCollection AddHostProvide(this IServiceCollection services, string baseUri)
+        => services.AddSingleton(_ => CreateNet.HostProvide(baseUri));
+    #endregion
+    #region 从配置中读取
+    /// <summary>
+    /// 以单例模式注入一个<see cref="IHostProvide"/>，
+    /// 它可以用于提供本机Host地址，
+    /// 它通过配置文件中一个叫Host的键提取地址
+    /// </summary>
+    /// <param name="services">待注入的服务容器</param>
+    /// <returns></returns>
+    public static IServiceCollection AddHostProvideFromConfiguration(this IServiceCollection services)
+        => services.AddSingleton(services =>
+        {
+            var configuration = services.GetRequiredService<IConfiguration>();
+            var baseUri = configuration.GetValue<string>("Host") ??
+            throw new NotSupportedException("没有在配置中设置主机的Host");
+            return CreateNet.HostProvide(baseUri);
+        });
+    #endregion
     #endregion
     #endregion 
 }

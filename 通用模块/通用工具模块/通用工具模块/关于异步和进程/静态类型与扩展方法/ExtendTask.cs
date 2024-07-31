@@ -47,4 +47,27 @@ public static class ExtendTask
         => task.AsTask().Result;
     #endregion
     #endregion
+    #region 延迟设置取消令牌
+    #region 泛型方法
+    /// <summary>
+    /// 为一个<see cref="CancellationToken"/>注册事件，
+    /// 当它被取消的时候，自动使<see cref="TaskCompletionSource{TResult}"/>进入取消状态
+    /// </summary>
+    /// <typeparam name="TResult">异步操作的类型</typeparam>
+    /// <param name="completionSource">要取消的<see cref="TaskCompletionSource{TResult}"/></param>
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
+    public static void SetCanceledAfter<TResult>(this TaskCompletionSource<TResult> completionSource, CancellationToken cancellationToken)
+        => cancellationToken.Register(completionSource.SetCanceled);
+    #endregion
+    #region 非泛型方法
+    /// <summary>
+    /// 为一个<see cref="CancellationToken"/>注册事件，
+    /// 当它被取消的时候，自动使<see cref="TaskCompletionSource"/>进入取消状态
+    /// </summary>
+    /// <param name="completionSource">要取消的<see cref="TaskCompletionSource"/></param>
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
+    public static void SetCanceledAfter(this TaskCompletionSource completionSource, CancellationToken cancellationToken)
+        => cancellationToken.Register(completionSource.SetCanceled);
+    #endregion
+    #endregion 
 }

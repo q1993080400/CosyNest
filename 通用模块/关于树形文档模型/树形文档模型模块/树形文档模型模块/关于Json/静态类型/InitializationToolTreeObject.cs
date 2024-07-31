@@ -28,7 +28,6 @@ public static class InitializationToolTreeObject
     internal static void InitializationImplicit()
     {
         var json = CreateDesign.JsonCommon;
-        json.Add(CreateJson.JsonCollection);
         json.Add(CreateJson.JsonTuple);
         json.Add(CreateJson.JsonDirect);
     }

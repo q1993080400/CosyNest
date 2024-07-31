@@ -12,6 +12,25 @@ public abstract record HttpHeader : IHttpHeader
     #region 标头属性
     public IReadOnlyDictionary<string, IEnumerable<string>> Headers => HeadersImmutable;
     #endregion
+    #region 自定义对象标头
+    public IObjectHeaderValue? ObjectHeaderValue
+    {
+        get => GetHeader(IObjectHeaderValue.HeaderName, x => CreateNet.ObjectHeaderValue(x.Single()));
+        init => SetHeader(IObjectHeaderValue.HeaderName, value, x => [x.Json]);
+    }
+    #endregion
+    #region 将标头复制到HttpHeaders
+    public Headers CopyHeader<Headers>(Headers header)
+          where Headers : HttpHeaders
+    {
+        header.Clear();
+        foreach (var (key, value) in this.Headers)
+        {
+            header.Add(key, value);
+        }
+        return header;
+    }
+    #endregion
     #endregion
     #region 内部成员
     #region 标头字典
@@ -28,7 +47,7 @@ public abstract record HttpHeader : IHttpHeader
     /// </summary>
     /// <typeparam name="Header">标头类型</typeparam>
     /// <param name="key">用来获取标头的键</param>
-    /// <param name="ifExist"></param>
+    /// <param name="ifExist">如果标头的键存在，根据标头的值返回标头的委托</param>
     /// <returns></returns>
     protected Header? GetHeader<Header>(string key, Func<IEnumerable<string>, Header> ifExist)
         where Header : class

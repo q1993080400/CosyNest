@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿using System.NetFrancis.Http;
+
+namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 这个组件可以提供异步遍历数据的迭代器，
@@ -20,6 +22,13 @@ public abstract partial class DataProvision<Data> : ComponentBase
     /// 获取应该高亮的文本
     /// </summary>
     protected IReadOnlyCollection<string>? Highlight { get; set; }
+    #endregion
+    #region 依赖注入的Http客户端
+    /// <summary>
+    /// 获取依赖注入的Http客户端
+    /// </summary>
+    [Inject]
+    protected IHttpClient HttpClient { get; set; }
     #endregion
     #region 提交搜索
     /// <summary>

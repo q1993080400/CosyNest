@@ -25,7 +25,7 @@ public interface IServerSearch<Parameter, Obj>
         async index =>
         {
             var parameter = generateParameter(index);
-            var objs = await httpClient.RequestStrongType<Interface>().
+            var objs = await httpClient.StrongType<Interface>().
             Request(x => x.Search(parameter));
             return objs;
         });

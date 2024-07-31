@@ -19,7 +19,7 @@ sealed class CompressedPackage : FromIO, ICompressedPackage
     public INode? Father => null;
     #endregion
     #region 子目录
-    public IEnumerable<INode> Son => new[] { RootDirectory };
+    public IEnumerable<INode> Son => [RootDirectory];
     #endregion
     #endregion
     #region 关于保存对象
@@ -65,6 +65,10 @@ sealed class CompressedPackage : FromIO, ICompressedPackage
     #endregion
     #endregion
     #region 内部成员
+    #region 检查文件路径的扩展名
+    protected override bool CheckExtensionName(string extensionName)
+        => extensionName is "zip";
+    #endregion
     #region 默认格式
     protected override string DefaultFormat => "zip";
     #endregion

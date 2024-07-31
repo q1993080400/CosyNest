@@ -41,7 +41,7 @@ public sealed partial class Watermark : ComponentBase, IContentComponent<RenderF
     #region 重写OnParametersSetAsync方法
     protected override async Task OnParametersSetAsync()
     {
-        SVGUri = await JSWindow.InvokeAsync<string>("CreateSVGUri", new[] { SVGContainerID });
+        SVGUri = await JSWindow.InvokeAsync<string>("CreateSVGUri", [SVGContainerID]);
     }
     #endregion
     #endregion

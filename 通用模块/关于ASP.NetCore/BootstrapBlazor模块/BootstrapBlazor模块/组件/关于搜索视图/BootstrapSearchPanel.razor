@@ -4,12 +4,13 @@
 @inject IHttpClient HttpClient
 
 <SearchPanel GetRenderCondition="@(GetRenderCondition??IGetRenderAllFilterCondition.GetConditionFunction<BusinessInterface>(HttpClient))"
-             SearchViewerState="SearchViewerState" Submit="Submit" ElementNumber=ElementNumber>
+             SearchViewerState="SearchViewerState" Submit="Submit"
+             ElementNumber=ElementNumber OnClear=OnClear!>
     <RenderComponent>
         @if (RenderComponent is null)
         {
             <div class="commonContainers">
-                <div class="perfectContainer">
+                <div class="perfectContainer bisectContainers">
                     @foreach (var item in context.RenderCondition)
                     {
                         @item
@@ -39,6 +40,7 @@
             <div class="compactCentered">
                 <Button Text="搜索" OnClick="@context.Submit" />
                 <Button Text="清除" OnClick="@context.Clear" />
+                <Button Text="回到顶部" OnClick="@context.GoToTop" />
             </div>
         }
         else

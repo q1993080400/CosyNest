@@ -11,7 +11,6 @@ namespace Microsoft.AspNetCore.Components;
 /// <typeparam name="Content">要寻找的对象的类型</typeparam>
 public sealed partial class Initialization<Interface, Parameter, Content> : ComponentBase
     where Interface : class, IServerFind<Parameter, Content>
-    where Parameter : class
     where Content : class
 {
     #region 组件参数
@@ -63,7 +62,7 @@ public sealed partial class Initialization<Interface, Parameter, Content> : Comp
     protected override async Task OnParametersSetAsync()
     {
         FindParameter = await GetFindParameter();
-        Obj = await HttpClient.RequestStrongType<Interface>().
+        Obj = await HttpClient.StrongType<Interface>().
             Request(x => x.Find(FindParameter));
         InitializationComplete = true;
     }

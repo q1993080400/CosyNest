@@ -52,7 +52,7 @@ sealed class OCRAliYun(string appCode, Func<IHttpClient>? httpClientProvide) :
             throw new WebException("图片短边不能小于15px，长边不能大于8192px，且长宽比不能大于50");
         using var st = httpResponse.GetResponseStream();
         var json = (await st.ReadAll()).ToText();
-        var response = JsonSerializer.Deserialize<IDirect>(json, CreateDesign.JsonCommonOptions)!;
+        var response = JsonSerializer.Deserialize<IDirect>(json, CreateDesign.JsonCommonOptions())!;
         var info = response.GetValue<object[]>("prism_paragraphsInfo", false)?.Cast<IDirect>() ??
             throw new APIException($"""
                 请求阿里OCR接口出现异常，错误码：{response["error_code"]}，错误描述：{response["error_msg"]}

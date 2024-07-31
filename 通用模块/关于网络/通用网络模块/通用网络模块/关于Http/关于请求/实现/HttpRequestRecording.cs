@@ -1,29 +1,15 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace System.NetFrancis.Http;
+﻿namespace System.NetFrancis.Http;
 
 /// <summary>
 /// 这个记录封装了提交Http请求所需要的信息
 /// </summary>
 public sealed record HttpRequestRecording
 {
-    #region 公开成员
     #region 获取请求的Uri
-    private readonly UriComplete? UriCompleteField;
-
     /// <summary>
     /// 获取请求的目标Uri
     /// </summary>
-    public required UriComplete Uri
-    {
-        get => UriCompleteField ?? throw new ArgumentNullException($"未初始化{nameof(UriComplete)}");
-        init
-        {
-            if (HttpMethod != HttpMethod.Get && (value.UriParameter?.Parameter.Any() ?? false))
-                throw new NotSupportedException($"只有Get方法才可以在Uri中设置参数");
-            UriCompleteField = value;
-        }
-    }
+    public required UriComplete Uri { get; init; }
     #endregion
     #region 获取请求头
     /// <summary>
@@ -39,54 +25,34 @@ public sealed record HttpRequestRecording
     #endregion
     #region Http请求内容
     /// <summary>
-    /// 获取Http请求的内容
+    /// 获取Http请求的内容，
+    /// 如果为<see langword="null"/>，
+    /// 视为没有任何内容，仅使用查询参数
     /// </summary>
-    public HttpContentRecording? Content { get; init; }
+    public HttpContent? Content { get; init; }
     #endregion
     #region 如果响应不成功，是否抛出异常
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
     /// 且响应不成功，则抛出异常
     /// </summary>
-    public bool ThrowIfNotSuccess { get; set; }
+    public bool ThrowIfNotSuccess { get; init; }
     #endregion
-    #endregion
-    #region 构造函数
-    #region 无参数构造函数
-    public HttpRequestRecording()
-    {
-
-    }
-    #endregion
-    #region 指定Uri
+    #region 转换为HttpRequestMessage
     /// <summary>
-    /// 使用指定的参数初始化对象
+    /// 将本对象转换为等效的<see cref="HttpRequestMessage"/>
     /// </summary>
-    /// <param name="uri">请求的目标Uri</param>
-    [SetsRequiredMembers]
-    public HttpRequestRecording(UriComplete uri)
+    /// <returns></returns>
+    public HttpRequestMessage ToHttpRequestMessage()
     {
-        Uri = uri;
+        var requestMessage = new HttpRequestMessage()
+        {
+            RequestUri = new(Uri),
+            Method = HttpMethod,
+            Content = Content,
+        };
+        Header.CopyHeader(requestMessage.Headers);
+        return requestMessage;
     }
-    #endregion
-    #region 指定Uri和参数
-    /// <summary>
-    /// 使用指定的Uri和参数初始化对象
-    /// </summary>
-    /// <param name="uri">指定的Uri</param>
-    /// <param name="parameters">Uri的参数，如果它为<see langword="null"/>，
-    /// 且<paramref name="uri"/>已经具有参数，则不会改变<paramref name="uri"/>的参数</param>
-    [SetsRequiredMembers]
-    public HttpRequestRecording(string uri, (string Parameter, string? Value)[]? parameters)
-    {
-        var uriComplete = new UriComplete(uri);
-        Uri = parameters.AnyAndNotNull() ?
-            uriComplete with
-            {
-                UriParameter = new(parameters)
-            } :
-            uriComplete;
-    }
-    #endregion
     #endregion
 }

@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using System.NetFrancis.Http;
+﻿using System.NetFrancis.Http;
 using System.Text.Json;
 
 using Microsoft.AspNetCore.SignalR.Client;
@@ -23,59 +22,77 @@ public static class CreateNet
         => ServiceProvider.GetRequiredService<IHttpClientFactory>().
         CreateClient().ToHttpClient();
     #endregion
-    #region 有关IHttpContent
-    #region 使用Json创建
+    #region 创建IObjectHeaderValue
+    #region 直接封装Json文本
     /// <summary>
-    /// 将指定对象序列化，
-    /// 然后创建一个包含Json的<see cref="HttpContentRecording"/>
+    /// 创建一个<see cref="IObjectHeaderValue"/>，
+    /// 它在Http标头中封装了一个Json文本
     /// </summary>
-    /// <typeparam name="Obj">要序列化的对象的类型</typeparam>
-    /// <param name="obj">要序列化的对象</param>
-    /// <param name="options">控制序列化过程的选项</param>
+    /// <param name="json">要封装的Json文本</param>
     /// <returns></returns>
-    public static Task<HttpContentRecording> HttpContentJson<Obj>(Obj? obj, JsonSerializerOptions? options = null)
-        => JsonContent.Create(obj, options: options).ToHttpContent()!;
+    public static IObjectHeaderValue ObjectHeaderValue(string json)
+        => new ObjectHeaderValue(json);
     #endregion
+    #region 封装对象
+    /// <summary>
+    /// 创建一个<see cref="IObjectHeaderValue"/>，
+    /// 它将对象序列化为Json，并封装到Http标头中
+    /// </summary>
+    /// <typeparam name="Obj">要封装的对象类型</typeparam>
+    /// <param name="obj">要封装的对象</param>
+    /// <param name="options">用于序列化的配置选项</param>
+    /// <returns></returns>
+    public static IObjectHeaderValue ObjectHeaderValue<Obj>(Obj obj, JsonSerializerOptions? options = null)
+    {
+        var json = JsonSerializer.Serialize(obj, options);
+        return ObjectHeaderValue(json);
+    }
+    #endregion 
     #endregion
     #region 有关创建ISignalRProvide
-    #region 直接创建ISignalRProvide
+    #region 正式方法
     /// <summary>
     /// 创建一个<see cref="ISignalRProvide"/>，
     /// 它可以用来提供SignalR连接
     /// </summary>
-    /// <inheritdoc cref="SignalRProvide.SignalRProvide(Func{string, Task{HubConnection}}, Func{string, string}?)"/>
-    public static ISignalRProvide SignalRProvide(Func<string, Task<HubConnection>>? create = null, Func<string, string>? toAbs = null)
-        => new SignalRProvide(create ?? ConfigureSignalRProvide(), toAbs);
-    #endregion
-    #region 创建ISignalRProvide的工厂
-    /// <summary>
-    /// 创建一个根据中心的绝对Uri返回<see cref="HubConnection"/>的工厂
-    /// </summary>
-    /// <param name="configure">这个委托被用于进一步配置<see cref="IHubConnectionBuilder"/>，
-    /// 它的参数是预配置的<see cref="IHubConnectionBuilder"/>，返回值是<see cref="IHubConnectionBuilder"/>的最终成品，
-    /// 如果为<see langword="null"/>，表示直接使用预配置版本</param>
-    /// <returns></returns>
-    public static Func<string, Task<HubConnection>> ConfigureSignalRProvide(Func<IHubConnectionBuilder, Task<IHubConnectionBuilder>>? configure = null)
-        => async (uri) =>
+    /// <inheritdoc cref="SignalRProvide.SignalRProvide(Func{string, Task{IHubConnectionBuilder}}, Func{string, string}?)"/>
+    public static ISignalRProvide SignalRProvide(Func<string, Task<IHubConnectionBuilder>>? create = null, Func<string, string>? toAbs = null)
+        => new SignalRProvide(create ??= uri =>
         {
-            var build = new HubConnectionBuilder().
-             WithUrl(uri).
-             AddMessagePackProtocol();
-            return (configure is null ? build : await configure(build)).Build();
-        };
+            var builder = new HubConnectionBuilder();
+            ConfigureHubConnectionBuilder(builder, uri);
+            return Task.FromResult<IHubConnectionBuilder>(builder);
+        }, toAbs ??= x => x);
+    #endregion
+    #region 辅助方法：配置IHubConnectionBuilder
+    /// <summary>
+    /// 对一个<see cref="IHubConnectionBuilder"/>进行基本配置
+    /// </summary>
+    /// <param name="builder">要进行配置的<see cref="IHubConnectionBuilder"/></param>
+    /// <param name="uri">Hub中心的绝对Uri</param>
+    /// <returns></returns>
+    public static void ConfigureHubConnectionBuilder(IHubConnectionBuilder builder, string uri)
+    {
+        builder.WithUrl(uri, op =>
+        {
+            op.UseStatefulReconnect = true;
+        }).
+        AddMessagePackProtocol().
+        WithAutomaticReconnect();
+    }
     #endregion
     #endregion
     #region 创建IUriManager
     /// <summary>
-    /// 创建一个<see cref="IUriManager"/>对象，
+    /// 创建一个<see cref="IHostProvide"/>对象，
     /// 它可以用来管理本机Uri
     /// </summary>
-    /// <param name="host">本机完整绝对Uri</param>
+    /// <param name="host">本机的Host地址</param>
     /// <returns></returns>
-    public static IUriManager UriManager(string host)
-        => new UriManager()
+    public static IHostProvide HostProvide(string host)
+        => new HostProvide()
         {
-            Uri = host
+            Host = host
         };
     #endregion
     #region 创建HttpRequestTransform
@@ -85,7 +102,7 @@ public static class CreateNet
     /// 如果当前请求没有指定基路径，
     /// 它可以自动为其添加一个
     /// </summary>
-    /// <param name="baseUri"></param>
+    /// <param name="baseUri">请求的基路径，它一般是应用的Host</param>
     /// <returns></returns>
     public static HttpRequestTransform TransformBaseUri(string baseUri)
         => (request) =>

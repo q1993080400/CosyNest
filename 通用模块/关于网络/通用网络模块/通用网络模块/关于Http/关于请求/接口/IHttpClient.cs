@@ -19,24 +19,17 @@ public interface IHttpClient
       而且经常在多个线程甚至整个应用中共享同一个HttpClient对象，
       这种操作非常危险，而本接口的所有API都是纯函数，消除了这个问题
 
-      同时，本接口使用IHttpRequestRecording来封装提交Http请求的信息，
-      根据推荐做法，通常使用该接口的实现HttpRequestRecording，
+      同时，本接口使用HttpRequestRecording来封装提交Http请求的信息，
       它是一个记录，通过C#9.0新支持的with表达式，能够更加方便的替换请求内容的任何部分
     
-      问：在本接口的早期版本，曾提供了一些API，
-      发起请求并将结果转换为文本，Json等对象直接返回，
-      这些方法非常方便，但是为什么后来被删除了？
-      答：出于以下原因：
-
-      #根据对象职责明确原则，本类型只负责发起请求，而不负责解释请求的结果，
-      这个职责由IHttpContent以及它的扩展方法负责执行，如果由本类型负责这个任务的话，
-      会导致接口非常臃肿，例如，必须为Get和Post方法分别声明返回文本，Json的方法
-    
-      #本类型发起Http请求的方法返回IHttpResponse，
-      它携带了有关错误码等等的信息，很多时候需要这些信息*/
+      问：本接口返回Json对象的请求都是直接返回IDirect，
+      为什么将响应序列化为其他对象返回？
+      答：因为这些API是为了请求不在你控制下的接口而设计的，
+      往往需要二次封装响应结果，返回不需要事先声明的IDirect更加适合，
+      如果你请求的接口就在你自己的服务器上，那么你应该使用强类型Http请求，
+      它更加方便，而且可以返回具体的Json对象*/
     #endregion
-    #region 发起Http请求（指定IHttpRequestRecording）
-    #region 直接返回IHttpResponse
+    #region 直接返回HttpResponseMessage 
     /// <summary>
     /// 发起Http请求，并返回结果
     /// </summary>
@@ -46,7 +39,56 @@ public interface IHttpClient
     /// 注意：默认配置不等于不进行转换</param>
     /// <param name="cancellationToken">一个用于取消操作的令牌</param>
     /// <returns>Http请求的结果</returns>
-    Task<IHttpResponse> Request(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default);
+    Task<HttpResponseMessage> Request(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default);
+    #endregion
+    #region 返回Json对象
+    /// <summary>
+    /// 发起Http请求，并将结果反序列化为<see cref="IDirect"/>对象返回
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="RequestJsonPost{Obj}(string, Obj, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?, CancellationToken)"/>
+    async Task<IDirect> RequestJson(HttpRequestRecording request, HttpRequestTransform? transformation = null, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        using var response = await Request(request, transformation, cancellationToken);
+        var newOptions = options.CanConverter(typeof(IDirect)) ?
+           options : CreateDesign.JsonCommonOptions(JsonSerializerDefaults.Web);
+        return await response.Content.ReadFromJsonAsync<IDirect>(newOptions, cancellationToken) ?? CreateDesign.DirectEmpty();
+    }
+    #endregion
+    #region 发起Get请求，并返回Json对象
+    /// <summary>
+    /// 发起Get请求，并将结果反序列化为<see cref="IDirect"/>对象返回
+    /// </summary>
+    /// <param name="uri">请求的Uri</param>
+    /// <param name="parameters">枚举请求的参数名称和值（如果有）</param>
+    /// <param name="options">用来执行序列化的对象，
+    /// 就算为<see langword="null"/>，它仍自带有对<see cref="IDirect"/>的支持</param>
+    /// <inheritdoc cref="Request(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
+    Task<IDirect> RequestJsonGet(string uri, (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null,
+        JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        => RequestJson(new HttpRequestRecording()
+        {
+            Uri = new(uri, parameters)
+        }, transformation, options, cancellationToken);
+    #endregion
+    #region 发起Post请求，并返回Json对象
+    /// <summary>
+    /// 发起Post请求，并将结果反序列化为<see cref="IDirect"/>对象返回
+    /// </summary>
+    /// <param name="content">这个对象会被序列化，并放在请求体的内部</param>
+    /// <typeparam name="Obj">请求参数的类型</typeparam>
+    /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?,CancellationToken)"/>
+    async Task<IDirect> RequestJsonPost<Obj>(string uri, Obj content, (string Parameter, string? Value)[]? parameters = null,
+       HttpRequestTransform? transformation = null, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var requestRecording = new HttpRequestRecording()
+        {
+            Uri = new(uri, parameters),
+            HttpMethod = HttpMethod.Post,
+            Content = JsonContent.Create(content, null, options)
+        };
+        return await RequestJson(requestRecording, transformation, options, cancellationToken);
+    }
     #endregion
     #region 返回IBitRead
     /// <summary>
@@ -55,43 +97,8 @@ public interface IHttpClient
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="Request(HttpRequestRecording, HttpRequestTransform?, CancellationToken)"/>
-    /// <inheritdoc cref="Request(string, ValueTuple{string, string}[], HttpRequestTransform?, CancellationToken)"/>
+    /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?,CancellationToken)"/>
     Task<IBitRead> RequestBitRead(string uri, CancellationToken cancellationToken = default);
-    #endregion
-    #endregion
-    #region 发起Http请求（指定Uri）
-    #region 直接返回IHttpResponse
-    /// <param name="uri">请求的Uri</param>
-    /// <param name="parameters">枚举请求的参数名称和值（如果有）</param>
-    /// <inheritdoc cref="Request(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
-    Task<IHttpResponse> Request(string uri, (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
-        => Request(new HttpRequestRecording(uri, parameters), transformation, cancellationToken);
-    #endregion
-    #region Post请求
-    /// <summary>
-    /// 发起Post请求，并返回结果
-    /// </summary>
-    /// <param name="content">这个对象会被序列化，并放在请求体的内部</param>
-    /// <param name="options">用来序列化<paramref name="content"/>的对象，
-    /// 就算为<see langword="null"/>，它仍自带有对<see cref="IDirect"/>的支持</param>
-    /// <param name="parameters">请求的Uri参数名称和值，
-    /// 是的，即便是Post请求，它也可以包含Uri参数</param>
-    /// <inheritdoc cref="Request(string, ValueTuple{string,string}[],HttpRequestTransform?, CancellationToken)"/>
-    async Task<IHttpResponse> RequestPost(string uri, object content, JsonSerializerOptions? options = null,
-        (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
-    {
-        var json = JsonContent.Create(content, options: options ?? CreateDesign.JsonCommonOptions);
-#if DEBUG
-        var jsonText = await json.ReadAsStringAsync(cancellationToken);
-#endif
-        var request = new HttpRequestRecording(uri, parameters) with
-        {
-            HttpMethod = HttpMethod.Post,
-            Content = await json.ToHttpContent()
-        };
-        return await Request(request, transformation, cancellationToken);
-    }
-    #endregion
     #endregion
     #region 强类型Http请求
     /// <summary>
@@ -99,7 +106,7 @@ public interface IHttpClient
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="IHttpStrongTypeRequest{API}"/>
-    IHttpStrongTypeRequest<API> RequestStrongType<API>()
+    IHttpStrongTypeRequest<API> StrongType<API>()
         where API : class;
     #endregion
 }

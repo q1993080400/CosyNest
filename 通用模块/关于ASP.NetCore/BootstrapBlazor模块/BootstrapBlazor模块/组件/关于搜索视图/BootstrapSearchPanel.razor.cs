@@ -50,7 +50,12 @@ public sealed partial class BootstrapSearchPanel<BusinessInterface> : ComponentB
     /// <inheritdoc cref="SearchPanel.Submit"/>
     [Parameter]
     [EditorRequired]
-    public Func<SearchPanelSubmitInfo, Task> Submit { get; set; }
+    public EventCallback<SearchPanelSubmitInfo> Submit { get; set; }
+    #endregion
+    #region 清除搜索后发生的事件
+    /// <inheritdoc cref="SearchPanel.OnClear"/>
+    [Parameter]
+    public Func<Task>? OnClear { get; set; }
     #endregion
     #endregion
     #endregion

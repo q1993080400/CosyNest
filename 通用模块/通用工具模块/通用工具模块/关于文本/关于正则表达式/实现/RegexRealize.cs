@@ -31,9 +31,9 @@ sealed class RegexRealize(string regexText, RegexOptions options) : IRegex
     public (bool IsMatch, IMatch[] Matches) Matches(string? text)
     {
         if (text is null)
-            return (false, Array.Empty<IMatch>());
+            return (false, []);
         var matcher = Regex.Matches(text, RegexText, Options).Select(x => new RegexMatch(x, RegexText)).ToArray();
-        return (matcher.Length != 0, matcher);
+        return (matcher.Length is not 0, matcher);
     }
     #endregion
     #region 返回唯一一个匹配到的结果
@@ -42,8 +42,8 @@ sealed class RegexRealize(string regexText, RegexOptions options) : IRegex
         var matchs = Regex.Matches(text, RegexText, Options);
         return matchs switch
         {
-            [] => null,
-            [var match] => new RegexMatch(match, RegexText),
+        [] => null,
+        [var match] => new RegexMatch(match, RegexText),
             _ => throw new ArgumentException($"""正则表达式"{RegexText}"对文本"{text}"的匹配找到了多个结果""")
         };
     }

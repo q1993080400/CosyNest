@@ -54,19 +54,16 @@ public static class ExtendDingDingClient
     /// 如果为<see langword="null"/>，会退出登录</param>
     /// <param name="jsWindow">JS运行时对象</param>
     /// <returns></returns>
-    public static async Task PersistenceAuthorizationState(this AuthorizationDingDingState? state, IJSWindow jsWindow)
+    public static async Task PersistenceAuthenticationState(this AuthenticationDingDingState? state, IJSWindow jsWindow)
     {
-        switch (state)
+        if (state is { Passed: true, AuthenticationResult: { } result })
         {
-            case null:
-                await jsWindow.LogOutDingDing();
-                break;
-            case { AuthenticationState: { Passed: true, AuthenticationResult: { } result } }:
-                var key = ToolAuthenticationDingDing.AuthenticationKey;
-                var json = JsonSerializer.Serialize(result);
-                await jsWindow.LocalStorage.IndexAsync.Set(key, json);
-                break;
+            var key = ToolAuthenticationDingDing.AuthenticationKey;
+            var json = JsonSerializer.Serialize(result);
+            await jsWindow.LocalStorage.IndexAsync.Set(key, json);
+            return;
         }
+        await jsWindow.LogOutDingDing();
     }
     #endregion
 }

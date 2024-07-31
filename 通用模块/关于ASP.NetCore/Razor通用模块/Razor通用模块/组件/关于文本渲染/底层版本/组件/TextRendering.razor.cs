@@ -44,12 +44,10 @@ public sealed partial class TextRendering : ComponentBase, IContentComponent<Ren
     /// <summary>
     /// 识别文本，将其中的普通文本和Uri分离出来
     /// </summary>
+    /// <param name="text">要识别的文本</param>
     /// <returns></returns>
-    private IEnumerable<(bool IsUri, string Text)> IdentifyUri()
+    private static IEnumerable<(bool IsUri, string Text)> IdentifyUri(string text)
     {
-        var text = Value?.ToString();
-        if (text is null)
-            yield break;
         var match = RegexUri.Matches(text).Matches;
         var pos = 0;
         foreach (var item in match)
@@ -137,20 +135,31 @@ public sealed partial class TextRendering : ComponentBase, IContentComponent<Ren
     /// <returns></returns>
     private IEnumerable<(RenderTextType RenderTextType, string Text)> Identify()
     {
+        var value = Value?.ToString();
+        if (value is null)
+            yield break;
         var regexHighlight = RegexHighlight;
-        foreach (var (isUri, text) in IdentifyUri())
+        var splitLineBreak = value.Split(Environment.NewLine);
+        foreach (var (_, notLineBreakText, isLast) in splitLineBreak.PackIndex())
         {
-            if (isUri)
+            foreach (var (isUri, text) in IdentifyUri(notLineBreakText))
             {
-                yield return (RenderTextType.Uri, text);
-            }
-            else
-            {
-                foreach (var (isHighlight, text1) in IdentifyHighlight(text, regexHighlight))
+                if (isUri)
                 {
-                    var type = isHighlight ? RenderTextType.Highlight : RenderTextType.Normal;
-                    yield return (type, text1);
+                    yield return (RenderTextType.Uri, text);
                 }
+                else
+                {
+                    foreach (var (isHighlight, text1) in IdentifyHighlight(text, regexHighlight))
+                    {
+                        var type = isHighlight ? RenderTextType.Highlight : RenderTextType.Normal;
+                        yield return (type, text1);
+                    }
+                }
+            }
+            if (!isLast)
+            {
+                yield return (RenderTextType.LineBreak, "");
             }
         }
     }

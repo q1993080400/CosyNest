@@ -22,7 +22,7 @@ public static partial class ExtendWebApi
     /// <param name="options">待添加支持的Mvc配置</param>
     public static void AddFormatterJson(this MvcOptions options)
     {
-        var jsonConvert = CreateDesign.JsonCommonOptions;
+        var jsonConvert = CreateDesign.JsonCommonOptions();
         options.InputFormatters.Insert(0, InputFormatterJson(jsonConvert));
         options.OutputFormatters.Insert(0, OutputFormatterJson(jsonConvert));
     }

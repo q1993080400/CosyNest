@@ -26,10 +26,15 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
         long? nextToken = 0L;
         while (nextToken is { })
         {
-            var request = new HttpRequestRecording($"https://api.dingtalk.com/v1.0/workflow/processes/userVisibilities/templates",
-                [("userId", userId), ("maxResults", "100"), ("nextToken", nextToken.ToString())]);
+            var request = new HttpRequestRecording()
+            {
+                Uri = new($"https://api.dingtalk.com/v1.0/workflow/processes/userVisibilities/templates")
+                {
+                    UriParameter = new([("userId", userId), ("maxResults", "100"), ("nextToken", nextToken.ToString())])
+                }
+            };
             await Delay();
-            var response = await http.Request(request, TransformAccessToken(accessToken)).Read(x => x.ToObject());
+            var response = await http.RequestJson(request, TransformAccessToken(accessToken));
             var list = response.GetValue<object[]>("result.processList")?.Cast<IDirect>().ToArray();
             if (list is null)
                 yield break;
@@ -85,8 +90,8 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
                 })
             };
             await Delay();
-            var response = await http.RequestPost("https://api.dingtalk.com/v1.0/workflow/processes/instanceIds/query",
-                postParameter, transformation: TransformAccessToken(accessToken)).Read(x => x.ToObject());
+            var response = await http.RequestJsonPost("https://api.dingtalk.com/v1.0/workflow/processes/instanceIds/query",
+                postParameter, transformation: TransformAccessToken(accessToken));
             response = VerifyResponse(response);
             var success = response.GetValue<bool>("success", false);
             if (!success)
@@ -114,9 +119,8 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
         var accessToken = await GetCompanyToken();
         var http = ServiceProvider.GetRequiredService<IHttpClient>();
         await Delay();
-        var response = await http.Request("https://api.dingtalk.com/v1.0/workflow/processInstances",
-            [("processInstanceId", instanceID)], transformation: TransformAccessToken(accessToken)).
-            Read(x => x.ToObject());
+        var response = await http.RequestJsonGet("https://api.dingtalk.com/v1.0/workflow/processInstances",
+            [("processInstanceId", instanceID)], transformation: TransformAccessToken(accessToken));
         return ConvertInstance(response, instanceID);
     }
     #endregion
@@ -322,13 +326,12 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
         var accessToken = await GetCompanyToken();
         var http = ServiceProvider.GetRequiredService<IHttpClient>();
         await Delay();
-        var response = await http.RequestPost("https://api.dingtalk.com/v1.0/workflow/processInstances/spaces/files/urls/download",
+        var response = await http.RequestJsonPost("https://api.dingtalk.com/v1.0/workflow/processInstances/spaces/files/urls/download",
             new
             {
                 processInstanceId = instanceID,
                 fileId = fileID,
-            }, transformation: TransformAccessToken(accessToken)).
-            Read(x => x.ToObject());
+            }, transformation: TransformAccessToken(accessToken));
         var result = response.GetValue<IDirect>("result", false);
         if (result is null && response.GetValue<string>("code", false) is "userNotExist")
             return null;

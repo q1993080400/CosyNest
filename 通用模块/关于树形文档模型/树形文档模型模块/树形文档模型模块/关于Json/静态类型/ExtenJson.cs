@@ -1,5 +1,6 @@
 ﻿using System.Design;
 using System.Design.Direct;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -33,8 +34,8 @@ public static class ExtenJson
     /// <param name="options">要检查的<see cref="JsonSerializerOptions"/></param>
     /// <param name="converterType">待转换的类型</param>
     /// <returns></returns>
-    public static bool CanConverter(this JsonSerializerOptions options, Type converterType)
-        => options.GetConverter(converterType) is { };
+    public static bool CanConverter([NotNullWhen(true)] this JsonSerializerOptions? options, Type converterType)
+        => options?.GetConverter(converterType) is { };
     #endregion
     #endregion
     #region 关于读取Json

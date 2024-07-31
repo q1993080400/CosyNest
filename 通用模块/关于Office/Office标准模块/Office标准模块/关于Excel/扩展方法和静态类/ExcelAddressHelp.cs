@@ -174,6 +174,20 @@ public static partial class ExcelRealizeHelp
     #endregion
     #endregion
     #region 解析地址
+    #region 指示是否为R1CR1地址
+    /// <summary>
+    /// 如果一个地址是R1CR地址，返回<see langword="true"/>，
+    /// 是A1地址，返回<see langword="false"/>，
+    /// 不是地址，返回<see langword="null"/>
+    /// </summary>
+    /// <param name="address">要检查的地址</param>
+    /// <returns></returns>
+    public static bool? IsR1C1Address(string address)
+        => MatchR1C1Abs.IsMatch(address) ?
+        true :
+        MatchA1.IsMatch(address) ?
+        false : null;
+    #endregion
     #region 返回行列数
     /// <summary>
     /// 根据A1地址，返回开始和结束的行列数，

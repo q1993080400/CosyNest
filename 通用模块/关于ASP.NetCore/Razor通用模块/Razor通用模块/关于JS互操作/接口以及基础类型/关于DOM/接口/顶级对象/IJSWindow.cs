@@ -28,12 +28,20 @@ public interface IJSWindow : IJSRuntime
     #endregion
     #endregion
     #region 关于存储
-    #region 返回本地存储对象
+    #region 本地存储
     /// <summary>
     /// 返回一个字典，它可以用来索引浏览器本地存储，
     /// 本地存储不会过期
     /// </summary>
     IAsyncDictionary<string, string> LocalStorage { get; }
+    #endregion
+    #region 会话存储
+    /// <summary>
+    /// 返回一个字典，
+    /// 它可以用来索引浏览器会话存储，
+    /// 在关闭页面的时候，会话存储会被清除
+    /// </summary>
+    IAsyncDictionary<string, string> SessionStorage { get; }
     #endregion
     #endregion
     #region 返回Document对象
@@ -92,7 +100,7 @@ public interface IJSWindow : IJSRuntime
     /// <param name="strWindowFeatures">新窗口的一些特性</param>
     /// <param name="cancellation">用于取消异步操作的令牌</param>
     /// <returns></returns>
-    ValueTask Open(string strUrl, string strWindowName = "_blank", string? strWindowFeatures = "noopener", CancellationToken cancellation = default);
+    ValueTask Open(string strUrl, string strWindowName = "_blank", string strWindowFeatures = "noopener", CancellationToken cancellation = default);
 
     /*问：为什么要将strWindowFeatures参数默认传入noopener？
       答：这是为了强制在不同的进程打开新窗口，这可以避免旧窗口卡死的问题，

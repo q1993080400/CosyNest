@@ -42,7 +42,7 @@ public interface IExcelBook : IFromIO
     /// 返回Office打印对象，
     /// 它可以用来打印整个工作簿
     /// </summary>
-    IOfficePrint Print { get; }
+    IWorkBookPage Print { get; }
     #endregion
     #endregion
     #region 关于工作表
@@ -51,16 +51,6 @@ public interface IExcelBook : IFromIO
     /// 返回一个用来管理工作表的对象
     /// </summary>
     IExcelSheetManage SheetManage { get; }
-    #endregion
-    #region 按照索引返回工作表
-    /// <summary>
-    /// 按照索引返回工作表，
-    /// 如果索引不存在，会引发异常
-    /// </summary>
-    /// <param name="index">工作表的索引</param>
-    /// <returns></returns>
-    IExcelSheet this[int index]
-        => SheetManage.GetSheet(index);
     #endregion
     #endregion
 }

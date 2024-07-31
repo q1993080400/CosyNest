@@ -1,5 +1,4 @@
-﻿using System.IOFrancis.Bit;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 using Microsoft.AspNetCore;
 
@@ -82,18 +81,6 @@ public interface IJSDocument
     /// </summary>
     ValueTask<IElementJS?> ActiveElement { get; }
     #endregion
-    #endregion
-    #region video截图
-    /// <summary>
-    /// 对一个video进行截图，
-    /// 并以管道的形式返回截图结果，
-    /// 如果截图未能成功，返回<see langword="null"/>
-    /// </summary>
-    /// <param name="id">video的id</param>
-    /// <param name="format">截图格式</param>
-    /// <param name="cancellation">一个用来取消异步操作的令牌</param>
-    /// <returns></returns>
-    ValueTask<IBitRead?> VideoScreenshot(string id, string format = "png", CancellationToken cancellation = default);
     #endregion
     #region 返回页面的可见状态
     /// <summary>

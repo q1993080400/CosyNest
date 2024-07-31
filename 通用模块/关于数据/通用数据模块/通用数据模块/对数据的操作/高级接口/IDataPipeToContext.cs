@@ -15,11 +15,9 @@ public interface IDataPipeToContext : IDataPipeFromContext
     /// </summary>
     /// <typeparam name="Data">数据的类型</typeparam>
     /// <param name="datas">待添加或更新的数据</param>
-    /// <param name="isAdd">这个委托传入数据，返回一个布尔值，
-    /// 如果为<see langword="true"/>，表示添加数据，否则表示更新数据，
-    /// 如果不指定，则自动判断，在显式指定主键的情况下，必须显式指定这个委托，否则会出现异常</param>
+    /// <param name="info">用来添加或更新数据的参数</param>
     /// <param name="cancellation">用于取消异步操作的令牌</param>
-    Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Data, bool>? isAdd = null, CancellationToken cancellation = default)
+    Task AddOrUpdate<Data>(IEnumerable<Data> datas, AddOrUpdateInfo<Data>? info = null, CancellationToken cancellation = default)
         where Data : class;
     #endregion
     #region 关于删除数据

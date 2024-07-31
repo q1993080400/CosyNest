@@ -81,7 +81,7 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     public IBindProperty<Value> BindValue<Value>()
         => IsReadOnly ?
         new BindPropertyInfoStatic<Value>((Value)this.Value!) :
-        new BindPropertyInfo<Value>(FormModel, Property, () => OnPropertyChangeed(this));
+        new BindPropertyInfo<Value>(FormModel, Property);
     #endregion
     #region 是否仅显示
     /// <summary>
@@ -89,12 +89,5 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// 表示仅提供数据显示功能，不提供数据编辑功能
     /// </summary>
     public required bool IsReadOnly { get; init; }
-    #endregion
-    #region 数据属性改变时的委托
-    /// <summary>
-    /// 当数据属性改变时，执行这个委托，
-    /// 它的参数就是当前属性渲染参数
-    /// </summary>
-    public Func<RenderFormViewerPropertyInfoBase<Model>, Task> OnPropertyChangeed { get; init; } = static _ => Task.CompletedTask;
     #endregion
 }

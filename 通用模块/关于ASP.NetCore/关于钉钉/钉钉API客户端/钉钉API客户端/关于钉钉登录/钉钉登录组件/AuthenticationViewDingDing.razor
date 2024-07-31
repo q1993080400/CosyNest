@@ -1,0 +1,24 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@inject IJSWindow JSWindow
+@inject IHostProvide HostProvide
+@inject IHttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+@if (AuthenticationState is { })
+{
+    <CascadingValue Value="AuthenticationState">
+        <CascadingValue Value="LogOut" Name="@LogOutParameterKey">
+            <CascadingValue Value="AppInfo">
+                @if (AuthenticationState.Passed)
+                {
+                    @Authorized(AuthenticationState)
+                }
+                else
+                {
+                    @NotAuthorized(LogOut)
+                }
+            </CascadingValue>
+        </CascadingValue>
+    </CascadingValue>
+}

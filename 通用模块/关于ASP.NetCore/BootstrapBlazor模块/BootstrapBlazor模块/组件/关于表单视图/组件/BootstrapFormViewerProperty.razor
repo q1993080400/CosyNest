@@ -12,6 +12,8 @@
     var name = propertyTitle.EndsWith(':') ? propertyTitle : propertyTitle + ":";
     var property = RenderInfo.Property;
     var propertyType = property.PropertyType;
+    var renderPreference = RenderInfo.RenderPreference;
+    var format = renderPreference.Format;
     #region 获取渲染特性
     Obj? GetRenderAttribute<Obj>()
     where Obj : Attribute
@@ -25,9 +27,6 @@
 
 <div class="bootstrapFormViewerPropertyContainer">
     <div class="bootstrapFormViewerPropertyItem">
-        @{
-            var format = GetRenderAttribute<FormatAttribute>()?.Format;
-        }
         @if (RenderInfo.IsReadOnly)
         {
             #region 获取文本值的本地函数
@@ -52,7 +51,7 @@
                 <div class="bootstrapFormViewerPropertyLabel">@name</div>
                 <pre class="bootstrapFormViewerPropertyText">
                 <TextRenderingSimple Highlight="Highlight" Value="text" />
-                                                </pre>
+                                                                                                                        </pre>
             </div>
         }
         else
@@ -61,14 +60,14 @@
             {
                 case var t when t == typeof(string):
                     var valueText = RenderInfo.BindValue<string>();
-                    var stringRender = GetRenderAttribute<FormRenderStringAttribute>();
-                    @switch (stringRender?.Render ?? FormStringRender.SingleLineText)
+                    var stringRender = renderPreference.RenderString;
+                    @switch (stringRender)
                     {
-                        case FormStringRender.SingleLineText:
+                        case FormStringRender.Default or FormStringRender.SingleLineText:
                             <BootstrapInput TValue="string" ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value />
                             break;
                         case FormStringRender.LongText:
-                            <Textarea ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value rows="@(stringRender?.Rows??4)" />
+                            <Textarea ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value rows="@(renderPreference.RenderLongTextRows)" />
                             break;
                         case FormStringRender.Password:
                             <BootstrapInput ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value type="password" />
@@ -78,9 +77,8 @@
                     }
                     break;
                 case var t when t.IsNum():
-                    var numRender = GetRenderAttribute<FormRenderNumAttribute>();
+                    var numRender = renderPreference.RenderNum;
                     var verifyInterval = GetRenderAttribute<VerifyIntervalAttribute>();
-                    var renderMode = numRender?.Render ?? FormNumRender.Num;
                     #region 渲染字段
                     void Render<T>()
                     where T : struct, IParsable<T>
@@ -89,14 +87,14 @@
                         var min = T.TryParse(minText, null, out var _) ? minText : null;
                         var maxText = verifyInterval?.Max.ToString();
                         var max = T.TryParse(maxText, null, out var _) ? maxText : null;
-                        @switch (renderMode)
+                        @switch (numRender)
                         {
-                            case FormNumRender.Num:
+                            case FormNumRender.Default or FormNumRender.Num:
                                 var value = RenderInfo.BindValue<T>();
                                 <BootstrapInputNumber TValue="T" ShowLabel="true"
                                                       Max="@max" Min="@min"
                                                       DisplayText="@name" @bind-Value=value.Value
-                                                      FormatString="@(format.IsVoid()?Tool.FormattedNumCommon:format)" />
+                                                      FormatString="@(format??Tool.FormattedNumCommon)" />
                                 break;
                             case FormNumRender.Grade when typeof(T) == typeof(double):
                                 var v = RenderInfo.BindValue<double>();
@@ -125,18 +123,17 @@
                             Render<decimal>();
                             break;
                         case var _:
-                            throw Throw(renderMode);
+                            throw Throw(numRender);
                     }
                     break;
                 case var t when t == typeof(bool):
-                    var boolDescribe = GetRenderAttribute<FormRenderBoolAttribute>();
-                    var trueDescribe = boolDescribe?.DescribeTrue ?? "打开";
-                    var flaseDescribe = boolDescribe?.DescribeFalse ?? "关闭";
-                    var boolRender = boolDescribe?.Render ?? FormBoolRender.Radio;
+                    var boolRender = renderPreference.RenderBool;
+                    var trueDescribe = "打开";
+                    var flaseDescribe = "关闭";
                     var valueBool = RenderInfo.BindValue<bool>();
                     switch (boolRender)
                     {
-                        case FormBoolRender.Radio:
+                        case FormBoolRender.Default or FormBoolRender.Radio:
                             var boolSelect = new SelectedItem[]
                             {
         new ()
@@ -160,6 +157,15 @@
                     }
                     break;
                 case { IsEnum: true } t:
+                    var enumRender = renderPreference.RenderEnum;
+                    Func<int, Task>? onEnumChange =
+                    this.OnPropertyChange is null ?
+                    null :
+                    async value =>
+                    {
+                        var enumValue = value.To(RenderInfo.ValueType);
+                        await this.OnPropertyChange(enumValue);
+                    };
                     var enumSelect = Enum.GetNames(t).
                     Select(x => t.GetField(x)!).
                     Where(x => !x.HasAttributes<NotMappedAttribute>()).
@@ -175,7 +181,17 @@
                             Value = x.Item1.ToString()
                         }).ToArray();
                     var valueEnum = RenderInfo.BindValue<int>();
-                    <RadioList Items="enumSelect" TValue="int" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value />
+                    @switch (enumRender)
+                    {
+                        case FormEnumRender.Default or FormEnumRender.Radio:
+                            <RadioList Items="enumSelect" TValue="int" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value OnValueChanged="onEnumChange!" />
+                            break;
+                        case FormEnumRender.Select:
+                            <Select Items="enumSelect" TValue="int" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value OnValueChanged="onEnumChange!" />
+                            break;
+                        case var r:
+                            throw Throw(r);
+                    }
                     break;
                 case var t when t == typeof(DateTimeOffset):
                     var formatDate = format.IsVoid() ? "d" : format;

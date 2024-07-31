@@ -4,11 +4,8 @@
 ///  在实现<see cref="IExcelSheet"/>时，可以继承自本类型，
 ///  以减少重复的操作
 /// </summary>
-/// <remarks>
-/// 将指定的工作簿封装进工作表中
-/// </remarks>
-/// <param name="book">指定的工作簿</param>
-public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
+/// <param name="sheetManage">工作表管理对象</param>
+public abstract class ExcelSheet(IExcelSheetManage sheetManage) : IExcelSheet
 {
     #region 关于单元格
     #region 返回工作表的所有单元格
@@ -30,8 +27,11 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     #endregion
     #endregion
     #region 关于工作簿与工作表
+    #region 返回工作表管理对象
+    public IExcelSheetManage SheetManage { get; } = sheetManage;
+    #endregion
     #region 返回工作表所在的工作薄
-    public IExcelBook Book { get; } = book;
+    public IExcelBook Book => SheetManage.Book;
     #endregion
     #region 获取或设置工作表的名称
     public abstract string Name { get; set; }
@@ -48,12 +48,12 @@ public abstract class ExcelSheet(IExcelBook book) : IExcelSheet
     #endregion
     #endregion
     #region 返回页面
-    public abstract IPageSheet Page { get; }
+    public abstract ISheetPage Page { get; }
     #endregion
     #endregion
     #region 关于Excel对象
     #region 返回用来管理图表的对象
-    public abstract IOfficeChartManage ChartManage { get; }
+    public abstract IOfficeObjectManageCommon<IOfficeChart> ChartManage { get; }
     #endregion
     #endregion
     #region 重写的方法

@@ -9,7 +9,7 @@ namespace System.Office.Excel;
 /// 底层使用EPPlus实现的Excel图表管理对象
 /// </summary>
 /// <param name="drawings">Excel对象管理对象</param>
-sealed class ExcelChartManageEPPlus(ExcelDrawings drawings) : IOfficeChartManage
+sealed class ExcelChartManageEPPlus(ExcelDrawings drawings) : IOfficeObjectManageCommon<IOfficeChart>
 {
     #region 公开成员
     #region 枚举所有图表
@@ -23,5 +23,11 @@ sealed class ExcelChartManageEPPlus(ExcelDrawings drawings) : IOfficeChartManage
     public int Count
         => drawings.OfType<ExcelChart>().Count();
     #endregion
+    #endregion
+    #region 未实现的成员
+    public IOfficeChart Add()
+    {
+        throw new NotImplementedException();
+    }
     #endregion
 }

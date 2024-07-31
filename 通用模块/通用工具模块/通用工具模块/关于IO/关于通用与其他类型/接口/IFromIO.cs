@@ -1,6 +1,4 @@
 ﻿using System.Design;
-using System.IOFrancis.Bit;
-using System.IOFrancis.FileSystem;
 
 namespace System.IOFrancis;
 
@@ -78,24 +76,10 @@ public interface IFromIO : IInstruct, IAsyncDisposable
       但如果该工作簿尚未保存到文件中，且没有指定保存路径，
       这种情况下应该引发异常，因为这是由于调用者的疏忽导致*/
     #endregion
-    #region 返回读取对象的流
-    /// <summary>
-    /// 返回读取对象的流
-    /// </summary>
-    /// <returns></returns>
-    IBitRead Read()
-    {
-        var format = Path is { } p ? ToolPath.SplitFilePath(p).Extended : null;
-        using var temporaryFile = ToolTemporaryFile.CreateTemporaryFile(format);
-        var file = temporaryFile.TemporaryObj;
-        Save(file.Path);
-        return file.GetBitPipe().Read;
-    }
-    #endregion
     #region 是否自动保存
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
-    /// 则在执行<see cref="IDisposable.Dispose"/>方法时，还会自动保存文件，
+    /// 则在执行<see cref="IAsyncDisposable.DisposeAsync"/>方法时，还会自动保存文件，
     /// 前提是文件的路径不为<see langword="null"/>
     /// </summary>
     bool AutoSave { get; set; }

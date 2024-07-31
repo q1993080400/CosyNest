@@ -1,66 +1,87 @@
 ﻿
-/*超大屏PC平台*/
-@container (min-width : 2448px)
-{ /*属性渲染容器属性标签样式*/
-    .bootstrapFormViewerPropertyLabel
-    {
-        white-space: nowrap;
-    }
-}
-
-/*普通屏PC平台*/
-@container (min-width : 1224px) and (max-width : 2448px)
+/*超大容器，一般出现在超大屏PC平台*/
+@container (min-width : 612px)
 {
     /*属性渲染容器属性标签样式*/
     .bootstrapFormViewerPropertyLabel
     {
         white-space: nowrap;
     }
+    /*表单视图容器样式*/
+    .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
+    {
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+    /*属性渲染容器样式*/
+    .bootstrapFormViewerPropertyContainer
+    {
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
 }
 
-/*平板平台*/
-@container (min-width : 667px) and (max-width : 1224px)
+/*大容器，一般出现在普通屏PC平台*/
+@container (min-width : 306px) and (max-width : 612px)
+{
+    /*属性渲染容器属性标签样式*/
+    .bootstrapFormViewerPropertyLabel
+    {
+        white-space: nowrap;
+    }
+    /*表单视图容器样式*/
+    .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
+    {
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+    /*属性渲染容器样式*/
+    .bootstrapFormViewerPropertyContainer
+    {
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+}
+
+/*中容器，一般出现在平板平台*/
+@container (min-width : 167px) and (max-width : 306px)
 {
     /*表单视图容器样式*/
     .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
     {
-        flex-wrap: nowrap;
         flex-direction: column;
     }
     /*属性渲染容器样式*/
     .bootstrapFormViewerPropertyContainer
     {
-        flex-wrap: nowrap;
         flex-direction: column;
     }
 }
 
-/*手机平台*/
-@container (max-width : 667px)
+/*小容器，一般出现在手机平台*/
+@container (max-width : 167px)
 {
     /*表单视图容器样式*/
     .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
     {
-        flex-wrap: nowrap;
         flex-direction: column;
     }
     /*属性渲染容器样式*/
     .bootstrapFormViewerPropertyContainer
     {
-        flex-wrap: nowrap;
         flex-direction: column;
     }
+}
+
+/*禁止label内部的button元素进行交互，使label可以正确触发input的事件*/
+label button
+{
+    pointer-events: none;
 }
 
 /*表单属性容器样式*/
 .bootstrapSearchPanelPropertyContainer
 {
-}
-
-/*完美容器不拉伸的子元素样式*/
-.perfectContainer > .notStretch
-{
-    flex-grow: 0;
 }
 
 /*媒体视图容器的样式*/
@@ -88,8 +109,8 @@
     object-position: center;
 }
 
-/*表单视图顶容器样式*/
-bootstrapFormViewerTopContainer
+/*表单视图容器的父容器样式*/
+:has(> :is(.bootstrapFormViewerContainer,.bootstrapFormViewerTopContainer))
 {
     container-type: inline-size;
 }
@@ -98,7 +119,6 @@ bootstrapFormViewerTopContainer
 .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
 {
     display: flex;
-    flex-wrap: wrap;
     gap: var(--gapMedium);
 }
 
@@ -107,9 +127,14 @@ bootstrapFormViewerTopContainer
 {
     display: flex;
     flex-grow: 1;
-    flex-wrap: wrap;
     gap: var(--gapMedium);
 }
+
+    /*如果一个表单属性容器下面存在一个选择器或日期选择器组件，则它在容器中单独占一行*/
+    .bootstrapFormViewerPropertyContainer:has( :where(.dropdown-toggle,.datetime-range))
+    {
+        width: 100%;
+    }
 
 /*属性渲染容器元素样式*/
 .bootstrapFormViewerPropertyItem
@@ -161,4 +186,30 @@ bootstrapFormViewerTopContainer
     gap: var(--gapMedium);
     grid-template-columns: repeat(auto-fit,14ic);
     max-width: var(--maxPopUpWidth);
+}
+
+/*弹窗下页头或页脚样式*/
+dialog :is(.card-header,.card-footer)
+{
+    position: sticky;
+    z-index: 1;
+    background-color: rgb(248,248,248);
+}
+
+/*弹窗下页头样式*/
+dialog .card-header
+{
+    top: 0px;
+}
+
+/*弹窗下的页脚样式*/
+dialog .card-footer
+{
+    bottom: 0px;
+}
+
+/*递归地设置弹出窗的父容器的z-index，确保弹出窗不会被遮盖*/
+:has( .dropdown-menu.show)
+{
+    z-index: 999;
 }

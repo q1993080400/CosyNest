@@ -32,7 +32,7 @@ public static class ToolBootstrapCRUD
             if (!confirm)
                 return false;
         }
-        var response = await httpClient.RequestStrongType<Interface>().
+        var response = await httpClient.StrongType<Interface>().
             Request(x => x.Delete(ids));
         if (await swalService.ShowIfFailure(response))
         {

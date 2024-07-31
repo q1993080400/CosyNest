@@ -1,0 +1,10 @@
+﻿@namespace BootstrapBlazor.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inherits ComponentBase
+
+<FileUpload OnSelectFile="OnSelectFile" OnUploadStatusChange="OnUploadStatusChange">
+    <label class="@context.PreventDuplicationCSS" for="@ID">
+        @ChildContent(context.InUpload)
+        <InputFile OnChange="@context.OnChange" multiple="@Multiple" accept="@Accept" id="@ID" />
+    </label>
+</FileUpload>

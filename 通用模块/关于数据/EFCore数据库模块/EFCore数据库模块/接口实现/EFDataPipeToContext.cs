@@ -16,16 +16,18 @@ sealed class EFDataPipeToContext(DbContext dbContext) : IDataPipeToContext
         => dbContext.Set<Data>();
     #endregion
     #region 添加或更新数据
-    public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, Func<Data, bool>? isAdd = null, CancellationToken cancellation = default)
+    public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, AddOrUpdateInfo<Data>? info = null, CancellationToken cancellation = default)
         where Data : class
     {
-        if (datas is IEnumerable<IUpdateBusinessProperty> updateBusinessPropertys)
+        info ??= new();
+        if ((info, datas) is ({ UpdateBusinessProperty: true }, IEnumerable<IUpdateBusinessProperty> updateBusinessPropertys))
         {
             foreach (var item in updateBusinessPropertys)
             {
-                item.UpdateBusinessProperty([]);
+                item.UpdateBusinessProperty();
             }
         }
+        var isAdd = info.IsAddData;
         if (isAdd is null)
         {
             dbContext.UpdateRange(datas);

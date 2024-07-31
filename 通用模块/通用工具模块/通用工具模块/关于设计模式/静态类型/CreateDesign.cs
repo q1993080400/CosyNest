@@ -86,14 +86,13 @@ public static class CreateDesign
     /// 返回一个<see cref="JsonSerializerOptions"/>，
     /// 它包含所有在<see cref="JsonCommon"/>中的转换器
     /// </summary>
+    /// <param name="jsonSerializerDefaults">指示序列化的选项</param>
     public static JsonSerializerOptions JsonCommonOptions
+        (JsonSerializerDefaults jsonSerializerDefaults = JsonSerializerDefaults.General)
     {
-        get
-        {
-            var options = new JsonSerializerOptions();
-            options.Converters.Add(JsonCommon);
-            return options;
-        }
+        var options = new JsonSerializerOptions(jsonSerializerDefaults);
+        options.Converters.Add(JsonCommon);
+        return options;
     }
     #endregion
 }

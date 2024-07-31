@@ -1,11 +1,8 @@
 ﻿using System.DataFrancis;
 using System.IOFrancis;
 using System.IOFrancis.BaseFileSystem;
-using System.NetFrancis;
-using System.NetFrancis.Http;
 
 using Microsoft.AspNetCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace System;
 
@@ -49,19 +46,6 @@ public static class ExtendASP
         var son = directory.Son.OfType<IFileBase>().Select(x => x.Path).ToArray();
         return analysis(son);
     }
-    #endregion
-    #region 关于依赖注入
-    #region 注入IUriManager
-    /// <summary>
-    /// 以单例模式注入一个<see cref="IUriManager"/>，
-    /// 它可以用于管理本机Uri
-    /// </summary>
-    /// <param name="services">待注入的服务容器</param>
-    /// <param name="baseUri">本地主机的Uri</param>
-    /// <returns></returns>
-    public static IServiceCollection AddUriManager(this IServiceCollection services, string baseUri)
-        => services.AddSingleton(_ => CreateNet.UriManager(baseUri));
-    #endregion
     #endregion
     #region 获取逻辑运算符
     /// <summary>

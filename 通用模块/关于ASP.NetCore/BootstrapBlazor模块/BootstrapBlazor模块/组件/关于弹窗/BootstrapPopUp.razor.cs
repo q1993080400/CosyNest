@@ -3,17 +3,13 @@
 namespace BootstrapBlazor.Components;
 
 /// <summary>
-/// 这个组件是底层使用Bootstrap实现的弹窗
+/// 这个组件是底层使用Bootstrap实现的弹窗，
+/// 它只要渲染，就默认打开，
+/// 如果不需要打开，就应该不渲染它
 /// </summary>
 public sealed partial class BootstrapPopUp : ComponentBase
 {
     #region 组件参数
-    #region 是否开启
-    /// <inheritdoc cref="PopUp.IsOpen"/>
-    [Parameter]
-    [EditorRequired]
-    public bool IsOpen { get; set; }
-    #endregion
     #region 标题
     /// <inheritdoc cref="PopUp.Title"/>
     [Parameter]

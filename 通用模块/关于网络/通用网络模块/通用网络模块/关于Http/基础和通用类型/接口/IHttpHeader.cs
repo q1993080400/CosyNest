@@ -1,4 +1,6 @@
-﻿namespace System.NetFrancis.Http;
+﻿using System.Net.Http.Headers;
+
+namespace System.NetFrancis.Http;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -13,5 +15,21 @@ public interface IHttpHeader
     /// </summary>
     /// <returns></returns>
     IReadOnlyDictionary<string, IEnumerable<string>> Headers { get; }
+    #endregion
+    #region 自定义对象标头
+    /// <summary>
+    /// 获取一个封装自定义Json对象的标头
+    /// </summary>
+    IObjectHeaderValue? ObjectHeaderValue { get; }
+    #endregion
+    #region 将标头复制到HttpHeaders
+    /// <summary>
+    /// 将本对象的所有标头复制到另一个<see cref="HttpHeaders"/>中，
+    /// 然后返回这个<see cref="HttpHeaders"/>
+    /// </summary>
+    /// <typeparam name="Headers">Http标头的类型</typeparam>
+    /// <param name="header">本对象的所有标头将被复制到这个参数中</param>
+    Headers CopyHeader<Headers>(Headers header)
+        where Headers : HttpHeaders;
     #endregion
 }

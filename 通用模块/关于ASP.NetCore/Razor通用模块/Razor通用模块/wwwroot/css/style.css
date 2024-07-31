@@ -16,7 +16,7 @@
         /*列表容器的较多数量*/
         --arrangeParticleMost: 6;
         /*最大弹窗宽度*/
-        --maxPopUpWidth: 72ic;
+        --maxPopUpWidth: 60vw;
     }
 }
 
@@ -37,7 +37,7 @@
         /*列表容器的较多数量*/
         --arrangeParticleMost: 5;
         /*最大弹窗宽度*/
-        --maxPopUpWidth: 54ic;
+        --maxPopUpWidth: 70vw;
     }
 }
 
@@ -58,7 +58,7 @@
         /*列表容器的较多数量*/
         --arrangeParticleMost: 4;
         /*最大弹窗宽度*/
-        --maxPopUpWidth: 36ic;
+        --maxPopUpWidth: 80vw;
     }
 }
 
@@ -79,7 +79,7 @@
         /*列表容器的较多数量*/
         --arrangeParticleMost: 2;
         /*最大弹窗宽度*/
-        --maxPopUpWidth: 18ic;
+        --maxPopUpWidth: 90vw;
     }
 }
 
@@ -170,19 +170,19 @@ dialog
     padding: unset;
 }
 
-/*完美容器样式，它的子元素依次排列，且平分所有剩余空间，但最后一个元素除外*/
+/*文件上传器样式*/
+input[type=file]
+{
+    display: none;
+}
+
+/*完美容器样式，它的子元素依次排列，允许换行*/
 .perfectContainer
 {
     display: flex;
     flex-wrap: wrap;
     gap: var(--gapMedium);
 }
-
-    /*完美容器直接子元素样式*/
-    .perfectContainer > *
-    {
-        flex-grow: 1;
-    }
 
 /*占满屏幕，并且在横屏时自动旋转*/
 .horizontalScreen
@@ -193,17 +193,23 @@ dialog
     box-sizing: border-box;
 }
 
-/*平等容器样式，它的子元素平分空间*/
-.equalityContainers
+/*平分容器样式，它的子元素平分空间*/
+.bisectContainers
 {
     display: flex;
 }
 
-    /*平等容器直接子元素样式*/
-    .equalityContainers > *
+    /*平分容器直接子元素样式*/
+    .bisectContainers > *
     {
         flex-grow: 1;
     }
+
+/*不平分样式*/
+.notBsect
+{
+    flex-grow: 0;
+}
 
 /*普通容器样式*/
 .commonContainers
@@ -230,8 +236,8 @@ dialog
     padding: var(--topLayoutPaddingVertical) var(--topLayoutPaddingHorizontal);
 }
 
-/*粘性定位页头样式*/
-.stickyHead
+/*粘性定位样式*/
+.sticky
 {
     position: sticky;
     top: 0px;
@@ -239,10 +245,16 @@ dialog
 }
 
 /*粘性定位父容器样式*/
-:has(> .stickyHead)
+:has(> .sticky)
 {
     isolation: isolate;
 }
+
+    /*粘性定位父容器的每一个子元素样式，它保证粘性定位不会被遮盖*/
+    :has(> .sticky) > *
+    {
+        isolation: isolate;
+    }
 
 /*豆腐块组件容器的CSS样式*/
 .tofuCubesContainer
@@ -421,4 +433,42 @@ div.autoPlayButtonCntainer > *:first-child
 .selectElementText
 {
     width: max-content;
+}
+
+/*禁止鼠标点击样式*/
+.prohibitClicking
+{
+    pointer-events: none;
+}
+
+
+/*依次排列元素样式*/
+.arrange
+{
+    display: grid;
+    gap: var(--gapMedium);
+}
+
+/*依次排列元素，且元素数量较少时的样式*/
+.arrangeMinority
+{
+    grid-template-columns: repeat(var(--arrangeParticleMinority),1fr)
+}
+
+/*依次排列元素，且元素数量中等时的样式*/
+.arrangeMedium
+{
+    grid-template-columns: repeat(var(--arrangeParticleMedium),1fr)
+}
+
+/*依次排列元素，且元素数量较多时的样式*/
+.arrangeMost
+{
+    grid-template-columns: repeat(var(--arrangeParticleMost),1fr)
+}
+
+/*弹窗宽度样式*/
+.popUpWidth
+{
+    max-width: var(--maxPopUpWidth);
 }

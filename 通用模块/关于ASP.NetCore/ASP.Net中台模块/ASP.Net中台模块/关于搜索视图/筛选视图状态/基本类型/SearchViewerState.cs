@@ -144,6 +144,13 @@ public sealed class SearchViewerState
     }
     #endregion
     #endregion
+    #region 获取所有条件
+    /// <summary>
+    /// 获取现有的所有搜索和排序条件
+    /// </summary>
+    public IEnumerable<IHasFilterIdentification> AllCondition
+        => QueryCondition.Values.Concat(SortCondition.Values).Cast<IHasFilterIdentification>();
+    #endregion
     #region 清空筛选条件
     /// <summary>
     /// 清除所有查询或排序条件

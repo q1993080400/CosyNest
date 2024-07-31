@@ -1,6 +1,4 @@
-﻿using System.MathFrancis.Plane;
-
-namespace System.Office.Excel.Realize;
+﻿namespace System.Office.Excel.Realize;
 
 /// <summary>
 /// 在实现<see cref="IExcelCells"/>时，
@@ -67,9 +65,6 @@ public abstract class ExcelCells(IExcelSheet sheet) : ExcelRange(sheet), IExcelC
     private protected override string AddressTextSimple(bool isR1C1)
         => ExcelRealizeHelp.GetAddress(Interface.AddressMath, !isR1C1);
     #endregion
-    #region 返回视觉位置
-    public abstract ISizePos VisualPosition { get; }
-    #endregion
     #region 复制单元格
     public abstract IExcelCells CopyTo(IExcelCells cells);
     #endregion
@@ -124,7 +119,6 @@ public abstract class ExcelCells(IExcelSheet sheet) : ExcelRange(sheet), IExcelC
     public virtual IEnumerable<IExcelCells> Find(string content, bool findValue = true)
         => Cells.Where(x =>
          (findValue ? x.Value.ToText : x.FormulaR1C1)?.Contains(content) ?? false);
-
     #endregion
     #endregion
 }

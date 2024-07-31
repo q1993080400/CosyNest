@@ -1,7 +1,5 @@
 ﻿using System.Linq.Expressions;
 
-using OpenQA.Selenium.Support.UI;
-
 using OpenQA.Selenium;
 
 namespace System.NetFrancis.Browser;
@@ -47,17 +45,13 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     {
         try
         {
-            var wait = new WebDriverWait(WebDriver, Browser.Options.TimeOut);
-            var elements = wait.Until(x =>
-            {
-                var e = this.Element.FindElements(By.CssSelector(cssSelect));
-                return e.Count > 0 ? e : null;
-            });
-            return elements?.Where(x => x is { }).Select(x => x.TagName switch
+            var elements = this.Element.FindElements(By.CssSelector(cssSelect)).
+                Select(x => x.TagName switch
             {
                 "input" => new ElementBrowserInputWebDriver(Browser, x),
                 _ => new ElementBrowserWebDriver(Browser, x),
-            }).OfType<Element>().ToArray() ?? [];
+            }).OfType<Element>().ToArray();
+            return elements;
         }
         catch (WebDriverTimeoutException) when (ignoreException)
         {

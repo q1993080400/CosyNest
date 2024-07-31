@@ -7,11 +7,17 @@
 public interface IExcelSheet : IExcelCellsCommunity
 {
     #region 关于工作簿与工作表
-    #region 返回工作表所在的工作簿
+    #region 返回工作簿
     /// <summary>
     /// 返回本工作表所在的工作簿
     /// </summary>
     IExcelBook Book { get; }
+    #endregion
+    #region 返回工作表管理对象
+    /// <summary>
+    /// 返回一个用来管理所有工作表的对象
+    /// </summary>
+    IExcelSheetManage SheetManage { get; }
     #endregion
     #region 工作表的名称
     /// <summary>
@@ -71,7 +77,7 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// 返回页面对象，
     /// 它可以管理这个工作表的页面设置和打印
     /// </summary>
-    IPageSheet Page { get; }
+    ISheetPage Page { get; }
     #endregion
     #endregion
     #region 关于单元格
@@ -104,7 +110,7 @@ public interface IExcelSheet : IExcelCellsCommunity
     /// <summary>
     /// 这个对象可以用来管理这个工作表中的所有图表
     /// </summary>
-    IOfficeChartManage ChartManage { get; }
+    IOfficeObjectManageCommon<IOfficeChart> ChartManage { get; }
     #endregion
     #endregion
 }

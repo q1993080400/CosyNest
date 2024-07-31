@@ -34,9 +34,14 @@ public interface IExcelRange
     /// </summary>
     /// <param name="isR1C1">如果这个值为<see langword="true"/>，
     /// 代表以R1C1形式返回，否则代表以A1形式返回</param>
-    /// <param name="whole">表示返回单元格地址的完整程度，
-    /// 小于等于0只返回简单地址，为1则还返回工作表名称，大于等于2则还返回文件名</param>
+    /// <param name="whole">表示返回单元格地址的完整程度</param>
     /// <returns></returns>
-    string AddressText(bool isR1C1 = true, int whole = 0);
+    string AddressText(bool isR1C1 = true, AddressTextMod whole = 0);
+    #endregion
+    #region 复制单元格为图片
+    /// <summary>
+    /// 将这个单元格作为图片复制到剪贴板
+    /// </summary>
+    Task CopyPictureToClipboard();
     #endregion
 }

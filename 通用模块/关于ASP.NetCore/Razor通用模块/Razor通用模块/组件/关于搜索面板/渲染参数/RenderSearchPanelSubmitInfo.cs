@@ -17,4 +17,10 @@ public sealed record RenderSearchPanelSubmitInfo
     /// </summary>
     public required Func<Task> Clear { get; init; }
     #endregion
+    #region 回到顶部
+    /// <summary>
+    /// 这个委托可以用来回到顶部
+    /// </summary>
+    public required Func<Task> GoToTop { get; init; }
+    #endregion
 }

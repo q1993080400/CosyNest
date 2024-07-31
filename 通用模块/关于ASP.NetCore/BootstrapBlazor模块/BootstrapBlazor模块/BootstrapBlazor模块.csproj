@@ -6,6 +6,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>BootstrapBlazor.Components</RootNamespace>
 		<AssemblyName>ToolBootstrapBlazor</AssemblyName>
+		<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+		<StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -17,8 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="8.7.0" />
-		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="8.0.4" />
+		<PackageReference Include="BootstrapBlazor" Version="8.7.5" />
 	</ItemGroup>
 
 	<ItemGroup>

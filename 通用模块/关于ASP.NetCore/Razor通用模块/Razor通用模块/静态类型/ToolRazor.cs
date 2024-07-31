@@ -66,29 +66,4 @@ public static class ToolRazor
     #endregion
     #endregion
     #endregion
-    #region 在脚本外追加新的脚本
-    /// <summary>
-    /// 在一个原有的JS脚本外追加新的JS脚本，
-    /// 它们具有不同的变量作用域，不会冲突
-    /// </summary>
-    /// <param name="script">原有的脚本</param>
-    /// <param name="appendScript">追加的新脚本</param>
-    /// <returns></returns>
-    public static string AppendScript(string script, params string[] appendScript)
-    {
-        var newScript = appendScript.Select(appendScript =>
-        {
-            var jsObjectName = CreateASP.JSObjectName();
-            return $$"""
-
-            function {{jsObjectName}}()
-            {
-                {{appendScript}}
-            };
-            {{jsObjectName}}();
-            """;
-        }).Prepend(script).ToArray();
-        return string.Join(Environment.NewLine, newScript);
-    }
-    #endregion
 }

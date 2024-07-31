@@ -24,7 +24,7 @@ public abstract record DingDingOAComponentInfo
         if (valueJson is null)
             return null;
         InitializationToolTreeObject.Initialization();
-        var options = CreateDesign.JsonCommonOptions;
+        var options = CreateDesign.JsonCommonOptions();
         try
         {
             switch (type)

@@ -56,8 +56,7 @@ public abstract class DingDingWebApi
             _ => throw new NotSupportedException($"{nameof(AuthenticationDingDingRequest)}对象的配置不正确")
         };
         var uri = "https://api.dingtalk.com/v1.0/oauth2/userAccessToken";
-        var response = await http.RequestPost(uri, httpParameter).
-                Read(x => x.ToObject());
+        var response = await http.RequestJsonPost(uri, httpParameter);
         var access = response.GetValueOrDefault("accessToken")?.ToString();
         var refresh = response.GetValueOrDefault("refreshToken")?.ToString();
         if (access is null || refresh is null)
@@ -98,8 +97,7 @@ public abstract class DingDingWebApi
             appKey = configuration.ClientID,
             appSecret = configuration.ClientSecret
         };
-        var response = await http.RequestPost("https://api.dingtalk.com/v1.0/oauth2/accessToken", info).
-            Read(x => x.ToObject());
+        var response = await http.RequestJsonPost("https://api.dingtalk.com/v1.0/oauth2/accessToken", info);
         return response.GetValueOrDefault("accessToken")?.ToString() ??
             throw new NotSupportedException("无法获取访问令牌");
     }

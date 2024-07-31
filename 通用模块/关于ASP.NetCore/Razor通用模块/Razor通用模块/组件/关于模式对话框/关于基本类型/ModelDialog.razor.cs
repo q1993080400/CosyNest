@@ -2,7 +2,9 @@
 namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
-/// 这个组件是一个模式对话框
+/// 这个组件是一个模式对话框，
+/// 它只要渲染，就默认打开，
+/// 如果不需要打开，就应该不渲染它
 /// </summary>
 public sealed partial class ModelDialog : ComponentBase, IContentComponent<RenderFragment>
 {
@@ -11,14 +13,6 @@ public sealed partial class ModelDialog : ComponentBase, IContentComponent<Rende
     [Parameter]
     [EditorRequired]
     public RenderFragment ChildContent { get; set; }
-    #endregion
-    #region 是否打开
-    /// <summary>
-    /// 获取这个模式对话框是否打开
-    /// </summary>
-    [Parameter]
-    [EditorRequired]
-    public bool IsOpen { get; set; }
     #endregion
     #endregion
     #region 内部成员
@@ -31,8 +25,7 @@ public sealed partial class ModelDialog : ComponentBase, IContentComponent<Rende
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (IsOpen)
-            await JSWindow.InvokeVoidAsync("OpenModelDialog", ID);
+        await JSWindow.InvokeVoidAsync("OpenModelDialog", ID);
     }
     #endregion
     #endregion

@@ -360,6 +360,9 @@ var docCookies = {
     hasItem: function (sKey) {
         return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[-.+*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
     },
+    count: function () {
+        return keys().length;
+    },
     keys: /* optional method: you can safely remove it! */ function () {
         let aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
         for (let nIdx = 0; nIdx < aKeys.length; nIdx++) {
@@ -375,13 +378,25 @@ var docCookies = {
     },
     keyAndValue: function () {
         let allKey = docCookies.keys();
-        for (let i = 0; i < allKey.length; i++) {
-            let key = allKey[i];
-            allKey[i] = {
-                Key: key,
+        let allKeyValue = Array.from(allKey.map(x => {
+            return {
+                Key: x,
                 Value: docCookies.getItem(key)
             }
+        }));
+        return allKeyValue;
+    },
+    tryGetValue: function (key) {
+        if (this.hasItem(key)) {
+            let value = getItem(key);
+            return {
+                Exist: true,
+                Value: value
+            };
         }
-        return allKey;
+        return {
+            Exist: false,
+            Value: null
+        };
     }
 };

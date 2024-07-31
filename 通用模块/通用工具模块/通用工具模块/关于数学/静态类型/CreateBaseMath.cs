@@ -62,7 +62,7 @@ public static class CreateBaseMath
     /// 如果为<see langword="null"/>，则默认使用时间作为种子</param>
     /// <returns></returns>
     public static IRandom Random(int? seed = null)
-        => new Random(seed);
+        => new Random(seed is { } s ? new System.Random(s) : new());
     #endregion
     #endregion
     #region 创建树形结构

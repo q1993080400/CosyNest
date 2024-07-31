@@ -36,17 +36,17 @@ public sealed partial class Arrange : ComponentBase, IContentComponent<RenderFra
     /// <returns></returns>
     private RenderArrangeInfo GetRenderInfo()
     {
-        var count = Particle switch
+        var particle = Particle switch
         {
-            ArrangeParticle.Minority => "--arrangeParticleMinority",
-            ArrangeParticle.Medium => "--arrangeParticleMedium",
-            ArrangeParticle.Most => "--arrangeParticleMost",
-            var particle => throw new NotSupportedException($"未能识别{particle}类型的枚举")
+            ArrangeParticle.Minority => "arrangeMinority",
+            ArrangeParticle.Medium => "arrangeMedium",
+            ArrangeParticle.Most => "arrangeMost",
+            var p => throw new NotSupportedException($"未能识别{p}类型的枚举")
         };
-        var style = $"display: grid;grid-template-columns: repeat(var({count}),1fr)";
+        var css = $"arrange {particle}";
         return new()
         {
-            Style = style,
+            CSS = css,
         };
     }
     #endregion

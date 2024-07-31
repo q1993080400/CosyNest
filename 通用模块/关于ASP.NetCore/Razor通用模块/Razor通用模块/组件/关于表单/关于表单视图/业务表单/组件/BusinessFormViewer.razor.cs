@@ -72,11 +72,6 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     public Func<Type, FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfoBase<Model>>> GetRenderPropertyInfo { get; set; }
         = FormViewer<Model>.GetRenderPropertyInfoDefault;
     #endregion
-    #region 数据属性改变时的委托
-    /// <inheritdoc cref="FormViewer{Model}.OnPropertyChangeed"/>
-    [Parameter]
-    public Func<RenderFormViewerPropertyInfoBase<Model>, Task> OnPropertyChangeed { get; set; } = _ => Task.CompletedTask;
-    #endregion
     #endregion
     #region 关于业务逻辑
     #region 用来提交表单的业务逻辑

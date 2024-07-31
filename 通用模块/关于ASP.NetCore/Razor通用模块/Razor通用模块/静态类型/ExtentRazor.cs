@@ -1,9 +1,7 @@
 ﻿using System.Net.Http.Headers;
-using System.NetFrancis;
 using System.NetFrancis.Http;
+using System.Text.Json;
 using System.Web;
-
-using Microsoft.AspNetCore.Http.Connections.Client;
 
 namespace System;
 
@@ -150,6 +148,43 @@ public static class ExtendRazor
             (value, cancellation) => js.SetProperty(property, value, cancellation).AsTask());
     #endregion
     #endregion
+    #region 将Promise对象封装为Task
+    /// <summary>
+    /// 将一个JS中的Promise对象封装为Net熟悉的<see cref="Task"/>对象
+    /// </summary>
+    /// <typeparam name="Ret">返回值类型</typeparam>
+    /// <param name="jsRuntime">JS运行时对象</param>
+    /// <param name="success">当Promise对象执行成功时，
+    /// 通过这个函数将JS对象反序列化为Net对象</param>
+    /// <param name="generateScript">这个委托的第一个参数是Promise执行成功时，执行的JS回调函数名称，
+    /// 第二个参数是Promise执行失败时，执行的JS回调函数名称，返回值是要执行的JS脚本</param>
+    /// <param name="fail">当Promise对象执行失败时，执行这个回调函数，
+    /// 如果为<see langword="null"/>，直接返回默认值</param>
+    /// <param name="cancellationToken">用于取消异步操作的令牌</param>
+    /// <returns>当Promise对象执行成功时，返回<paramref name="success"/>的返回值，
+    /// 执行失败时，返回<typeparamref name="Ret"/>的默认值</returns>
+    internal static async Task<Ret?> AwaitPromise<Ret>(this IJSRuntime jsRuntime, Func<JsonElement, Ret?> success, Func<string, string, string> generateScript,
+        Func<JsonElement, Ret?>? fail = null, CancellationToken cancellationToken = default)
+    {
+        var completionSource = new TaskCompletionSource<Ret?>();
+        completionSource.SetCanceledAfter(cancellationToken);
+        var document = new JSDocument(jsRuntime);
+        var (successMethod, successDisposable) = await document.PackNetMethod<JsonElement>(x => completionSource.SetResult(success(x)), cancellation: cancellationToken);
+        fail ??= _ => default;
+        var (failMethod, failDisposable) = await document.PackNetMethod<JsonElement>(x => completionSource.SetResult(fail(x)), cancellation: cancellationToken);
+        try
+        {
+            var script = generateScript(successMethod, failMethod);
+            await jsRuntime.InvokeCodeVoidAsync(script, cancellation: cancellationToken);
+            return await completionSource.Task;
+        }
+        finally
+        {
+            successDisposable.Dispose();
+            failDisposable.Dispose();
+        }
+    }
+    #endregion
     #endregion
     #region 关于依赖注入
     #region 注入前端对象
@@ -172,39 +207,6 @@ public static class ExtendRazor
     /// <returns></returns>
     public static IServiceCollection AddJSWindow(this IServiceCollection services)
         => services.AddScoped<IJSWindow, JSWindow>();
-    #endregion
-    #region 注入携带Cookie的SignalRProvide对象
-    /// <summary>
-    /// 以瞬时模式注入一个<see cref="ISignalRProvide"/>，
-    /// 它可以自动携带浏览器Cookie，
-    /// 本服务依赖于<see cref="IUriManager"/>以及<see cref="IJSWindow"/>
-    /// </summary>
-    /// <param name="services">要添加服务的容器</param>
-    /// <param name="withUri">这个委托被用来进一步执行Uri配置，
-    /// 如果为<see langword="null"/>，则不执行</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="CreateNet.ConfigureSignalRProvide(Func{IHubConnectionBuilder, Task{IHubConnectionBuilder}}?)"/>
-    public static IServiceCollection AddSignalRProvideWithCookie(this IServiceCollection services,
-        Action<HttpConnectionOptions>? withUri = null,
-        Func<IHubConnectionBuilder, Task<IHubConnectionBuilder>>? configure = null)
-        => services.AddSignalRProvide(async (uri, server) =>
-        {
-            var cookie = await server.GetRequiredService<IJSWindow>().Document.Cookie.ToListAsync();
-            var host = server.GetRequiredService<IUriManager>().Uri.UriHost!.DomainName;
-            var connection = new HubConnectionBuilder().
-             WithUrl(uri, op =>
-             {
-                 foreach (var (key, value) in cookie.Where(x => !x.Key.IsVoid()))
-                 {
-                     op.Cookies.Add(new Net.Cookie(HttpUtility.UrlEncode(key), HttpUtility.UrlEncode(value), "/", host));
-                 }
-                 op.UseStatefulReconnect = true;
-                 withUri?.Invoke(op);
-             }).
-             AddMessagePackProtocol().
-             WithAutomaticReconnect();
-            return (configure is null ? connection : await configure(connection)).Build();
-        });
     #endregion
     #region 注入上传任务工厂
     /// <summary>

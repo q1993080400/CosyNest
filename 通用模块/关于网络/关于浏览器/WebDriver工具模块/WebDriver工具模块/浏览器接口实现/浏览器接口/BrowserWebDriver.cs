@@ -1,7 +1,7 @@
-﻿using OpenQA.Selenium;
-
-using System.Design;
+﻿using System.Design;
 using System.Underlying.PC;
+
+using OpenQA.Selenium;
 
 namespace System.NetFrancis.Browser;
 
@@ -73,16 +73,9 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     /// </summary>
     internal WebDriver WebDriver { get; }
     #endregion
-    #region 浏览器选项
-    /// <summary>
-    /// 获取浏览器的配置选项
-    /// </summary>
-    internal WebDriverOptions Options { get; }
-    #endregion
     #region 释放对象
     protected override void DisposeRealize()
     {
-        WebDriver.Quit();
         WebDriver.Dispose();
     }
     #endregion
@@ -92,12 +85,9 @@ sealed class BrowserWebDriver : AutoRelease, IBrowser
     /// 使用指定的参数初始化对象
     /// </summary>
     /// <param name="webDriver">浏览器实例</param>
-    /// <param name="options">用来创建浏览器的选项，
-    /// 如果为<see langword="null"/>，则使用默认选项</param>
-    public BrowserWebDriver(WebDriver webDriver, WebDriverOptions options)
+    public BrowserWebDriver(WebDriver webDriver)
     {
         WebDriver = webDriver;
-        Options = options;
         Body = new ElementBrowserWebDriverBody(this);
     }
     #endregion

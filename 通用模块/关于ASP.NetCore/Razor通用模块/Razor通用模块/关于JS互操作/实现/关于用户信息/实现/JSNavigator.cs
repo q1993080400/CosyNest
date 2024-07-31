@@ -9,7 +9,8 @@ namespace Microsoft.JSInterop;
 /// 本类型是<see cref="IJSNavigator"/>的实现，
 /// 可以视为JS中Navigator对象的封装
 /// </summary>
-sealed class JSNavigator : JSRuntimeBase, IJSNavigator
+/// <param name="jsRuntime">封装的JS运行时对象，本对象的功能就是通过它实现的</param>
+sealed class JSNavigator(IJSRuntime jsRuntime) : IJSNavigator
 {
     #region 获取基本硬件信息
     private IEnvironmentInfoWeb? EnvironmentInfoField;
@@ -18,33 +19,26 @@ sealed class JSNavigator : JSRuntimeBase, IJSNavigator
     {
         if (EnvironmentInfoField is { } e)
             return e;
-        var userAgent = await JSRuntime.GetProperty<string>("navigator.userAgent", cancellation);
+        var userAgent = await jsRuntime.GetProperty<string>("navigator.userAgent", cancellation);
         return EnvironmentInfoField = CreateASP.EnvironmentInfo(userAgent);
     }
     #endregion
     #region 获取定位对象
     public IPosition Geolocation { get; }
+        = new JSGeolocation(jsRuntime);
     #endregion
     #region 剪切板对象
     public IJSClipboard Clipboard { get; }
+        = new JSClipboard(jsRuntime);
     #endregion
     #region 获取唤醒锁
     public async Task<IAsyncDisposable?> GetWakeLock()
     {
         var id = CreateASP.JSObjectName();
-        var success = await JSRuntime.InvokeAsync<bool>("CreateWakeLock", id);
+        var success = await jsRuntime.InvokeAsync<bool>("CreateWakeLock", id);
         return success ?
-            new JSWakeLock(JSRuntime, id) :
+            new JSWakeLock(jsRuntime, id) :
             null;
-    }
-    #endregion
-    #region 构造函数
-    /// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-    public JSNavigator(IJSRuntime jsRuntime)
-        : base(jsRuntime)
-    {
-        Geolocation = new JSGeolocation(JSRuntime);
-        Clipboard = new JSClipboard(JSRuntime);
     }
     #endregion
 }

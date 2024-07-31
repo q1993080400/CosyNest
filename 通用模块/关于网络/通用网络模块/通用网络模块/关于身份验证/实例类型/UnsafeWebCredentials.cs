@@ -20,6 +20,6 @@ public sealed record UnsafeWebCredentials
     /// 如果为<see langword="null"/>，
     /// 表示不需要身份验证
     /// </summary>
-    public required UnsafeCredentials? Credentials { get; init; }
+    public UnsafeCredentials? Credentials { get; init; }
     #endregion
 }

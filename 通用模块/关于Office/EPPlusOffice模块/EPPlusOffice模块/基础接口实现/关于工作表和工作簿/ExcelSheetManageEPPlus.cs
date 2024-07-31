@@ -20,18 +20,6 @@ sealed class ExcelSheetManageEPPlus(IExcelBook excelBook) : ExcelSheetManage(exc
        => EPPlusSheets.Select(PackEPPlusSheet).GetEnumerator();
     #endregion
     #region 关于返回工作表
-    #region 根据名称返回，不可能返回null
-    public override IExcelSheet GetSheet(string name, bool createTable = false)
-    {
-        var sheet = GetSheetOrNull(name);
-        return (sheet, createTable) switch
-        {
-            ({ } s, _) => s,
-            (null, false) => throw new KeyNotFoundException($"没有找到名称为{name}的工作表"),
-            (null, true) => Add(name)
-        };
-    }
-    #endregion
     #region 根据名称返回，可能返回null
     public override IExcelSheet? GetSheetOrNull(string name)
     {
@@ -40,10 +28,13 @@ sealed class ExcelSheetManageEPPlus(IExcelBook excelBook) : ExcelSheetManage(exc
     }
     #endregion
     #region 根据索引返回
-    public override IExcelSheet GetSheet(int index)
+    public override IExcelSheet this[int index]
     {
-        var sheet = EPPlusSheets[index];
-        return PackEPPlusSheet(sheet);
+        get
+        {
+            var sheet = EPPlusSheets[index];
+            return PackEPPlusSheet(sheet);
+        }
     }
     #endregion
     #endregion
@@ -91,7 +82,7 @@ sealed class ExcelSheetManageEPPlus(IExcelBook excelBook) : ExcelSheetManage(exc
     /// <param name="sheet">待封装的工作表</param>
     /// <returns></returns>
     private ExcelSheetEPPlus PackEPPlusSheet(ExcelWorksheet sheet)
-        => new(Book, sheet);
+        => new(this, sheet);
     #endregion
     #endregion
 }

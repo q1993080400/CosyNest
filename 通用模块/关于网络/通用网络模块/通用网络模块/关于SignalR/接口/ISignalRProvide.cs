@@ -15,36 +15,38 @@ public interface ISignalRProvide : IAsyncDisposable
     /// </summary>
     /// <param name="uri">SignalR中心的Uri，
     /// 它可以是相对的，也可以是绝对的</param>
+    /// <param name="configuration">这个委托可以用来配置新创建的<see cref="HubConnection"/>，
+    /// 它最常见的用途是为<see cref="HubConnection"/>注册客户端方法</param>
     /// <param name="newBuilt">如果这个值为<see langword="true"/>，
     /// 则始终新建连接，不缓存连接，新建的连接需要调用者自己想办法释放</param>
     /// <returns></returns>
-    Task<HubConnection> GetConnection(string uri, bool newBuilt = false);
+    Task<HubConnection> GetConnection(string uri, Action<HubConnection>? configuration = null, bool newBuilt = false);
     #endregion
     #region 通过业务接口自动获取Uri
     /// <typeparam name="BusinessInterface">Hub中心实现的业务接口，
     /// 如果在注册中心的时候使用默认路由，函数可以通过它推断出中心的Uri</typeparam>
-    /// <inheritdoc cref="GetConnection(string,bool)"/>
-    Task<HubConnection> GetConnection<BusinessInterface>(bool newBuilt = false)
+    /// <inheritdoc cref="GetConnection(string, Action{HubConnection}?, bool)"/>
+    Task<HubConnection> GetConnection<BusinessInterface>(Action<HubConnection>? configuration = null, bool newBuilt = false)
         where BusinessInterface : class
     {
         var uri = ToolSignalR.GetHubDefaultUri<BusinessInterface>();
-        return GetConnection(uri, newBuilt);
+        return GetConnection(uri, configuration, newBuilt);
     }
     #endregion
-    #endregion
-    #region 设置用于配置SignalR连接的委托
+    #region 通过业务接口自动获取Uri，且返回它的强类型封装
     /// <summary>
-    /// 设置用于配置SignalR连接的委托，
-    /// 这个方法只能调用一次，
-    /// 第二次调用无效
+    /// 获取指定Hub中心的SignalR连接的强类型封装，
+    /// 当返回的时候，它已经连接完毕，可以直接使用
     /// </summary>
-    /// <param name="configuration">用于配置连接的委托，
-    /// 它的第一个参数是待配置的连接，第二个参数是中心的相对Uri，该委托一般用来注册客户端方法</param>
-    void SetConfiguration(Action<HubConnection, string> configuration);
-
-    /*问：配置客户端方法似乎不需要Hub中心的Uri，
-      那么，为什么需要第二个参数？
-      答：这是因为本接口是一个工厂，它缓存了多个SignalR连接，
-      需要通过Uri来区分给哪一个连接添加客户端方法*/
+    /// <returns></returns>
+    /// <inheritdoc cref="GetConnection{BusinessInterface}(Action{HubConnection}?, bool)"/>
+    async Task<ISignalRStrongTypeInvoke<BusinessInterface>> GetConnectionStrongType<BusinessInterface>
+        (Action<HubConnection>? configuration = null, bool newBuilt = false)
+        where BusinessInterface : class
+    {
+        var connection = await GetConnection<BusinessInterface>(configuration, newBuilt);
+        return connection.StrongType<BusinessInterface>();
+    }
+    #endregion
     #endregion
 }

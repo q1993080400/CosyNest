@@ -71,7 +71,7 @@ public sealed record UriHost : UriBase
     /// <summary>
     /// 获取用来匹配主机地址的正则表达式
     /// </summary>
-    private static IRegex Regex { get; } =/*language=regex*/@"^((?<agreement>[a-z]+)://)?(?<domainName>([^:/])+)(:(?<port>\d+))?/?$".
+    private static IRegex Regex { get; } =/*language=regex*/@"^((?<agreement>[a-z0-9]+)://)?(?<domainName>([^:/])+)(:(?<port>\d+))?/?$".
         Op().Regex(RegexOptions.IgnoreCase);
     #endregion
     #region 正式方法

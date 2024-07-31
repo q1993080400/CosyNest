@@ -13,8 +13,8 @@ namespace Microsoft.JSInterop;
 /// 使用指定的参数初始化对象
 /// </remarks>
 /// <param name="id">元素的ID</param>
-/// <inheritdoc cref="JSRuntimeBase(IJSRuntime)"/>
-sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime), IElementJS
+/// <param name="jsRuntime">封装的JS运行时对象，本对象的功能就是通过它实现的</param>
+sealed class Element(IJSRuntime jsRuntime, string id) : IElementJS
 {
     #region 公开成员
     #region 获取ID
@@ -23,7 +23,7 @@ sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime)
     #region 触发鼠标点击事件
     public async ValueTask Click(int interval = 0, CancellationToken cancellationToken = default)
     {
-        await JSRuntime.InvokeCodeVoidAsync($"{Prefix}.click()", cancellation: cancellationToken);
+        await jsRuntime.InvokeCodeVoidAsync($"{Prefix}.click()", cancellation: cancellationToken);
         if (interval > 0)
             await Task.Delay(interval, cancellationToken);
     }
@@ -31,11 +31,11 @@ sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime)
     #region 关于元素的位置和大小
     #region 获取元素的完全高度
     public ValueTask<double> ScrollHeight
-          => JSRuntime.InvokeCodeAsync<double>(Prefix + ".scrollHeight");
+          => jsRuntime.InvokeCodeAsync<double>(Prefix + ".scrollHeight");
     #endregion
     #region 获取元素内部的高度
     public ValueTask<double> ClientHeight
-        => JSRuntime.InvokeCodeAsync<double>(Prefix + ".clientHeight");
+        => jsRuntime.InvokeCodeAsync<double>(Prefix + ".clientHeight");
     #endregion
     #region 获取元素的绝对位置和大小
     public async ValueTask<ISizePos> GetBoundingClientRect()
@@ -53,7 +53,7 @@ sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime)
         {
             #region 本地函数
             async ValueTask<double> Fun()
-                => (await JSRuntime.InvokeCodeAsync<double?>(Prefix + ".scrollTop")) ?? 0;
+                => (await jsRuntime.InvokeCodeAsync<double?>(Prefix + ".scrollTop")) ?? 0;
             #endregion
             return Fun();
         }
@@ -63,30 +63,30 @@ sealed class Element(IJSRuntime jsRuntime, string id) : JSRuntimeBase(jsRuntime)
     public ValueTask Scroll(double x, double y, bool isbehavior, bool isAbs = true, CancellationToken cancellationToken = default)
     {
         var script = $".{(isAbs ? "scroll" : "scrollBy")}({{left:{x},top:{y},behavior:'{(isbehavior ? "smooth" : "auto")}'}})";
-        return JSRuntime.InvokeCodeVoidAsync(Prefix + script, cancellation: cancellationToken);
+        return jsRuntime.InvokeCodeVoidAsync(Prefix + script, cancellation: cancellationToken);
     }
     #endregion
     #endregion
     #region 获取焦点
     public ValueTask Focus(CancellationToken cancellationToken = default)
-        => JSRuntime.InvokeCodeVoidAsync($"{Prefix}.focus()", cancellation: cancellationToken);
+        => jsRuntime.InvokeCodeVoidAsync($"{Prefix}.focus()", cancellation: cancellationToken);
     #endregion
     #region 获取成员
     private IAsyncIndex<string, string>? IndexField;
 
     public IAsyncIndex<string, string> Index
         => IndexField ??= CreateTasks.AsyncIndex<string, string>(
-           async (name, c) => await JSRuntime.GetProperty<string>($"{Prefix}.{name}.toString()", c),
-           async (name, value, c) => await JSRuntime.SetProperty($"{Prefix}.{name}", value, c));
+           async (name, c) => await jsRuntime.GetProperty<string>($"{Prefix}.{name}.toString()", c),
+           async (name, value, c) => await jsRuntime.SetProperty($"{Prefix}.{name}", value, c));
     #endregion
     #region 以元素为基础执行脚本
     #region 无返回值
     public ValueTask InvokeCodeVoidAsync(string jsCode, bool isAsynchronous = false, CancellationToken cancellation = default)
-        => JSRuntime.InvokeCodeVoidAsync($"{Prefix}.{jsCode}", isAsynchronous, cancellation);
+        => jsRuntime.InvokeCodeVoidAsync($"{Prefix}.{jsCode}", isAsynchronous, cancellation);
     #endregion
     #region 有返回值
     public ValueTask<Ret> InvokeCodeAsync<Ret>(string jsCode, bool isAsynchronous = false, CancellationToken cancellation = default)
-        => JSRuntime.InvokeCodeAsync<Ret>($"{Prefix}.{jsCode}", isAsynchronous, cancellation);
+        => jsRuntime.InvokeCodeAsync<Ret>($"{Prefix}.{jsCode}", isAsynchronous, cancellation);
     #endregion
     #endregion
     #endregion

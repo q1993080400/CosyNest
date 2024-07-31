@@ -9,6 +9,12 @@ namespace Microsoft.AspNetCore.Components;
 public sealed record RenderFormViewerPropertyInfo<Model> : RenderFormViewerPropertyInfoBase<Model>, ITitleData
     where Model : class
 {
+    #region 渲染偏好
+    /// <summary>
+    /// 获取进行渲染时的偏好
+    /// </summary>
+    public required RenderPreference RenderPreference { get; init; }
+    #endregion
     #region 属性名称
     public required string Name { get; init; }
     #endregion

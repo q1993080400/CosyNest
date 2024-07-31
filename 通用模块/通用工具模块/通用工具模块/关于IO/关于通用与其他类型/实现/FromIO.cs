@@ -7,34 +7,37 @@ namespace System.IOFrancis;
 /// 这个类型代表一个通过文件或流加载，
 /// 且可以保存到文件或流中的对象，每个对象独占一个文件
 /// </summary>
-/// <remarks>
-/// 用指定的文件路径初始化文件
-/// </remarks>
-/// <param name="path">文件路径， 如果该对象不是通过文件创建的，则为<see langword="null"/></param>
-public abstract class FromIO(string? path) : ReleaseAsync, IFromIO
+public abstract class FromIO : ReleaseAsync, IFromIO
 {
     #region 关于文件路径
     #region 返回文件的格式
-    #region 正式方法
     public string Format
         => Path is { } p ?
         ToolPath.SplitFilePath(p).Extended ?? "" : DefaultFormat;
     #endregion
-    #region 模板方法
+    #region 文件的默认格式
     /// <summary>
     /// 这个属性指示当对象尚未保存到文件中时，
     /// 应该使用什么格式
     /// </summary>
     protected abstract string DefaultFormat { get; }
     #endregion
-    #endregion
     #region 文件路径
-    public string? Path { get; private set; } = path;
+    public string? Path { get; private set; }
+    #endregion
+    #region 检查文件路径的扩展名
+    /// <summary>
+    /// 检查文件路径的扩展名，
+    /// 并返回它们是否受支持
+    /// </summary>
+    /// <param name="extensionName">待检查的文件扩展名</param>
+    /// <returns></returns>
+    protected abstract bool CheckExtensionName(string extensionName);
     #endregion
     #endregion
     #region 关于保存文件
     #region 是否自动保存
-    public virtual bool AutoSave { get; set; } = true;
+    public virtual bool AutoSave { get; set; }
     #endregion
     #region 保存文件
     public async Task Save(string? path = null)
@@ -44,6 +47,10 @@ public abstract class FromIO(string? path) : ReleaseAsync, IFromIO
         #region 
         async Task Fun(string path, bool isSitu)
         {
+            var extension = ToolPath.SplitFilePath(path).Extended ??
+                throw new NotSupportedException($"{path}是一个目录，不能将本对象保存在这个路径");
+            if (!CheckExtensionName(extension))
+                throw new NotSupportedException($"{path}的扩展名是{extension}，它不受支持，不能将本对象保存到这个路径");
             ToolIO.CreateFather(path);
             await SaveRealize(path, isSitu);
         }
@@ -104,5 +111,22 @@ public abstract class FromIO(string? path) : ReleaseAsync, IFromIO
     #region 重写ToString方法
     public override string ToString()
         => Path ?? "此对象尚未保存到文件中";
+    #endregion
+    #region 构造函数
+    /// <summary>
+    /// 使用指定的路径初始化对象
+    /// </summary>
+    /// <param name="path">文件路径， 如果该对象不是通过文件创建的，则为<see langword="null"/></param>
+    public FromIO(string? path)
+    {
+        Path = path;
+        if (path is { })
+        {
+            var extension = ToolPath.SplitFilePath(path).Extended ??
+                throw new NotSupportedException($"{path}是一个目录，不能通过这个路径加载本对象");
+            if (!CheckExtensionName(extension))
+                throw new NotSupportedException($"{path}的扩展名是{extension}，它不受支持，不能通过这个路径加载本对象");
+        }
+    }
     #endregion
 }

@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis;
-using System.IOFrancis.FileSystem;
 
 namespace System.Media.Drawing.PDF;
 
@@ -9,13 +8,6 @@ namespace System.Media.Drawing.PDF;
 /// </summary>
 public interface IPDFDocument : IFromIO
 {
-    #region PDF的文件类型
-    /// <summary>
-    /// 返回PDF文件类型
-    /// </summary>
-    public static IFileType FileTypePDF { get; }
-    = CreateIO.FileType("PDF文件格式", "pdf");
-    #endregion
     #region 合并文档
     /// <summary>
     /// 将另一个文档与本文档合并，
@@ -31,6 +23,6 @@ public interface IPDFDocument : IFromIO
     /// <summary>
     /// 枚举PDF文档中的所有页面
     /// </summary>
-    IPDFCollect Pages { get; }
+    IPDFCollection Pages { get; }
     #endregion
 }

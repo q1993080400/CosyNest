@@ -21,15 +21,15 @@ sealed class FaceRecognitionBaiDu(string apiKey, string secretKey, Func<IHttpCli
     public async Task<IFaceRecognitionInfo> Recognition(string imageBase64, CancellationToken cancellation)
     {
         var accessToken = await GetAccessToken();
-        var response = await HttpClientProvide().RequestPost("https://aip.baidubce.com/rest/2.0/face/v3/detect",
+        var response = await HttpClientProvide().RequestJsonPost("https://aip.baidubce.com/rest/2.0/face/v3/detect",
             new
             {
                 image = imageBase64,
                 image_type = "BASE64"
-            }, null, new[]
+            }, new[]
             {
                 ("access_token", accessToken)
-            }!, cancellationToken: cancellation).Read(x => x.ToObject());
+            }!, options: null, cancellationToken: cancellation);
         Check(response);
         return new FaceRecognitionInfo()
         {
@@ -46,14 +46,13 @@ sealed class FaceRecognitionBaiDu(string apiKey, string secretKey, Func<IHttpCli
     /// <returns></returns>
     private async Task<string> GetAccessToken()
     {
-        var response = await HttpClientProvide().RequestPost("https://aip.baidubce.com/oauth/2.0/token",
-            new { }, null,
-            new[]
+        var response = await HttpClientProvide().RequestJsonPost("https://aip.baidubce.com/oauth/2.0/token",
+            new { }, new[]
             {
                 ("grant_type","client_credentials"),
                 ("client_id",apiKey),
                 ("client_secret",secretKey)
-            }!).Read(x => x.ToObject());
+            }!);
         return Check(response)["access_token"]!.ToString()!;
     }
     #endregion

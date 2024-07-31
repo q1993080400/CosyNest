@@ -12,8 +12,7 @@ public interface IAsyncCollection<Obj> : IAsyncEnumerable<Obj>
     /// 返回迭代器中元素的数量
     /// </summary>
     /// <param name="cancellation">用于取消异步任务的令牌</param>
-    async Task<int> CountAsync(CancellationToken cancellation = default)
-       => await this.ConfigureCancel(cancellation).CountAsync(cancellation);
+    Task<int> CountAsync(CancellationToken cancellation = default);
     #endregion
     #region 添加元素
     /// <summary>

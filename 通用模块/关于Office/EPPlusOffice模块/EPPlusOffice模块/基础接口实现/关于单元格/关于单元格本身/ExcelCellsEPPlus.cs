@@ -1,5 +1,4 @@
-﻿using System.MathFrancis.Plane;
-using System.Office.Excel.Realize;
+﻿using System.Office.Excel.Realize;
 
 using OfficeOpenXml;
 
@@ -16,7 +15,7 @@ sealed class ExcelCellsEPPlus : ExcelCells, IExcelCells
     #region 单元格的值
     public override RangeValue Value
     {
-        get => new() { Content = Range.Value };
+        get => new(Range.Value);
         set
         {
             var (r, c) = Interface.RCCount;
@@ -155,9 +154,6 @@ sealed class ExcelCellsEPPlus : ExcelCells, IExcelCells
       这导致了在某些情况下，即便是单线程获取某些重叠的单元格，且不修改它们，
       都有可能造成单元格错乱，本设计的目的就是为了解决这个问题*/
     #endregion
-    #endregion
-    #region 未实现的成员
-    public override ISizePos VisualPosition => throw new NotImplementedException();
     #endregion
     #region 构造函数
     /// <inheritdoc cref="ExcelCells(IExcelSheet)"/>
