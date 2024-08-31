@@ -8,6 +8,10 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="itext" Version="8.0.5" PrivateAssets="compile" />
 	</ItemGroup>

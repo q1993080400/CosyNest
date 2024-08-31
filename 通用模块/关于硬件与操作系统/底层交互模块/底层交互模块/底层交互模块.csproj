@@ -9,6 +9,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\关于地理\通用地理模块\通用地理模块\通用地理模块.csproj" />
 		<ProjectReference Include="..\..\..\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />

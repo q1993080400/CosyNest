@@ -9,6 +9,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<ProjectReference Include="..\..\..\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj" />

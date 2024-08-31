@@ -9,6 +9,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
 		<ProjectReference Include="..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />

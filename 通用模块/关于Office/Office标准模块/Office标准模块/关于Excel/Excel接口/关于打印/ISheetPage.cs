@@ -32,8 +32,8 @@ public interface ISheetPage : IOfficePage
     /// </summary>
     /// <param name="regional">打印区域，
     /// 如果为<see langword="null"/>，则遵照<see cref="PrintRegional"/>属性设置的打印区域</param>
-    /// <inheritdoc cref="IOfficePrint.PrintFromPage(Range?, int, IPrinter?)"/>
-    int PrintFromRegional(ISizePosPixel? regional = null, int number = 1, IPrinter? printer = null);
+    /// <inheritdoc cref="IOfficePage.PrintFromPage(Range?, int, IPrinter?)"/>
+    (int PageCount, Task Wait) PrintFromRegional(ISizePosPixel? regional = null, int number = 1, IPrinter? printer = null);
     #endregion
     #region 打印到文件（按照打印区域）
     /// <summary>
@@ -41,7 +41,7 @@ public interface ISheetPage : IOfficePage
     /// </summary>
     ///<param name="regional">打印区域，
     /// 如果为<see langword="null"/>，则遵照<see cref="PrintRegional"/>属性设置的打印区域</param>
-    /// <inheritdoc cref="IOfficePrint.PrintFromPageToFile(string, Range?)"/>
-    void PrintFromRegionalToFile(ISizePosPixel? regional, string filePath);
+    /// <inheritdoc cref="IOfficePage.PrintFromPageToFile(string, Range?)"/>
+    (int PageCount, Task Wait) PrintFromRegionalToFile(ISizePosPixel? regional, string filePath);
     #endregion
 }

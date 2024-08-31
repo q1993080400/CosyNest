@@ -8,16 +8,25 @@ namespace System.NetFrancis.Browser;
 /// <summary>
 /// 本类型是底层使用Selenium实现的浏览器
 /// </summary>
-sealed class BrowserWebDriver : AutoRelease, IBrowser
+sealed class BrowserWebDriver : Release, IBrowser
 {
     #region 公开成员
+    #region 有关历史
+    #region 后退
+    public Task HistoryBack()
+         => WebDriver.Navigate().BackAsync();
+    #endregion
+    #region 前进
+    public Task HistoryForward()
+        => WebDriver.Navigate().ForwardAsync();
+    #endregion
+    #endregion
     #region 有关选项卡
     #region 创建浏览器标签
     public ITab CreateTab(string uri)
     {
         WebDriver.SwitchTo().NewWindow(WindowType.Tab);
         var tab = new TabWebDriver(this, WebDriver.CurrentWindowHandle);
-        tab.Select();
         Uri = uri;
         return tab;
     }

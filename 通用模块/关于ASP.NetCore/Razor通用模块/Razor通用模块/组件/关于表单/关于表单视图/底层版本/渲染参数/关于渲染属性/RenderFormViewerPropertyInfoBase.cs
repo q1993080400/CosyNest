@@ -38,9 +38,9 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
         get
         {
             var value = Property.GetValue(FormModel);
-            return IsReadOnly ?
-                ReadOnlyConvert(Property.PropertyType, value) :
-                value;
+            return PropertyValueConvert is null ?
+                value :
+                PropertyValueConvert(Property.PropertyType, value);
         }
     }
     #endregion
@@ -54,22 +54,22 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     public Obj? GetValue<Obj>()
         => Value.To<Obj>();
     #endregion
-    #region 仅显示转换函数
-    private Func<Type, object?, object?> ReadOnlyConvertField { get; init; }
-        = static (_, value) => value;
-
+    #region 值转换函数
     /// <summary>
     /// 这个函数的第一个参数是值的类型，
     /// 第二个参数是真正的值，
     /// 返回值是渲染的时候应该渲染的值，
-    /// 它仅在<see cref="IsReadOnly"/>为<see langword="true"/>的时候有效
+    /// 通过它可以实现某些特殊操作，
+    /// 例如把空字符串渲染成不明
     /// </summary>
-    public Func<Type, object?, object?> ReadOnlyConvert
-    {
-        get => ReadOnlyConvertField;
-        init => ReadOnlyConvertField = (type, oldValue)
-            => value(type, oldValue).To(type);
-    }
+    public required Func<Type, object?, object?>? PropertyValueConvert { get; init; }
+    #endregion
+    #region 值改变时的函数
+    /// <summary>
+    /// 当值改变时触发的委托，
+    /// 它的参数就是数据的新值
+    /// </summary>
+    public required Func<object?, Task>? OnPropertyChange { get; init; }
     #endregion
     #region 创建属性绑定对象
     /// <summary>

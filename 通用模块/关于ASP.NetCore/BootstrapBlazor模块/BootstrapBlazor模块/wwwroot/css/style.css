@@ -73,6 +73,12 @@
     }
 }
 
+/*高亮样式*/
+mark
+{
+    padding: 0;
+}
+
 /*禁止label内部的button元素进行交互，使label可以正确触发input的事件*/
 label button
 {
@@ -121,6 +127,12 @@ label button
     display: flex;
     gap: var(--gapMedium);
 }
+
+    /*表单视图顶层容器的子容器样式*/
+    .bootstrapFormViewerTopContainer > *
+    {
+        flex-grow: 1;
+    }
 
 /*属性渲染容器样式*/
 .bootstrapFormViewerPropertyContainer
@@ -184,7 +196,7 @@ label button
 {
     display: grid;
     gap: var(--gapMedium);
-    grid-template-columns: repeat(auto-fit,14ic);
+    grid-template-columns: repeat(auto-fit,18ic);
     max-width: var(--maxPopUpWidth);
 }
 
@@ -212,4 +224,10 @@ dialog .card-footer
 :has( .dropdown-menu.show)
 {
     z-index: 999;
+}
+
+/*粘性定位样式*/
+.sticky
+{
+    z-index: 1000;
 }

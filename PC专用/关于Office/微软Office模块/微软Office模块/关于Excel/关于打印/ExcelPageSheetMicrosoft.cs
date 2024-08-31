@@ -21,12 +21,15 @@ sealed class ExcelPageSheetMicrosoft(IExcelSheet sheet, Worksheet worksheet) : I
         => worksheet.PageSetup.Pages.Count;
     #endregion
     #region 打印到文件
-    public void PrintFromPageToFile(string filePath, Range? page = null)
+    public (int PageCount, Task Wait) PrintFromPageToFile(string filePath, Range? page = null)
     {
+        ToolIO.CreateFather(filePath);
         var (start, end) = (page ?? Range.All).GetStartAndEnd(Count);
         var printer = MicrosoftOfficeRealize.GetPrinterName(filePath);
         worksheet.PrintOutEx(From: start + 1, To: end + 1,
             PrintToFile: true, PrToFileName: filePath, ActivePrinter: printer);
+        var pageCount = end - start + 1;
+        return (pageCount, Task.Delay(300 * pageCount));
     }
     #endregion
     #region 设置打印区域
@@ -57,18 +60,18 @@ sealed class ExcelPageSheetMicrosoft(IExcelSheet sheet, Worksheet worksheet) : I
     #endregion
     #region 未实现的成员
 
-    public int PrintFromRegional(ISizePosPixel? regional = null, int number = 1, IPrinter? printer = null)
+    public (int PageCount, Task Wait) PrintFromRegional(ISizePosPixel? regional = null, int number = 1, IPrinter? printer = null)
     {
         throw new NotImplementedException();
     }
 
-    public void PrintFromRegionalToFile(ISizePosPixel? regional, string filePath)
+    public (int PageCount, Task Wait) PrintFromRegionalToFile(ISizePosPixel? regional, string filePath)
     {
         throw new NotImplementedException();
     }
 
 
-    public int PrintFromPage(Range? page = null, int number = 1, IPrinter? printer = null)
+    public (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, IPrinter? printer = null)
     {
         throw new NotImplementedException();
     }

@@ -3,11 +3,11 @@
 @typeparam Model
 
 <BusinessFormViewer GetRenderPropertyInfo=GetRenderPropertyInfo
-                    InitializationModel="InitializationModel"
+                    InitializationModel="InitializationModel" CanEditForm="CanEditForm"
                     ExistingForms=ExistingForms IsReadOnlyProperty=IsReadOnlyProperty
-                    CanEdit="CanEdit"
                     IsValueReference=IsValueReference Delete="Delete" Cancellation="Cancellation"
                     ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
+                    PropertyValueConvert="PropertyValueConvert" CreatePropertyChangeEvent="CreatePropertyChangeEvent"
                     Submit="Submit">
     <RenderComponent>
         @if (RenderComponent is null)

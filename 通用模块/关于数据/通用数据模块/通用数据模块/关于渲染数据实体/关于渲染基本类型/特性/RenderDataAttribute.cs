@@ -25,4 +25,11 @@ public sealed class RenderDataAttribute : RenderDataBaseAttribute
     /// </summary>
     public int RenderLongTextRows { get; init; } = 4;
     #endregion
+    #region 渲染枚举时的偏好
+    /// <summary>
+    /// 如果这个特性是枚举，
+    /// 指定在渲染枚举时的偏好
+    /// </summary>
+    public FormEnumRender RenderEnum { get; init; }
+    #endregion
 }

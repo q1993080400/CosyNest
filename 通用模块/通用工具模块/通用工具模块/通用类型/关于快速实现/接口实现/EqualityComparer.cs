@@ -16,7 +16,7 @@ sealed class EqualityComparer<Obj>(Func<Obj, Obj, bool> equals, Func<Obj, int> g
     /// <summary>
     /// 在进行相等比较时，实际执行这个委托
     /// </summary>
-    private Func<Obj?, Obj?, bool> EqualsDelegate { get; } = (x, y) => ToolEqual.JudgeNull(x, y) ?? equals(x!, y!);
+    private Func<Obj?, Obj?, bool> EqualsDelegate { get; } = (x, y) => ReferenceEquals(x, y) || equals(x!, y!);
     #endregion
     #region 计算哈希值的委托
     /// <summary>
@@ -30,6 +30,5 @@ sealed class EqualityComparer<Obj>(Func<Obj, Obj, bool> equals, Func<Obj, int> g
         => EqualsDelegate(x, y);
     public int GetHashCode(Obj obj)
         => GetHashCodeDelegate(obj);
-
     #endregion
 }

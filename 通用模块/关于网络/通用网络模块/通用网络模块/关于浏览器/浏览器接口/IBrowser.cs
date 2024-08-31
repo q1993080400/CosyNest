@@ -9,6 +9,22 @@ namespace System.NetFrancis.Browser;
 /// </summary>
 public interface IBrowser : IInstruct, IDisposable
 {
+    #region 有关历史
+    #region 后退
+    /// <summary>
+    /// 在历史记录中后退网页
+    /// </summary>
+    /// <returns></returns>
+    Task HistoryBack();
+    #endregion
+    #region 前进
+    /// <summary>
+    /// 在历史记录中前进网页
+    /// </summary>
+    /// <returns></returns>
+    Task HistoryForward();
+    #endregion
+    #endregion
     #region 有关选项卡
     #region 创建新选项卡
     /// <summary>

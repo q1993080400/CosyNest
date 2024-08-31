@@ -9,9 +9,7 @@ namespace System.Office;
 /// </summary>
 public static class CreateOfficeMS
 {
-    #region 公开成员
     #region 创建Excel对象
-    #region 直接创建
     /// <summary>
     /// 创建一个底层由COM组件实现的Excel对象
     /// </summary>
@@ -25,24 +23,7 @@ public static class CreateOfficeMS
             AutoSave = autoSave
         };
     #endregion
-    #region 创建并升级
-    /// <summary>
-    /// 创建一个底层由COM组件实现的Excel工作簿，
-    /// 如果它是旧版本的Excel，还会将其升级为新版本
-    /// </summary>
-    /// <param name="path">Excel工作簿的路径</param>
-    /// <returns>一个元组，它的项分别是工作簿的路径，
-    /// 如果发生升级，可能和旧路径不同，以及创建好的工作簿</returns>
-    /// <inheritdoc cref="ExcelBookLast(string, bool)"/>
-    public static async Task<(string NewPath, IExcelBook ExcelBook)> ExcelBookLast(string path, bool autoSave)
-    {
-        var newPath = await UpdateOfficeFile(path);
-        return (newPath, ExcelBook(newPath, autoSave));
-    }
-    #endregion
-    #endregion
     #region 创建Word对象
-    #region 直接创建
     /// <summary>
     /// 创建一个底层由COM组件实现的Word文档
     /// </summary>
@@ -55,22 +36,6 @@ public static class CreateOfficeMS
         {
             AutoSave = autoSave
         };
-    #endregion
-    #region 创建并升级
-    /// <summary>
-    /// 创建一个底层由COM组件实现的Word文档，
-    /// 如果它是旧版本的Word，还会将其升级为新版本
-    /// </summary>
-    /// <param name="path">Word文档的路径</param>
-    /// <returns>一个元组，它的项分别是文档的路径，
-    /// 如果发生升级，可能和旧路径不同，以及创建好的Word文档</returns>
-    /// <inheritdoc cref="WordDocument(string, bool)"/>
-    public static async Task<(string NewPath, IWordDocument WordDocument)> WordDocumentLast(string path, bool autoSave)
-    {
-        var newPath = await UpdateOfficeFile(path);
-        return (newPath, WordDocument(newPath, autoSave));
-    }
-    #endregion
     #endregion
     #region 创建Word位置
     #region 创建特殊位置
@@ -98,8 +63,6 @@ public static class CreateOfficeMS
         };
     #endregion
     #endregion
-    #endregion
-    #region 内部成员
     #region 升级Office文件
     /// <summary>
     /// 升级一个Office文件，并返回升级后的文件路径
@@ -107,7 +70,7 @@ public static class CreateOfficeMS
     /// <param name="path">Office文件的路径，
     /// 如果不需要升级，或者不是Office文件，则原路返回</param>
     /// <returns></returns>
-    private static async Task<string> UpdateOfficeFile(string path)
+    public static async Task<string> UpdateOfficeFile(string path)
     {
         #region 用来升级的本地函数
         async Task<string> Update(Func<IOfficeUpdate> createOffice)
@@ -137,6 +100,5 @@ public static class CreateOfficeMS
             _ => path
         };
     }
-    #endregion
     #endregion
 }

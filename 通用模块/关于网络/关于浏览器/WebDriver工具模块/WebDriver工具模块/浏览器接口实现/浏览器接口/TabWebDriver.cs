@@ -1,7 +1,5 @@
 ﻿using OpenQA.Selenium;
 
-using System.Design;
-
 namespace System.NetFrancis.Browser;
 
 /// <summary>
@@ -12,47 +10,52 @@ namespace System.NetFrancis.Browser;
 /// </remarks>
 /// <param name="browser">本标签所隶属的浏览器对象</param>
 /// <param name="windowHandle">窗口句柄，它可以用来标识窗口</param>
-sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : Release, ITab
+sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : ITab
 {
     #region 公开成员
     #region 选择选项卡
     public void Select()
     {
-        WebDriver.SwitchTo().Window(WindowHandle);
+        WebDriver.SwitchTo().Window(windowHandle);
+    }
+    #endregion
+    #region 浏览器对象
+    public IBrowser Browser => browser;
+    #endregion
+    #region 指示对象是否可用
+    public bool IsAvailable
+        => (Browser.IsAvailable, IsDispose) is (true, false);
+    #endregion
+    #region 释放对象
+    public void Dispose()
+    {
+        if (IsAvailable)
+        {
+            IsDispose = true;
+            try
+            {
+                WebDriver.SwitchTo().Window(windowHandle).Close();
+            }
+            catch (NoSuchWindowException)
+            {
+            }
+        }
     }
     #endregion
     #endregion
     #region 内部成员
-    #region 浏览器对象
-    IBrowser ITab.Browser => Browser;
-
-    /// <summary>
-    /// 本标签所隶属的浏览器对象
-    /// </summary>
-    internal BrowserWebDriver Browser { get; } = browser;
-
+    #region 封装的浏览器对象
     /// <summary>
     /// 获取封装的浏览器对象，
     /// 本对象的功能就是通过它实现的
     /// </summary>
-    private WebDriver WebDriver => Browser.WebDriver;
+    private WebDriver WebDriver => browser.WebDriver;
     #endregion
-    #region 释放对象
-    protected override void DisposeRealize()
-    {
-        Select();
-        WebDriver.Close();
-        var tabs = Browser.Tabs;
-        if (tabs.Count > 0)
-            tabs[^1].Select();
-    }
-    #endregion
-    #region 窗口句柄
+    #region 指示对象是否被释放
     /// <summary>
-    /// 获取窗口句柄，它可以用来标识窗口
+    /// 指示这个对象是否被释放
     /// </summary>
-    private string WindowHandle { get; } = windowHandle;
-
+    private bool IsDispose { get; set; }
     #endregion
     #endregion
 }

@@ -208,6 +208,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
                 "ADD_REMARK" => DingDingOAOperationType.AddComments,
                 "REDIRECT_PROCESS" => DingDingOAOperationType.ReturnComment,
                 "PROCESS_CC" => DingDingOAOperationType.CC,
+                "EXECUTE_TASK_AUTO" => DingDingOAOperationType.ExexuteTaskAuto,
                 var type => throw new NotSupportedException($"未能识别{type}类型的操作")
             },
             Result = Fun<string>("result") switch

@@ -8,6 +8,10 @@
 		<AssemblyName>DingDing.Shared</AssemblyName>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\ASP.Net中台模块\ASP.Net中台模块\ASP.Net中台模块.csproj" />
 	</ItemGroup>

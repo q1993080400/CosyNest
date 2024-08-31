@@ -20,8 +20,9 @@ public interface IOfficePage
     /// 如果为<see langword="null"/>，代表全部打印，页码从0开始</param>
     /// <param name="number">打印的份数</param>
     /// <param name="printer">执行打印的打印机，如果为<see langword="null"/>，则使用默认打印机</param>
-    /// <returns>打印的所有页数，通过它可以估算打印任务的完成时间</returns>
-    int PrintFromPage(Range? page = null, int number = 1, IPrinter? printer = null);
+    /// <returns>这个元组的第一个项是打印的所有页数，通过它可以估算打印任务的完成时间，
+    /// 第二个项是一个估算的，用于等待打印完成的<see cref="Task"/></returns>
+    (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, IPrinter? printer = null);
     #endregion
     #region 打印到文件
     /// <summary>
@@ -30,7 +31,7 @@ public interface IOfficePage
     /// <param name="filePath">指定打印的目标文件路径，
     /// 函数会根据该路径的扩展名自动判断应使用哪个打印机</param>
     /// <inheritdoc cref="PrintFromPage(Range?, int, IPrinter?)"/>
-    void PrintFromPageToFile(string filePath, Range? page = null);
+    (int PageCount, Task Wait) PrintFromPageToFile(string filePath, Range? page = null);
     #endregion
     #endregion
 }

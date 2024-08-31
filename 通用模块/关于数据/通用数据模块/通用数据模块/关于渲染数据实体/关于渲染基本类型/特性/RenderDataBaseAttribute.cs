@@ -24,6 +24,6 @@ public abstract class RenderDataBaseAttribute : Attribute
     /// 如果这个值为<see langword="true"/>，
     /// 表示仅提供数据显示功能，不提供数据编辑功能
     /// </summary>
-    public bool IsReadOnly { get; init; }
+    public bool IsReadOnly { get; init; } = true;
     #endregion
 }

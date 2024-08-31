@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text.Json;
 
 namespace System;
 
@@ -86,9 +87,8 @@ public static partial class ExtendTool
                     { } o when type.IsEnum              //如果是枚举，则转换它的值或字面量
                     => o is string text ?
                     Enum.Parse(type, text) : Enum.ToObject(type, o.To(Enum.GetUnderlyingType(type))),
-                    string t when type == typeof(DateTimeOffset) => DateTimeOffset.Parse(t),
-                    string t when type == typeof(Guid) => Guid.Parse(t),          //为Guid做优化
                     IConvertible o => Convert.ChangeType(o, type),
+                    JsonElement jsonElement => jsonElement.Deserialize<Ret>(),
                     var o => (Ret)(dynamic)o          //如果一切失败，则尝试调用隐式转换以及类型自带的转换
                 };
             #endregion

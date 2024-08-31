@@ -410,24 +410,12 @@ div.autoPlayButtonCntainer > *:first-child
     backdrop-filter: saturate(1.8) blur(20px);
 }
 
-/*高亮显示样式*/
-[highlightGroup]
-{
-    background-color: yellow;
-}
-
 /*被选中的元素的样式*/
 .selectElement
 {
     background-color: gray;
     color: white;
 }
-
-    /*被选中的元素下面的高亮元素样式*/
-    .selectElement [highlightGroup]
-    {
-        color: black;
-    }
 
 /*被选择的元素的文本样式*/
 .selectElementText

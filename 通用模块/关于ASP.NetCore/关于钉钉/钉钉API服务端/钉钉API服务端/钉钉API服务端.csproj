@@ -8,6 +8,10 @@
 		<AssemblyName>DingDing.Server</AssemblyName>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\ASP.Net后端模块\ASP.Net后端模块\ASP.Net后端模块.csproj" />
 		<ProjectReference Include="..\..\钉钉API中台\钉钉API中台\钉钉API中台.csproj" />

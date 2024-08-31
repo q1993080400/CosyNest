@@ -24,6 +24,7 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// 获取渲染末尾的委托，
     /// 它的参数是末尾元素的ID，
     /// 必须将这个ID赋值给这个元素，
+    /// 并给它加上Key，
     /// 当用户看到末尾的时候，自动加载新的元素
     /// </summary>
     [Parameter]
@@ -55,17 +56,18 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     public async ValueTask DisposeAsync()
     {
         IsDispose = true;
-        if (RenderElements is { })
+        await Lock.WaitAsync();
+        try
         {
-            try
-            {
+            if (RenderElements is { })
                 await RenderElements.DisposeAsync();
-            }
-            catch (NotSupportedException)
-            {
-            }
+            PackNet?.Dispose();
         }
-        PackNet?.Dispose();
+        finally
+        {
+            Lock.Release();
+            Lock.Dispose();
+        }
     }
     #endregion
     #region 指示是否已经释放
@@ -84,7 +86,7 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// <summary>
     /// 获取封装的JS方法的名称
     /// </summary>
-    private string? JSMethodName { get; set; }
+    private string? JSMethodName { get; } = CreateASP.JSObjectName();
     #endregion
     #endregion
     #endregion
@@ -96,18 +98,17 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// </summary>
     private ImmutableList<Element> ElementList { get; set; } = [];
     #endregion
-    #region 枚举要渲染的元素
+    #region 异步迭代器
     /// <summary>
-    /// 枚举要渲染的元素
+    /// 获取用来枚举元素的异步迭代器
     /// </summary>
     private IAsyncEnumerator<Element> RenderElements { get; set; }
     #endregion
-    #region 渲染阻塞
+    #region 锁对象
     /// <summary>
-    /// 这个对象允许在上一个渲染未完成前，阻塞下一个渲染
+    /// 获取锁对象
     /// </summary>
-    private ImmutableDictionary<Guid, Task> RenderBlock { get; set; }
-        = ImmutableDictionary<Guid, Task>.Empty;
+    private SemaphoreSlim Lock { get; } = new(1);
     #endregion
     #region 是否需要继续渲染
     /// <summary>
@@ -117,35 +118,33 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// <returns></returns>
     private async Task<bool> NeedRender()
     {
-        var oldIsComplete = IsComplete;
-        #region 本地函数
-        async Task<bool> Fun()
+        if (IsComplete || IsDispose)
+            return false;
+        await Lock.WaitAsync();
+        try
         {
-            if (IsComplete || IsDispose)
-                return false;
-            (var element, IsComplete) = await RenderElements.MoveRange(Plus);
-            var newElement = element.ToArray();
-            if (newElement.Length is 0)
+            var oldIsComplete = IsComplete;
+            #region 本地函数
+            async Task<bool> Fun()
             {
-                await RenderElements.DisposeAsync();
-                return false;
+                (var element, IsComplete) = await RenderElements.MoveRange(Plus);
+                var newElement = element.ToArray();
+                if (newElement.Length is 0)
+                {
+                    await RenderElements.DisposeAsync();
+                    return false;
+                }
+                ElementList = ElementList.AddRange(newElement);
+                return true;
             }
-            ElementList = ElementList.AddRange(newElement);
-            return true;
+            #endregion
+            var needRender = await Fun();
+            return needRender || (IsComplete != oldIsComplete);
         }
-        #endregion
-        var completionSource = new TaskCompletionSource();
-        var id = Guid.NewGuid();
-        var renderStack = RenderBlock.Values.ToArray();
-        RenderBlock = RenderBlock.Add(id, completionSource.Task);
-        foreach (var item in renderStack)
+        finally
         {
-            await item;
+            Lock.Release();
         }
-        var needRender = await Fun();
-        RenderBlock = RenderBlock.Remove(id);
-        completionSource.SetResult();
-        return needRender || (IsComplete != oldIsComplete);
     }
     #endregion
     #region 集合是否已枚举完毕
@@ -183,42 +182,44 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     #region 重写SetParametersAsync
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var dictionary = parameters.ToDictionary().ToDictionary();
         var elements = parameters.GetValueOrDefault<IAsyncEnumerable<Element>>(nameof(Elements));
-        if (elements is null || !ReferenceEquals(elements, Elements))
+        var hasNewElements = elements is null || !ReferenceEquals(elements, Elements);
+        if (hasNewElements)
         {
-            if (RenderElements is { })
+            await Lock.WaitAsync();
+            try
             {
-                try
-                {
+                if (RenderElements is { })
                     await RenderElements.DisposeAsync();
-                }
-                catch (NotSupportedException)
-                {
-                }
+                RenderElements = (elements ?? Array.Empty<Element>().ToAsyncEnumerable()).GetAsyncEnumerator();
+                IsComplete = elements is null;
+                ElementList = [];
             }
-            RenderElements = (elements ?? Array.Empty<Element>().ToAsyncEnumerable()).GetAsyncEnumerator();
-            IsComplete = elements is null;
-            ElementList = [];
+            finally
+            {
+                Lock.Release();
+            }
         }
-        await base.SetParametersAsync(parameters);
+        await base.SetParametersAsync(ParameterView.FromDictionary(dictionary));
+        PackNet ??= (await JSWindow.Document.PackNetMethod<JsonElement>(_ => AddElementAndRender(), JSMethodName)).Freed;
+        if (hasNewElements)
+        {
+            await JSWindow.InvokeCodeVoidAsync($"""
+                ObservingVirtualizationContainers({JSMethodName},'{EndID}');
+                """);
+        }
     }
     #endregion
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-            (JSMethodName, PackNet) = await JSWindow.Document.PackNetMethod<JsonElement>(_ => AddElementAndRender());
         if (IsComplete || IsDispose)
             return;
+        await Task.Delay(1000);
         var intersecting = await JSWindow.InvokeAsync<bool>("CheckIntersecting", EndID);
         if (intersecting && await NeedRender())
-        {
             StateHasChanged();
-            return;
-        }
-        await JSWindow.InvokeCodeVoidAsync($"""
-                ObservingVirtualizationContainers({JSMethodName},'{EndID}');
-                """);
     }
     #endregion
     #endregion
@@ -233,6 +234,7 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             x =>
         {
             x.OpenElement(0, "div");
+            x.SetKey(EndID);
             x.AddAttribute(1, "id", EndID);
             x.CloseElement();
         }
@@ -241,7 +243,16 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
         {
             DataSource = ElementList,
             RenderLoadingPoint = renderEnd,
-            IsEmpty = (IsComplete, ElementList.Count) is (true, 0)
+            EnumerableState = (Elements, IsComplete) switch
+            {
+                (null, _) => VirtualizationEnumerableState.NotEnumerable,
+                ({ }, false) => VirtualizationEnumerableState.InEnumerable,
+                ({ }, true) => ElementList.Count switch
+                {
+                    > 0 => VirtualizationEnumerableState.Complete,
+                    _ => VirtualizationEnumerableState.Empty,
+                },
+            }
         };
     }
     #endregion

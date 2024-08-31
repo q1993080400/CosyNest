@@ -8,12 +8,16 @@
 		<RootNamespace>System.NetFrancis</RootNamespace>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\通用网络模块\通用网络模块\通用网络模块.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.14.1" PrivateAssets="compile" />
+		<PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.14.1" PrivateAssets="compile" />
 	</ItemGroup>
 
 </Project>

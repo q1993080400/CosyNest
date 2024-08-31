@@ -71,7 +71,7 @@ public interface IElementBase
     /// <returns></returns>
     /// <inheritdoc cref="Find{Element}(Expression{Func{Element, bool}},bool)"/>
     IReadOnlyList<Element> FindFromCss<Element>(string cssSelect, bool ignoreException = false)
-        where Element : IElementBase;
+        where Element : class, IElementBase;
     #endregion
     #region 非泛型方法
     /// <inheritdoc cref="FindFromCss{Element}(string, bool)"/>

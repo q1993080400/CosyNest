@@ -36,10 +36,10 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     [EditorRequired]
     public RenderFragment<RenderBusinessFormViewerInfo<Model>> RenderSubmit { get; set; }
     #endregion
-    #region 是否可编辑
-    /// <inheritdoc cref="FormViewer{Model}.CanEdit"/>
+    #region 表单是否可编辑
+    /// <inheritdoc cref="FormViewer{Model}.CanEditForm"/>
     [Parameter]
-    public bool CanEdit { get; set; }
+    public bool? CanEditForm { get; set; }
     #endregion
     #region 是否仅显示
     /// <inheritdoc cref="FormViewer{Model}.IsReadOnlyProperty"/>
@@ -66,10 +66,20 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     public Func<Model, bool> ExistingForms { get; set; }
         = FormViewer<Model>.ExistingFormsDefault;
     #endregion
+    #region 值转换函数
+    /// <inheritdoc cref="FormViewer{Model}.PropertyValueConvert"/>
+    [Parameter]
+    public Func<Type, object?, object?>? PropertyValueConvert { get; set; }
+    #endregion
+    #region 创建值改变时的函数的高阶函数
+    /// <inheritdoc cref="FormViewer{Model}.CreatePropertyChangeEvent"/>
+    [Parameter]
+    public Func<RenderFormViewerPropertyInfoBase<Model>, Func<object?, Task>?>? CreatePropertyChangeEvent { get; set; }
+    #endregion
     #region 用来获取属性渲染参数的委托
     /// <inheritdoc cref="FormViewer{Model}.GetRenderPropertyInfo"/>
     [Parameter]
-    public Func<Type, FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfoBase<Model>>> GetRenderPropertyInfo { get; set; }
+    public Func<FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfoBase<Model>>> GetRenderPropertyInfo { get; set; }
         = FormViewer<Model>.GetRenderPropertyInfoDefault;
     #endregion
     #endregion

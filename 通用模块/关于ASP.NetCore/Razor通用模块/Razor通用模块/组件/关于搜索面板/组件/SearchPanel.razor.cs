@@ -149,6 +149,8 @@ public sealed partial class SearchPanel : ComponentBase
     /// <returns></returns>
     private async Task SubmitFunction()
     {
+        if (InitializeDefaultQueryConditions)
+            return;
         var info = new SearchPanelSubmitInfo()
         {
             DataFilterDescription = SearchViewerState.GenerateFilter()

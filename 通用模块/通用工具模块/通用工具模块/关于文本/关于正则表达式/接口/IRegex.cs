@@ -51,10 +51,9 @@ public interface IRegex
     /// 并返回替换后的文本
     /// </summary>
     /// <param name="text">待修改的原始文本</param>
-    /// <param name="replace">该委托的参数是需要替换的原始文本，
-    /// 返回值是用来代替的新文本</param>
+    /// <param name="replace">替换后的新文本</param>
     /// <returns></returns>
-    string Replace(string text, Func<string, string> replace);
+    string Replace(string text, string replace);
     #endregion
     #region 删除匹配到的字符
     /// <summary>
@@ -63,7 +62,7 @@ public interface IRegex
     /// <param name="text">待修改的原始文本</param>
     /// <returns></returns>
     string Remove(string text)
-        => Replace(text, _ => "");
+        => Replace(text, "");
     #endregion
     #endregion
 }

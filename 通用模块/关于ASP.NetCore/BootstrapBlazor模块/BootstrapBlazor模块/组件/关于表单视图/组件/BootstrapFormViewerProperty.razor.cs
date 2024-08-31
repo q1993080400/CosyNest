@@ -18,14 +18,6 @@ public sealed partial class BootstrapFormViewerProperty<Model> : ComponentBase
     [EditorRequired]
     public RenderFormViewerPropertyInfo<Model> RenderInfo { get; set; }
     #endregion
-    #region 当数据改变时触发的委托
-    /// <summary>
-    /// 当数据改变时触发的委托，
-    /// 它的参数就是数据的新值
-    /// </summary>
-    [Parameter]
-    public Func<object?, Task>? OnPropertyChange { get; set; }
-    #endregion
     #region 高亮文本
     /// <summary>
     /// 获取高亮文本的集合

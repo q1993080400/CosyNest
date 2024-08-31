@@ -48,14 +48,14 @@ public sealed partial class FormViewer<Model> : ComponentBase
     [EditorRequired]
     public RenderFragment<RenderSubmitInfo<Model>> RenderSubmit { get; set; }
     #endregion
-    #region 是否可编辑
+    #region 表单是否可编辑
     /// <summary>
-    /// 获取这个表单是否可编辑，
-    /// 它比<see cref="IsReadOnlyProperty"/>优先级更高，
-    /// 只有在它为<see langword="true"/>的时候，才会去检查后者
+    /// 如果这个值为<see langword="true"/>，表示表单可编辑，
+    /// 为<see langword="false"/>，表示不可编辑，
+    /// 为<see langword="null"/>，表示交给<see cref="GetRenderPropertyInfo"/>判断
     /// </summary>
     [Parameter]
-    public bool CanEdit { get; set; }
+    public bool? CanEditForm { get; set; }
     #endregion
     #region 是否仅显示
     #region 正式方法
@@ -148,28 +148,46 @@ public sealed partial class FormViewer<Model> : ComponentBase
         => model is IWithID { ID: { } id } && id != default;
     #endregion
     #endregion
+    #region 值转换函数
+    /// <summary>
+    /// 这个函数的第一个参数是值的类型，
+    /// 第二个参数是真正的值，
+    /// 返回值是渲染的时候应该渲染的值，
+    /// 通过它可以实现某些特殊操作，
+    /// 例如把空字符串渲染成不明
+    /// </summary>
+    [Parameter]
+    public Func<Type, object?, object?>? PropertyValueConvert { get; set; }
+    #endregion
+    #region 创建值改变时的函数的高阶函数
+    /// <summary>
+    /// 这个高阶函数传入属性渲染对象，
+    /// 然后返回一个在属性的值被修改时触发的函数，
+    /// 如果返回<see langword="null"/>，表示不执行
+    /// </summary>
+    [Parameter]
+    public Func<RenderFormViewerPropertyInfoBase<Model>, Func<object?, Task>?>? CreatePropertyChangeEvent { get; set; }
+    #endregion
     #region 用来获取属性渲染参数的委托
     #region 正式属性
     /// <summary>
-    /// 这个委托的第一个参数是模型的类型，
-    /// 第二个参数是这个组件本身，
+    /// 这个委托的参数是这个组件本身，
     /// 返回值是所有属性渲染参数，
     /// 它的顺序非常重要，组件会依次渲染它们
     /// </summary>
     [Parameter]
-    public Func<Type, FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfoBase<Model>>> GetRenderPropertyInfo { get; set; } = GetRenderPropertyInfoDefault;
+    public Func<FormViewer<Model>, IEnumerable<RenderFormViewerPropertyInfoBase<Model>>> GetRenderPropertyInfo { get; set; } = GetRenderPropertyInfoDefault;
     #endregion
     #region 默认方法
     /// <summary>
     /// 本方法是<see cref="GetRenderPropertyInfo"/>的默认方法，
     /// 它通过<see cref="RenderDataBaseAttribute"/>属性确定如何进行转换
     /// </summary>
-    /// <param name="modelType">模型的类型</param>
     /// <param name="formViewer">当前表单视图组件</param>
     /// <returns></returns>
-    public static IEnumerable<RenderFormViewerPropertyInfoBase<Model>> GetRenderPropertyInfoDefault(Type modelType, FormViewer<Model> formViewer)
+    public static IEnumerable<RenderFormViewerPropertyInfoBase<Model>> GetRenderPropertyInfoDefault(FormViewer<Model> formViewer)
     {
-        var property = modelType.GetProperties().Where(x => !x.IsStatic()).ToArray();
+        var property = typeof(Model).GetProperties().Where(x => !x.IsStatic()).ToArray();
         var propertys = property.Select(x =>
         {
             var renderData = x.GetCustomAttribute<RenderDataBaseAttribute>();
@@ -182,36 +200,50 @@ public sealed partial class FormViewer<Model> : ComponentBase
         Where(x => x.Attribute is { }).ToArray().
         OrderBy(x => x.Attribute.Order).ToArray();
         var model = formViewer.FormModel;
+        var canEditForm = formViewer.CanEditForm;
         return propertys.Select(x =>
         {
             var property = x.Item;
             var attribute = x.Attribute;
             var groupName = attribute.GroupName;
-            var isReadOnlyProperty = !formViewer.CanEdit || !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model);
-            return attribute switch
+            var isReadOnly = !property.IsAlmighty() || (canEditForm ?? formViewer.IsReadOnlyProperty(property, model));
+            var readOnlyConvert = isReadOnly ? formViewer.PropertyValueConvert : null;
+            var renderInfo = attribute switch
             {
                 RenderDataAttribute renderDataAttribute => (RenderFormViewerPropertyInfoBase<Model>)new RenderFormViewerPropertyInfo<Model>()
                 {
                     FormModel = model,
                     GroupName = groupName,
-                    IsReadOnly = isReadOnlyProperty,
+                    IsReadOnly = isReadOnly,
                     Property = property,
                     Name = renderDataAttribute.Name,
+                    PropertyValueConvert = readOnlyConvert,
+                    OnPropertyChange = null,
                     RenderPreference = new()
                     {
                         Format = renderDataAttribute.Format,
-                        RenderLongTextRows = renderDataAttribute.RenderLongTextRows
+                        RenderLongTextRows = renderDataAttribute.RenderLongTextRows,
+                        RenderEnum = renderDataAttribute.RenderEnum,
                     }
                 },
                 RenderDataCustomAttribute => new RenderFormViewerPropertyInfoCustom<Model>()
                 {
                     FormModel = model,
                     GroupName = groupName,
-                    IsReadOnly = isReadOnlyProperty,
+                    IsReadOnly = isReadOnly,
                     Property = property,
+                    PropertyValueConvert = readOnlyConvert,
+                    OnPropertyChange = null
                 },
                 _ => throw new NotSupportedException("无法识别这个渲染数据特性")
             };
+            var createPropertyChangeEvent = formViewer.CreatePropertyChangeEvent;
+            return (isReadOnly, createPropertyChangeEvent) is (false, { }) ?
+            renderInfo with
+            {
+                OnPropertyChange = createPropertyChangeEvent(renderInfo)
+            } :
+            renderInfo;
         }).ToArray();
     }
     #endregion
@@ -229,7 +261,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
             FormModel = model,
             IsReadOnlyProperty = static (_, _) => true
         };
-        return GetRenderPropertyInfoDefault(typeof(Model), formViewer);
+        return GetRenderPropertyInfoDefault(formViewer);
     }
     #endregion
     #endregion
@@ -249,7 +281,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// <returns></returns>
     private RenderFormViewerInfo<Model> GetRenderInfo()
     {
-        var renderFormViewerPropertyInfo = GetRenderPropertyInfo(typeof(Model), this).ToArray();
+        var renderFormViewerPropertyInfo = GetRenderPropertyInfo(this).ToArray();
         var renderPropertyGroup = renderFormViewerPropertyInfo.GroupBy(x => x.GroupName).ToArray();
         #region 返回渲染组的本地函数
         RenderFormViewerRegionInfo<Model> RenderGroup(IGrouping<string?, RenderFormViewerPropertyInfoBase<Model>> renderProperty)

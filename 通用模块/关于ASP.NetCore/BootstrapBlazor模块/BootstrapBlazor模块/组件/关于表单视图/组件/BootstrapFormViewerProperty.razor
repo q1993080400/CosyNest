@@ -51,7 +51,7 @@
                 <div class="bootstrapFormViewerPropertyLabel">@name</div>
                 <pre class="bootstrapFormViewerPropertyText">
                 <TextRenderingSimple Highlight="Highlight" Value="text" />
-                                                                                                                        </pre>
+                                                                                                                            </pre>
             </div>
         }
         else
@@ -159,12 +159,12 @@
                 case { IsEnum: true } t:
                     var enumRender = renderPreference.RenderEnum;
                     Func<int, Task>? onEnumChange =
-                    this.OnPropertyChange is null ?
+                    RenderInfo.OnPropertyChange is null ?
                     null :
                     async value =>
                     {
                         var enumValue = value.To(RenderInfo.ValueType);
-                        await this.OnPropertyChange(enumValue);
+                        await RenderInfo.OnPropertyChange(enumValue);
                     };
                     var enumSelect = Enum.GetNames(t).
                     Select(x => t.GetField(x)!).

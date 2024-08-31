@@ -3,10 +3,11 @@
 @typeparam Model
 
 <FormViewer GetRenderPropertyInfo=GetRenderPropertyInfo
-            InitializationModel="InitializationModel"
+            InitializationModel="InitializationModel" CanEditForm="CanEditForm"
             ExistingForms=ExistingForms IsReadOnlyProperty=IsReadOnlyProperty
-            IsValueReference=IsValueReference CanEdit="CanEdit"
-            RenderComponent="RenderComponent" RenderMain="RenderMain" RenderProperty="RenderProperty">
+            PropertyValueConvert="PropertyValueConvert" CreatePropertyChangeEvent="CreatePropertyChangeEvent"
+            RenderComponent="RenderComponent" RenderMain="RenderMain" RenderProperty="RenderProperty"
+            IsValueReference=IsValueReference>
     <RenderSubmit>
         @RenderSubmit(GetRenderSubmitInfo(context))
     </RenderSubmit>

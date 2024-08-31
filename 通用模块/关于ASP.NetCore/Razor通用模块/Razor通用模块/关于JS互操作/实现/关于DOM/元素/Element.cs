@@ -120,15 +120,16 @@ sealed class Element(IJSRuntime jsRuntime, string id) : IElementJS
 
     public string Text => throw new NotImplementedException();
 
-    public IReadOnlyList<Element1> Find<Element1>(Expression<Func<Element1, bool>> where, bool ignoreException) where Element1 : IElementBase
+    public IReadOnlyList<Element1> Find<Element1>(Expression<Func<Element1, bool>> where, bool ignoreException)
+        where Element1 : IElementBase
     {
         throw new NotImplementedException();
     }
 
-    public IReadOnlyList<Element1> FindFromCss<Element1>(string cssSelect, bool ignoreException) where Element1 : IElementBase
+    public IReadOnlyList<Element1> FindFromCss<Element1>(string cssSelect, bool ignoreException)
+        where Element1 : class, IElementBase
     {
         throw new NotImplementedException();
     }
-
     #endregion
 }

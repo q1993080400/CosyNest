@@ -106,9 +106,9 @@
                                     </BodyTemplate>
                                     <FooterTemplate>
                                         <div class="compactCentered">
-                                            <Button Text="返回页面" OnClick="renderPopUpInfo.Cancellation" />
-                                            <Button Text="提交搜索" OnClick="renderSelectorInfo.Submit" IsDisabled="@(!renderSelectorInfo.AnySelect)" />
                                             <Button Text="清除条件" OnClick="ClearEnumItem(bindQueryEnum)" />
+                                            <Button Text="提交搜索" OnClick="renderSelectorInfo.Submit" IsDisabled="@(!renderSelectorInfo.AnySelect)" />
+                                            <Button Text="返回页面" OnClick="renderPopUpInfo.Cancellation" />
                                         </div>
                                     </FooterTemplate>
                                 </Card>

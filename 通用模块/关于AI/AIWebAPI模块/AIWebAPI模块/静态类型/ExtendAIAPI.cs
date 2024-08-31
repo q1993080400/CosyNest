@@ -18,7 +18,7 @@ public static class ExtendAIAPI
     /// </summary>
     /// <param name="services">服务容器</param>
     /// <returns></returns>
-    /// <inheritdoc cref="AI.AIChatBaiDu(string, string, string, Func{IHttpClient}?)"/>
+    /// <inheritdoc cref="AIChatBaiDu(string, string, string, Func{IHttpClient}?)"/>
     public static IServiceCollection AddAIChatBaiDu(this IServiceCollection services, string modelUri, Func<IHttpClient>? httpClientProvide = null)
     {
         services.AddSingleton(x =>

@@ -61,5 +61,10 @@ public enum DingDingOAOperationType
     /// 抄送
     /// </summary>
     [RenderData(Name = "抄送")]
-    CC
+    CC,
+    /// <summary>
+    /// 自动执行任务，意义不明
+    /// </summary>
+    [RenderData(Name = "自动执行任务")]
+    ExexuteTaskAuto
 }

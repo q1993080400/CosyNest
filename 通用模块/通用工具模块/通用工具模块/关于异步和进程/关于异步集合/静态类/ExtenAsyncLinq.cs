@@ -55,4 +55,14 @@ public static partial class ExtendEnumerable
         }
     }
     #endregion
+    #region 等待所有集合中的所有Task
+    /// <summary>
+    /// 等待一个集合中的所有<see cref="Task"/>
+    /// </summary>
+    /// <typeparam name="Obj"><see cref="Task"/>的返回值类型</typeparam>
+    /// <param name="list">要等待的<see cref="Task"/>集合</param>
+    /// <returns></returns>
+    public static Task<Obj[]> WhenAll<Obj>(this IEnumerable<Task<Obj>> list)
+        => Task.WhenAll(list);
+    #endregion
 }

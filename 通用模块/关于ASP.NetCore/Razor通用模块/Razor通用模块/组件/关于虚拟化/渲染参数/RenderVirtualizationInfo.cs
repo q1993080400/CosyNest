@@ -11,15 +11,13 @@ public sealed record RenderVirtualizationInfo<Obj>
     /// 获取数据源，
     /// 它枚举所有需要渲染的数据
     /// </summary>
-    public required IEnumerable<Obj> DataSource { get; init; }
+    public required IReadOnlyCollection<Obj> DataSource { get; init; }
     #endregion
-    #region 是否为空集合
+    #region 枚举状态
     /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示集合已经枚举完毕，而且是一个空集合，
-    /// 可以视情况考虑是否应该显示一个提示
+    /// 获取虚拟化组件的异步集合的枚举状态
     /// </summary>
-    public required bool IsEmpty { get; init; }
+    public required VirtualizationEnumerableState EnumerableState { get; init; }
     #endregion
     #region 用来渲染加载点的委托
     /// <summary>

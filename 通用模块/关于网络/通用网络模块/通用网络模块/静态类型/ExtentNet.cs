@@ -18,16 +18,19 @@ public static class ExtendNet
     #region 转换Base64字符串
     #region 转换为Base64字符串
     /// <summary>
-    /// 将字符串转换为Base64字符串，
-    /// 它替换了所有不安全的字符
+    /// 将字符串转换为Base64字符串
     /// </summary>
     /// <param name="text">封装要转换的字符串的对象</param>
+    /// <param name="replaceUnsafe">如果这个值为<see langword="true"/>，
+    /// 则还会替换所有不安全字符</param>
     /// <returns></returns>
-    public static string ToBase64(this StringOperate text)
+    public static string ToBase64(this StringOperate text, bool replaceUnsafe = true)
     {
         var plainTextBytes = text.Text.ToBytes();
-        var base64 = Convert.ToBase64String(plainTextBytes).Replace('+', '-').Replace('/', '_').TrimEnd('=');
-        return base64;
+        var base64 = Convert.ToBase64String(plainTextBytes);
+        return replaceUnsafe ?
+            base64.Replace('+', '-').Replace('/', '_').TrimEnd('=') :
+            base64;
     }
     #endregion
     #region 从Base64字符串转换

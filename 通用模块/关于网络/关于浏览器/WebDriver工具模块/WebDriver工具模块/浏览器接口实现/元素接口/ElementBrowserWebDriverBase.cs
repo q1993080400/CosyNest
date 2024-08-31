@@ -41,7 +41,7 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     #region 搜索子元素
     #region 指定CSS选择器
     public IReadOnlyList<Element> FindFromCss<Element>(string cssSelect, bool ignoreException)
-        where Element : IElementBase
+        where Element : class, IElementBase
     {
         try
         {

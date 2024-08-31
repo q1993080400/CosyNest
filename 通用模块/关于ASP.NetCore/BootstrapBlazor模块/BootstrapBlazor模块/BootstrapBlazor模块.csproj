@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<NoWarn>1701;1702;CS8618</NoWarn>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,7 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="8.7.5" />
+		<PackageReference Include="BootstrapBlazor" Version="8.8.4" />
 	</ItemGroup>
 
 	<ItemGroup>

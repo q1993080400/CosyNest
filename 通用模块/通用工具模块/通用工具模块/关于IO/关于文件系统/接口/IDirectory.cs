@@ -13,12 +13,12 @@ public interface IDirectory : IIO, IDirectoryBase
     /// 将子文件目录复制到其他位置，
     /// 但是不复制这个目录本身
     /// </summary>
-    /// <param name="father">新的父目录</param>
-    void CopySon(IDirectory father)
+    /// <param name="fatherPath">新的父目录路径</param>
+    void CopySon(string fatherPath)
     {
         foreach (var item in Son)
         {
-            item.Copy(father);
+            item.Copy(fatherPath);
         }
     }
     #endregion
