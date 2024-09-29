@@ -51,7 +51,7 @@
                 <div class="bootstrapFormViewerPropertyLabel">@name</div>
                 <pre class="bootstrapFormViewerPropertyText">
                 <TextRenderingSimple Highlight="Highlight" Value="text" />
-                                                                                                                            </pre>
+                                                                                                                                        </pre>
             </div>
         }
         else
@@ -196,20 +196,8 @@
                 case var t when t == typeof(DateTimeOffset):
                     var formatDate = format.IsVoid() ? "d" : format;
                     var valueDate = RenderInfo.BindValue<DateTimeOffset>();
-                    var verifyAge = GetRenderAttribute<VerifyAgeAttribute>();
-                    if (verifyAge is { })
-                    {
-                        var now = DateTime.Now;
-                        var maxBirthday = now.AddYears((decimal)-verifyAge.MinAge);
-                        var minBirthday = now.AddYears((decimal)-verifyAge.MaxAge);
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true" DisplayText="@name"
-                                        MinValue="minBirthday" MaxValue=" maxBirthday" DateFormat="@formatDate" />
-                    }
-                    else
-                    {
-                        <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true"
-                                        DisplayText="@name" DateFormat="@formatDate" />
-                    }
+                    <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true"
+                                    DisplayText="@name" DateFormat="@formatDate" />
                     break;
                 case var t:
                     throw new NotSupportedException($"无法识别属性{name}的类型{t}，不能生成表单");

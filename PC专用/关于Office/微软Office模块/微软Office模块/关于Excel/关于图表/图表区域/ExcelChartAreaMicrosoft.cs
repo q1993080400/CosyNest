@@ -1,4 +1,4 @@
-﻿using System.Media.Drawing;
+﻿using System.Drawing;
 
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
@@ -12,7 +12,7 @@ namespace System.Office;
 sealed class ExcelChartAreaMicrosoft(ChartArea chartArea) : IOfficeChartArea
 {
     #region 图表区填充
-    public IColor? Fill
+    public Color? Fill
     {
         get => throw new NotImplementedException();
         set

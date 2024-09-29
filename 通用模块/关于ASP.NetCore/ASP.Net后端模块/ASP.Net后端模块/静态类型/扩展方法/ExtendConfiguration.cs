@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.Reflection;
+
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR;
-
-using System.Design;
-using System.Reflection;
-
-using static Microsoft.AspNetCore.CreateWebApi;
 
 namespace System;
 
@@ -14,20 +11,6 @@ public static partial class ExtendWebApi
 {
     //这个部分类专门用来声明有关配置的扩展方法
 
-    #region 配置MvcOptions
-    #region 添加常用类型Json的支持
-    /// <summary>
-    /// 为<see cref="MvcOptions"/>添加常用类型Json的支持
-    /// </summary>
-    /// <param name="options">待添加支持的Mvc配置</param>
-    public static void AddFormatterJson(this MvcOptions options)
-    {
-        var jsonConvert = CreateDesign.JsonCommonOptions();
-        options.InputFormatters.Insert(0, InputFormatterJson(jsonConvert));
-        options.OutputFormatters.Insert(0, OutputFormatterJson(jsonConvert));
-    }
-    #endregion
-    #endregion
     #region 配置SignalR
     #region 注册所有SignalR中心
     /// <summary>

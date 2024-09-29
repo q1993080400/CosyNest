@@ -7,9 +7,6 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
 	</PropertyGroup>
 

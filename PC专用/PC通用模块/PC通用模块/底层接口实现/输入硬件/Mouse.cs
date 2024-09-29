@@ -8,7 +8,7 @@ namespace System.Underlying.PC;
 /// 该类型是<see cref="IMouse"/>的实现，
 /// 可以视为一个鼠标
 /// </summary>
-sealed class Mouse : IMouse
+sealed partial class Mouse : IMouse
 {
 #pragma warning disable CA1806
 
@@ -31,8 +31,8 @@ sealed class Mouse : IMouse
     /// <param name="dwData">如果事件类型为滚动滚轮，则它指示滚动的幅度</param>
     /// <param name="dwExtraInfo">该参数意义不明</param>
     /// <returns></returns>
-    [DllImport("user32")]
-    private static extern int mouse_event(int dwFlags, int dx, int dy, int dwData = 0, int dwExtraInfo = 0);
+    [LibraryImport("user32")]
+    private static partial int mouse_event(int dwFlags, int dx, int dy, int dwData = 0, int dwExtraInfo = 0);
     #endregion
     #region Win32枚举
     /// <summary>

@@ -26,7 +26,6 @@ sealed class JSCookie : ICookie
     #endregion
     #region 关于集合
     #region 枚举所有键值对
-    #region 正式属性
     public async IAsyncEnumerator<KeyValuePair<string, string>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
         var cookie = await JSRuntime.InvokeAsync<KeyAndValue[]>("docCookies.keyAndValue", cancellationToken);
@@ -35,7 +34,6 @@ sealed class JSCookie : ICookie
             yield return new(item.Key, item.Value);
         }
     }
-    #endregion
     #endregion
     #region 检查键值对是否存在
     public async Task<bool> ContainsAsync(KeyValuePair<string, string> item, CancellationToken cancellation = default)
@@ -74,13 +72,13 @@ sealed class JSCookie : ICookie
     private IJSRuntime JSRuntime { get; }
     #endregion
     #region 辅助类型
-    private record ExistAndValue
+    private sealed record ExistAndValue
     {
         public bool Exist { get; set; }
         public string? Value { get; set; }
     }
 
-    private record KeyAndValue
+    private sealed record KeyAndValue
     {
         public string Key { get; set; }
         public string Value { get; set; }

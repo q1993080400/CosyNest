@@ -8,12 +8,9 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<COMReference Include="IWshRuntimeLibrary" PrivateAssets="compile">
 			<WrapperTool>tlbimp</WrapperTool>

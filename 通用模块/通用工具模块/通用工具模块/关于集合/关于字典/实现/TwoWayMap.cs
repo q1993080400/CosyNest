@@ -18,8 +18,11 @@ sealed class TwoWayMap<A, B> : ITwoWayMap<A, B>
         => AToB[a];
     #endregion
     #region 不会引发异常
-    public (bool Exist, B? Value) TryAMapB(A key, LazyPro<B>? notFound = null)
-         => AToB.TryGetValue(key, notFound);
+    public (bool Exist, B? Value) TryAMapB(A key, Lazy<B>? notFound = null)
+    {
+        var exist = AToB.TryGetValue(key, out var notFoundValue);
+        return (exist, exist ? notFoundValue : notFound.Value());
+    }
     #endregion
     #endregion
     #region 将B映射为A
@@ -28,8 +31,11 @@ sealed class TwoWayMap<A, B> : ITwoWayMap<A, B>
         => BToA[b];
     #endregion
     #region 不会引发异常
-    public (bool Exist, A? Value) TryBMapA(B key, LazyPro<A>? notFound = null)
-         => BToA.TryGetValue(key, notFound);
+    public (bool Exist, A? Value) TryBMapA(B key, Lazy<A>? notFound = null)
+    {
+        var exist = BToA.TryGetValue(key, out var notFoundValue);
+        return (exist, exist ? notFoundValue : notFound.Value());
+    }
     #endregion
     #endregion
     #endregion

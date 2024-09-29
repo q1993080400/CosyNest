@@ -1,6 +1,4 @@
-﻿using System.Underlying;
-
-namespace System.Office;
+﻿namespace System.Office;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -22,7 +20,7 @@ public interface IOfficePage
     /// <param name="printer">执行打印的打印机，如果为<see langword="null"/>，则使用默认打印机</param>
     /// <returns>这个元组的第一个项是打印的所有页数，通过它可以估算打印任务的完成时间，
     /// 第二个项是一个估算的，用于等待打印完成的<see cref="Task"/></returns>
-    (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, IPrinter? printer = null);
+    (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, string? printer = null);
     #endregion
     #region 打印到文件
     /// <summary>

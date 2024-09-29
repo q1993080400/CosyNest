@@ -25,7 +25,7 @@ sealed class ReflectionDictionary(object? target, IEnumerable<PropertyInfo> prop
     /// <summary>
     /// 该字典通过名称索引属性对象
     /// </summary>
-    private IReadOnlyDictionary<string, PropertyInfo> Properties { get; } = properties.ToDictionary(x => (x.Name, x), true);
+    private DictionaryFit<string, PropertyInfo> Properties { get; } = properties.ToDictionary(x => (x.Name, x), true);
     #endregion
     #endregion
     #region 有关键值对集合

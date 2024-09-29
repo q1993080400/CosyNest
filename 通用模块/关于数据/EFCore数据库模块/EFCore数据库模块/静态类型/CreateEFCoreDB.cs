@@ -1,12 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.DataFrancis.DB.EF;
+
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
-
-using System.DataFrancis.DB.EF;
-using System.Text.Json.Serialization;
-using System.TreeObject.Json;
 
 namespace System.DataFrancis;
 
@@ -28,25 +26,6 @@ public static class CreateEFCoreDB
     /// 获取一个用来创建几何图形的工厂
     /// </summary>
     public static GeometryFactory GeometryFactory { get; } = NtsGeometryServices.Instance.CreateGeometryFactory(SRID);
-    #endregion
-    #region 返回用来转换Point的转换器
-    /// <summary>
-    /// 返回用来转换<see cref="Point"/>的Json转换器
-    /// </summary>
-    public static JsonConverter<Point> JsonPoint { get; }
-        = CreateJson.JsonMap<Point, PointMap>(x => new PointMap()
-        {
-            X = x.X,
-            Y = x.Y,
-            Z = x.Z is double.NaN ? null : x.Z,
-            SRID = x.SRID
-        },
-            x => x.SRID is SRID ?
-            GeometryFactory.CreatePoint(new Coordinate(x.X, x.Y)) :
-            new Point(x.X, x.Y, x.Z ?? double.NaN)
-            {
-                SRID = x.SRID
-            });
     #endregion
     #endregion
     #region 有关数据管道
@@ -85,15 +64,5 @@ public static class CreateEFCoreDB
         => DataContextFactory(() => new DB());
     #endregion
     #endregion
-    #endregion 
+    #endregion
 }
-
-#region Json投影类型
-file class PointMap
-{
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double? Z { get; set; }
-    public int SRID { get; set; }
-}
-#endregion

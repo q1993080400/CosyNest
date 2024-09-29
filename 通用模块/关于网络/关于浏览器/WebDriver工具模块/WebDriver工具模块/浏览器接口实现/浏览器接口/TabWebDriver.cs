@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium;
+﻿using System.Diagnostics;
+
+using OpenQA.Selenium;
 
 namespace System.NetFrancis.Browser;
 
@@ -29,16 +31,21 @@ sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : ITab
     #region 释放对象
     public void Dispose()
     {
-        if (IsAvailable)
+        if (!IsAvailable)
+            return;
+        IsDispose = true;
+        try
         {
-            IsDispose = true;
-            try
-            {
-                WebDriver.SwitchTo().Window(windowHandle).Close();
-            }
-            catch (NoSuchWindowException)
-            {
-            }
+            WebDriver.SwitchTo().Window(windowHandle).Close();
+        }
+        catch (NoSuchWindowException)
+        {
+        }
+        catch (Exception)
+        {
+            //如果关闭标签页出现问题，则强制关闭整个浏览器，防止浏览器无法关闭，造成更严重的后果
+            Process.GetProcesses().Where(x => x.ProcessName is "msedge").ToArray().ForEach(x => x.Kill());
+            throw;
         }
     }
     #endregion

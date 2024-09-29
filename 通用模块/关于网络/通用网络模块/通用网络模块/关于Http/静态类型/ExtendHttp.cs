@@ -9,15 +9,15 @@ namespace System;
 /// </summary>
 public static class ExtendHttp
 {
-    #region 将HttpClient转换为IHttpClient
+    #region 将IHttpClientFactory转换为IHttpClient
     /// <summary>
-    /// 返回一个<see cref="HttpClient"/>的<see cref="IHttpClient"/>包装
+    /// 返回一个<see cref="IHttpClientFactory"/>的<see cref="IHttpClient"/>包装
     /// </summary>
-    /// <param name="httpClient">待包装的<see cref="HttpClient"/></param>
+    /// <param name="httpClientFactory">待包装的<see cref="IHttpClientFactory"/></param>
     /// <returns></returns>
-    /// <inheritdoc cref="HttpClientRealize(HttpClient, HttpRequestTransform?)"/>
-    public static IHttpClient ToHttpClient(this HttpClient httpClient, HttpRequestTransform? defaultTransform = null)
-        => new HttpClientRealize(httpClient, defaultTransform);
+    /// <inheritdoc cref="HttpClientRealize(IHttpClientFactory, HttpRequestTransform?)"/>
+    public static IHttpClient ToHttpClient(this IHttpClientFactory httpClientFactory, HttpRequestTransform? defaultTransform = null)
+        => new HttpClientRealize(httpClientFactory, defaultTransform);
     #endregion
     #region 将HttpContent序列化为Json或String
     /// <summary>

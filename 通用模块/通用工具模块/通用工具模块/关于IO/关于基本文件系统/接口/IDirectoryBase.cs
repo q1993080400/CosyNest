@@ -17,7 +17,7 @@ public interface IDirectoryBase : IIOBase
     #endregion
     #region 直达子文件或目录
     /// <summary>
-    /// 尝试直达子文件或目录
+    /// 尝试通过相对于本目录的路径，直达子文件或目录
     /// </summary>
     /// <typeparam name="IO">要直达的文件或目录的类型</typeparam>
     /// <param name="relativelyPath">子文件或目录的相对路径，

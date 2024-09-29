@@ -28,7 +28,7 @@ public interface ITwoWayMap<A, B> : IReadOnlyCollection<(A, B)>
     /// <param name="key">要映射的A对象</param>
     /// <param name="notFound">如果不存在此映射，则通过这个延迟对象返回一个默认值</param>
     /// <returns></returns>
-    (bool Exist, B? Value) TryAMapB(A key, LazyPro<B>? notFound = null);
+    (bool Exist, B? Value) TryAMapB(A key, Lazy<B>? notFound = null);
     #endregion
     #endregion
     #region 将B映射为A
@@ -48,7 +48,7 @@ public interface ITwoWayMap<A, B> : IReadOnlyCollection<(A, B)>
     /// <param name="key">要映射的B对象</param>
     /// <param name="noFound">如果不存在此映射，则通过这个延迟对象返回一个默认值</param>
     /// <returns></returns>
-    (bool Exist, A? Value) TryBMapA(B key, LazyPro<A>? noFound = null);
+    (bool Exist, A? Value) TryBMapA(B key, Lazy<A>? noFound = null);
     #endregion
     #endregion
     #endregion

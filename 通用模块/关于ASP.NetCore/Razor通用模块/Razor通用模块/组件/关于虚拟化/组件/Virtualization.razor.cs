@@ -217,6 +217,8 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
         if (IsComplete || IsDispose)
             return;
         await Task.Delay(1000);
+        if (IsDispose)
+            return;
         var intersecting = await JSWindow.InvokeAsync<bool>("CheckIntersecting", EndID);
         if (intersecting && await NeedRender())
             StateHasChanged();

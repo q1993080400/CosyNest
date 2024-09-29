@@ -1,5 +1,4 @@
-﻿using System.Media.Drawing;
-using System.Media.Drawing.Text;
+﻿using System.Drawing;
 
 namespace System.Office.Excel;
 
@@ -14,7 +13,7 @@ public interface IRangeStyle
     /// 设置或获取单元格的背景颜色，
     /// <see langword="null"/>代表无任何颜色
     /// </summary>
-    IColor? BackColor { get; set; }
+    Color? BackColor { get; set; }
 
     /*本API的实现应当遵循以下规范：
       当读取这个属性时，返回单元格的背景颜色，如果无任何颜色，返回Null
@@ -28,12 +27,6 @@ public interface IRangeStyle
     /// 它控制单元格的数据显示形式
     /// </summary>
     string Format { get; set; }
-    #endregion
-    #region 文本样式
-    /// <summary>
-    /// 获取或设置单元格的文本样式
-    /// </summary>
-    ITextStyleVar TextStyle { get; set; }
     #endregion
     #endregion
     #region 关于对齐

@@ -26,10 +26,4 @@ public interface IFile : IIO, IFileBase
         => Copy(CreateIO.Directory(target ?? Father!.Path), newSimple, newExtension, rename);
     #endregion
     #endregion
-    #region 最后一次保存时间
-    /// <summary>
-    /// 获取或设置最后一次保存的时间
-    /// </summary>
-    DateTimeOffset DateLastWrite { get; set; }
-    #endregion
 }

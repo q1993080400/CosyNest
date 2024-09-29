@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore;
+﻿using System.DataFrancis;
+
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Components;
 
 namespace BootstrapBlazor.Components;

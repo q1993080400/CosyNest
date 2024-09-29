@@ -19,8 +19,7 @@ public static class CreateNet
     /// 它在内部通过<see cref="IHttpClientFactory"/>进行池化，可以放心使用
     /// </summary>
     public static IHttpClient HttpClientShared
-        => ServiceProvider.GetRequiredService<IHttpClientFactory>().
-        CreateClient().ToHttpClient();
+        => ServiceProvider.GetRequiredService<IHttpClientFactory>().ToHttpClient();
     #endregion
     #region 创建IObjectHeaderValue
     #region 直接封装Json文本

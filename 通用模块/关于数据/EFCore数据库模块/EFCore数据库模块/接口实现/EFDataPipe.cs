@@ -11,7 +11,7 @@ sealed class EFDataPipe(DbContext dbContext) : IDataPipe
     #region 查询数据源抽象
     public IQueryable<Data> Query<Data>()
         where Data : class
-        => dbContext.Set<Data>();
+        => dbContext.Set<Data>().AsNoTracking();
     #endregion
     #region 执行推送上下文
     #region 无返回值

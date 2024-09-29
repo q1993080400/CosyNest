@@ -15,8 +15,8 @@ public static class CreateOfficeEPPlus
     /// </summary>
     public static IFileType SupportExcel { get; }
     = CreateIO.FileType("受EPPlusOffice模块支持的Excel文件类型",
-        OfficeFileCom.Excel2007,
-        OfficeFileCom.Excel2007Macro);
+        OfficeFileCommon.Excel2007,
+        OfficeFileCommon.Excel2007Macro);
     #endregion
     #region 创建Excel工作簿
     #region 创建空工作簿

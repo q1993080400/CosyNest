@@ -1,4 +1,4 @@
-﻿using System.Media.Drawing;
+﻿using System.Drawing;
 
 namespace System.Office;
 
@@ -12,6 +12,6 @@ public interface IOfficeChartDraw
     /// <summary>
     /// 获取或设置绘图区填充
     /// </summary>
-    IColor? Fill { get; set; }
+    Color? Fill { get; set; }
     #endregion
 }

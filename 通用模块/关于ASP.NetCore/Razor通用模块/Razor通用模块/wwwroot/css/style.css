@@ -205,7 +205,7 @@ input[type=file]
         flex-grow: 1;
     }
 
-/*不平分样式*/
+/*不平分样式，它可以避免平分容器的子元素大小改变*/
 .notBsect
 {
     flex-grow: 0;
@@ -240,7 +240,6 @@ input[type=file]
 .sticky
 {
     position: sticky;
-    top: 0px;
     z-index: 1;
 }
 
@@ -255,6 +254,18 @@ input[type=file]
     {
         isolation: isolate;
     }
+
+/*粘在顶部的粘性定位样式*/
+.stickyTop
+{
+    top: 0px;
+}
+
+/*粘在底部的粘性定位样式*/
+.stickyBottom
+{
+    bottom: 0px;
+}
 
 /*豆腐块组件容器的CSS样式*/
 .tofuCubesContainer

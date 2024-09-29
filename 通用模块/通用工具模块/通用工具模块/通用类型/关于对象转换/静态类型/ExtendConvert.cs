@@ -70,7 +70,7 @@ public static partial class ExtendTool
     /// <param name="notConvert">如果转换失败，而且不抛出异常，则返回这个值，默认为类型默认值</param>
     /// <returns></returns>
     [return: NotNullIfNotNull(nameof(obj))]
-    public static Ret? To<Ret>(this object? obj, bool @throw = true, LazyPro<Ret>? notConvert = default)
+    public static Ret? To<Ret>(this object? obj, bool @throw = true, Lazy<Ret>? notConvert = default)
     {
         if (obj is Ret ret)
             return ret;
@@ -96,14 +96,14 @@ public static partial class ExtendTool
         }
         catch (Exception) when (!@throw)
         {
-            return notConvert;
+            return notConvert.Value();
         }
     }
     #endregion
     #region 正式高性能方法
-    /// <inheritdoc cref="To{Ret}(object?, bool, LazyPro{Ret}?)"/>
+    /// <inheritdoc cref="To{Ret}(object?, bool, Lazy{Ret}?)"/>
     [return: NotNullIfNotNull(nameof(obj))]
-    public static Ret? To<Ret>(this string? obj, bool @throw = true, LazyPro<Ret>? notConvert = default)
+    public static Ret? To<Ret>(this string? obj, bool @throw = true, Lazy<Ret>? notConvert = default)
         where Ret : IParsable<Ret>
     {
         var canConvert = Ret.TryParse(obj, null, out var convert);
@@ -111,7 +111,7 @@ public static partial class ExtendTool
         {
             (true, _) => convert,
             (false, true) => throw new NotSupportedException($"无法将文本{obj}转换为{typeof(Ret)}"),
-            (false, false) => notConvert
+            (false, false) => notConvert.Value()
         };
     }
     #endregion

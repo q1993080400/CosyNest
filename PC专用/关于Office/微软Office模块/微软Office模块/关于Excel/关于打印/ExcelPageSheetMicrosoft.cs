@@ -1,7 +1,6 @@
 ﻿using System.MathFrancis.Plane;
 using System.Office.Excel;
 using System.Office.Excel.Realize;
-using System.Underlying;
 
 using Microsoft.Office.Interop.Excel;
 
@@ -59,8 +58,7 @@ sealed class ExcelPageSheetMicrosoft(IExcelSheet sheet, Worksheet worksheet) : I
     #endregion
     #endregion
     #region 未实现的成员
-
-    public (int PageCount, Task Wait) PrintFromRegional(ISizePosPixel? regional = null, int number = 1, IPrinter? printer = null)
+    public (int PageCount, Task Wait) PrintFromRegional(ISizePosPixel? regional = null, int number = 1, string? printer = null)
     {
         throw new NotImplementedException();
     }
@@ -71,7 +69,7 @@ sealed class ExcelPageSheetMicrosoft(IExcelSheet sheet, Worksheet worksheet) : I
     }
 
 
-    public (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, IPrinter? printer = null)
+    public (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, string? printer = null)
     {
         throw new NotImplementedException();
     }

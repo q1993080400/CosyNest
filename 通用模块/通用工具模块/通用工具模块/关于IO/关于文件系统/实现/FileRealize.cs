@@ -10,8 +10,6 @@ namespace System.IOFrancis.FileSystem;
 /// </summary>
 sealed class FileRealize : IORealize, IFile
 {
-#pragma warning disable CA2208
-
     #region 封装的对象
     #region 获取文件对象
     protected override FileInfo PackFS => new(Path);
@@ -38,7 +36,7 @@ sealed class FileRealize : IORealize, IFile
     #region 读写扩展名
     public string NameExtension
     {
-        get => ToolPath.SplitFilePath(Path, false).Extended ?? "";
+        get => IO.Path.GetExtension(Path).TrimStart('.');
         set => Path = ToolPath.RefactoringPath(Path, newSimple: null,
           newExtension: _ => value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
     }
@@ -56,7 +54,7 @@ sealed class FileRealize : IORealize, IFile
     #region 复制文件
     public override IIO Copy(IDirectory? target, string? newName = null, Func<string, int, string>? rename = null)
     {
-        target ??= File.Father ?? throw new ArgumentNullException($"父目录不能为null");
+        target ??= File.Father ?? throw new ArgumentNullException(nameof(target), $"父目录不能为null");
         newName ??= File.NameFull;
         if (rename is { })
         {
@@ -65,6 +63,8 @@ sealed class FileRealize : IORealize, IFile
                 (x, y) => ToolPath.GetFullName(rename(simple, y), extended));
         }
         var newPath = IO.Path.Combine(target.Path, newName);
+        if (newPath == Path)
+            return this;
         PackFS.CopyTo(newPath, true);
         return new FileRealize(newPath);
     }
@@ -78,13 +78,6 @@ sealed class FileRealize : IORealize, IFile
     #region 创建数据管道
     public IFullDuplex GetBitPipe()
           => CreateIO.FullDuplexFile(Path);
-    #endregion
-    #region 最后一次保存时间
-    public DateTimeOffset DateLastWrite
-    {
-        get => new(PackFS.LastWriteTime, PackFS.LastWriteTime - PackFS.LastWriteTimeUtc);
-        set => PackFS.LastWriteTimeUtc = value.UtcDateTime;
-    }
     #endregion
     #region 构造函数
     /// <summary>

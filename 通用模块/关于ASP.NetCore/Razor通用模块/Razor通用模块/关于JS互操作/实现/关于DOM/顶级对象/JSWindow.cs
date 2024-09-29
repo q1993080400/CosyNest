@@ -1,9 +1,5 @@
-﻿using System.Design;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.MathFrancis;
-using System.NetFrancis;
-using System.NetFrancis.Http;
-using System.Text.Json;
 using System.Underlying;
 
 namespace Microsoft.JSInterop;
@@ -89,34 +85,6 @@ sealed class JSWindow(IJSRuntime jsRuntime) : IJSWindow
 
     public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
         => jsRuntime.InvokeAsync<TValue>(identifier, cancellationToken, args);
-    #endregion
-    #region 通过JS发起Post请求
-    public async ValueTask<Ret?> FetchPost<Ret>(UriComplete uri, object? parameter, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        options ??= CreateDesign.JsonCommonOptions();
-        return await jsRuntime.AwaitPromise(x => JsonSerializer.Deserialize<Ret>(x, options),
-                 (successMethod, failMethod) =>
-                 {
-                     var json = JsonSerializer.Serialize(parameter, parameter?.GetType() ?? typeof(object), options);
-                     var script = $$"""
-                        var myInit = 
-                        { 
-                            method: 'post',
-                            body: {{json.ToJSSecurity()}},
-                            credentials:'same-origin',
-                            headers: 
-                            {
-                                'Content-Type': '{{MediaTypeName.TextJson}}'
-                            }
-                        };
-                        fetch('{{uri}}',myInit).
-                            then(x=>x.json()).
-                            then(x=>{{successMethod}}(x)).
-                            catch({{failMethod}});
-                """;
-                     return script;
-                 }, null, cancellationToken);
-    }
     #endregion
     #region 关于通知
     #region 请求通知权限

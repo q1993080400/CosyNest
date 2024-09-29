@@ -141,13 +141,12 @@ public static class ToolPath
         var fullName = Path.GetFileName(path);
         if (fullName.IsVoid())
             return ("", null, "");
-        var split = fullName.Split('.');
-        var hasExtended = split.Length > 1;
-        var extended = hasExtended ?
-          (withDot ? $".{split[^1]}" : split[^1]) :
-          null;
-        var simple = hasExtended ? split[..^1].Join(".") : split[0];
-        return (simple, extended?.ToLower(), fullName);
+        var index = fullName.LastIndexOf('.');
+        if (index < 0)
+            return (fullName, null, fullName);
+        var simple = fullName[..index];
+        var extended = fullName[(withDot ? index : index + 1)..].ToLower();
+        return (simple, extended, fullName);
     }
     #endregion
     #region 拆分为父目录和文件/目录

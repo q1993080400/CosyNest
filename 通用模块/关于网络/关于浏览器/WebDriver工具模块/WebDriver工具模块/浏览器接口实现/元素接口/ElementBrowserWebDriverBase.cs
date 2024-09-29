@@ -33,8 +33,21 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     public async Task<IDisposable> ClickWithCreateTab()
     {
         await Click();
-        Browser.Tabs[^1].Select();
-        return FastRealize.Disposable(null, () => Browser.Tabs[^1].Dispose());
+        #region 返回最后一个标签的本地函数
+        ITab? LastTab()
+            => Browser.To<IBrowser>().LastTab;
+        #endregion
+        var last = LastTab();
+        last?.Select();
+        return FastRealize.Disposable(null,
+            last is null ?
+            () => { }
+        :
+            () =>
+        {
+            LastTab()?.Dispose();
+            LastTab()?.Select();
+        });
     }
     #endregion
     #endregion 

@@ -7,9 +7,6 @@
 		<RootNamespace>System.DataFrancis</RootNamespace>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
 	</PropertyGroup>
 

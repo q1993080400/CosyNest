@@ -8,7 +8,7 @@ namespace System.DataFrancis.DB;
 /// </summary>
 /// <typeparam name="Entity">实体类的类型</typeparam>
 public interface IConfigureEntity<Entity>
-    where Entity : class
+    where Entity : class, IConfigureEntity<Entity>
 {
     #region 配置实体类
     /// <summary>

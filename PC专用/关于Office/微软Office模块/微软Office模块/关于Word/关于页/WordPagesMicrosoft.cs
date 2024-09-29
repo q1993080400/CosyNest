@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Office.Word;
-using System.Underlying;
 
 using Microsoft.Office.Interop.Word;
 
@@ -70,7 +69,7 @@ sealed class WordPagesMicrosoft(Document document) : IWordPages
     #endregion
     #endregion
     #region 未实现的成员
-    public (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, IPrinter? printer = null)
+    public (int PageCount, Task Wait) PrintFromPage(Range? page = null, int number = 1, string? printer = null)
     {
         throw new NotImplementedException();
     }

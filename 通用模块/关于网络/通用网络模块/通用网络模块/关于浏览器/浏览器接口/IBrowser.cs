@@ -47,6 +47,20 @@ public interface IBrowser : IInstruct, IDisposable
     /// </summary>
     ITab CurrentTab { get; }
     #endregion
+    #region 最后一个选项卡
+    /// <summary>
+    /// 获取浏览器最右边的一个选项卡，
+    /// 如果没有任何选项卡，返回<see langword="null"/>
+    /// </summary>
+    ITab? LastTab
+    {
+        get
+        {
+            var tabs = Tabs;
+            return tabs.Any() ? tabs[^1] : null;
+        }
+    }
+    #endregion
     #endregion
     #region 有关浏览器内容
     #region 说明文档

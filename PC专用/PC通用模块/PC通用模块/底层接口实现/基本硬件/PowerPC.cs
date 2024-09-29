@@ -7,12 +7,12 @@ namespace System.Underlying.PC;
 /// 这个类型是<see cref="IPower"/>的实现，
 /// 封装了一些有关电源的API
 /// </summary>
-sealed class PowerPC : IPower
+sealed partial class PowerPC : IPower
 {
     #region 是否允许休眠
     #region Win32API调用
-    [DllImport("kernel32.dll")]
-    static extern uint SetThreadExecutionState(uint esFlags);
+    [LibraryImport("kernel32.dll")]
+    private static partial uint SetThreadExecutionState(uint esFlags);
     #endregion
     #region 正式属性
     private bool CanDormancyField = true;

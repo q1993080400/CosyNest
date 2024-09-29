@@ -215,7 +215,7 @@ public static partial class ExtendEnumerable
     /// <param name="index">元素的索引</param>
     /// <param name="indexOut">如果索引非法，则返回这个延迟对象的值</param>
     /// <returns></returns>
-    public static Obj? ElementAt<Obj>(this IEnumerable<Obj> objs, Index index, LazyPro<Obj>? indexOut)
+    public static Obj? ElementAt<Obj>(this IEnumerable<Obj> objs, Index index, Lazy<Obj>? indexOut)
     {
         try
         {
@@ -223,7 +223,7 @@ public static partial class ExtendEnumerable
         }
         catch (Exception e) when (e is ArgumentNullException or ArgumentOutOfRangeException)
         {
-            return indexOut;
+            return indexOut.Value();
         }
     }
     #endregion

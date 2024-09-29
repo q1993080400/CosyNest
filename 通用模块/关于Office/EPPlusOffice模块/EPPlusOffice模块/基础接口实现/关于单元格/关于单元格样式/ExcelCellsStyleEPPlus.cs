@@ -1,7 +1,7 @@
-﻿using OfficeOpenXml.Style;
-
+﻿using System.Drawing;
 using System.Media.Drawing;
-using System.Media.Drawing.Text;
+
+using OfficeOpenXml.Style;
 
 namespace System.Office.Excel;
 
@@ -14,24 +14,9 @@ namespace System.Office.Excel;
 /// <param name="cell">指定的单元格</param>
 sealed class ExcelCellsStyleEPPlus(ExcelCellsEPPlus cell) : IRangeStyle
 {
-    #region 内部成员
-    #region 封装的单元格
-    /// <summary>
-    /// 获取封装的单元格，
-    /// 本对象的功能就是通过它实现的
-    /// </summary>
-    private ExcelCellsEPPlus Cell { get; } = cell;
-    #endregion
-    #region 单元格样式
-    /// <summary>
-    /// 获取单元格的样式
-    /// </summary>
-    private ExcelStyle Style => Cell.Range.Style;
-    #endregion
-    #endregion
     #region 公开成员
     #region 背景颜色
-    public IColor? BackColor
+    public Color? BackColor
     {
         get
         {
@@ -42,25 +27,29 @@ sealed class ExcelCellsStyleEPPlus(ExcelCellsEPPlus cell) : IRangeStyle
         set
         {
             var fill = Style.Fill;
-            if (value is null)
+            if (value is { } color)
             {
-                fill.PatternType = ExcelFillStyle.None;
-                return;
+                fill.PatternType = ExcelFillStyle.Solid;
+                fill.BackgroundColor.SetColor(color);
             }
-            fill.PatternType = ExcelFillStyle.Solid;
-            fill.BackgroundColor.SetColor(value.ToColor());
+            else
+                fill.PatternType = ExcelFillStyle.None;
         }
     }
     #endregion
     #endregion
+    #region 内部成员
+    #region 单元格样式
+    /// <summary>
+    /// 获取单元格的样式
+    /// </summary>
+    private ExcelStyle Style => cell.Range.Style;
+    #endregion
+    #endregion
     #region 未实现的成员
     public string Format { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public ITextStyleVar TextStyle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public bool AutoLineBreaks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public OfficeAlignment AlignmentVertical { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public OfficeAlignment AlignmentHorizontal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-    #endregion
-    #region 构造函数
     #endregion
 }

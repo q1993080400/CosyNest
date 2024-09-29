@@ -1,4 +1,6 @@
-﻿namespace Microsoft.AspNetCore.Components;
+﻿using System.DataFrancis;
+
+namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 这个记录允许绑定到表单视图属性，

@@ -32,13 +32,20 @@ sealed class JSNavigator(IJSRuntime jsRuntime) : IJSNavigator
         = new JSClipboard(jsRuntime);
     #endregion
     #region 获取唤醒锁
-    public async Task<IAsyncDisposable?> GetWakeLock()
+    public Task<IAsyncDisposable?> WakeLock
     {
-        var id = CreateASP.JSObjectName();
-        var success = await jsRuntime.InvokeAsync<bool>("CreateWakeLock", id);
-        return success ?
-            new JSWakeLock(jsRuntime, id) :
-            null;
+        get
+        {
+            async Task<IAsyncDisposable?> GetWakeLock()
+            {
+                var id = CreateASP.JSObjectName();
+                var success = await jsRuntime.InvokeAsync<bool>("CreateWakeLock", id);
+                return success ?
+                    new JSWakeLock(jsRuntime, id) :
+                    null;
+            }
+            return GetWakeLock();
+        }
     }
     #endregion
 }

@@ -39,11 +39,11 @@ public static partial class ExtendEnumerable
     /// <param name="key">用来提取值的键，如果它为<see langword="null"/>，则默认该键不存在</param>
     /// <param name="noFound">如果键不存在，则通过这个延迟对象返回默认值</param>
     /// <returns></returns>
-    public static (bool Exist, Value? Value) TryGetValue<Key, Value>(this IEnumerable<KeyValuePair<Key, Value>> dictionary, Key key, LazyPro<Value>? noFound = default)
+    public static (bool Exist, Value? Value) TryGetValue<Key, Value>(this IEnumerable<KeyValuePair<Key, Value>> dictionary, Key key, Lazy<Value>? noFound = default)
         => dictionary switch
         {
-            IDictionary<Key, Value> d => d.TryGetValue(key, out Value? value) ? (true, value) : (false, noFound),
-            IReadOnlyDictionary<Key, Value> d => d.TryGetValue(key, out Value? v) ? (true, v) : (false, noFound),
+            IDictionary<Key, Value> d => d.TryGetValue(key, out Value? value) ? (true, value) : (false, noFound.Value()),
+            IReadOnlyDictionary<Key, Value> d => d.TryGetValue(key, out Value? v) ? (true, v) : (false, noFound.Value()),
             _ => throw new TypeUnlawfulException(dictionary, typeof(IDictionary<Key, Value>), typeof(IReadOnlyDictionary<Key, Value>)),
         };
     #endregion

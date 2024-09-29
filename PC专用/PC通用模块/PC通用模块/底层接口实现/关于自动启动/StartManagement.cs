@@ -7,6 +7,6 @@
 sealed class StartManagement : IStartManagement
 {
     #region 枚举或添加自启动项
-    public ICollection<string> AutomaticStart { get; } = new StartCollections();
+    public ICollection<string> AutomaticStart { get; } = [];
     #endregion 
 }

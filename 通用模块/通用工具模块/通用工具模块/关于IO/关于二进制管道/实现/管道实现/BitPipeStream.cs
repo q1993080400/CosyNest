@@ -6,7 +6,7 @@ namespace System.IOFrancis.Bit;
 /// <summary>
 /// 这个类型允许将流适配为管道
 /// </summary>
-/// <inheritdoc cref="ExtenIO.ToBitPipe(Stream, string, string?)"/>
+/// <inheritdoc cref="ExtendIO.ToBitPipe(Stream, string, string?)"/>
 sealed class BitPipeStream(Stream stream, string? format, string? describe) : AutoRelease, IBitRead, IBitWrite
 {
     #region 封装的对象

@@ -36,7 +36,7 @@ sealed class ExcelCellsEPPlus : ExcelCells, IExcelCells
             null or "" => null,
             var t => t
         };
-        set => SetFormulaAssist(value, value => Range.Formula = value, false);
+        set => SetFormulaAssist(value, @value => Range.Formula = @value, false);
     }
     #endregion
     #region R1C1格式
@@ -47,7 +47,7 @@ sealed class ExcelCellsEPPlus : ExcelCells, IExcelCells
             null or "" => null,
             var t => t
         };
-        set => SetFormulaAssist(value, value => Range.FormulaR1C1 = value, false);
+        set => SetFormulaAssist(value, @value => Range.FormulaR1C1 = @value, false);
     }
     #endregion
     #endregion

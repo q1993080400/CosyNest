@@ -37,6 +37,6 @@ public interface IJSNavigator
     /// 如果返回<see langword="null"/>，表示获取失败
     /// </summary>
     /// <returns></returns>
-    Task<IAsyncDisposable?> GetWakeLock();
+    Task<IAsyncDisposable?> WakeLock { get; }
     #endregion
 }

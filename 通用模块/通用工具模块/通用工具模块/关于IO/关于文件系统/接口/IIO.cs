@@ -93,8 +93,7 @@ public interface IIO : IIOBase
     #endregion
     #region 传入目录路径
     /// <inheritdoc cref="Copy(IDirectory?, string?, Func{string, int, string}?)"/>
-    IIO Copy(string? target, string? newName = null, Func<string, int, string>? rename = null)
-        => Copy(CreateIO.Directory(target ?? Father?.Path ?? Path, false), newName, rename);
+    IIO Copy(string? target, string? newName = null, Func<string, int, string>? rename = null);
     #endregion
     #endregion
     #region 打开
@@ -104,42 +103,6 @@ public interface IIO : IIOBase
     /// <returns>打开文件或目录所创建的新进程</returns>
     Process Open()
        => ToolThread.Open(Path);
-    #endregion
-    #region 对文件或目录执行原子操作
-    #region 说明文档
-    /*问：文件或目录的原子操作是什么意思？
-       答：指类似数据库事务的模式，
-       如果在操作过程中出现了异常，
-       则不会对文件或目录产生修改
-
-       问：原子操作有性能损失吗？
-       答：由于可能会涉及创建备份之类的操作，
-       因此对于大文件，原子操作有明显的性能损失，
-       建议仅在必要时使用*/
-    #endregion
-    #region 有返回值
-    /// <summary>
-    /// 对文件或目录执行原子操作
-    /// </summary>
-    /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <param name="delegate">对文件或目录进行原子操作的委托，
-    /// 参数就是这个<see cref="IIO"/>对象本身</param>
-    /// <returns>执行<paramref name="delegate"/>所获取的返回值</returns>
-    Ret Atomic<Ret>(Func<IIO, Ret> @delegate);
-    #endregion
-    #region 无返回值
-    /// <summary>
-    /// 对文件或目录执行原子操作
-    /// </summary>
-    /// <param name="delegate">对文件或目录进行原子操作的委托，
-    /// 参数就是这个<see cref="IIO"/>对象本身</param>
-    void Atomic(Action<IIO> @delegate)
-        => Atomic<object?>(x =>
-        {
-            @delegate(x);
-            return null;
-        });
-    #endregion
     #endregion
     #endregion
 }

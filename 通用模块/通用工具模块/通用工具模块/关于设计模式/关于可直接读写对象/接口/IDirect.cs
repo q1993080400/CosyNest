@@ -25,12 +25,12 @@ public interface IDirect : IRestrictedDictionary<string, object?>
     /// </summary>
     /// <typeparam name="Ret">返回值类型</typeparam>
     /// <param name="path">属性的路径，不同层次之间用.分割</param>
-    /// <param name="checkExist">当属性名称不存在的时候，
+    /// <param name="check">当属性名称不存在，或者类型转换失败的时候，
     /// 如果该参数为<see langword="true"/>，则引发异常，否则返回默认值</param>
     /// <exception cref="KeyNotFoundException">要读写的属性名称不存在</exception>
     /// <exception cref="TypeUnlawfulException">无法转换为指定的类型</exception>
     /// <returns></returns>
-    Ret? GetValue<Ret>(string path, bool checkExist = true)
+    Ret? GetValue<Ret>(string path, bool check = true)
     {
         var (isMatch, matchs) = /*language=regex*/@"((\[(?<index>\d+)\])|(?<property>[^\[\]\.]+))".Op().Regex().Matches(path);
         if (!isMatch)
@@ -58,7 +58,7 @@ public interface IDirect : IRestrictedDictionary<string, object?>
                         return array;
                     }
                     #endregion
-                    return (exist, checkExist) switch
+                    return (exist, check) switch
                     {
                         (true, _) => value switch
                         {
@@ -74,7 +74,7 @@ public interface IDirect : IRestrictedDictionary<string, object?>
                 default:
                     throw new ArgumentException($"递归读取属性只支持{nameof(IDirect)}和{nameof(IEnumerable<object>)}");
             }
-        }).To<Ret>();
+        }).To<Ret>(check);
     }
     #endregion
     #region 复制数据（可选转换为强类型版本）

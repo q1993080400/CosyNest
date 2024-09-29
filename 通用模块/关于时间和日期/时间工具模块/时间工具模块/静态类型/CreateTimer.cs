@@ -32,7 +32,7 @@ public static class CreateTimer
     {
         ExceptionIntervalOut.Check(1, null, intervalDays);
         var timeSpan = time.ToTimeSpan();
-        var startTime = DateTimeOffset.Now.ToDay() + timeSpan;
+        var startTime = DateTimeOffset.Now.ToDate() + timeSpan;
         var finalStartTime =
             startTime < DateTimeOffset.Now ? startTime.AddDays(1) : startTime;
         return TimerCycle(TimeSpan.FromDays(intervalDays), finalStartTime, immediately);

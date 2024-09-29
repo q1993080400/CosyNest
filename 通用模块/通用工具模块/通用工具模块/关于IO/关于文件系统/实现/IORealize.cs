@@ -59,14 +59,19 @@ abstract class IORealize(string path) : IIO
     #endregion
     #region 文件或目录的信息
     #region 完整路径
-
     public string Path
     {
         get => path;
         set
         {
-            File.Delete(value);
-            PackFS.To<dynamic>().MoveTo(value);
+            if (value == path)
+                return;
+            var father = IO.Path.GetDirectoryName(value);
+            if (father.IsVoid())
+                throw new NotSupportedException($"新的路径{value}的父目录无效");
+            var newName = IO.Path.GetFileName(value);
+            Copy(father, newName);
+            Delete();
             path = value;
         }
     }
@@ -107,27 +112,13 @@ abstract class IORealize(string path) : IIO
     public abstract void Delete();
     #endregion
     #region 复制
+    #region 传入目录
     public abstract IIO Copy(IDirectory? target, string? newName = null, Func<string, int, string>? rename = null);
     #endregion
-    #region 对文件或目录执行原子操作
-    public Ret Atomic<Ret>(Func<IIO, Ret> @delegate)
-    {
-        IIO io = this;
-        var backup = Copy(io.Father!, Guid.NewGuid().ToString());
-        Ret r;
-        try
-        {
-            r = @delegate(this);                                  //对原始文件，而不是备份执行操作
-        }
-        catch (Exception)
-        {
-            Delete();                                           //如果出现异常，则删除自身，并将备份转正
-            backup.Path = Path;
-            throw;
-        }
-        backup.Delete();                        //如果没有出现异常，则删除备份
-        return r;
-    }
+    #region 传入目标路径
+    public IIO Copy(string? target, string? newName = null, Func<string, int, string>? rename = null)
+         => Copy(CreateIO.Directory(target ?? Father?.Path ?? Path, false), newName, rename);
+    #endregion
     #endregion
     #endregion
     #region 用来监视文件系统的对象

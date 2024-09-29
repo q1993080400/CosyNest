@@ -1,7 +1,6 @@
 ﻿using System.Design.Direct;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Performance;
+using System.Text.Json.Serialization;
 
 namespace System.Design;
 
@@ -10,47 +9,14 @@ namespace System.Design;
 /// </summary>
 public static class CreateDesign
 {
-    #region 创建IServiceProvider
-    #region 合并IServiceProvider
+    #region 创建事件总线工厂
     /// <summary>
-    /// 返回一个<see cref="IServiceProvider"/>，
-    /// 它依次从多个<see cref="IServiceProvider"/>中请求服务，
-    /// 直到请求成功为止
-    /// </summary>
-    /// <param name="serviceProvider">多个服务提供者对象，它们的顺序很重要</param>
-    /// <returns></returns>
-    public static IServiceProvider ServiceProviderMerge(IEnumerable<IServiceProvider> serviceProvider)
-        => new ServiceProviderMerge(serviceProvider.ToArray());
-    #endregion
-    #endregion
-    #region 创建单例对象
-    private static ICache<Type, object> SingleCache { get; }
-        = CreatePerformance.MemoryCache<Type, object>
-        ((type, _) => type.GetTypeData().ConstructorCreate<object>());
-
-    /// <summary>
-    /// 返回一个类型的实例，
-    /// 如果多次调用，不会重复创建
-    /// </summary>
-    /// <typeparam name="Obj">要返回实例的类型，
-    /// 它必须要有无参数构造函数，但不一定要公开</typeparam>
-    /// <returns></returns>
-    public static Obj Single<Obj>()
-        where Obj : class
-        => (Obj)SingleCache[typeof(Obj)];
-    #endregion
-    #region 创建池化对象
-    /// <summary>
-    /// 创建一个最简单的<see cref="IPool{Obj}"/>实现，
-    /// 它实际上不缓存对象，而是每次都创建一个新对象，
-    /// 在调用对象的<see cref="IDisposable.Dispose"/>方法时，会将对象销毁
+    /// 创建一个事件总线工厂，
+    /// 它可以用来创建事件总线上下文
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="Pool{Obj}.Pool(Func{Obj})"/>
-    /// <inheritdoc cref="IPool{Obj}"/>
-    public static IPool<Obj> PoolSimple<Obj>(Func<Obj> create)
-        where Obj : class, IDisposable
-        => new Pool<Obj>(create);
+    public static IEventBusFactory EventBusFactory()
+        => new EventBusFactory();
     #endregion
     #region 创建IDirect
     #region 创建简易实现

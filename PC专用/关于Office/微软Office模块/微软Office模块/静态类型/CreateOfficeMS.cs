@@ -1,4 +1,5 @@
-﻿using System.IOFrancis.FileSystem;
+﻿using System.IOFrancis;
+using System.IOFrancis.FileSystem;
 using System.Office.Excel;
 using System.Office.Word;
 
@@ -9,6 +10,7 @@ namespace System.Office;
 /// </summary>
 public static class CreateOfficeMS
 {
+    #region 关于Excel
     #region 创建Excel对象
     /// <summary>
     /// 创建一个底层由COM组件实现的Excel对象
@@ -23,6 +25,17 @@ public static class CreateOfficeMS
             AutoSave = autoSave
         };
     #endregion
+    #region 筛选Excel文件
+    /// <summary>
+    /// 返回某个文件是否是受本模块支持的Excel文件
+    /// </summary>
+    /// <param name="file">待判断的文件</param>
+    /// <returns></returns>
+    public static bool FilterExcelFile(IFile file)
+        => !FilterOfficeTemporaryFile(file) && file.NameExtension is "xls" or "xlsx";
+    #endregion
+    #endregion
+    #region 关于Word
     #region 创建Word对象
     /// <summary>
     /// 创建一个底层由COM组件实现的Word文档
@@ -63,6 +76,27 @@ public static class CreateOfficeMS
         };
     #endregion
     #endregion
+    #region 筛选Word文件
+    /// <summary>
+    /// 返回某个文件是否是受本模块支持的Word文件
+    /// </summary>
+    /// <param name="file">待判断的文件</param>
+    /// <returns></returns>
+    public static bool FilterWordFile(IFile file)
+        => !FilterOfficeTemporaryFile(file) && file.NameExtension is "doc" or "docx";
+    #endregion
+    #endregion
+    #region 关于Office文件
+    #region 筛选Office临时文件
+    /// <summary>
+    /// 返回某个文件是否为Office临时文件，
+    /// 它通常应该被直接忽略
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    public static bool FilterOfficeTemporaryFile(IFile file)
+        => file.NameSimple.StartsWith("~$");
+    #endregion
     #region 升级Office文件
     /// <summary>
     /// 升级一个Office文件，并返回升级后的文件路径
@@ -87,7 +121,10 @@ public static class CreateOfficeMS
             return newPath;
         }
         #endregion
-        return ToolPath.SplitFilePath(path).Extended switch
+        var file = CreateIO.File(path);
+        if (FilterOfficeTemporaryFile(file))
+            return path;
+        return file.NameExtension switch
         {
             "xls" => await Update(() => new ExcelBookMicrosoft(path)
             {
@@ -100,5 +137,6 @@ public static class CreateOfficeMS
             _ => path
         };
     }
+    #endregion 
     #endregion
 }

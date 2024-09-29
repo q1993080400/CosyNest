@@ -25,7 +25,7 @@ public sealed partial class WakeLock : ComponentBase, IAsyncDisposable
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-            JSWakeLock = await JSWindow.Navigator.GetWakeLock();
+            JSWakeLock = await JSWindow.Navigator.WakeLock;
     }
     #endregion
     #endregion

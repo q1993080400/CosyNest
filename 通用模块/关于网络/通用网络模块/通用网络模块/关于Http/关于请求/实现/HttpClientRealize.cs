@@ -7,15 +7,12 @@ namespace System.NetFrancis.Http;
 /// 这个类型是<see cref="IHttpClient"/>的实现，
 /// 可以用来发起Http请求
 /// </summary>
-/// <remarks>
-/// 使用指定的Http客户端初始化对象
-/// </remarks>
-/// <param name="httpClient">指定的Http客户端，
+/// <param name="httpClientFactory">指定的Http工厂，
 /// 本对象的功能就是通过它实现的</param>
 /// <param name="defaultTransform">用来转换Http请求的函数，
 /// 它可以用来改变Http请求的默认值，并具有较低的优先级，
 /// 如果为<see langword="null"/>，则不做转换</param>
-sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? defaultTransform) : IHttpClient
+sealed class HttpClientRealize(IHttpClientFactory httpClientFactory, HttpRequestTransform? defaultTransform) : IHttpClient
 {
     #region 接口实现
     #region 发起Http请求
@@ -28,7 +25,7 @@ sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? defa
             var requestMiddle = defaultTransform?.Invoke(request) ?? request;
             var transformationRequest = transformation?.Invoke(requestMiddle) ?? requestMiddle;
             using var bclRequest = transformationRequest.ToHttpRequestMessage();
-            var response = await httpClient.SendAsync(bclRequest, cancellationToken);
+            var response = await HttpClient.SendAsync(bclRequest, cancellationToken);
             if (response.StatusCode is HttpStatusCode.Found)
             {
                 var redirect = response.Headers.Location!.AbsoluteUri;
@@ -47,7 +44,7 @@ sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? defa
     #region 返回IBitRead
     public async Task<IBitRead> RequestBitRead(string uri, CancellationToken cancellationToken = default)
     {
-        var stream = await httpClient.GetStreamAsync(uri, cancellationToken);
+        var stream = await HttpClient.GetStreamAsync(uri, cancellationToken);
         return stream.ToBitPipe().Read;
     }
     #endregion
@@ -56,6 +53,16 @@ sealed class HttpClientRealize(HttpClient httpClient, HttpRequestTransform? defa
     public IHttpStrongTypeRequest<API> StrongType<API>()
         where API : class
         => new HttpStrongTypeRequest<API>(this);
+    #endregion
+    #endregion
+    #region 内部成员
+    #region Http客户端
+    /// <summary>
+    /// 获取Http客户端，
+    /// 它可以用于发起请求
+    /// </summary>
+    private HttpClient HttpClient
+        => httpClientFactory.CreateClient();
     #endregion
     #endregion
 }

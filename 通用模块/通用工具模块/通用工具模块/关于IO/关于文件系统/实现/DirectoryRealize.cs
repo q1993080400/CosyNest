@@ -56,7 +56,7 @@ sealed class DirectoryRealize : IORealize, IDirectory
     public override IUnit<IUTStorage> Size
         => this.To<INode>().Father is IDrive d ?
         d.SizeUsed :
-        CreateBaseMath.UnitMetric<IUTStorage>(Directory.Son.Select(x => x.Size).Sum(x => x.ValueMetric));
+        CreateBaseMath.UnitMetric<IUTStorage>(Directory.Son.Select(x => (long)x.Size.ValueMetric).Sum());
     #endregion
     #endregion
     #region 关于对目录的操作
@@ -67,6 +67,8 @@ sealed class DirectoryRealize : IORealize, IDirectory
         newName ??= Directory.NameFull;
         if (rename is { })
             newName = ToolPath.Distinct(target, newName, rename);
+        if (IO.Path.Combine(target.Path, newName) == Path)
+            return this;
         var newPosition = new DirectoryRealize(IO.Path.Combine(target.Path, newName), false);                //如果父目录不存在，则会自动创建
         Directory.Son.ForEach(x => x.Copy(newPosition));
         return newPosition;

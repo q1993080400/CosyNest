@@ -16,13 +16,13 @@ public sealed class VerifyIntervalAttribute(string? min = null, string? max = nu
     /// <summary>
     /// 获取区间的最大值
     /// </summary>
-    public decimal Max { get; } = max.To<decimal>(false, decimal.MaxValue);
+    public decimal Max { get; } = max.To<decimal>(false, new(decimal.MaxValue));
     #endregion
     #region 最小值
     /// <summary>
     /// 获取区间的最小值
     /// </summary>
-    public decimal Min { get; } = min.To<decimal>(false, decimal.MinValue);
+    public decimal Min { get; } = min.To<decimal>(false, new(decimal.MinValue));
     #endregion
     #region 执行验证
     public override string? Verify(object? obj, string describe)

@@ -1,7 +1,8 @@
-﻿using System.MathFrancis.Plane;
-using System.MathFrancis;
+﻿using System.MathFrancis;
+using System.MathFrancis.Plane;
 
 using Microsoft.Office.Interop.Word;
+
 using Application = Microsoft.Office.Interop.Word.Application;
 
 namespace System.Office.Word;

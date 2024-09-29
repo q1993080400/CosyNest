@@ -8,9 +8,6 @@
 		<AssemblyName>ToolBootstrapBlazor</AssemblyName>
 		<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
 		<StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
 	</PropertyGroup>
 
@@ -19,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="8.8.4" />
+		<PackageReference Include="BootstrapBlazor" Version="8.10.1" />
 	</ItemGroup>
 
 	<ItemGroup>
