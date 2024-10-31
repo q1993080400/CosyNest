@@ -15,21 +15,13 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
     [Parameter]
     public string Text { get; set; }
     #endregion
-    #region 每行最大字数
+    #region 可显示的最大字数
     /// <summary>
-    /// 获取或设置豆腐块的每行最大字数
+    /// 获取或设置豆腐块可显示的最大字数，
+    /// 注意：豆腐块只支持显示一行文字
     /// </summary>
     [Parameter]
-    public int MaxRowLength { get; set; } = 6;
-    #endregion
-    #region 宽度
-    /// <summary>
-    /// 显式指定组件的宽度，
-    /// 它可以保证每个豆腐块的宽度一致，
-    /// 如果为<see langword="null"/>，则自动计算
-    /// </summary>
-    [Parameter]
-    public string? Width { get; set; }
+    public int MaxTextLength { get; set; } = 6;
     #endregion
     #region 子内容
     [Parameter]
@@ -41,7 +33,7 @@ public sealed partial class TofuCubes : ComponentBase, IContentComponent<RenderF
     #region 获取渲染参数
     private RenderTofuCubesInfo GetRenderInfo()
     {
-        var width = $"width:{Width ?? $"calc({MaxRowLength}ic + 2ch)"}";
+        var width = $"width: calc({MaxTextLength}ic + 2ch)";
         return new()
         {
             Text = Text,

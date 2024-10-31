@@ -1,6 +1,4 @@
-﻿using System.NetFrancis.Http;
-
-namespace Microsoft.AspNetCore;
+﻿namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -16,7 +14,6 @@ public interface IServerSummarize<in Parameter, Summarize>
     /// </summary>
     /// <param name="info">用来获取摘要的参数</param>
     /// <returns></returns>
-    [HttpMethodPost]
     Task<Summarize> GetSummarize(Parameter info);
     #endregion
 }

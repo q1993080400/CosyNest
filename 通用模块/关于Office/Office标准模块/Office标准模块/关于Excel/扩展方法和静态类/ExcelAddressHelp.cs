@@ -1,8 +1,7 @@
 ﻿using System.IOFrancis.FileSystem;
-using System.Text.RegularExpressions;
-using System.Office.Realize;
-using System.MathFrancis.Plane;
 using System.MathFrancis;
+using System.Office.Realize;
+using System.Text.RegularExpressions;
 
 using static System.MathFrancis.CreateMath;
 
@@ -37,9 +36,8 @@ public static partial class ExcelRealizeHelp
     /// <returns>列号对应的A1格式地址</returns>
     private static string ColumnToText(int column)
     {
-        ExceptionIntervalOut.Check(0, null, column);
         const int begin = 'A';
-        var packIndex = ToolBit.FromDecimal(column, 26).Integer.PackIndex().ToArray();
+        var packIndex = ToolBit.FromDecimal(column, 26).PackIndex().ToArray();
         var count = packIndex.Length;
         return packIndex.Select(x => (char)(begin + (x.Index == 0 && count > 1 ? x.Elements - 1 : x.Elements))).Join();
     }
@@ -56,7 +54,6 @@ public static partial class ExcelRealizeHelp
     /// <returns></returns>
     public static string GetAddressRC(int begin, int end, bool isRow, bool isA1 = true)
     {
-        ExceptionIntervalOut.Check(0, null, begin, end);
         begin++;
         end++;
         return (isRow, isA1) switch
@@ -81,7 +78,6 @@ public static partial class ExcelRealizeHelp
     /// <returns></returns>
     public static string GetAddress(int br, int bc, int er = -1, int ec = -1, bool isA1 = true)
     {
-        ExceptionIntervalOut.Check(0, null, br, bc);
         er = er < 0 ? br : er;
         ec = ec < 0 ? bc : ec;
         var isSingle = br == er && bc == ec;
@@ -102,14 +98,14 @@ public static partial class ExcelRealizeHelp
             (isSingle ? "" : $":{FunR1C1(er, ec)}");
     }
     #endregion
-    #region 根据ISizePosPixel
+    #region 根据ISizePos
     /// <summary>
     /// 根据一个平面，返回它的地址
     /// </summary>
     /// <param name="rectangular">待返回地址的平面</param>
     /// <param name="isA1">如果这个值为<see langword="true"/>，则返回A1地址，否则返回R1C1地址</param>
     /// <returns></returns>
-    public static string GetAddress(ISizePosPixel rectangular, bool isA1 = true)
+    public static string GetAddress(ISizePos<int> rectangular, bool isA1 = true)
     {
         var (topLeft, bottomRight) = rectangular.Boundaries;
         var (bc, br) = topLeft.Abs();
@@ -146,12 +142,11 @@ public static partial class ExcelRealizeHelp
     /// <param name="endColumn">结束单元格的列数，
     /// 如果为<see langword="null"/>，则与<paramref name="beginColumn"/>相同</param>
     /// <returns></returns>
-    public static ISizePosPixel AddressMathAbs(int beginRow, int beginColumn, int? endRow = null, int? endColumn = null)
+    public static ISizePos<int> AddressMathAbs(int beginRow, int beginColumn, int? endRow = null, int? endColumn = null)
     {
         var er = endRow ?? beginRow;
         var ec = endColumn ?? beginColumn;
-        ExceptionIntervalOut.Check(0, null, beginColumn, ec);
-        return SizePosPixel(Point(beginColumn, -beginRow), Point(ec, -er));
+        return SizePosInteger(Point(beginColumn, -beginRow), Point(ec, -er));
     }
     #endregion
     #region 相对地址
@@ -165,12 +160,8 @@ public static partial class ExcelRealizeHelp
     /// <param name="rowCount">单元格的行数量</param>
     /// <param name="columnCount">单元格的列数量</param>
     /// <returns></returns>
-    public static ISizePosPixel AddressMathRel(int beginRow, int beginColumn, int rowCount = 1, int columnCount = 1)
-    {
-        ExceptionIntervalOut.Check(0, null, beginRow);
-        ExceptionIntervalOut.Check(1, null, rowCount, columnCount);
-        return SizePosPixel(beginColumn, ToolArithmetic.Abs(beginRow), columnCount, rowCount);
-    }
+    public static ISizePos<int> AddressMathRel(int beginRow, int beginColumn, int rowCount = 1, int columnCount = 1)
+        => SizePosInteger(beginColumn, beginRow, columnCount, rowCount);
     #endregion
     #endregion
     #region 解析地址
@@ -202,7 +193,7 @@ public static partial class ExcelRealizeHelp
             throw new Exception($"{addressA1}不是合法的A1地址格式");
         #region 用来获取列号的本地函数
         static int Get(IMatch add)
-            => ToolBit.ToDecimal(26, add.Match.Select(x => x - 64).ToArray(), null) - 1;
+            => ToolBit.ToDecimal(26, add.Match.Select(x => x - 64).ToArray()) - 1;
         #endregion
         var bc = Get(mathce["bc"]);
         var br = mathce["br"].Match.To<int>() - 1;
@@ -221,10 +212,10 @@ public static partial class ExcelRealizeHelp
     /// </summary>
     /// <param name="addressA1">待解析的A1格式地址</param>
     /// <returns></returns>
-    public static ISizePosPixel AddressToSizePos(string addressA1)
+    public static ISizePos<int> AddressToSizePos(string addressA1)
     {
         var (br, bc, er, ec) = AddressToTupts(addressA1);
-        return SizePosPixel(
+        return SizePosInteger(
             Point(bc, -br),
             ec - bc + 1, er - br + 1);
     }

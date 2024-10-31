@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis.Bit;
-using System.MathFrancis;
 using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
@@ -46,10 +45,6 @@ sealed class FileRealize : IORealize, IFile
     public override IEnumerable<INode> Son
         => [];
     #endregion
-    #region 获取文件的大小
-    public override IUnit<IUTStorage> Size
-        => CreateBaseMath.Unit(PackFS.Length, IUTStorage.ByteMetric);
-    #endregion
     #endregion
     #region 复制文件
     public override IIO Copy(IDirectory? target, string? newName = null, Func<string, int, string>? rename = null)
@@ -93,7 +88,7 @@ sealed class FileRealize : IORealize, IFile
         if (!PackFS.Exists)
         {
             if (checkExist)
-                throw IOExceptionFrancis.BecauseExist(path ?? "null");
+                throw new NotSupportedException($"文件{path}不存在");
             PackFS.Create().Dispose();
         }
     }

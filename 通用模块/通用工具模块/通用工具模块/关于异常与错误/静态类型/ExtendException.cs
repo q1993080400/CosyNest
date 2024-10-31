@@ -22,4 +22,16 @@ public static class ExtendException
         log?.CreateLogger("").Log(LogLevel.Error, default, additionalMessage, exception, (_, _) => "");
     }
     #endregion
+    #region 将不认识的枚举转换为异常
+    /// <summary>
+    /// 指示这个枚举无法识别，
+    /// 并返回一个异常，稍后可以抛出它
+    /// </summary>
+    /// <typeparam name="Enum">枚举的类型</typeparam>
+    /// <param name="enum">被标记为无法识别的枚举</param>
+    /// <returns></returns>
+    public static Exception Unrecognized<Enum>(this Enum @enum)
+        where Enum : struct, System.Enum
+        => new NotSupportedException($"无法识别枚举{@enum}");
+    #endregion
 }

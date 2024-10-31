@@ -187,8 +187,8 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// 它在解析表达式树的时候会被用到
     /// </summary>
     private static MethodInfo MethodAny { get; }
-        = typeof(Enumerable).GetTypeData().
-        MethodDictionary[nameof(Enumerable.Any)].SingleOrDefaultSecure(x => x.GetParameters().Length is 2) ??
+        = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static).
+        SingleOrDefaultSecure(x => x.Name is nameof(Enumerable.Any) && x.GetParameters().Length is 2) ??
         throw new NotSupportedException($"{nameof(Enumerable)}中存在多个名为{nameof(Enumerable.Any)}，且参数数量为2的方法，" +
             $"您可以检查下，是不是升级Net版本后新增了这个方法？如果是，请将这个属性重构");
     #endregion
@@ -198,7 +198,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// 它在解析表达式树的时候会被用到
     /// </summary>
     private static MethodInfo MethodContains { get; }
-        = typeof(string).GetTypeData().FindMethod(nameof(string.Contains), CreateReflection.MethodSignature(typeof(bool), typeof(string)));
+        = typeof(string).GetMethod(nameof(string.Contains), BindingFlags.Public | BindingFlags.Instance, [typeof(string)])!;
     #endregion
     #endregion
     #region 生成排序表达式

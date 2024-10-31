@@ -1,6 +1,4 @@
-﻿using System.IOFrancis;
-
-using Aliyun.OSS;
+﻿using Aliyun.OSS;
 
 namespace System.NetFrancis;
 
@@ -12,13 +10,12 @@ sealed class OSSAliyun(AliyunOSSToken token) : IOSS
 {
     #region 公开成员
     #region 执行上传
-    public Task<string> Upload(string filePath, string? objectName = null)
+    public Task<string> Upload(Stream stream, string? objectName, string? objectExtension)
     {
-        using var checkpointDir = ToolTemporaryFile.CreateTemporaryPath();
-        var extension = Path.GetExtension(filePath);
-        var newObjectName = (objectName ?? Guid.NewGuid().ToString()) + extension;
+        var newObjectExtension = objectExtension.IsVoid() ? null : "." + objectExtension;
+        var newObjectName = (objectName ?? Guid.NewGuid().ToString()) + newObjectExtension;
         var client = CreateClient();
-        using var result = client.PutObject(token.Bucket, newObjectName, filePath);
+        using var result = client.PutObject(token.Bucket, newObjectName, stream);
         return Task.FromResult(newObjectName);
     }
     #endregion
@@ -29,6 +26,18 @@ sealed class OSSAliyun(AliyunOSSToken token) : IOSS
         var expire = DateTime.Now + (lifespan ?? TimeSpan.FromHours(8));
         var uri = client.GeneratePresignedUri(token.Bucket, objectName, expire);
         return Task.FromResult(uri.AbsoluteUri);
+    }
+    #endregion
+    #region 删除文件
+    public Task Delete(IEnumerable<string> fileName)
+    {
+        var client = CreateClient();
+        foreach (var item in fileName.Chunk(1000))
+        {
+            var deleteObjectsRequest = new DeleteObjectsRequest(token.Bucket, item);
+            client.DeleteObjects(deleteObjectsRequest);
+        }
+        return Task.CompletedTask;
     }
     #endregion
     #endregion

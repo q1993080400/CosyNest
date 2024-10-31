@@ -44,12 +44,10 @@ public static class FastRealize
     /// 获取一个实现<see cref="IDisposable"/>的锁，
     /// 它可以利用using语句自动完成某些操作，以免遗漏
     /// </summary>
-    /// <param name="initialization">在锁初始化的时候，这个委托会被立即执行，
-    /// 如果为<see langword="null"/>，则会被忽略</param>
     /// <param name="dispose">在锁被释放的时候，这个委托会被执行</param>
     /// <returns></returns>
-    public static IDisposable Disposable(Action? initialization, Action dispose)
-        => new Lock(initialization, dispose);
+    public static IDisposable Disposable(Action dispose)
+        => new Lock(dispose);
     #endregion
     #region 实现IComparer
     #region 通用类型
@@ -101,7 +99,7 @@ public static class FastRealize
                 default:
                     Regex ??=/*language=regex*/@"\d+".Op().Regex();
                     compareString ??= Collections.Generic.Comparer<string>.Default;
-                    foreach (var (index, match, _) in Regex.Matches(x).Matches.Zip(Regex.Matches(y).Matches, false).PackIndex())
+                    foreach (var (index, match, _) in Regex.Matches(x).Matches.ZipFill(Regex.Matches(y).Matches).PackIndex())
                     {
                         #region 本地函数
                         static int Fun(string a, string b)

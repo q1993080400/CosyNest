@@ -22,14 +22,14 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
     public async Task<string[]> GetSonDepartmentID(string departmentID = "1")
     {
         var accessToken = await GetCompanyToken();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         var response = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/v2/department/listsubid",
             new
             {
                 dept_id = departmentID
             }, parameters: [("access_token", accessToken)],
             transformation: TransformAccessToken(accessToken));
-        return response.GetValue<Num[]>("result.dept_id_list")?.Select(x => x.ToString()).ToArray() ?? [];
+        return response.GetValue<double[]>("result.dept_id_list")?.Select(x => x.ToString()).ToArray() ?? [];
     }
     #endregion
     #region 获取所有子部门和员工
@@ -40,10 +40,11 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
     public async IAsyncEnumerable<DingDingDepartmentInfo> GetAllSonDepartment()
     {
         var accessToken = await GetCompanyToken();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         #region 递归获取所有子部门的本地函数
         async IAsyncEnumerable<DingDingDepartmentInfo> GetSonDepartmentID(string fatherDepartmentID)
         {
+            await Delay();
             var response = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/v2/department/listsub",
             new
             {
@@ -73,6 +74,7 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
             var cursor = 0;
             while (true)
             {
+                await Delay();
                 var response = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/v2/user/list",
                     new
                     {
@@ -115,7 +117,7 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
     #region 返回钉钉身份验证状态
     public async Task<APIPackDingDing> GetAuthenticationDingDingState(AuthenticationDingDingRequest parameter)
     {
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         var configuration = ServiceProvider.GetRequiredService<DingDingConfiguration>();
         var token = await GetUserToken(parameter);
         if (token is null or { IsToken: false } or { RefreshToken: null })

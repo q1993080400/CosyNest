@@ -1,5 +1,4 @@
 ﻿using System.NetFrancis.Api;
-using System.NetFrancis.Http;
 
 namespace Microsoft.AspNetCore;
 
@@ -16,7 +15,6 @@ public interface IServerUpdatePart<in Parameter>
     /// </summary>
     /// <param name="parameter">执行修改需要的参数</param>
     /// <returns></returns>
-    [HttpMethodPost]
     Task<APIPack> UpdateProperty(Parameter parameter);
     #endregion
 }

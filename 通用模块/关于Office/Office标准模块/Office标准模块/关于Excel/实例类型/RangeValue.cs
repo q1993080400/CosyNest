@@ -27,10 +27,6 @@ public readonly struct RangeValue
     public static implicit operator RangeValue(string? value)
         => new(value);
     #endregion
-    #region 从Num转换
-    public static implicit operator RangeValue(Num value)
-        => new(value);
-    #endregion
     #region 从Double转换
     public static implicit operator RangeValue(double value)
         => new(value);
@@ -119,10 +115,10 @@ public readonly struct RangeValue
                 switch (array.Rank)
                 {
                     case 1:
-                        return array.OfType().Select(Convert).ToArray();
+                        return array.Cast<object>().Select(Convert).ToArray();
                     case 2:
                         var length = array.GetLength();
-                        return array.OfType().Select(Convert).ToArray(length[0], length[1]);
+                        return array.Cast<object>().Select(Convert).ToArray(length[0], length[1]);
                     case var rank:
                         throw new NotSupportedException($"最多支持二维数组，但是传入了一个{rank}维数组");
                 }
@@ -133,13 +129,10 @@ public readonly struct RangeValue
                 null or string or int or double or DateTime => content,
                 RangeValue r => r.Content,
                 Array a => ConvertArray(a),
-                Num n => (double)n,
                 DateTimeOffset d => d.DateTime,
-                IEnumerable list => ConvertArray(list.ToArray<object>()),
+                IEnumerable list => ConvertArray(list.Cast<object>().ToArray()),
                 Guid guid => guid.ToString(),
-                _ => throw new TypeUnlawfulException(content,
-                typeof(string), typeof(Num), typeof(double), typeof(DateTime),
-                typeof(Array), typeof(DateTimeOffset), typeof(IEnumerable)),
+                _ => throw new NotSupportedException($"{content.GetType()}不是基本类型，也不是基本集合类型"),
             };
         }
         #endregion

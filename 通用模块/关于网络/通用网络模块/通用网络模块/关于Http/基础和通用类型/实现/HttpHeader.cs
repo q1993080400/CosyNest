@@ -12,13 +12,6 @@ public abstract record HttpHeader : IHttpHeader
     #region 标头属性
     public IReadOnlyDictionary<string, IEnumerable<string>> Headers => HeadersImmutable;
     #endregion
-    #region 自定义对象标头
-    public IObjectHeaderValue? ObjectHeaderValue
-    {
-        get => GetHeader(IObjectHeaderValue.HeaderName, x => CreateNet.ObjectHeaderValue(x.Single()));
-        init => SetHeader(IObjectHeaderValue.HeaderName, value, x => [x.Json]);
-    }
-    #endregion
     #region 将标头复制到HttpHeaders
     public Headers CopyHeader<Headers>(Headers header)
           where Headers : HttpHeaders
@@ -51,8 +44,10 @@ public abstract record HttpHeader : IHttpHeader
     /// <returns></returns>
     protected Header? GetHeader<Header>(string key, Func<IEnumerable<string>, Header> ifExist)
         where Header : class
-        => HeadersImmutable.TryGetValue(key).Value is { } v ?
-        ifExist(v) : null;
+    {
+        var value = HeadersImmutable.TryGetValue(key).Value?.ToArray();
+        return value is { Length: > 0 } ? ifExist(value) : null;
+    }
     #endregion
     #region 设置标头
     /// <summary>

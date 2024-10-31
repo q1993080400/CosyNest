@@ -23,12 +23,19 @@ sealed class BrowserWebDriver : Release, IBrowser
     #endregion
     #region 有关选项卡
     #region 创建浏览器标签
-    public ITab CreateTab(string uri)
+    public async Task<ITab> CreateTab(string uri)
     {
-        WebDriver.SwitchTo().NewWindow(WindowType.Tab);
-        var tab = new TabWebDriver(this, WebDriver.CurrentWindowHandle);
-        Uri = uri;
-        return tab;
+        try
+        {
+            await WebDriver.SwitchTo().NewWindow(WindowType.Tab).
+             Navigate().GoToUrlAsync(uri);
+            return new TabWebDriver(this, WebDriver.CurrentWindowHandle);
+        }
+        catch (Exception)
+        {
+            Dispose();
+            throw;
+        }
     }
     #endregion
     #region 选项卡的集合
@@ -47,10 +54,7 @@ sealed class BrowserWebDriver : Release, IBrowser
     #endregion
     #region 选项卡Uri
     public string Uri
-    {
-        get => WebDriver.Url;
-        set => WebDriver.Navigate().GoToUrl(value);
-    }
+        => WebDriver.Url;
     #endregion
     #region 键盘模拟器
     public IKeyBoard KeyboardEmulation

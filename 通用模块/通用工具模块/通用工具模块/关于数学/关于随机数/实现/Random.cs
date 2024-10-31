@@ -1,4 +1,6 @@
-﻿namespace System.MathFrancis;
+﻿using System.Numerics;
+
+namespace System.MathFrancis;
 
 /// <summary>
 /// 这个类型是<see cref="IRandom"/>的实现，
@@ -8,8 +10,9 @@
 sealed class Random(System.Random random) : IRandom
 {
     #region 生成大于0小于1的随机数
-    public Num Rand()
-        => random.NextDouble();
+    public Num Rand<Num>()
+        where Num : IFloatingPoint<Num>
+        => Num.CreateChecked(random.NextDouble());
     #endregion
     #region 用随机数据填满字节数组
     public byte[] RangdBytes(int length)

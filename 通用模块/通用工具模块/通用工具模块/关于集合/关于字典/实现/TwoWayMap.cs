@@ -50,7 +50,7 @@ sealed class TwoWayMap<A, B> : ITwoWayMap<A, B>
     #endregion
     #region 迭代器
     public IEnumerator<(A, B)> GetEnumerator()
-        => AToB.ToTupts().GetEnumerator();
+        => AToB.Select(x => (x.Key, x.Value)).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();

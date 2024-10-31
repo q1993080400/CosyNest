@@ -8,8 +8,9 @@ namespace System.AI;
 /// 使用百度实现的AI聊天接口上下文
 /// </summary>
 /// <param name="accessToken">访问令牌</param>
-/// <inheritdoc cref="AIChatBaiDu(string, string, string, Func{IHttpClient}?)"/>
-sealed class AIChatContextBaiDu(string accessToken, string modelUri, Func<IHttpClient> httpClientProvide) : IAIChatContext
+/// <param name="httpClient">用于发起请求的Http客户端</param>
+/// <inheritdoc cref="AIChatBaiDu(string, string, string, IServiceProvider)"/>
+sealed class AIChatContextBaiDu(string accessToken, string modelUri, IHttpClient httpClient) : IAIChatContext
 {
     #region 公开成员
     #region 历史消息
@@ -33,7 +34,7 @@ sealed class AIChatContextBaiDu(string accessToken, string modelUri, Func<IHttpC
         {
             UriParameter = new([("access_token", accessToken)])
         };
-        var response = await httpClientProvide().
+        var response = await httpClient.
              RequestJsonPost(uri, new
              {
                  messages = body

@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 using System.Office.Excel.Realize;
 
 namespace System.Office.Excel;
@@ -50,7 +50,7 @@ public interface IExcelCellsCommunity
     /// </summary>
     /// <param name="point">单元格的坐标</param>
     /// <returns></returns>
-    IExcelCells this[IPoint point]
+    IExcelCells this[IPoint<int> point]
     {
         get
         {
@@ -66,7 +66,7 @@ public interface IExcelCellsCommunity
     /// <param name="rectangle">这个平面被用来描述单元格的大小和位置，
     /// 如果它的坐标有负数，那么会取绝对值</param>
     /// <returns></returns>
-    IExcelCells this[ISizePosPixel rectangle]
+    IExcelCells this[ISizePos<int> rectangle]
     {
         get
         {

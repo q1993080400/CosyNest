@@ -15,28 +15,6 @@ public static partial class ExtendEnumerable
     public static int[] GetLength(this Array array)
         => Enumerable.Range(0, array.Rank).Select(array.GetLength).ToArray();
     #endregion
-    #region 合并数组
-    /// <summary>
-    /// 合并多个数组
-    /// </summary>
-    /// <typeparam name="Obj">数组的元素类型</typeparam>
-    /// <param name="objs">要合并的第一个数组</param>
-    /// <param name="otherArray">要合并的其他数组</param>
-    /// <returns></returns>
-    public static Obj[] Concat<Obj>(this Obj[] objs, params Obj[][] otherArray)
-    {
-        var sumArray = otherArray.Prepend(objs).ToArray();
-        var array = new Obj[sumArray.Sum(x => (long)x.Length)];
-        var len = 0L;
-        foreach (var item in sumArray)
-        {
-            var itemLen = item.Length;
-            Array.Copy(item, 0, array, len, itemLen);
-            len += itemLen;
-        }
-        return array;
-    }
-    #endregion
     #endregion
     #region 为Queue<T>优化
     #region 在末尾添加元素
@@ -54,28 +32,6 @@ public static partial class ExtendEnumerable
         if (queue.Count >= maxCount)
             queue.Dequeue();
         queue.Enqueue(obj);
-    }
-    #endregion
-    #endregion
-    #region 为ILookup优化
-    #region 尝试获取元素
-    /// <summary>
-    /// 尝试获取一个<see cref="ILookup{TKey, TElement}"/>的元素，
-    /// 如果键不存在，不会引发异常
-    /// </summary>
-    /// <param name="lookup">要获取元素的键值对集合</param>
-    /// <param name="key">用来获取元素的键</param>
-    /// <returns>一个元组，它的项分别是是否存在元素，以及找到的元素集合，
-    /// 如果不存在元素，返回空集合</returns>
-    /// <inheritdoc cref="ILookup{TKey, TElement}"/>
-    public static (bool Exist, IEnumerable<TElement> Value) TryGetValue<TKey, TElement>(this ILookup<TKey, TElement> lookup, TKey key)
-        where TKey : notnull
-    {
-        if (lookup.Contains(key))
-        {
-            return (true, lookup[key]);
-        }
-        return (false, Array.Empty<TElement>());
     }
     #endregion
     #endregion

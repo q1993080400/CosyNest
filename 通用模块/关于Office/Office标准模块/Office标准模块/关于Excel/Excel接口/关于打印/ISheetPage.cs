@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 
 namespace System.Office.Excel;
 
@@ -14,7 +14,7 @@ public interface ISheetPage : IOfficePage
     /// 获取或设置打印区域，
     /// 如果为<see langword="null"/>，代表没有打印区域
     /// </summary>
-    ISizePosPixel? PrintRegional { get; set; }
+    ISizePos<int>? PrintRegional { get; set; }
     #endregion
     #region 打印区域单元格
     /// <summary>
@@ -32,7 +32,7 @@ public interface ISheetPage : IOfficePage
     /// <param name="regional">打印区域，
     /// 如果为<see langword="null"/>，则遵照<see cref="PrintRegional"/>属性设置的打印区域</param>
     /// <inheritdoc cref="IOfficePage.PrintFromPage(Range?, int, string?)"/>
-    (int PageCount, Task Wait) PrintFromRegional(ISizePosPixel? regional = null, int number = 1, string? printer = null);
+    (int PageCount, Task Wait) PrintFromRegional(ISizePos<int>? regional = null, int number = 1, string? printer = null);
     #endregion
     #region 打印到文件（按照打印区域）
     /// <summary>
@@ -41,6 +41,6 @@ public interface ISheetPage : IOfficePage
     ///<param name="regional">打印区域，
     /// 如果为<see langword="null"/>，则遵照<see cref="PrintRegional"/>属性设置的打印区域</param>
     /// <inheritdoc cref="IOfficePage.PrintFromPageToFile(string, Range?)"/>
-    (int PageCount, Task Wait) PrintFromRegionalToFile(ISizePosPixel? regional, string filePath);
+    (int PageCount, Task Wait) PrintFromRegionalToFile(ISizePos<int>? regional, string filePath);
     #endregion
 }

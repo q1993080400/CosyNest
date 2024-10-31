@@ -15,4 +15,12 @@ public interface IDataPipeFromContext
     IQueryable<Data> Query<Data>()
         where Data : class;
     #endregion
+    #region 获取所有受支持的实体类型
+    /// <summary>
+    /// 获取受这个查询上下文所支持的所有实体类型，
+    /// 如果它为<see langword="null"/>，
+    /// 表示支持任意类型，不受限制的实体类型
+    /// </summary>
+    IEnumerable<Type>? EntityTypes { get; }
+    #endregion
 }

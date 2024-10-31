@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace System.Collections.Generic;
+﻿namespace System.Collections.Generic;
 
 /// <summary>
 /// 这个静态类可以用来帮助创建集合
@@ -111,17 +109,7 @@ public static class CreateCollection
     #endregion
     #endregion
     #endregion
-    #region 创建字典
-    #region 创建反射字典
-    /// <summary>
-    /// 创建一个反射字典，它通过反射属性来读写值
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="ReflectionDictionary.ReflectionDictionary(object?, IEnumerable{PropertyInfo})"/>
-    public static IRestrictedDictionary<string, object?> ReflectionDictionary(object? target, IEnumerable<PropertyInfo> properties)
-        => new ReflectionDictionary(target, properties);
-    #endregion
-    #region 有关ITwoWayMap
+    #region 创建双向映射表
     /// <summary>
     /// 创建一个双向映射表，并返回
     /// </summary>
@@ -131,6 +119,5 @@ public static class CreateCollection
         where A : notnull
         where B : notnull
         => new TwoWayMap<A, B>();
-    #endregion
     #endregion
 }

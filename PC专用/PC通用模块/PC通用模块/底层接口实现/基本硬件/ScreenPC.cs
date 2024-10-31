@@ -1,5 +1,4 @@
 ﻿using System.MathFrancis;
-using System.MathFrancis.Plane;
 using System.Runtime.InteropServices;
 
 namespace System.Underlying.PC;
@@ -11,10 +10,11 @@ namespace System.Underlying.PC;
 sealed partial class ScreenPC : IScreen
 {
     #region 获取物理分辨率
-    public ISizePixel Resolution { get; }
+    public ISize<int> Resolution { get; }
     #endregion
     #region 逻辑分辨率
-    public ISizePixel LogicalResolution => Resolution;
+    public ISize<double> LogicalResolution
+        => CreateMath.Size<double>(Resolution.Width, Resolution.Height);
     #endregion
     #region 获取DPI
     #region X轴DPI
@@ -70,10 +70,10 @@ sealed partial class ScreenPC : IScreen
     /// <summary>
     /// 获取真实设置的桌面分辨率大小
     /// </summary>
-    private static ISizePixel DESKTOP()
+    private static ISize<int> DESKTOP()
     {
         var hdc = GetDC(IntPtr.Zero);
-        var size = CreateMath.SizePixel(
+        var size = CreateMath.Size(
             GetDeviceCaps(hdc, DESKTOPHORZRES),
             GetDeviceCaps(hdc, DESKTOPVERTRES));
         ReleaseDC(IntPtr.Zero, hdc);

@@ -69,7 +69,7 @@ sealed partial class RegexMatch : IMatch
         }).
         Select(x => x == match ? new RegexMatch(x.Value, x.Index, x.Length) : (IMatch)new RegexMatch(x, regular)).ToArray();
         var names = MatchGroupName().Matches(regular).Select(x => x.Value[3..^1]).ToHashSet();
-        GroupsNamed = Groups.Where(x => x.Name != null && names.Contains(x.Name)).ToDictionary(x => (x.Name!, x), false);
+        GroupsNamed = Groups.Where(x => x.Name != null && names.Contains(x.Name)).ToDictionary(x => x.Name!, x => x);
     }
     #endregion
     #region 辅助方法：预编译正则表达式

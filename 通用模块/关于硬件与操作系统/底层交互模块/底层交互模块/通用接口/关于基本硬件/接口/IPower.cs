@@ -21,9 +21,10 @@ public interface IPower
     /// </summary>
     /// <returns></returns>
     IDisposable CreateDormancyLock()
-        => FastRealize.Disposable(
-            () => CanDormancy = false,
-            () => CanDormancy = true);
+    {
+        CanDormancy = false;
+        return FastRealize.Disposable(() => CanDormancy = true);
+    }
     #endregion
     #endregion
     #region 关闭电源

@@ -7,8 +7,6 @@ namespace System.Mapping.Settlement;
 /// </summary>
 public sealed record SettlementRootBuild
 {
-#pragma warning disable CS8618
-
     #region 名称
     /// <summary>
     /// 获取起始点的名称

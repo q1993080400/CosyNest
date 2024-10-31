@@ -29,6 +29,13 @@ public abstract record WebDriverOptions
     /// </summary>
     public UnsafeWebCredentials? Proxy { get; init; }
     #endregion
+    #region 是否为无头模式
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示以无头模式启动浏览器
+    /// </summary>
+    public bool IsHeadLess { get; init; }
+    #endregion
     #endregion
     #region 生成浏览器配置
     /// <summary>

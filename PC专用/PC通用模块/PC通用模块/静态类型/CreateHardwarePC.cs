@@ -28,12 +28,6 @@ public static class CreateHardwarePC
     /// </summary>
     public static IStartManagement StartManagement => StartManagementField ??= new();
     #endregion
-    #region 获取IMouse对象
-    /// <summary>
-    /// 获取一个<see cref="IMouse"/>对象，它表示鼠标
-    /// </summary>
-    public static IMouse Mouse { get; } = new Mouse();
-    #endregion
     #region 获取IKeyBoard对象
     /// <summary>
     /// 获取一个<see cref="IKeyBoard"/>对象，

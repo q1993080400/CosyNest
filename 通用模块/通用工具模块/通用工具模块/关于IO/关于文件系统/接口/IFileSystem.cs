@@ -1,5 +1,4 @@
-﻿using System.MathFrancis;
-using System.MathFrancis.Tree;
+﻿using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
 
@@ -24,37 +23,5 @@ public interface IFileSystem : INode
     /// <returns>具有指定名称的驱动器，如果没有找到，则返回<see langword="null"/></returns>
     IDrive? this[string name]
         => Son.FirstOrDefault(x => x.Name == name);
-    #endregion
-    #region 关于容量
-    #region 辅助方法
-    /// <summary>
-    /// 计算容量的辅助方法
-    /// </summary>
-    /// <param name="delegate">通过驱动器获取容量的委托</param>
-    /// <returns></returns>
-    private IUnit<IUTStorage> SizeAided(Func<IDrive, IUnit<IUTStorage>> @delegate)
-        => CreateBaseMath.UnitMetric<IUTStorage>(Son.Select(@delegate).Sum(x => x.ValueMetric));
-    #endregion
-    #region 获取总容量
-    /// <summary>
-    /// 获取文件系统总容量
-    /// </summary>
-    IUnit<IUTStorage> SizeTotal
-        => SizeAided(x => x.SizeTotal);
-    #endregion
-    #region 获取已用容量
-    /// <summary>
-    /// 获取文件系统已用容量
-    /// </summary>
-    IUnit<IUTStorage> SizeUsed
-        => SizeAided(x => x.SizeUsed);
-    #endregion
-    #region 获取可用容量
-    /// <summary>
-    /// 获取文件系统可用容量
-    /// </summary>
-    IUnit<IUTStorage> SizeAvailable
-        => SizeAided(x => x.SizeAvailable);
-    #endregion
     #endregion
 }

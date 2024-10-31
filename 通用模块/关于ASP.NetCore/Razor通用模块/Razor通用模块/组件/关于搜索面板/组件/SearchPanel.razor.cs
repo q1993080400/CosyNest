@@ -74,7 +74,9 @@ public sealed partial class SearchPanel : ComponentBase
     #endregion
     #region 清除搜索后发生的事件
     /// <summary>
-    /// 当清除搜索后发生的事件
+    /// 当清除搜索后发生的事件，
+    /// 注意：不要在这个委托中刷新组件，
+    /// 因为组件会自动刷新
     /// </summary>
     [Parameter]
     public Func<Task>? OnClear { get; set; }
@@ -90,13 +92,6 @@ public sealed partial class SearchPanel : ComponentBase
     #endregion
     #endregion
     #region 内部成员
-    #region 应该初始化默认查询条件
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示应该初始化默认查询条件
-    /// </summary>
-    private bool InitializeDefaultQueryConditions { get; set; } = true;
-    #endregion
     #region 缓存描述如何渲染筛选条件的对象
     /// <summary>
     /// 这个属性缓存描述如何渲染筛选条件的对象
@@ -106,39 +101,10 @@ public sealed partial class SearchPanel : ComponentBase
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!InitializeDefaultQueryConditions)
+        if (!firstRender)
             return;
-        InitializeDefaultQueryConditions = false;
         CacheRenderCondition = await GetRenderCondition();
-        var hasDefaultValue = CacheRenderCondition.Where(x => x.HasDefaultValue).ToArray();
-        foreach (var item in hasDefaultValue)
-        {
-            var filterQuery = item.RenderFilterQuery;
-            #region 本地函数
-            void Bind<Property>()
-                => SearchViewerState.Bind<Property>(filterQuery);
-            #endregion
-            switch (filterQuery.FilterTarget.FilterObjectType)
-            {
-                case FilterObjectType.Bool:
-                    Bind<bool?>();
-                    break;
-                case FilterObjectType.Text:
-                    Bind<string>();
-                    break;
-                case FilterObjectType.Num:
-                    Bind<double?>();
-                    break;
-                case FilterObjectType.Date:
-                    Bind<DateTimeOffset?>();
-                    break;
-                case FilterObjectType.Enum:
-                    Bind<string?>();
-                    break;
-                case var filterObjectType:
-                    throw new NotSupportedException($"不能识别筛选对象类型{filterObjectType}");
-            }
-        }
+        this.SearchViewerState.InitializeDefaultValue(CacheRenderCondition);
         await SubmitFunction();
     }
     #endregion
@@ -149,8 +115,6 @@ public sealed partial class SearchPanel : ComponentBase
     /// <returns></returns>
     private async Task SubmitFunction()
     {
-        if (InitializeDefaultQueryConditions)
-            return;
         var info = new SearchPanelSubmitInfo()
         {
             DataFilterDescription = SearchViewerState.GenerateFilter()
@@ -171,10 +135,10 @@ public sealed partial class SearchPanel : ComponentBase
         #region 用来清除的委托
         async Task Clear()
         {
-            SearchViewerState.Clear();
-            InitializeDefaultQueryConditions = true;
+            SearchViewerState.Clear(CacheRenderCondition);
             if (OnClear is { })
                 await OnClear();
+            await SubmitFunction();
         }
         #endregion
         return new()

@@ -1,5 +1,4 @@
-﻿using System.MathFrancis;
-using System.MathFrancis.Tree;
+﻿using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
 
@@ -48,26 +47,5 @@ public interface IDrive : INode
     /// <param name="format">格式化后驱动器的文件格式</param>
     /// <param name="label">格式化后驱动器的卷标</param>
     void Format(DriveFormat format, string label = "");
-    #endregion
-    #region 关于容量
-    #region 获取总容量
-    /// <summary>
-    /// 获取驱动器总容量
-    /// </summary>
-    IUnit<IUTStorage> SizeTotal { get; }
-    #endregion
-    #region 获取已用容量
-    /// <summary>
-    /// 获取驱动器已用容量
-    /// </summary>
-    IUnit<IUTStorage> SizeUsed { get; }
-    #endregion
-    #region 获取可用容量
-    /// <summary>
-    /// 获取驱动器可用容量
-    /// </summary>
-    IUnit<IUTStorage> SizeAvailable
-        => SizeTotal - SizeUsed;
-    #endregion
     #endregion
 }

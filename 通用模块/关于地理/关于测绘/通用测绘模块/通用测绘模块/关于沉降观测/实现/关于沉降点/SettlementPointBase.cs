@@ -44,6 +44,5 @@ abstract class SettlementPointBase(string name) : SettlementBase, ISettlementPoi
     #endregion
     #region 重写ToString
     public override string ToString() => Name;
-
     #endregion
 }

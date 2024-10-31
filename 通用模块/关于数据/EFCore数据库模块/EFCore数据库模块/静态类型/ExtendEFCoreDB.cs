@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.DataFrancis;
 using System.DataFrancis.DB;
-using System.Linq.Expressions;
+using System.Numerics;
 using System.Reflection;
 
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +23,14 @@ public static class ExtendEFCoreDB
     /// <returns></returns>
     public static Type[] GetAllEntityType(this Assembly entityAssembly)
     {
-        var entityType = typeof(Entity);
+        var entityType = typeof(IEntity);
         return entityAssembly.GetTypes().
-            Where(x => entityType.IsAssignableFrom(x) && !x.HasAttributes<NotMappedAttribute>() && x != entityType).ToArray();
+            Where(x => x is { IsClass: true, IsPublic: true } &&
+            entityType.IsAssignableFrom(x) &&
+            !x.IsDefined<NotMappedAttribute>(false)).ToArray();
     }
     #endregion
+    #region 添加模型映射
     #region 添加所有模型
     /// <summary>
     /// 添加一个程序集中的所有模型
@@ -63,8 +66,17 @@ public static class ExtendEFCoreDB
     /// </summary>
     /// <param name="modelBuilder">模型创建者对象，
     /// 函数会通过它找到所有的模型</param>
-    public static void AddAllTPHMap(this ModelBuilder modelBuilder)
+    /// <param name="getDiscriminator">这个委托传入抽象实体类的类型，
+    /// 然后返回实体类鉴别器的列名</param>
+    /// <param name="getDiscriminatorValue">这个委托传入具体实体类的类型，
+    /// 然后返回实体类鉴别器的值，它用来在TPH表映射中区分该实体类的具体类型</param>
+    public static void AddAllTPHMap(this ModelBuilder modelBuilder,
+        Func<Type, string>? getDiscriminator = null,
+        Func<Type, string>? getDiscriminatorValue = null)
     {
+        getDiscriminator ??= x => $"{x.Name}Discriminator";
+        getDiscriminatorValue ??= x => x.FullName ??
+        throw new NotSupportedException($"实体类{x.Name}类型的{nameof(Type)}.{nameof(Type.FullName)}属性返回null，无法确认鉴别器的值");
         var entityTypes = modelBuilder.Model.GetEntityTypes().Select(x => x.ClrType).ToArray();
         var abstractEntityTypes = entityTypes.Where(x => x.IsAbstract && x.BaseType == typeof(Entity)).ToArray();
         foreach (var abstractEntityType in abstractEntityTypes)
@@ -74,66 +86,69 @@ public static class ExtendEFCoreDB
             if (realizeEntityTypes.Length is 0)
                 continue;
             var builder = modelBuilder.Entity(abstractEntityType).
-                HasDiscriminator<string>($"{abstractEntityType.Name}Type");
+                HasDiscriminator<string>(getDiscriminator(abstractEntityType));
             foreach (var realizeEntityType in realizeEntityTypes)
             {
-                builder = builder.HasValue(realizeEntityType, realizeEntityType.Name);
+                builder = builder.HasValue(realizeEntityType, getDiscriminatorValue(realizeEntityType));
             }
         }
     }
     #endregion
-    #region 关于具有寿命的实体
-    #region 生成一个过期时间计算列
-    #region 复杂方法
+    #endregion
+    #region 统一配置浮点数的精度
     /// <summary>
-    /// 为<see cref="IWithLife.IsExpire"/>生成一个计算列，
-    /// 它指示实体是否过期
+    /// 统一配置所有实体的所有浮点数属性的精度
     /// </summary>
-    /// <typeparam name="Entity">实体类的类型</typeparam>
-    /// <param name="entityBuilder">实体生成器</param>
-    /// <param name="getInitialDate">这个表达式指定应该使用实体的哪一个属性，
-    /// 作为计算实体过期日期的开始日期</param>
-    /// <param name="lifeDay">实体类的寿命，从<see cref="IWithDate.Date"/>开始计起，按天计算</param>
-    /// <returns></returns>
-    public static PropertyBuilder<bool> HasExpireComputedColumn<Entity>
-        (this EntityTypeBuilder<Entity> entityBuilder,
-        Expression<Func<Entity, DateTimeOffset>> getInitialDate,
-        int lifeDay)
-        where Entity : class, IWithLife
+    /// <typeparam name="FloatingPointNum">要配置的浮点数属性的类型，
+    /// 注意：它的可空版本也会被同样配置</typeparam>
+    /// <param name="configurationBuilder">要配置的模型的约定</param>
+    /// <param name="precision">属性的精度</param>
+    /// <param name="scale">属性的小数位数</param>
+    public static void ConfigureFloatingPointNumPrecision<FloatingPointNum>(this ModelConfigurationBuilder configurationBuilder, int precision = 28, int scale = 6)
+        where FloatingPointNum : struct, IFloatingPoint<FloatingPointNum>
     {
-        var initialDate = getInitialDate is
-        {
-            Body: MemberExpression
-            {
-                Member: PropertyInfo
-                {
-                    Name: { } name
-                }
-            }
-        } ?
-        name : throw new NotSupportedException($"用来指定过期日期基准的表达式不符合格式要求，它必须且只能包含一个属性访问表达式");
-        var script = $"cast(iif(GETDATE() >= DATEADD(day,{lifeDay},{name}),1,0) as bit)";
-        return entityBuilder.Property(x => x.IsExpire).HasComputedColumnSql(script, false);
+        configurationBuilder.Properties<FloatingPointNum>().HavePrecision(precision, scale);
+        configurationBuilder.Properties<FloatingPointNum?>().HavePrecision(precision, scale);
     }
     #endregion
-    #region 简单方法，需实现IWithDate
-    /// <inheritdoc cref="HasExpireComputedColumn{Entity}(EntityTypeBuilder{Entity}, Expression{Func{Entity, DateTimeOffset}}, int)"/>
-    public static PropertyBuilder<bool> HasExpireComputedColumnSimple<Entity>
-        (this EntityTypeBuilder<Entity> entityBuilder, int lifeDay)
-        where Entity : class, IWithLife, IWithDate
-        => entityBuilder.HasExpireComputedColumn(x => x.Date, lifeDay);
-    #endregion
-    #endregion
     #region 删除已经过期的实体
+    #region 可指定派生类
     /// <summary>
     /// 删除所有已经过期的实体
     /// </summary>
-    /// <typeparam name="Entity">实体类的类型</typeparam>
-    /// <param name="entities">要删除的实体查询</param>
+    /// <typeparam name="Data">实现接口的实体类型</typeparam>
+    /// <typeparam name="DerivativeEntity">实体的派生实体，
+    /// 它可以用于为派生类生成表达式</typeparam>
+    /// <param name="entities">要删除的实体数据源</param>
     /// <returns></returns>
-    public static Task ExecuteDeleteExpireEntity<Entity>(this IQueryable<Entity> entities)
-        where Entity : class, IWithLife
-        => entities.Where(x => x.IsExpire).ExecuteDeleteAsync();
+    public static Task ExecuteDeleteExpire<Data, DerivativeEntity>(this IQueryable<DerivativeEntity> entities)
+        where Data : class, IWithLife<Data>
+        where DerivativeEntity : Data
+        => entities.WhereLife<Data, DerivativeEntity>(true).ExecuteDeleteAsync();
+    #endregion
+    #region 直接删除当前类型
+    /// <inheritdoc cref="ExecuteDeleteExpire{Data, DerivativeEntity}(IQueryable{DerivativeEntity})"/>
+    public static Task ExecuteDeleteExpire<Data>(this IQueryable<Data> entities)
+        where Data : class, IWithLife<Data>
+    {
+        var type = typeof(Data);
+        if (type.IsAbstract)
+            throw new NotSupportedException($"{type.Name}是一个抽象的实体类，为避免引起意外的后果，不允许直接执行这个删除操作，" +
+                $"请显式使用本方法具有两个泛型参数的重载");
+        return entities.ExecuteDeleteExpire<Data, Data>();
+    }
+    #endregion
+    #endregion
+    #region 内部成员
+    #region 获取一个DbContext的所有实体类型
+    /// <summary>
+    /// 获取一个<see cref="DbContext"/>的所有实体类型
+    /// </summary>
+    /// <param name="dbContext">要获取实体类型的<see cref="DbContext"/></param>
+    /// <returns></returns>
+    internal static IEnumerable<Type> EntityTypes(this DbContext dbContext)
+        => dbContext.Model.GetEntityTypes().
+        Where(x => !x.HasSharedClrType).Select(x => x.ClrType);
     #endregion
     #endregion
 }

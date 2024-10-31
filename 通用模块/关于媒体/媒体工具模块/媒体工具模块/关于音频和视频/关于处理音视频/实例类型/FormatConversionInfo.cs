@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 
 namespace System.Media.Play;
 
@@ -46,6 +46,6 @@ public sealed record class FormatConversionInfo
     /// 则不加以限制，它的横纵比并不重要，
     /// 最后计算大小的时候，以像素总数为准
     /// </summary>
-    public ISizePixel? MaxDefinition { get; init; }
+    public ISize<int>? MaxDefinition { get; init; }
     #endregion
 }

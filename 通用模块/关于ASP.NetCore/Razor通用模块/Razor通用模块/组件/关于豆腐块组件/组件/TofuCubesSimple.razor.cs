@@ -13,15 +13,10 @@ public sealed partial class TofuCubesSimple : ComponentBase
     [Parameter]
     public string Text { get; set; }
     #endregion
-    #region 每行最大字数
-    /// <inheritdoc cref="TofuCubes.MaxRowLength"/>
+    #region 可显示的最大字数
+    /// <inheritdoc cref="TofuCubes.MaxTextLength"/>
     [Parameter]
-    public int MaxRowLength { get; set; } = 6;
-    #endregion
-    #region 宽度
-    /// <inheritdoc cref="TofuCubes.Width"/>
-    [Parameter]
-    public string? Width { get; set; }
+    public int MaxTextLength { get; set; } = 6;
     #endregion
     #region 渲染图标部分的委托
     /// <summary>

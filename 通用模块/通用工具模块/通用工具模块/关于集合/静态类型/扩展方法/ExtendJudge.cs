@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace System.Linq;
+﻿namespace System.Linq;
 
 public static partial class ExtendEnumerable
 {
@@ -8,93 +6,7 @@ public static partial class ExtendEnumerable
       判断与查找指的是：API返回某一个存在于集合中的元素，
       或是其他单个对象，而不是返回一个新的集合*/
 
-    #region 有关包含关系
-    #region 返回一个集合与另一个集合的包含关系
-    /// <summary>
-    /// 判断集合A相对于集合B的包含关系
-    /// </summary>
-    /// <typeparam name="Obj">要比较的集合的元素类型</typeparam>
-    /// <param name="collectionA">集合A</param>
-    /// <param name="collectionB">集合B</param>
-    /// <param name="isRelational">如果这个值为<see langword="true"/>，
-    /// 表示判断基于关系模型，不会考虑重复元素和元素的顺序</param>
-    /// <returns></returns>
-    public static CollectionContains IsSupersetOf<Obj>(this IEnumerable<Obj> collectionA, IEnumerable<Obj> collectionB, bool isRelational = false)
-    {
-        #region 遵循关系模型
-        CollectionContains FollowRelational()
-        {
-            var a = collectionA.ToHashSet();
-            var b = collectionB.ToHashSet();
-            #region 本地函数
-            static bool Fun(IEnumerable<Obj> a, IEnumerable<Obj> b)
-                => a.All(x => b.Contains(x));
-            #endregion
-            return a.Count.CompareTo(b.Count) switch
-            {
-                0 => Fun(a, b) ? CollectionContains.Equal : CollectionContains.NotMatter,
-                > 0 => Fun(b, a) ? CollectionContains.Superset : CollectionContains.NotMatter,
-                < 0 => Fun(a, b) ? CollectionContains.Subset : CollectionContains.NotMatter
-            };
-        }
-        #endregion
-        #region 不遵循关系模型
-        CollectionContains NotRelational()
-        {
-            var (a, b) = (collectionA.GetEnumerator(), collectionB.GetEnumerator());
-            CollectionContains Get(bool aHas, bool bHas)
-                => (aHas, bHas) switch
-                {
-                    (false, false) => CollectionContains.Equal,
-                    (true, false) => CollectionContains.Superset,
-                    (false, true) => CollectionContains.Subset,
-                    _ => Equals(a.Current, b.Current) ? Get(a.MoveNext(), b.MoveNext()) : CollectionContains.NotMatter
-                };
-            return Get(a.MoveNext(), b.MoveNext());
-        }
-        #endregion
-        return isRelational ? FollowRelational() : NotRelational();
-    }
-    #endregion
-    #region 判断包含关系是否为子集
-    /// <summary>
-    /// 判断某一包含关系是否为子集
-    /// </summary>
-    /// <param name="collectionContains">待判断的包含关系</param>
-    /// <returns>如果<paramref name="collectionContains"/>为
-    /// <see cref="CollectionContains.Equal"/>或<see cref="CollectionContains.Subset"/>，
-    /// 则返回<see langword="true"/>，否则返回<see langword="false"/></returns>
-    public static bool IsSubset(this CollectionContains collectionContains)
-        => collectionContains is
-        CollectionContains.Equal or CollectionContains.Subset;
-    #endregion
-    #endregion
     #region 关于索引，范围和元素位置
-    #region 关于Int形式的索引
-    #region 按照元素返回索引
-    /// <summary>
-    /// 在任意泛型集合中，根据元素返回索引，不需要实现<see cref="IList{T}"/>，
-    /// 如果没有找到，返回-1
-    /// </summary>
-    /// <typeparam name="Obj">泛型集合的类型</typeparam>
-    /// <param name="collection">元素所在的泛型集合</param>
-    /// <param name="obj">要检查索引的元素</param>
-    /// <param name="optimization">如果这个值为<see langword="true"/>，
-    /// 则当<paramref name="collection"/>实现<see cref="IList{T}"/>时，调用<see cref="IList{T}.IndexOf(T)"/>以提高性能，
-    /// 如果本方法在<see cref="IList{T}.IndexOf(T)"/>中调用，请传入<see langword="false"/>以避免无限递归异常</param>
-    /// <returns></returns>
-    public static int BinarySearch<Obj>(this IEnumerable<Obj> collection, Obj obj, bool optimization = true)
-    {
-        if (collection is IList<Obj> c && optimization)
-            return c.IndexOf(obj);
-        foreach (var (index, e, _) in collection.PackIndex())
-        {
-            if (Equals(e, obj))
-                return index;
-        }
-        return -1;
-    }
-    #endregion
     #region 封装集合的元素和索引
     /// <summary>
     /// 封装一个集合的元素和索引，并返回一个新集合
@@ -125,7 +37,6 @@ public static partial class ExtendEnumerable
             }
         }
     }
-    #endregion
     #endregion
     #region 关于Range
     #region 解构范围
@@ -173,10 +84,10 @@ public static partial class ExtendEnumerable
     /// 也就是它的<see cref="Range.End"/>是否从集合开头数起，
     /// 确定范围不会随着集合元素的增减而发生变化
     /// </summary>
-    /// <param name="r">待确定的范围</param>
+    /// <param name="range">待确定的范围</param>
     /// <returns></returns>
-    public static bool IsAccurate(this Range r)
-        => !r.End.IsFromEnd;
+    public static bool IsAccurate(this Range range)
+        => !range.End.IsFromEnd;
     #endregion
     #endregion
     #region 关于Index
@@ -286,31 +197,6 @@ public static partial class ExtendEnumerable
         }
     }
     #endregion
-    #region 关于Aggregate
-    #region 带转换，且可以访问种子的累加
-    /// <summary>
-    /// 将一个集合的元素转化为另一种类型，
-    /// 在转换的时候，可以访问一个种子作为参考
-    /// </summary>
-    /// <typeparam name="Source">原始集合的元素类型</typeparam>
-    /// <typeparam name="Seed">种子的类型</typeparam>
-    /// <typeparam name="Ret">返回值的类型</typeparam>
-    /// <param name="collections">待转换的原始集合</param>
-    /// <param name="initial">种子的初始值</param>
-    /// <param name="delegate">这个委托的参数是集合元素和当前的种子，
-    /// 并返回一个元组，分别是转换后的新元素，以及经过累加后的新种子</param>
-    /// <returns></returns>
-    public static IEnumerable<Ret> AggregateSelect<Source, Seed, Ret>(this IEnumerable<Source> collections, Seed initial, Func<Source, Seed, (Ret, Seed)> @delegate)
-    {
-        foreach (var item in collections)
-        {
-            var (retItem, newSeed) = @delegate(item, initial);
-            initial = newSeed;
-            yield return retItem;
-        }
-    }
-    #endregion
-    #endregion
     #endregion
     #region 关于重复元素
     #region 返回集合中是否存在重复元素
@@ -376,17 +262,6 @@ public static partial class ExtendEnumerable
     #endregion
     #endregion
     #endregion
-    #region 返回集合是否不为null且存在元素
-    /// <summary>
-    /// 如果集合不为<see langword="null"/>且存在至少一个元素，
-    /// 则返回<see langword="true"/>，否则返回<see langword="false"/>
-    /// </summary>
-    /// <typeparam name="Obj">集合元素的类型</typeparam>
-    /// <param name="objs">要判断的集合</param>
-    /// <returns></returns>
-    public static bool AnyAndNotNull<Obj>([NotNullWhen(true)] this IEnumerable<Obj>? objs)
-        => objs?.Any() ?? false;
-    #endregion
     #region 返回唯一符合条件的元素，或默认值
     #region 无测试条件
     /// <summary>
@@ -420,27 +295,3 @@ public static partial class ExtendEnumerable
     #endregion
     #endregion
 }
-#region 集合包含关系枚举
-/// <summary>
-/// 这个枚举指示两个集合之间的包含关系
-/// </summary>
-public enum CollectionContains
-{
-    /// <summary>
-    /// 表示真超集
-    /// </summary>
-    Superset,
-    /// <summary>
-    /// 表示真子集
-    /// </summary>
-    Subset,
-    /// <summary>
-    /// 表示两个集合完全等价
-    /// </summary>
-    Equal,
-    /// <summary>
-    /// 表示两个集合之间没有任何包含关系
-    /// </summary>
-    NotMatter
-}
-#endregion

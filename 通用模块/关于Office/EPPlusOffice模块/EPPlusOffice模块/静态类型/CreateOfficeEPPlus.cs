@@ -1,6 +1,4 @@
-﻿using System.IOFrancis;
-using System.IOFrancis.FileSystem;
-using System.Office.Excel;
+﻿using System.Office.Excel;
 
 namespace System.Office;
 
@@ -9,15 +7,6 @@ namespace System.Office;
 /// </summary>
 public static class CreateOfficeEPPlus
 {
-    #region 返回受支持的文件类型
-    /// <summary>
-    /// 返回受本模块支持的Excel文件类型
-    /// </summary>
-    public static IFileType SupportExcel { get; }
-    = CreateIO.FileType("受EPPlusOffice模块支持的Excel文件类型",
-        OfficeFileCommon.Excel2007,
-        OfficeFileCommon.Excel2007Macro);
-    #endregion
     #region 创建Excel工作簿
     #region 创建空工作簿
     /// <summary>

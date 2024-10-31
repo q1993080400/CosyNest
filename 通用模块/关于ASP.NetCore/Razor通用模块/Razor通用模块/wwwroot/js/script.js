@@ -14,7 +14,7 @@ function RegisterNetMethod(net, jsMethodName, netMethodName) {
 //获取复制文本
 async function ReadCopyText() {
     try {
-        let text = await navigator.clipboard.readText();
+        const text = await navigator.clipboard.readText();
         return {
             IsSuccess: true,
             Text: text
@@ -44,12 +44,12 @@ function JumpTo(elementID, smooth, scrollingContextCSS) {
 
 //动态加载css文件
 function LoadCSS(uri) {
-    let head = document.head;
+    const head = document.head;
     for (let i in head.childNodes) {
         if (i.href == uri)
             return;
     }
-    let link = document.createElement("link");
+    const link = document.createElement("link");
     link.type = "text/css";
     link.rel = "stylesheet";
     link.href = uri;
@@ -58,7 +58,7 @@ function LoadCSS(uri) {
 
 //下载文件
 function Download(uri, fileName) {
-    let downloadDom = document.createElement('a');
+    const downloadDom = document.createElement('a');
     downloadDom.href = uri;
     downloadDom.download = fileName;
     document.body.appendChild(downloadDom);
@@ -77,7 +77,7 @@ function ShowSmallWindow(uri, proportion) {
 
 //固定具有所有特性的粘性定位元素
 function FixedSticky(id, attribute) {
-    let array = Array.from(document.querySelectorAll(`#${id} [${attribute}]`));
+    const array = Array.from(document.querySelectorAll(`#${id} [${attribute}]`));
     let top = 0;
     for (let i = 1; i < array.length; i++) {
         let back = array[i - 1];
@@ -90,7 +90,7 @@ function FixedSticky(id, attribute) {
 //创建一个唤醒锁，它阻止屏幕变暗
 async function CreateWakeLock(key) {
     try {
-        let lock = await navigator.wakeLock.request("screen");
+        const lock = await navigator.wakeLock.request("screen");
         window[key] = lock;
         return true;
     } catch (e) {
@@ -100,7 +100,7 @@ async function CreateWakeLock(key) {
 
 //释放一个唤醒锁
 async function ReleaseWakeLock(key) {
-    let lock = window[key];
+    const lock = window[key];
     if (lock)
         await lock.release();
 }
@@ -109,7 +109,7 @@ const volumeKey = "TotalPlayVolume";
 
 //初始化播放器音量
 function InitializationPlayVolume() {
-    let volume = localStorage.getItem(volumeKey);
+    const volume = localStorage.getItem(volumeKey);
     return parseFloat(volume ?? 0.5);
 }
 
@@ -130,7 +130,7 @@ function GetPlayer(playerID) {
 
 //获取播放器的状态
 function GetPlayerState(playerID) {
-    let player = GetPlayer(playerID);
+    const player = GetPlayer(playerID);
     return player == null ? null : {
         PlayerID: playerID,
         Length: player.duration,
@@ -151,7 +151,7 @@ function GetPlayerState(playerID) {
 
 //切换播放器的播放/暂停状态，然后返回播放器的状态
 async function SwitchPlayerStatus(playerID) {
-    let player = GetPlayer(playerID);
+    const player = GetPlayer(playerID);
     if (player == null)
         return null;
     if (player.paused) {
@@ -169,12 +169,12 @@ async function SwitchPlayerStatus(playerID) {
 
 //写入播放器的状态，并返回是否成功写入
 async function SetPlayerState(playerID, stateOperational) {
-    let player = GetPlayer(playerID);
+    const player = GetPlayer(playerID);
     if (player == null)
         return false;
     player.autoplay = stateOperational.autoPlay;
-    let source = Array.prototype.map.call(player.childNodes, source => source.src);
-    let mediumSource = stateOperational.mediumSource;
+    const source = Array.prototype.map.call(player.childNodes, source => source.src);
+    const mediumSource = stateOperational.mediumSource;
     if (JSON.stringify(source) != JSON.stringify(mediumSource)) {
         while (player.firstChild) {
             player.removeChild(player.firstChild);
@@ -194,7 +194,7 @@ async function SetPlayerState(playerID, stateOperational) {
         }
     }
     else {
-        let played = stateOperational.played;
+        const played = stateOperational.played;
         if (Math.abs(player.currentTime - played) >= 1)
             player.currentTime = played;
     }
@@ -206,22 +206,22 @@ async function SetPlayerState(playerID, stateOperational) {
 
 //将这个函数赋值给播放器的ontimeupdate事件，以更新已播放时间和媒体总长度
 function UpdatePlayerTime(player, currentTimeElementID, totalTimeElementID) {
-    let currentTimeElement = document.getElementById(currentTimeElementID);
-    let totalTimeElement = document.getElementById(totalTimeElementID);
+    const currentTimeElement = document.getElementById(currentTimeElementID);
+    const totalTimeElement = document.getElementById(totalTimeElementID);
     currentTimeElement.textContent = toTimeString(player.currentTime);
     totalTimeElement.textContent = toTimeString(player.duration);
 }
 
 //获取播放器的播放进度，并返回一个double
 function GetPlayerProgress(player) {
-    let duration = player.duration;
+    const duration = player.duration;
     return duration == 0 || Number.isNaN(duration) ?
         0 : player.currentTime / duration;
 }
 
 //获取某一元素是否被用户看到
 function CheckIntersecting(id) {
-    let element = document.getElementById(id);
+    const element = document.getElementById(id);
     if (!element)
         return false;
     const elementRect = element.getBoundingClientRect();
@@ -233,7 +233,7 @@ function CheckIntersecting(id) {
 
 //观察虚拟化容器
 function ObservingVirtualizationContainers(netMethod, endID) {
-    let observer = CacheObservation(endID,
+    const observer = CacheObservation(endID,
         () => new IntersectionObserver(async (entries, observer) => {
             for (let i of entries) {
                 if (i.isIntersecting) {
@@ -247,13 +247,13 @@ function ObservingVirtualizationContainers(netMethod, endID) {
                 }
             }
         }));
-    let element = document.getElementById(endID);
+    const element = document.getElementById(endID);
     observer.observe(element);
 }
 
 //如果页面存在一个观察者的缓存，提取它，否则创建一个新的缓存
 function CacheObservation(key, createObserve) {
-    let newKey = key + 'Observe'
+    const newKey = key + 'Observe'
     let observe = window[newKey];
     if (observe)
         return observe;
@@ -264,11 +264,11 @@ function CacheObservation(key, createObserve) {
 
 //注册观察媒体事件，它检测媒体的可见性，并自动播放暂停媒体
 function ObserveVisiblePlay(id) {
-    let element = document.querySelectorAll(`#${id} :is(video,audio)`);
-    let observe = CacheObservation(id,
+    const element = document.querySelectorAll(`#${id} :is(video,audio)`);
+    const observe = CacheObservation(id,
         () => new IntersectionObserver(array => {
             for (let i of array) {
-                let medium = i.target;
+                const medium = i.target;
                 if (i.isIntersecting) {
                     medium.play();
                 }
@@ -296,7 +296,7 @@ function ObserveVisiblePlay(id) {
             }
         }
     }
-    let observerDOM = CacheObservation(id + 'ObserveDOM', () => new MutationObserver(callback));
+    const observerDOM = CacheObservation(id + 'ObserveDOM', () => new MutationObserver(callback));
     observerDOM.observe(document.getElementById(id),
         {
             subtree: true,
@@ -309,7 +309,7 @@ function toTimeString(totalSeconds) {
     if (Number.isNaN(totalSeconds))
         totalSeconds = 0;
     const totalMs = totalSeconds * 1000;
-    let position = totalMs >= 3600 * 1000 ?
+    const position = totalMs >= 3600 * 1000 ?
         11 :
         totalMs >= 600 ?
             14 : 15;
@@ -319,17 +319,37 @@ function toTimeString(totalSeconds) {
 
 //将一个SVG标签的文本封装成Blob，再封装成一个Uri
 function CreateSVGUri(svgID) {
-    let svg = document.getElementById(svgID).innerHTML;
-    let blob = new Blob([svg],
+    const svg = document.getElementById(svgID).innerHTML;
+    const blob = new Blob([svg],
         {
             type: "image/svg+xml"
         });
     return URL.createObjectURL(blob);
 }
 
+//释放预览图片
+function DisposablePreviewImage(imageUrls) {
+    for (let url of imageUrls) {
+        URL.revokeObjectURL(url)
+    }
+}
+
+//初始化预览图片，并返回它们的ObjectURL
+function InitializationPreviewImage(inputElementID, previewIndexs) {
+    const files = document.getElementById(inputElementID).files;
+    const indexMap = new Map(previewIndexs);
+    const indexs = [];
+    for (let i = 0; i < files.length; i++) {
+        const url = indexMap.has(i) ?
+            URL.createObjectURL(files.item(i)) : null;
+        indexs.push(url);
+    }
+    return indexs;
+}
+
 //这是一个读写cookie的小框架
 
-var docCookies = {
+const docCookies = {
     getItem: function (sKey) {
         return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[-.+*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
     },
@@ -364,21 +384,21 @@ var docCookies = {
         return keys().length;
     },
     keys: /* optional method: you can safely remove it! */ function () {
-        let aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
+        const aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
         for (let nIdx = 0; nIdx < aKeys.length; nIdx++) {
             aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]);
         }
         return aKeys;
     },
     clear: function (sPath, sDomain) {
-        let allKey = docCookies.keys();
+        const allKey = docCookies.keys();
         for (let i = 0; i < allKey.length; i++) {
             docCookies.removeItem(allKey[i], sPath, sDomain);
         }
     },
     keyAndValue: function () {
-        let allKey = docCookies.keys();
-        let allKeyValue = Array.from(allKey.map(x => {
+        const allKey = docCookies.keys();
+        const allKeyValue = Array.from(allKey.map(x => {
             return {
                 Key: x,
                 Value: docCookies.getItem(key)
@@ -388,7 +408,7 @@ var docCookies = {
     },
     tryGetValue: function (key) {
         if (this.hasItem(key)) {
-            let value = getItem(key);
+            const value = getItem(key);
             return {
                 Exist: true,
                 Value: value

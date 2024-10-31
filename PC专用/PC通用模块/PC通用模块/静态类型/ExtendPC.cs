@@ -35,7 +35,7 @@ public static class ExtendPC
                 FileSystem.DeleteDirectory(d.Path, dialogMod, deleteMod);
                 break;
             default:
-                throw new TypeUnlawfulException(io, typeof(IFile), typeof(IDirectory));
+                throw new NotSupportedException($"{io.GetType()}既不是{nameof(IFile)}也不是{nameof(IDirectory)}");
         }
     }
     #endregion

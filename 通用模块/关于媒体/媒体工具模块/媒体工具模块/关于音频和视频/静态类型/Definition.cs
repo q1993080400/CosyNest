@@ -1,5 +1,4 @@
 ﻿using System.MathFrancis;
-using System.MathFrancis.Plane;
 
 namespace System.Media.Play;
 
@@ -13,13 +12,13 @@ public static class Definition
     /// 获取720P的清晰度，
     /// 也就是1280*720
     /// </summary>
-    public static ISizePixel P720 { get; } = CreateMath.SizePixel(1280, 720);
+    public static ISize<int> P720 { get; } = CreateMath.Size(1280, 720);
     #endregion
     #region 480P
     /// <summary>
     /// 获取480P的清晰度，
     /// 也就是854*480
     /// </summary>
-    public static ISizePixel P480 { get; } = CreateMath.SizePixel(854, 480);
+    public static ISize<int> P480 { get; } = CreateMath.Size(854, 480);
     #endregion
 }

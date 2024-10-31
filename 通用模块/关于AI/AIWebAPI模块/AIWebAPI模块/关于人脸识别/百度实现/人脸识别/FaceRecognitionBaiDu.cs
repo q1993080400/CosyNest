@@ -1,6 +1,5 @@
 ﻿using System.Design.Direct;
 using System.NetFrancis.Api;
-using System.NetFrancis.Http;
 
 namespace System.AI;
 
@@ -12,16 +11,16 @@ namespace System.AI;
 /// </remarks>
 /// <param name="apiKey">应用的ApiKey，它用于身份验证</param>
 /// <param name="secretKey">应用的SecretKey，它用于身份验证</param>
-/// <inheritdoc cref="WebApi(Func{IHttpClient}?)"/>
-sealed class FaceRecognitionBaiDu(string apiKey, string secretKey, Func<IHttpClient>? httpClientProvide)
-    : WebApi(httpClientProvide), IFaceRecognition
+/// <inheritdoc cref="WebApi(IServiceProvider)"/>
+sealed class FaceRecognitionBaiDu(string apiKey, string secretKey, IServiceProvider serviceProvider)
+    : WebApi(serviceProvider), IFaceRecognition
 {
     #region 公开成员
     #region 执行人脸检测
     public async Task<IFaceRecognitionInfo> Recognition(string imageBase64, CancellationToken cancellation)
     {
         var accessToken = await GetAccessToken();
-        var response = await HttpClientProvide().RequestJsonPost("https://aip.baidubce.com/rest/2.0/face/v3/detect",
+        var response = await HttpClient.RequestJsonPost("https://aip.baidubce.com/rest/2.0/face/v3/detect",
             new
             {
                 image = imageBase64,
@@ -46,7 +45,7 @@ sealed class FaceRecognitionBaiDu(string apiKey, string secretKey, Func<IHttpCli
     /// <returns></returns>
     private async Task<string> GetAccessToken()
     {
-        var response = await HttpClientProvide().RequestJsonPost("https://aip.baidubce.com/oauth/2.0/token",
+        var response = await HttpClient.RequestJsonPost("https://aip.baidubce.com/oauth/2.0/token",
             new { }, new[]
             {
                 ("grant_type","client_credentials"),

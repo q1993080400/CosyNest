@@ -17,14 +17,6 @@ public sealed partial class FileRendering : ComponentBase
     [EditorRequired]
     public string Uri { get; set; }
     #endregion
-    #region 宽度
-    /// <summary>
-    /// 获取描述宽度的样式（不是CSS类名），
-    /// 如果为<see langword="null"/>，则自动确定
-    /// </summary>
-    [Parameter]
-    public string? Width { get; set; }
-    #endregion
     #region 用来获取文件下载名称的委托
     /// <summary>
     /// 这个委托传入原始文件名，

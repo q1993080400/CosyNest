@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis.BaseFileSystem;
-using System.MathFrancis;
 using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
@@ -52,12 +51,6 @@ sealed class DirectoryRealize : IORealize, IDirectory
     public override IEnumerable<INode> Son
         => Search<IIO>("*");
     #endregion
-    #region 获取目录的大小
-    public override IUnit<IUTStorage> Size
-        => this.To<INode>().Father is IDrive d ?
-        d.SizeUsed :
-        CreateBaseMath.UnitMetric<IUTStorage>(Directory.Son.Select(x => (long)x.Size.ValueMetric).Sum());
-    #endregion
     #endregion
     #region 关于对目录的操作
     #region 复制
@@ -79,7 +72,7 @@ sealed class DirectoryRealize : IORealize, IDirectory
         where IO : IIOBase
     {
         var type = typeof(IO);
-        var newName = IDirectoryBase.GetUniqueName(this, name);
+        var newName = name ?? Guid.NewGuid().ToString();
         var path = System.IO.Path.Combine(Path, newName);
         if (type == typeof(IFile) || type == typeof(IFileBase))
             return (IO)CreateIO.File(path, false);
@@ -116,7 +109,7 @@ sealed class DirectoryRealize : IORealize, IDirectory
         if (!PackFS.Exists)
         {
             if (checkExist)
-                throw IOExceptionFrancis.BecauseExist(path ?? "null");
+                throw new NotSupportedException($"目录{path}不存在");
             PackFS.Create();
         }
     }

@@ -22,7 +22,7 @@ public sealed record QueryCondition : DataCondition
     public required object? CompareValue
     {
         get => CompareValueField;
-        init => CompareValueField = (value is JsonElement e ? e.Deserialize() : value) switch
+        init => CompareValueField = (value is JsonElement e ? e.DeserializeToObject() : value) switch
         {
             { } v when !v.GetType().IsCommonType()
             => throw new NotSupportedException($"{v}不是基本类型，不能作为查询条件中用来进行比较的值"),

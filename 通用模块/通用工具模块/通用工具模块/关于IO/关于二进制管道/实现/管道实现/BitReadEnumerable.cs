@@ -29,7 +29,6 @@ sealed class BitReadEnumerable : IBitRead
     #region 读取数据
     public async IAsyncEnumerable<byte[]> Read(int bufferSize = 1024, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        ExceptionIntervalOut.Check(1, null, bufferSize);
         var cache = new byte[bufferSize];
         var cachePos = 0;
         await foreach (var array in Bytes)

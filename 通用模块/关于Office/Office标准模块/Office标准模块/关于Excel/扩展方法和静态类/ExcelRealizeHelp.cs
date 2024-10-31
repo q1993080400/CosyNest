@@ -1,6 +1,5 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 using System.Office.Realize;
-using System.Reflection;
 
 namespace System.Office.Excel.Realize;
 
@@ -60,28 +59,6 @@ public static partial class ExcelRealizeHelp
     #endregion
     #endregion
     #endregion
-    #region 关于格式
-    #region 复制格式
-    #region 缓存属性
-    /// <summary>
-    /// 这个属性缓存<see cref="IRangeStyle"/>中所有公开，
-    /// 而且既能读取又能写入的属性，为复制格式提供方便
-    /// </summary>
-    private static IEnumerable<PropertyInfo> CacheStyleProperty { get; }
-    = typeof(IRangeStyle).GetProperties().
-        Where(x => x.IsAlmighty()).ToArray();
-    #endregion
-    #region 复制单元格格式
-    /// <summary>
-    /// 复制单元格格式
-    /// </summary>
-    /// <param name="source">待复制的格式</param>
-    /// <param name="target">复制的目标格式</param>
-    public static void CopyStyle(IRangeStyle source, IRangeStyle target)
-        => CacheStyleProperty.ForEach(x => x.Copy(source, target));
-    #endregion
-    #endregion
-    #endregion 
     #region 关于位置
     #region 通过相对位置获取绝对位置
     /// <summary>
@@ -104,10 +81,10 @@ public static partial class ExcelRealizeHelp
     /// <param name="rectangle">这个平面被用来描述单元格的大小和位置，
     /// 如果它的坐标有负数，那么会取绝对值</param>
     /// <returns></returns>
-    public static (int BeginRow, int BeginColumn, int EndRow, int EndColumn) GetPosition(ISizePosPixel rectangle)
+    public static (int BeginRow, int BeginColumn, int EndRow, int EndColumn) GetPosition(ISizePos<int> rectangle)
     {
-        var (h, v) = rectangle;
-        var (r, t) = rectangle.FirstPixel.Abs();
+        var (h, v) = rectangle.Size;
+        var (r, t) = rectangle.Position.Abs();
         return GetPosition(t, r, (v, h));
     }
     #endregion

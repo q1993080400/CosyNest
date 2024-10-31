@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Performance;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace System;
 
@@ -43,130 +41,48 @@ public static partial class ExtendReflection
         => typeof(Delegate).IsAssignableFrom(type);
     #endregion
     #endregion
-    #region 关于方法与构造函数
-    #region 获取方法所有参数类型
+    #region 方法和构造函数共用
+    #region 获取所有参数类型
     /// <summary>
-    /// 获取一个方法的所有参数类型
+    /// 获取一个方法或构造函数的所有参数类型
     /// </summary>
-    /// <param name="method">要获取参数类型的方法</param>
+    /// <param name="method">要获取参数类型的方法或构造函数</param>
     /// <returns></returns>
     public static Type[] GetParameterTypes(this MethodBase method)
         => method.GetParameters().Select(p => p.ParameterType).ToArray();
     #endregion
-    #region 关于方法
-    #region 关于签名
-    #region 返回参数的类型
+    #region 判断方法是否与指定的签名兼容
+    #region 仅指定方法参数
     /// <summary>
-    /// 返回参数列表中参数的类型
+    /// 判断方法是否与指定的签名兼容
     /// </summary>
-    /// <param name="parameter">参数列表</param>
+    /// <param name="method">要判断的方法</param>
+    /// <param name="parameterType">方法参数的类型</param>
     /// <returns></returns>
-    public static Type[] GetParType(this IEnumerable<ParameterInfo> parameter)
-        => parameter.Select(x => x.ParameterType).ToArray();
-    #endregion
-    #region 返回签名
-    #region 返回一个方法或构造函数的签名
-    #region 缓存字典
-    /// <summary>
-    /// 这个字典缓存方法的签名，
-    /// 以确保相同的方法签名只会初始化一次
-    /// </summary>
-    private static ICache<MethodBase, ISignature> CacheSignature { get; }
-    = CreatePerformance.MemoryCache<MethodBase, ISignature>(
-        (key, _) =>
-        {
-            var par = key.GetParameters().GetParType();
-            return key switch
+    public static bool IsSame(this MethodBase method, Type[] parameterType)
+    {
+        var methodParameter = method.GetParameterTypes();
+        return methodParameter.Length == parameterType.Length &&
+            methodParameter.Zip(parameterType).All(x =>
             {
-                MethodInfo a => CreateReflection.MethodSignature(a.ReturnType, par),
-                ConstructorInfo => CreateReflection.ConstructSignature(par),
-                _ => throw new Exception($"{key}不是方法也不是构造函数"),
-            };
-        });
+                var (fromMethod, fromExternal) = x;
+                return fromMethod.IsAssignableFrom(fromExternal);
+            });
+    }
     #endregion
-    #region 返回MethodBase的签名
+    #region 指定方法参数和返回值
     /// <summary>
-    /// 获取一个方法或构造函数的签名
+    /// 判断方法是否与指定的签名和返回值兼容
     /// </summary>
-    /// <param name="methodBase">要获取签名的方法或构造函数</param>
+    /// <param name="returnType">方法的返回值</param>
     /// <returns></returns>
-    public static ISignature GetSignature(this MethodBase methodBase)
-        => CacheSignature[methodBase];
-    #endregion
-    #region 返回方法签名
-    /// <summary>
-    /// 获取一个方法的签名
-    /// </summary>
-    /// <param name="method">要获取签名的方法</param>
-    /// <returns></returns>
-    public static IMethodSignature GetSignature(this MethodInfo method)
-        => (IMethodSignature)CacheSignature[method];
-    #endregion
-    #region 返回构造函数签名
-    /// <summary>
-    /// 获取一个构造函数的签名
-    /// </summary>
-    /// <param name="construct">要获取签名的构造函数</param>
-    /// <returns></returns>
-    public static IConstructSignature GetSignature(this ConstructorInfo construct)
-        => (IConstructSignature)CacheSignature[construct];
-    #endregion
-    #endregion
-    #region 返回委托的签名
-    #region 传入委托的类型
-    /// <param name="delegateType">委托的类型，
-    /// 如果它不是委托，会引发一个异常</param>
-    /// <inheritdoc cref="GetSignature(Delegate)"/>
-    public static IMethodSignature GetSignature(this Type delegateType)
-        => delegateType.IsDelegate() ?
-        delegateType.GetMethod(nameof(Action.Invoke))!.GetSignature() :
-        throw new ArgumentException($"类型{delegateType}不是委托");
-    #endregion
-    #region 传入委托的实例
-    /// <summary>
-    /// 返回一个委托的签名
-    /// </summary>
-    /// <param name="delegate">待返回签名的委托</param>
-    /// <returns></returns>
-    public static IMethodSignature GetSignature(this Delegate @delegate)
-        => @delegate.Method.GetSignature();
-    #endregion
-    #endregion
-    #region 返回表达式树的签名
-    /// <summary>
-    /// 返回<see cref="LambdaExpression"/>的签名
-    /// </summary>
-    /// <param name="lambda">要返回签名的表达式</param>
-    /// <returns></returns>
-    public static IMethodSignature GetSignature(this LambdaExpression lambda)
-        => CreateReflection.MethodSignature(lambda.ReturnType, lambda.Parameters.Select(x => x.Type).ToArray());
-    #endregion
-    #endregion 
-    #region 判断方法签名是否兼容
-    #region 传入方法签名
-    /// <summary>
-    /// 判断一个方法或构造函数是否与一个签名兼容，
-    /// 该判断参数支持协变，返回值支持逆变
-    /// </summary>
-    /// <param name="methodBase">要判断的方法</param>
-    /// <param name="signature">要检查兼容的签名</param>
-    /// <returns></returns>
-    public static bool IsSame(this MethodBase methodBase, ISignature signature)
-        => methodBase.GetSignature().IsSame(signature);
-    #endregion
-    #region 传入另一个方法
-    /// <summary>
-    /// 判断两个方法或构造函数的签名是否兼容，
-    /// 该判断参数支持协变，返回值支持逆变
-    /// </summary>
-    /// <param name="methodA">要判断的第一个方法</param>
-    /// <param name="methodB">要判断的第二个方法</param>
-    /// <returns></returns>
-    public static bool IsSame(this MethodBase methodA, MethodBase methodB)
-        => methodA.IsSame(methodB.GetSignature());
+    /// <inheritdoc cref="IsSame(MethodBase, Type[])"/>
+    public static bool IsSame(this MethodInfo method, Type returnType, Type[] parameterType)
+        => returnType.IsAssignableFrom(method.ReturnType) && method.IsSame(parameterType);
     #endregion
     #endregion
     #endregion
+    #region 关于方法
     #region 调用方法
     /// <summary>
     /// 调用一个<see cref="MethodInfo"/>
@@ -179,6 +95,17 @@ public static partial class ExtendReflection
     public static Ret? Invoke<Ret>(this MethodInfo method, object? target, params object?[] parameters)
         => (Ret?)method.Invoke(target, parameters);
     #endregion
+    #region 递归获取方法
+    /// <summary>
+    /// 递归获取类型的方法，
+    /// 如果该类型是一个接口，
+    /// 它可以保证接口能够正常获取基接口的所有方法
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="GetMemberInfoRecursion{Member}(Type, Func{Type, BindingFlags, Member[]}, BindingFlags)"/>
+    public static MethodInfo[] GetMethodInfoRecursion(this Type type, BindingFlags bindingFlags = CreateReflection.BindingFlagsAll)
+        => type.GetMemberInfoRecursion((type, bindingFlags) => type.GetMethods(bindingFlags), bindingFlags);
+    #endregion
     #endregion
     #region 关于构造函数
     #region 调用构造函数
@@ -190,10 +117,11 @@ public static partial class ExtendReflection
     /// <param name="parameters">构造函数的参数列表</param>
     /// <returns>调用构造函数所构造出的对象</returns>
     public static Ret Invoke<Ret>(this ConstructorInfo constructor, params object?[] parameters)
-        => constructor.IsStatic ? throw new ArgumentException("无法通过静态构造函数构造对象") : (Ret)constructor.Invoke(parameters);
+        => constructor.IsStatic ?
+        throw new ArgumentException("无法通过静态构造函数构造对象") :
+        (Ret)constructor.Invoke(parameters);
     #endregion
     #endregion
-    #endregion 
     #region 关于事件
     #region 根据布尔值，注册或注销事件
     /// <summary>
@@ -207,8 +135,20 @@ public static partial class ExtendReflection
     {
         if (isAdd)
             @event.AddEventHandler(target, @delegate);
-        else @event.RemoveEventHandler(target, @delegate);
+        else
+            @event.RemoveEventHandler(target, @delegate);
     }
+    #endregion
+    #region 递归获取事件
+    /// <summary>
+    /// 递归获取类型的事件，
+    /// 如果该类型是一个接口，
+    /// 它可以保证接口能够正常获取基接口的所有事件
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="GetMemberInfoRecursion{Member}(Type, Func{Type, BindingFlags, Member[]}, BindingFlags)"/>
+    public static EventInfo[] GetEventInfoRecursion(this Type type, BindingFlags bindingFlags = CreateReflection.BindingFlagsAll)
+        => type.GetMemberInfoRecursion((type, bindingFlags) => type.GetEvents(bindingFlags), bindingFlags);
     #endregion
     #endregion
 }

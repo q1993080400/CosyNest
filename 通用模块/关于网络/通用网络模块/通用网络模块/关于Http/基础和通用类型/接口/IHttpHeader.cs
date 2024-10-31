@@ -16,12 +16,6 @@ public interface IHttpHeader
     /// <returns></returns>
     IReadOnlyDictionary<string, IEnumerable<string>> Headers { get; }
     #endregion
-    #region 自定义对象标头
-    /// <summary>
-    /// 获取一个封装自定义Json对象的标头
-    /// </summary>
-    IObjectHeaderValue? ObjectHeaderValue { get; }
-    #endregion
     #region 将标头复制到HttpHeaders
     /// <summary>
     /// 将本对象的所有标头复制到另一个<see cref="HttpHeaders"/>中，

@@ -1,6 +1,4 @@
-﻿using System.NetFrancis.Http;
-
-namespace System.AI;
+﻿namespace System.AI;
 
 /// <summary>
 /// 这个静态类可以用来创建和AI有关的WebAPI
@@ -12,9 +10,9 @@ public static class CreateAIAPI
     /// <summary>
     /// 创建一个由百度实现的人脸识别接口
     /// </summary>
-    /// <inheritdoc cref="FaceRecognitionBaiDu.FaceRecognitionBaiDu(string, string, Func{IHttpClient}?)"/>
-    public static IFaceRecognition FaceRecognitionBaiDu(string apiKey, string secretKey, Func<IHttpClient>? httpClientProvide = null)
-        => new FaceRecognitionBaiDu(apiKey, secretKey, httpClientProvide);
+    /// <inheritdoc cref="FaceRecognitionBaiDu.FaceRecognitionBaiDu(string, string, IServiceProvider)"/>
+    public static IFaceRecognition FaceRecognitionBaiDu(string apiKey, string secretKey, IServiceProvider serviceProvider)
+        => new FaceRecognitionBaiDu(apiKey, secretKey, serviceProvider);
     #endregion
     #endregion
     #region 创建AI聊天接口
@@ -24,9 +22,9 @@ public static class CreateAIAPI
     /// 如果因为各种原因无法创建，会引发异常
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="AI.AIChatBaiDu(string, string, string, Func{IHttpClient}?)"/>
-    public static IAIChat AIChatBaiDu(string appKey, string secretKey, string modelUri, Func<IHttpClient>? httpClientProvide = null)
-        => new AIChatBaiDu(appKey, secretKey, modelUri, httpClientProvide);
+    /// <inheritdoc cref="AIChatBaiDu.AIChatBaiDu(string, string, string, IServiceProvider)"/>
+    public static IAIChat AIChatBaiDu(string appKey, string secretKey, string modelUri, IServiceProvider serviceProvider)
+        => new AIChatBaiDu(appKey, secretKey, modelUri, serviceProvider);
     #endregion
     #endregion
     #region 创建OCR接口
@@ -35,9 +33,9 @@ public static class CreateAIAPI
     /// 创建一个由阿里API实现的<see cref="IOCR"/>接口
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="OCRAliYun.OCRAliYun(string, Func{IHttpClient}?)"/>
-    public static IOCR OCRAliYun(string appCode, Func<IHttpClient>? httpClientProvide = null)
-        => new OCRAliYun(appCode, httpClientProvide);
+    /// <inheritdoc cref="OCRAliYun.OCRAliYun(string, IServiceProvider)"/>
+    public static IOCR OCRAliYun(string appCode, IServiceProvider serviceProvider)
+        => new OCRAliYun(appCode, serviceProvider);
     #endregion
     #endregion
 }

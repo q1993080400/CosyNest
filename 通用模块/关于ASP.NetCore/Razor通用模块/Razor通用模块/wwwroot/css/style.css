@@ -289,37 +289,6 @@ input[type=file]
     text-overflow: ellipsis;
 }
 
-/*自动播放按钮容器样式*/
-.autoPlayButtonCntainer
-{
-    display: grid;
-    grid-template: 1fr 1fr 1fr/1fr 1fr 1fr
-}
-
-/*自动播放按钮容器的第一个元素样式*/
-div.autoPlayButtonCntainer > *:first-child
-{
-    grid-area: 1/1/-1/-1
-}
-
-/*自动播放按钮的直接父容器样式*/
-.playButtonFather
-{
-    grid-area: 2/2;
-    display: flex;
-    place-content: center;
-}
-
-/*播放按钮的公共样式*/
-.playButton
-{
-    background-color: rgba(128,128,128,0.5);
-    border-radius: 50%;
-    cursor: pointer;
-    width: 100%;
-    max-width: 4em;
-}
-
 /*表示一个换行样式*/
 .wrap
 {

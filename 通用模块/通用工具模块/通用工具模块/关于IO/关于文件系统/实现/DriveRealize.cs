@@ -1,5 +1,4 @@
-﻿using System.MathFrancis;
-using System.MathFrancis.Tree;
+﻿using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
 
@@ -44,17 +43,6 @@ sealed class DriveRealize(DriveInfo drive) : IDrive
             throw new ArgumentException($"不能将驱动器格式化为未知格式");
         CreateIO.DriveFormatRealize(this, format, label);
     }
-    #endregion
-    #region 关于容量
-    #region 获取总容量
-    public IUnit<IUTStorage> SizeTotal
-        => CreateBaseMath.Unit(PackDrive.TotalSize, IUTStorage.ByteMetric);
-    #endregion
-    #region 获取已用容量
-    public IUnit<IUTStorage> SizeUsed
-        => CreateBaseMath.Unit
-        (PackDrive.TotalSize - PackDrive.TotalFreeSpace, IUTStorage.ByteMetric);
-    #endregion
     #endregion
     #region 关于文件系统树
     #region 获取父节点

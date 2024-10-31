@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 
 namespace System.Media.Drawing;
 
@@ -18,6 +18,6 @@ public interface IImageProcessing
     /// 它的横纵比并不重要，以总像素数量为准</param>
     /// <param name="cancellation">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
-    Task FormatConversion(string imagePath, string targetPath, ISizePixel? maxSize = null, CancellationToken cancellation = default);
+    Task FormatConversion(string imagePath, string targetPath, ISize<int>? maxSize = null, CancellationToken cancellation = default);
     #endregion
 }

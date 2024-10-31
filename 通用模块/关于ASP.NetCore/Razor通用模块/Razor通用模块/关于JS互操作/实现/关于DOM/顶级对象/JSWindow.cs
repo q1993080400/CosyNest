@@ -26,7 +26,7 @@ sealed class JSWindow(IJSRuntime jsRuntime) : IJSWindow
         var height = await jsRuntime.InvokeCodeAsync<int>("innerHeight");
         ScreenField = new()
         {
-            LogicalResolution = CreateMath.SizePixel(width, height),
+            LogicalResolution = CreateMath.Size<double>(width, height),
             DevicePixelRatio = await jsRuntime.InvokeCodeAsync<double>("devicePixelRatio")
         };
         return (IJSScreen)ScreenField;

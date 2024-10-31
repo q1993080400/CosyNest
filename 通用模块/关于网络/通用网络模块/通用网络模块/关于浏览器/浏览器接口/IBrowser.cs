@@ -33,7 +33,7 @@ public interface IBrowser : IInstruct, IDisposable
     /// <param name="uri">新选项卡的Uri</param>
     /// <returns>新创建的选项卡，在返回时，已经加载完毕，
     /// 浏览器会聚焦到这个选项卡</returns>
-    ITab CreateTab(string uri);
+    Task<ITab> CreateTab(string uri);
     #endregion
     #region 所有选项卡
     /// <summary>
@@ -103,10 +103,9 @@ public interface IBrowser : IInstruct, IDisposable
     #endregion 
     #region 当前Uri
     /// <summary>
-    /// 获取或设置当前选项卡Uri，
-    /// 当设置这个属性时，会将当前选项卡跳转到指定位置
+    /// 获取当前选项卡Uri
     /// </summary>
-    string Uri { get; set; }
+    string Uri { get; }
     #endregion
     #endregion 
 }

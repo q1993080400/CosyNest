@@ -17,6 +17,7 @@ sealed class TimerCycle
             if (Immediately)
             {
                 Immediately = false;
+                Next = DateTimeOffset.Now + Interval;
                 return true;
             }
             var delay = Next - DateTimeOffset.Now;
@@ -32,7 +33,7 @@ sealed class TimerCycle
             null :
             new()
             {
-                Next = Next,
+                NextTimeState = (NextTimeState.HasNext, Next.Add(Interval)),
                 Wait = Wait()
             };
     }
@@ -65,17 +66,19 @@ sealed class TimerCycle
     /// </summary>
     /// <param name="interval">定时器的触发间隔</param>
     /// <param name="startTime">定时器第一次触发的时间，
-    /// 如果这个时间发生在过去，则引发一个异常</param>
-    /// <param name="immediately">如果这个值为<see langword="true"/>，
-    /// 则立即触发一次定时器，否则等待定时器完成后才触发</param>
-    public TimerCycle(TimeSpan interval, DateTimeOffset startTime, bool immediately)
+    /// 如果这个时间发生在过去，则引发一个异常，
+    /// 如果为<see langword="null"/>，立即触发一次定时器</param>
+    public TimerCycle(TimeSpan interval, DateTimeOffset? startTime)
     {
-        ExceptionIntervalOut.Check(1d, null, interval.TotalMilliseconds);
-        if (startTime < DateTimeOffset.Now)
-            throw new NotSupportedException($"定时器开始的时间{startTime}早于现在时间，无法创建这个定时器");
-        Next = startTime;
+        if (interval.TotalMilliseconds < 1)
+            throw new NotSupportedException($"定时器目前的触发周期是{interval}，它不能小于1毫秒");
+        var now = DateTimeOffset.Now;
+        var startTimeValue = startTime ?? now;
+        if (startTimeValue < now)
+            throw new NotSupportedException($"定时器开始的时间{startTimeValue}早于现在时间，无法创建这个定时器");
+        Next = startTimeValue;
         Interval = interval;
-        Immediately = immediately;
+        Immediately = startTimeValue == now;
     }
     #endregion
 }

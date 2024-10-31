@@ -1,15 +1,70 @@
 ﻿using System.Net.Http.Json;
+using System.NetFrancis;
 using System.NetFrancis.Http;
 using System.Text.Json;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace System;
 
-/// <summary>
-/// 有关Http的扩展方法全部放在这里
-/// </summary>
-public static class ExtendHttp
+public static partial class ExtendNet
 {
-    #region 将IHttpClientFactory转换为IHttpClient
+    //这个部分类专门声明有关Http的扩展方法
+
+    #region 关于依赖注入
+    #region 注入IHttpClient
+    /// <summary>
+    /// 以单例模式注入一个<see cref="IHttpClient"/>，
+    /// 它可以用来发起Http请求，
+    /// 如果服务容器中注册了<see cref="HttpRequestTransform"/>，
+    /// 那么还会将它作为<see cref="IHttpClient"/>的请求转换函数
+    /// </summary>
+    /// <param name="services">要注入的服务集合</param>
+    /// <returns></returns>
+    public static IServiceCollection AddIHttpClient(this IServiceCollection services)
+    {
+        services.AddHttpClient();
+        return services.AddSingleton(x =>
+        {
+            var requestTransform = x.GetService<HttpRequestTransform>();
+            return x.GetRequiredService<IHttpClientFactory>().ToHttpClient(requestTransform);
+        });
+    }
+    #endregion
+    #region 注入HttpRequestTransform
+    /// <summary>
+    /// 以单例模式注入一个<see cref="HttpRequestTransform"/>，
+    /// 它可以自动处理相对请求路径，将其视为请求本站，
+    /// 本服务依赖于<see cref="IHostProvide"/>
+    /// </summary>
+    /// <param name="services">要注入的服务集合</param>
+    /// <returns></returns>
+    public static IServiceCollection AddHttpRequestTransformUri(this IServiceCollection services)
+    {
+        services.AddSingleton(x =>
+        {
+            var hostProvide = x.GetRequiredService<IHostProvide>();
+            return CreateNet.TransformBaseUri(hostProvide.Host);
+        });
+        return services;
+    }
+    #endregion
+    #endregion
+    #region 关于IHttpClient
+    #region 从HttpClient转换
+    /// <summary>
+    /// 返回一个<see cref="IHttpClient"/>，
+    /// 它直接封装了一个<see cref="HttpClient"/>，
+    /// 除非出于测试用途，不方便使用依赖注入，
+    /// 否则不要使用它
+    /// </summary>
+    /// <param name="httpClient">待包装的Http客户端</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="HttpClientRealizeDirect(HttpClient, HttpRequestTransform?)"/>
+    public static IHttpClient ToHttpClient(this HttpClient httpClient, HttpRequestTransform? defaultTransform = null)
+        => new HttpClientRealizeDirect(httpClient, defaultTransform);
+    #endregion
+    #region 从IHttpClientFactory转换
     /// <summary>
     /// 返回一个<see cref="IHttpClientFactory"/>的<see cref="IHttpClient"/>包装
     /// </summary>
@@ -19,6 +74,7 @@ public static class ExtendHttp
     public static IHttpClient ToHttpClient(this IHttpClientFactory httpClientFactory, HttpRequestTransform? defaultTransform = null)
         => new HttpClientRealize(httpClientFactory, defaultTransform);
     #endregion
+    #endregion 
     #region 将HttpContent序列化为Json或String
     /// <summary>
     /// 将<see cref="HttpContent"/>转换为对象或文本形式

@@ -38,7 +38,7 @@ public sealed record UriParameter : UriBase
     /// <param name="parameter">这个键值对集合枚举参数的名称和值</param>
     public UriParameter(IEnumerable<KeyValuePair<string, string?>> parameter)
     {
-        Parameter = parameter.ToDictionary(true);
+        Parameter = parameter.ToDictionary();
     }
     #endregion
     #region 使用元组集合
@@ -49,7 +49,7 @@ public sealed record UriParameter : UriBase
     /// 如果为<see langword="null"/>，给予一个空集合</param>
     public UriParameter(IEnumerable<(string Name, string? Value)>? parameter)
     {
-        Parameter = (parameter ?? []).ToDictionary(true);
+        Parameter = (parameter ?? []).ToDictionary();
     }
     #endregion
     #region 使用字符串
@@ -67,7 +67,7 @@ public sealed record UriParameter : UriBase
             var key = x["key"].Match;
             var value = x.GroupsNamed.GetValueOrDefault("value")?.Match;
             return (key, value);
-        }).ToDictionary(true);
+        }).ToDictionary();
     }
     #endregion
     #endregion

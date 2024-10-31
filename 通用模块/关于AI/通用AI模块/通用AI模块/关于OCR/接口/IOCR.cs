@@ -11,7 +11,7 @@ public interface IOCR
     /// 识别图片文件，并返回识别结果
     /// </summary>
     /// <param name="imagePath">图片文件的路径</param>
-    /// <returns>识别结果，如果为<see langword="null"/>，表示识别失败</returns>
-    Task<string?> Identify(string imagePath);
+    /// <returns>识别结果</returns>
+    Task<string> Identify(string imagePath);
     #endregion
 }

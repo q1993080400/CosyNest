@@ -60,13 +60,6 @@ public interface IIO : IIOBase
     /// </summary>
     IFileSystemWatcher FileSystemWatcher { get; }
     #endregion
-    #region 是否隐藏文件或目录
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 代表该文件或目录为隐藏，否则代表正常显示
-    /// </summary>
-    bool Hide { get; set; }
-    #endregion
     #region 文件或目录的创建时间
     /// <summary>
     /// 获取或设置文件或目录的创建时间
@@ -102,7 +95,16 @@ public interface IIO : IIOBase
     /// </summary>
     /// <returns>打开文件或目录所创建的新进程</returns>
     Process Open()
-       => ToolThread.Open(Path);
+       => ToolThread.Open(Path)!;
+    #endregion
+    #region 执行完毕后删除
+    /// <summary>
+    /// 返回一个<see cref="IDisposable"/>，
+    /// 在它被using的时候，自动删除这个文件或目录
+    /// </summary>
+    /// <returns></returns>
+    IDisposable DeleteHandle()
+        => FastRealize.Disposable(this.Delete);
     #endregion
     #endregion
 }

@@ -13,7 +13,7 @@ sealed class JSStorage(IJSRuntime jsRuntime, bool isLocal) : IAsyncDictionary<st
     private IAsyncIndex<string, string>? IndexAsyncField { get; set; }
 
     public IAsyncIndex<string, string> IndexAsync
-        => IndexAsyncField ??= CreateTasks.AsyncIndex<string, string>(
+        => IndexAsyncField ??= CreateTask.AsyncIndex<string, string>(
            async (key, cancellation) =>
            (await jsRuntime.InvokeAsync<string?>($"{Prefix}.getItem", cancellation, key)) ??
            throw new KeyNotFoundException($"未找到键{key}"),

@@ -5,7 +5,7 @@
 /// 都可以在不知道具体类型的情况下，
 /// 直接通过属性名称读写属性
 /// </summary>
-public interface IDirect : IRestrictedDictionary<string, object?>
+public interface IDirect : IReadOnlyDictionary<string, object?>
 {
     #region 说明文档
     /*重要说明
@@ -19,7 +19,15 @@ public interface IDirect : IRestrictedDictionary<string, object?>
     
       除此之外的任何情况，都应当使用强类型DTO*/
     #endregion
-    #region 读写属性（强类型版本）
+    #region 读写属性的索引器
+    /// <summary>
+    /// 通过键读取或写入值
+    /// </summary>
+    /// <param name="key">用来读写值的键</param>
+    /// <returns></returns>
+    new object? this[string key] { get; set; }
+    #endregion
+    #region 读取属性（强类型版本）
     /// <summary>
     /// 通过属性名称读取属性，并转换为指定的类型返回，支持递归
     /// </summary>
@@ -28,7 +36,6 @@ public interface IDirect : IRestrictedDictionary<string, object?>
     /// <param name="check">当属性名称不存在，或者类型转换失败的时候，
     /// 如果该参数为<see langword="true"/>，则引发异常，否则返回默认值</param>
     /// <exception cref="KeyNotFoundException">要读写的属性名称不存在</exception>
-    /// <exception cref="TypeUnlawfulException">无法转换为指定的类型</exception>
     /// <returns></returns>
     Ret? GetValue<Ret>(string path, bool check = true)
     {
@@ -65,7 +72,10 @@ public interface IDirect : IRestrictedDictionary<string, object?>
                             object[] objs when type.IsArray && type != typeof(object[]) => GetArray(objs),
                             var obj => obj
                         },
-                        (_, true) => throw new KeyNotFoundException($"不存在名为{matchText}的属性"),
+                        (_, true) => throw new KeyNotFoundException($"""
+                            不存在名为{matchText}的属性，以下是整个对象的Json：
+                            {direct.Json}
+                            """),
                         (_, false) => null
                     };
                 case (Collections.IEnumerable list, "index"):

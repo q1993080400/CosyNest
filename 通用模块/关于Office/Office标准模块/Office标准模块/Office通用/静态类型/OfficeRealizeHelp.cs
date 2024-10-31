@@ -1,5 +1,4 @@
 ﻿using System.MathFrancis;
-using System.MathFrancis.Plane;
 
 namespace System.Office.Realize;
 
@@ -14,9 +13,7 @@ public static class OfficeRealizeHelp
     /// </summary>
     /// <param name="point">待取绝对值的坐标</param>
     /// <returns></returns>
-    public static IPoint Abs(this IPoint point)
-        => CreateMath.Point(
-            ToolArithmetic.Abs(point.Right),
-            ToolArithmetic.Abs(point.Top));
+    public static IPoint<int> Abs(this IPoint<int> point)
+        => CreateMath.Point(int.Abs(point.Right), int.Abs(point.Top));
     #endregion
 }

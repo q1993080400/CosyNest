@@ -1,7 +1,5 @@
 ﻿using System.DataFrancis;
 using System.DataFrancis.EntityDescribe;
-using System.IOFrancis;
-using System.IOFrancis.FileSystem;
 using System.NetFrancis.Api;
 
 namespace Microsoft.AspNetCore;
@@ -11,43 +9,6 @@ namespace Microsoft.AspNetCore;
 /// </summary>
 public static class ToolASP
 {
-    #region 获取公用的服务提供对象
-    private static IServiceProvider? SingleServiceProviderField;
-
-    /// <summary>
-    /// 获取公用的服务提供对象，
-    /// 它可以用于请求单例服务，注意：
-    /// 需要手动初始化它，方可使用
-    /// </summary>
-    public static IServiceProvider SingleServiceProvider
-    {
-        get => SingleServiceProviderField ??
-            throw new NullReferenceException($"{nameof(SingleServiceProvider)}尚未初始化，请自行将它初始化后再使用");
-        set => SingleServiceProviderField = value;
-    }
-
-    /*问：为什么要使用静态对象，
-      而不是依赖注入来访问IServiceProvider？
-      答：这是因为在只请求单例服务的情况下，
-      IServiceProvider实际上可以也应该静态化，
-      它比较方便，而且可以让静态对象也能够请求服务*/
-    #endregion
-    #region 关于Web根文件夹
-    #region 获取Web根文件夹
-    /// <summary>
-    /// 获取Web根文件夹
-    /// </summary>
-    public static IDirectory WebRoot
-        => CreateIO.Directory(WebRootPath, false);
-    #endregion
-    #region 获取Web根文件夹的路径
-    /// <summary>
-    /// 获取Web根文件夹的路径
-    /// </summary>
-    public static string WebRootPath { get; }
-    = Path.Combine(Environment.CurrentDirectory, "wwwroot");
-    #endregion
-    #endregion
     #region 验证WebApi的参数
     /// <summary>
     /// 验证WebApi的参数，

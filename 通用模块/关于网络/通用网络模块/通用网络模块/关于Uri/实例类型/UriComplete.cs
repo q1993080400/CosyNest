@@ -36,8 +36,8 @@ public sealed record UriComplete : UriBase
     /// </summary>
     public UriParameter? UriParameter
     {
-        get => UriParameterField;
-        init => UriParameterField = value is { Parameter.Count: > 0 } ? value : null;
+        get => UriParameterField is { Parameter.Count: > 0 } ? UriParameterField : null;
+        init => UriParameterField = value;
     }
     #endregion
     #region 锚点部分

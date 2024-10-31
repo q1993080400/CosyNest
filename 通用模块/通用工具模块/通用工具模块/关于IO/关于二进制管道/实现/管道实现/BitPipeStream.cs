@@ -62,9 +62,9 @@ sealed class BitPipeStream(Stream stream, string? format, string? describe) : Au
     #region 读取数据
     public async IAsyncEnumerable<byte[]> Read(int bufferSize = 1024, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        ExceptionIntervalOut.Check(1, null, bufferSize);
         CheckLock();
-        using var @lock = FastRealize.Disposable(() => Lock = true, () => Lock = false);
+        Lock = true;
+        using var @lock = FastRealize.Disposable(() => Lock = false);
         Stream.Reset();
         while (true)
         {
@@ -87,7 +87,8 @@ sealed class BitPipeStream(Stream stream, string? format, string? describe) : Au
     public async ValueTask Write(IEnumerable<byte> data, CancellationToken cancellation = default)
     {
         CheckLock();
-        using var @lock = FastRealize.Disposable(() => Lock = true, () => Lock = false);
+        Lock = true;
+        using var @lock = FastRealize.Disposable(() => Lock = false);
         Stream.Reset();
         foreach (var item in data.Chunk(1024))
         {

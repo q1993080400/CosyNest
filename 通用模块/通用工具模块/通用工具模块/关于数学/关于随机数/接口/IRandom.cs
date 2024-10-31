@@ -1,4 +1,6 @@
-﻿namespace System.MathFrancis;
+﻿using System.Numerics;
+
+namespace System.MathFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -6,34 +8,34 @@
 /// </summary>
 public interface IRandom
 {
-    #region 说明文档
-    /*实现本接口请遵循以下规范：
-      #本接口的所有API都应该是线程安全的，
-      或者应该提供一个其他机制来保证线程安全，
-      例如：通过一个使用ThreadStatic修饰的静态属性来获取随机数生成器，
-      因为随机数生成器一般是静态属性，很可能在多个线程中访问它们*/
-    #endregion
     #region 有关数学的随机数
     #region 生成大于0小于1的随机数
     /// <summary>
     /// 生成一个大于等于0，且小于1的浮点数
     /// </summary>
+    /// <typeparam name="Num">数字的类型</typeparam>
     /// <returns></returns>
-    Num Rand();
+    Num Rand<Num>()
+        where Num : IFloatingPoint<Num>;
     #endregion
     #region 生成指定范围内的随机数
     /// <summary>
     /// 生成一个位于指定范围内的随机数
     /// </summary>
+    /// <typeparam name="Num">数字的类型</typeparam>
     /// <param name="min">随机数的最小值</param>
     /// <param name="max">随机数的最大值，注意：
     /// 最后生成的随机数可能等于该最大值</param>
     /// <returns></returns>
-    Num RandRange(Num min, Num max)
+    Num Rand<Num>(Num min, Num max)
+        where Num : INumber<Num>
     {
         if (min > max)
             (min, max) = (max, min);
-        return Math.Min((decimal)max, min + (max - min) * 1.01 * Rand());
+        var minNum = decimal.CreateChecked(min);
+        var maxNum = decimal.CreateChecked(max);
+        var rand = minNum + (maxNum - minNum) * 1.01M * Rand<decimal>();
+        return Num.MinNumber(max, Num.CreateTruncating(rand));
     }
 
     /*问：为什么在生成随机数的时候，
@@ -53,22 +55,7 @@ public interface IRandom
     /// <param name="denominator">命中概率的分母</param>
     /// <returns></returns>
     bool RollDice(double molecular, double denominator = 100)
-        => Rand() < molecular / denominator;
-    #endregion
-    #region 将一个数字按照比例随机分配
-    /// <summary>
-    /// 将一个数字按照比例随机分配
-    /// </summary>
-    /// <param name="num">待分配的数字</param>
-    /// <param name="count">指示将数字分配为多少份</param>
-    /// <param name="discrete">指示分配的离散程度，也就是最大值最多是最小值的多少倍</param>
-    /// <returns></returns>
-    Num[] RandDistribute(Num num, int count, double discrete = 2)
-    {
-        ExceptionIntervalOut.Check(1d, null, discrete);
-        var weight = Enumerable.Range(1, count).Select(_ => RandRange(1, discrete)).ToArray();
-        return ToolArithmetic.Segmentation(num, weight);
-    }
+        => Rand<double>() < molecular / denominator;
     #endregion
     #endregion
     #region 有关集合的随机数
@@ -95,7 +82,7 @@ public interface IRandom
         var maxIndex = (count ?? collections.Count()) - 1;
         if (maxIndex is < 0)
             return -1;
-        return RandRange(0, maxIndex);
+        return Rand(0, maxIndex);
     }
     #endregion
     #region 返回随机元素
@@ -158,29 +145,5 @@ public interface IRandom
     /// <returns></returns>
     IEnumerable<Obj> Shuffle<Obj>(IEnumerable<Obj> collections);
     #endregion
-    #endregion
-    #region 生成随机字符串
-    /// <summary>
-    /// 生成随机字符串
-    /// </summary>
-    /// <param name="minLength">生成字符串的最小长度</param>
-    /// <param name="maxLength">生成字符串的最大长度</param>
-    /// <param name="category">这个数组枚举允许生成的字符所在区间，
-    /// 如果为空数组，则表示可生成任意字符</param>
-    /// <returns></returns>
-    string RandText(int minLength, int maxLength, params IIntervalSpecific<char>[] category)
-    {
-        if (category.Any(x => !x.IsClosed))
-            throw new Exception($"{nameof(category)}中的全部元素必须为封闭区间");
-        category = category.Length is not 0 ? category : [IInterval.CreateSpecific((char?)ushort.MinValue, (char?)ushort.MaxValue)];      //如果不指定合法字符范围，则默认可以生成任何UTF16字符
-        int len = RandRange(minLength, maxLength);
-        var charts = new char[len];
-        for (int i = 0; i < len; i++)
-        {
-            var (beg, end) = RandElement(category);
-            charts[i] = (char)RandRange(beg!.Value, end!.Value);
-        }
-        return new string(charts);
-    }
     #endregion
 }

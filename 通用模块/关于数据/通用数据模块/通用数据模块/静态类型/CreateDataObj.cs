@@ -32,7 +32,7 @@ public static class CreateDataObj
         var newGetVerifyPropertys = getVerifyPropertys ??= obj =>
          {
              var propertys = obj.GetType().GetProperties().
-             Where(x => x.HasAttributes<RenderDataAttribute>()).ToArray();
+             Where(x => x.IsDefined<RenderDataAttribute>()).ToArray();
              return propertys;
          };
         #region 验证本地函数

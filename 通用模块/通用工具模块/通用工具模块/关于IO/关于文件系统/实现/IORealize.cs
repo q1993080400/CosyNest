@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis.BaseFileSystem;
-using System.MathFrancis;
 using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
@@ -85,18 +84,6 @@ abstract class IORealize(string path) : IIO
             var father = IO.Path.GetDirectoryName(Path)!;
             Path = IO.Path.Combine(father, value ?? throw new ArgumentNullException(nameof(NameFull)));
         }
-    }
-    #endregion
-    #region 获取文件或目录的大小
-    public abstract IUnit<IUTStorage> Size { get; }
-    #endregion
-    #region 是否隐藏文件或目录
-    public bool Hide
-    {
-        get => PackFS.Attributes.HasFlag(FileAttributes.Hidden);
-        set => PackFS.Attributes = value ?
-            PackFS.Attributes | FileAttributes.Hidden :
-            PackFS.Attributes.RemoveFlag(FileAttributes.Hidden);
     }
     #endregion
     #region 文件或目录的创建时间

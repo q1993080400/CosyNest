@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.SignalR;
 
 namespace System;
@@ -26,10 +26,10 @@ public static partial class ExtendWebApi
     public static void MapHubAll(this IEndpointRouteBuilder builder, Assembly assembly, Func<string, string>? pattern = null)
     {
         pattern ??= x => $"/Hub/{x.Trim(false, "Hub")}";
-        var method = typeof(HubEndpointRouteBuilderExtensions).GetTypeData().
-            FindMethod(nameof(HubEndpointRouteBuilderExtensions.MapHub), CreateReflection.MethodSignature(typeof(HubEndpointConventionBuilder), typeof(IEndpointRouteBuilder),
-            typeof(string), typeof(Action<HttpConnectionDispatcherOptions>)));
-        foreach (var item in assembly.GetTypes().Where(x => typeof(Hub).IsAssignableFrom(x) && x.IsPublic && !x.IsAbstract))
+        var method = typeof(HubEndpointRouteBuilderExtensions).GetMethod(
+            nameof(HubEndpointRouteBuilderExtensions.MapHub),
+            [typeof(IEndpointRouteBuilder), typeof(string), typeof(Action<HttpConnectionDispatcherOptions>)])!;
+        foreach (var item in assembly.GetExportedTypes().Where(x => typeof(Hub).IsAssignableFrom(x) && !x.IsAbstract))
         {
             method.MakeGenericMethod(item).Invoke<object>(null, builder, pattern(item.Name), (HttpConnectionDispatcherOptions options) =>
             {
@@ -38,21 +38,6 @@ public static partial class ExtendWebApi
         }
     }
     #endregion
-    #endregion
-    #region 配置SingleServiceProvider
-    /// <summary>
-    /// 配置<see cref="CreateASP.SingleServiceProvider"/>，
-    /// 使它能够被使用
-    /// </summary>
-    /// <param name="host">函数通过<see cref="IHost.Services"/>来获取<see cref="IServiceProvider"/></param>
-    public static void SetSingleServiceProvider(this IHost host)
-        => ToolASP.SingleServiceProvider = host.Services;
-
-    /*本方法存在以下隐患：
-      如果使用本方法进行初始化，
-      不要在单例服务初始化时访问CreateASP.SingleServiceProvider，
-      这是因为在WebApplicationBuilder.Build()调用后才会执行本方法，
-      它发生在单例服务初始化之后*/
     #endregion
     #region 配置AuthorizationOptions
     #region 通过静态方法验证
@@ -66,15 +51,43 @@ public static partial class ExtendWebApi
     /// 方法作为策略的验证方法，并将其添加到授权策略中</param>
     public static void AddPolicyValidation(this AuthorizationOptions options, Type policyValidation)
     {
-        var signature = CreateReflection.MethodSignature(typeof(bool), typeof(AuthorizationHandlerContext));
-        var methods = policyValidation.GetMethods().
-            Where(x => x.IsStatic && x.IsSame(signature)).
+        var methods = policyValidation.GetMethods(BindingFlags.Public | BindingFlags.Static).
+            Where(x => x.IsSame(typeof(bool), [typeof(AuthorizationHandlerContext)])).
             ToDictionary(x => x.Name, x => x);
         foreach (var (name, method) in methods)
         {
             var fun = method.CreateDelegate<Func<AuthorizationHandlerContext, bool>>();
             options.AddPolicy(name, x => x.RequireAssertion(fun));
         }
+    }
+    #endregion
+    #endregion
+    #region 配置约定
+    #region 返回模型绑定成功的Task
+    /// <summary>
+    /// 将模型配置为绑定成功，
+    /// 并返回绑定成功的<see cref="Task"/>
+    /// </summary>
+    /// <param name="bindingContext">待配置模型绑定失败的约定</param>
+    /// <param name="model">要绑定的模型</param>
+    /// <returns></returns>
+    public static Task BindingSuccess(this ModelBindingContext bindingContext, object? model)
+    {
+        bindingContext.Result = ModelBindingResult.Success(model);
+        return Task.CompletedTask;
+    }
+    #endregion 
+    #region 返回模型绑定失败的Task
+    /// <summary>
+    /// 将模型配置为绑定失败，
+    /// 并返回绑定失败的<see cref="Task"/>
+    /// </summary>
+    /// <param name="bindingContext">待配置模型绑定失败的约定</param>
+    /// <returns></returns>
+    public static Task BindingFailed(this ModelBindingContext bindingContext)
+    {
+        bindingContext.Result = ModelBindingResult.Failed();
+        return Task.CompletedTask;
     }
     #endregion
     #endregion

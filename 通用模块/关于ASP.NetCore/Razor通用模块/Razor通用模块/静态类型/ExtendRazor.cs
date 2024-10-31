@@ -1,4 +1,5 @@
 ﻿using System.NetFrancis.Http;
+using System.Reflection;
 using System.Text.Json;
 using System.Web;
 
@@ -118,7 +119,7 @@ public static partial class ExtendRazor
     /// <returns></returns>
     /// <inheritdoc cref="GetProperty{Property}(IJSRuntime, string, CancellationToken)"/>
     public static IAsyncProperty<Obj> PackProperty<Obj>(this IJSRuntime js, string property)
-        => CreateTasks.AsyncProperty(
+        => CreateTask.AsyncProperty(
             cancellation => js.GetProperty<Obj>(property, cancellation).AsTask(),
             (value, cancellation) => js.SetProperty(property, value, cancellation).AsTask());
     #endregion
@@ -183,17 +184,6 @@ public static partial class ExtendRazor
     public static IServiceCollection AddJSWindow(this IServiceCollection services)
         => services.AddScoped<IJSWindow, JSWindow>();
     #endregion
-    #region 注入上传任务工厂
-    /// <summary>
-    /// 以单例模式注入一个<see cref="UploadTaskFactory{Progress}"/>，
-    /// 它可以创建一个用于上传文件的任务
-    /// </summary>
-    /// <param name="services">要添加的服务容器</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="UploadTaskFactory(IServiceProvider, UploadTaskFactoryInfo)"/>
-    public static IServiceCollection AddUploadTaskFactory(this IServiceCollection services, UploadTaskFactoryInfo uploadTaskFactoryInfo)
-        => services.AddSingleton(x => CreateRazor.UploadTaskFactory(x, uploadTaskFactoryInfo));
-    #endregion
     #endregion
     #region 有关组件
     #region 返回组件参数
@@ -205,9 +195,9 @@ public static partial class ExtendRazor
     public static IDictionary<string, object> GetParameters(this IComponent component)
     {
         var parameters = component.GetType().GetProperties().
-            Where(x => x.HasAttributes<ParameterAttribute>()).
+            Where(x => x.IsDefined<ParameterAttribute>()).
             Select(x => (x.Name, x.GetValue(component))).ToArray();
-        return parameters.Where(x => x.Item2 is { }).ToDictionary(true)!;
+        return parameters.Where(x => x.Item2 is { }).ToDictionary()!;
     }
     #endregion
     #region 关于ParameterView
@@ -222,7 +212,7 @@ public static partial class ExtendRazor
     /// <returns></returns>
     public static ParameterView Reconfiguration(this ParameterView parameters, Action<IDictionary<string, object?>> reconfiguration)
     {
-        var dictionary = parameters.ToDictionary().ToDictionary(true);
+        var dictionary = parameters.ToDictionary().ToDictionary();
         reconfiguration(dictionary);
         return ParameterView.FromDictionary(dictionary!);
     }
@@ -235,7 +225,7 @@ public static partial class ExtendRazor
     /// <param name="component">要刷新的组件</param>
     public static void StateHasChanged(this ComponentBase component)
     {
-        var stateHasChanged = component.GetTypeData().FindMethod("StateHasChanged");
+        var stateHasChanged = component.GetType().GetMethod("StateHasChanged", BindingFlags.NonPublic | BindingFlags.Instance)!;
         stateHasChanged.Invoke(component, null);
     }
     #endregion
@@ -258,15 +248,6 @@ public static partial class ExtendRazor
         };
     }
     #endregion
-    #endregion
-    #region 返回是否被验证
-    /// <summary>
-    /// 返回是否验证成功
-    /// </summary>
-    /// <param name="authenticationStateProvider">用于提供验证的服务</param>
-    /// <returns></returns>
-    public static async Task<bool> IsAuthenticated(this AuthenticationStateProvider authenticationStateProvider)
-        => (await authenticationStateProvider.GetAuthenticationStateAsync()).User.IsAuthenticated();
     #endregion
     #region 有关NavigationManager
     #region 导航到组件
@@ -296,19 +277,6 @@ public static partial class ExtendRazor
         navigation.NavigateTo(uri, forceLoad);
     }
     #endregion
-    #endregion
-    #region 一次性阻止导航
-    /// <summary>
-    /// 注册一个事件，它能够阻止用户进入其他导航，
-    /// 但是与原生方法不同的是，它不会持续地锁定新的导航
-    /// </summary>
-    /// <param name="navigation">用来执行导航的对象</param>
-    /// <param name="locationChangingHandler">当触发导航时的事件，
-    /// 它返回一个布尔值，指示是否应该阻止导航</param>
-    /// <returns>一个<see cref="IDisposable"/>，释放它可以停止阻止导航</returns>
-    public static IDisposable RegisterLocationChangingHandlerDisposable(this NavigationManager navigation,
-        Func<Task<bool>> locationChangingHandler)
-        => new LocationChangingHandlerDisposable(navigation, locationChangingHandler);
     #endregion
     #endregion 
 }

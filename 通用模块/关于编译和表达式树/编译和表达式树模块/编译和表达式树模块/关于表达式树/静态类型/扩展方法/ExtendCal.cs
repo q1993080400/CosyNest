@@ -56,7 +56,17 @@ public static partial class ExtendExpressions
     /// <param name="expression">要执行的表达式</param>
     /// <returns>一个元组，指示表达式是否计算成功，以及计算结果</returns>
     public static (bool CanPerform, object? Results) CalValueSafety(this Expression expression)
-        => ToolException.Ignore<object?, NotSupportedException>(expression.CalValue);
+    {
+        try
+        {
+            var results = expression.CalValue();
+            return (true, results);
+        }
+        catch (Exception)
+        {
+            return (false, null);
+        }
+    }
     #endregion
     #endregion
     #region 针对一元运算符表达式
@@ -172,7 +182,7 @@ public static partial class ExtendExpressions
     public static object? CalValue(this DefaultExpression expression)
     {
         var type = expression.Type;
-        return type.IsValueType ? type.GetTypeData().ConstructorCreate<object?>() : null;
+        return type.IsValueType ? type.ConstructorsInvoke<object?>() : null;
     }
     #endregion
 }

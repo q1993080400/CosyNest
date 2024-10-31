@@ -11,7 +11,7 @@ sealed class EFDataPipe(DbContext dbContext) : IDataPipe
     #region 查询数据源抽象
     public IQueryable<Data> Query<Data>()
         where Data : class
-        => dbContext.Set<Data>().AsNoTracking();
+        => dbContext.Set<Data>();
     #endregion
     #region 执行推送上下文
     #region 无返回值
@@ -28,7 +28,11 @@ sealed class EFDataPipe(DbContext dbContext) : IDataPipe
         await dbContext.SaveChangesAsync();
         return @return;
     }
-    #endregion 
+    #endregion
+    #endregion
+    #region 获取所有受支持的实体类型
+    public IEnumerable<Type>? EntityTypes
+        => dbContext.EntityTypes();
     #endregion
     #region 释放对象
     public async ValueTask DisposeAsync()

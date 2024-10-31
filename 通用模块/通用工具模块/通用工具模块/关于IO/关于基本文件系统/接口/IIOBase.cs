@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.MathFrancis;
-using System.MathFrancis.Tree;
+﻿using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.BaseFileSystem;
 
@@ -42,28 +40,6 @@ public interface IIOBase : INode
     /// 当写入这个属性时，修改它的名称
     /// </summary>
     string NameFull { get; set; }
-    #endregion
-    #endregion
-    #region 关于文件或目录的大小
-    #region 获取文件或目录的大小
-    /// <summary>
-    /// 获取这个文件或目录的大小
-    /// </summary>
-    IUnit<IUTStorage> Size { get; }
-    #endregion
-    #region 返回是否为空文件或目录
-    /// <summary>
-    /// 返回该对象是否为空文件或空目录
-    /// </summary>
-    bool IsVoid
-        => this is IFile ?
-        Size.ValueMetric == 0 : !Son.Any();
-
-    /*问：为什么不直接写Size==0呢？
-      这样就可以同时兼容于文件和目录
-      答：因为要考虑一种特殊情况，
-      那就是目录下的文件全部大小为0，
-      在这种情况下，目录的大小也是0，但是它不是空目录*/
     #endregion
     #endregion
     #region 删除

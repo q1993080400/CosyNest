@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 
 using Microsoft.Office.Interop.Excel;
 
@@ -21,8 +21,8 @@ sealed class ExcelChartMicrosoft(Shape shape) : IOfficeChart
     #region 未实现的成员
     public string Title { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public IOfficeChartSeriesManage Series => throw new NotImplementedException();
-    public MathFrancis.Plane.IPoint Pos { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public ISize Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public IPoint<double> Pos { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public ISize<double> Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public bool InTextTop { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public double Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     #endregion

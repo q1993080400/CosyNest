@@ -1,5 +1,4 @@
-﻿using System.IOFrancis;
-using System.Underlying;
+﻿using System.Underlying;
 
 using Microsoft.AspNetCore.Http;
 
@@ -18,14 +17,6 @@ public static class CreateASP
     /// <inheritdoc cref="EnvironmentInfoWeb(string)"/>
     public static IEnvironmentInfoWeb EnvironmentInfo(string userAgent)
         => new EnvironmentInfoWeb(userAgent);
-    #endregion
-    #region 创建媒体文件路径协议
-    /// <summary>
-    /// 创建媒体文件路径协议，
-    /// 它支持按照封面/本体分类路径，以及排序等功能
-    /// </summary>
-    public static (GenerateFilePathProtocol<FilePathGenerateParameters, FileSource> Generate, AnalysisFilePathProtocol<IEnumerable<string>, IEnumerable<FileSource>> Analysis) MediaPathProtocol { get; }
-        = (FilePathProtocol.Generate, FilePathProtocol.Analysis);
     #endregion
     #region 生成一个不重复的，符合JS规范的对象名称
     /// <summary>

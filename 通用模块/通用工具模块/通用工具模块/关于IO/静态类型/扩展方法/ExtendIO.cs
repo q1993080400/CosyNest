@@ -1,7 +1,6 @@
 ﻿using System.Design;
 using System.IOFrancis;
 using System.IOFrancis.Bit;
-using System.IOFrancis.FileSystem;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -12,18 +11,6 @@ namespace System;
 /// </summary>
 public static class ExtendIO
 {
-    #region 根据文件类型筛选文件集合
-    /// <summary>
-    /// 在一个文件集合中，筛选出所有与指定文件类型兼容的文件
-    /// </summary>
-    /// <param name="list">要筛选的集合</param>
-    /// <param name="fileType">作为条件的路径对象</param>
-    /// <param name="isForward">如果这个值为<see langword="true"/>，选择是这个类型的文件，
-    /// 否则选择不是这个类型的文件，即取反</param>
-    /// <returns></returns>
-    public static IEnumerable<IFile> WhereFileType(this IEnumerable<IFile> list, IFileType fileType, bool isForward = true)
-        => list.Where(x => x.IsCompatible(fileType) == isForward);
-    #endregion
     #region 关于流
     #region 读取流的全部内容
     /// <summary>
@@ -60,13 +47,12 @@ public static class ExtendIO
     /// <param name="path">要保存到的文件路径</param>
     /// <param name="cancellationToken">一个用来取消异步操作的令牌</param>
     /// <returns></returns>
-    public static async Task SaveFile(this Stream stream, string path, CancellationToken cancellationToken = default)
+    public static async Task SaveToFile(this Stream stream, string path, CancellationToken cancellationToken = default)
     {
         if (!stream.CanRead)
             throw new NotSupportedException("这个流不可读取");
         stream.Reset();
-        if (File.Exists(path))
-            File.Delete(path);
+        File.Delete(path);
         using var fileStream = CreateIO.FileStream(path, FileMode.Create);
         await stream.CopyToAsync(fileStream, cancellationToken);
     }
@@ -130,7 +116,6 @@ public static class ExtendIO
     /// <returns></returns>
     public static async IAsyncEnumerable<byte[]> SplitBuffer(this IAsyncEnumerable<byte[]> source, int bufferSize = 1024, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        ExceptionIntervalOut.Check(1, null, bufferSize);
         await using var enumerator = source.GetAsyncEnumerator(cancellation);
         var buffer = new byte[bufferSize];
         var surplus = Array.Empty<byte>();

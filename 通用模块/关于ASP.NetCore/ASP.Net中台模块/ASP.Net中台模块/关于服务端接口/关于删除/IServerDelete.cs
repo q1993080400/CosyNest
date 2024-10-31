@@ -1,5 +1,4 @@
 ﻿using System.NetFrancis.Api;
-using System.NetFrancis.Http;
 
 namespace Microsoft.AspNetCore;
 
@@ -16,7 +15,6 @@ public interface IServerDelete<Parameter>
     /// </summary>
     /// <param name="parameter">用来执行删除的参数</param>
     /// <returns></returns>
-    [HttpMethodPost]
     Task<APIPack> Delete(Parameter parameter);
     #endregion
 }

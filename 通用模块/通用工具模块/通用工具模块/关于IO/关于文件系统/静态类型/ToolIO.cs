@@ -30,7 +30,7 @@ public static class ToolIO
     public static void CreateFather(string path)
     {
         var father = Path.GetDirectoryName(path);
-        if (father is { })
+        if (!father.IsVoid())
             Directory.CreateDirectory(father);
     }
     #endregion

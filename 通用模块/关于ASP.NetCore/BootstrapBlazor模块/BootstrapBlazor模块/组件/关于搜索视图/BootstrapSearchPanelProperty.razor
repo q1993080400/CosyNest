@@ -182,11 +182,11 @@
             </BootstrapInputGroup>
             break;
         case (FilterObjectType.Bool, _):
-            var bindQueryBool = BindQuery<bool?>().ToBindProperty();
+            var bindQueryBool = BindQuery<bool>().ToBindProperty();
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <NullSwitch @bind-Value=@(bindQueryBool.Value)
-                            OnValueChanged="OnSubmit" OnText="开启" OffText="关闭" />
+                <Switch @bind-Value=@(bindQueryBool.Value)
+                        OnValueChanged="OnSubmit" OnText="开启" OffText="关闭" />
             </BootstrapInputGroup>
             break;
         default:

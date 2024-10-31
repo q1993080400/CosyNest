@@ -14,11 +14,11 @@ public static class ToolThread
     /// </summary>
     /// <param name="path">要打开的文件或目录的路径</param>
     /// <returns></returns>
-    public static Process Open(string path)
+    public static Process? Open(string path)
         => Process.Start(new ProcessStartInfo()
         {
             FileName = path,
             UseShellExecute = true
-        })!;
+        });
     #endregion
 }

@@ -1,5 +1,4 @@
-﻿
-namespace System.Localization;
+﻿namespace System.Localization;
 
 /// <summary>
 /// 这个静态类可以用来创建和本地化有关的对象

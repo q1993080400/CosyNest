@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-
-namespace System.IOFrancis.BaseFileSystem;
+﻿namespace System.IOFrancis.BaseFileSystem;
 
 /// <summary>
 /// 该接口为基本文件系统中的目录提供统一抽象
@@ -27,32 +25,14 @@ public interface IDirectoryBase : IIOBase
         where IO : IIOBase;
     #endregion
     #region 创建文件或目录
-    #region 辅助方法：获取不重复的名称
-    /// <summary>
-    /// 实现<see cref="Create{IO}(string?)"/>的辅助方法，获取一个在目录下绝对不会重复的名称
-    /// </summary>
-    /// <param name="directory">要获取不重复名称的目录</param>
-    /// <inheritdoc cref="Create{IO}(string?)"/>
-    protected static string GetUniqueName(IDirectoryBase directory, string? name)
-    {
-        if (name is null)
-            return Guid.NewGuid().ToString();
-        var names = directory.Son.Cast<IIOBase>().Select(x => x.NameFull);
-        return names.Distinct(name, (n, i) =>
-        {
-            var (simple, extended, _) = ToolPath.SplitFilePath(n, true);
-            return $"{simple}({i}){extended}";
-        });
-    }
-    #endregion
-    #region 创建文件或目录
+    #region 通用方法
     /// <summary>
     /// 创建一个文件或目录，并返回
     /// </summary>
     /// <typeparam name="IO">要创建的文件或目录的全名</typeparam>
     /// <param name="name">新文件或目录的名称，
     /// 如果为<see langword="null"/>，则给予一个不重复的随机名称，
-    /// 如果不为<see langword="null"/>但是名称重复，则自动对名称进行重命名</param>
+    /// 如果已经存在指定的文件或目录，则直接返回</param>
     /// <returns></returns>
     IO Create<IO>(string? name = null)
         where IO : IIOBase;
@@ -65,11 +45,11 @@ public interface IDirectoryBase : IIOBase
     /// <param name="nameSimple">文件的简称，不带扩展名</param>
     /// <param name="nameExtended">文件的扩展名，不带点号</param>
     /// <returns>新创建的文件，如果文件的名称不指定，则分配一个不重复的随机名称，
-    /// 如果指定，但是名称重复，则自动对名称进行重命名</returns>
+    /// 如果已经存在指定的文件，则直接返回</returns>
     File CreateFile<File>(string? nameSimple = null, string? nameExtended = null)
         where File : IFileBase
     {
-        var name = nameSimple ?? Guid.NewGuid().ToString() + (nameExtended is null ? null : $".{nameExtended}");
+        var name = (nameSimple ?? Guid.NewGuid().ToString()) + (nameExtended is null ? null : $".{nameExtended}");
         return Create<File>(name);
     }
     #endregion

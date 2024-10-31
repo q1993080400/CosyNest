@@ -1,5 +1,4 @@
 ﻿using System.MathFrancis;
-using System.MathFrancis.Plane;
 
 using Microsoft.Office.Interop.Word;
 
@@ -15,31 +14,31 @@ abstract class WordObjectMicrosoft(Shape shape) : IWordObject
 {
     #region 公开成员
     #region 对象的坐标
-    public IPoint Pos
+    public IPoint<double> Pos
     {
         get
         {
             var right = Application.PointsToCentimeters(shape.Left);
             var top = Application.PointsToCentimeters(-shape.Top);
-            return CreateMath.Point(right, top);
+            return CreateMath.Point<double>(right, top);
         }
         set
         {
             var (right, top) = value;
-            shape.Left = Application.CentimetersToPoints(right);
-            shape.Top = Application.CentimetersToPoints(-top);
+            shape.Left = Application.CentimetersToPoints((float)right);
+            shape.Top = Application.CentimetersToPoints((float)-top);
         }
     }
     #endregion
     #region 对象的大小
-    public ISize Size
+    public ISize<double> Size
     {
         get => throw new NotImplementedException();
         set
         {
             var (width, height) = value;
-            shape.Width = Application.CentimetersToPoints(width);
-            shape.Height = Application.CentimetersToPoints(height);
+            shape.Width = Application.CentimetersToPoints((float)width);
+            shape.Height = Application.CentimetersToPoints((float)height);
         }
     }
     #endregion

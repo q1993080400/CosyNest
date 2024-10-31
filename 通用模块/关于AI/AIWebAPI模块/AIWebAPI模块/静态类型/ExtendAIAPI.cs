@@ -1,5 +1,4 @@
 ﻿using System.AI;
-using System.NetFrancis.Http;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,20 +17,17 @@ public static class ExtendAIAPI
     /// </summary>
     /// <param name="services">服务容器</param>
     /// <returns></returns>
-    /// <inheritdoc cref="AIChatBaiDu(string, string, string, Func{IHttpClient}?)"/>
-    public static IServiceCollection AddAIChatBaiDu(this IServiceCollection services, string modelUri, Func<IHttpClient>? httpClientProvide = null)
-    {
-        services.AddSingleton(x =>
+    /// <inheritdoc cref="AIChatBaiDu(string, string, string, IServiceProvider)"/>
+    public static IServiceCollection AddAIChatBaiDu(this IServiceCollection services, string modelUri)
+        => services.AddSingleton(serviceProvider =>
         {
-            var configuration = x.GetRequiredService<IConfiguration>();
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var baiDuConfiguration = configuration.GetSection("AIChatBaiDuConfiguration");
             var appKey = baiDuConfiguration["AppKey"] ??
             throw new KeyNotFoundException("没有找到百度AI聊天服务的AppKey");
             var secretKey = baiDuConfiguration["SecretKey"] ??
             throw new KeyNotFoundException("没有找到百度AI聊天服务的SecretKey");
-            return CreateAIAPI.AIChatBaiDu(appKey, secretKey, modelUri, httpClientProvide);
+            return CreateAIAPI.AIChatBaiDu(appKey, secretKey, modelUri, serviceProvider);
         });
-        return services;
-    }
     #endregion
 }

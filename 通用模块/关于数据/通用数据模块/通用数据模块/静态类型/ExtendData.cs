@@ -9,7 +9,7 @@ namespace System;
 /// <summary>
 /// 有关数据的扩展方法
 /// </summary>
-public static class ExtendData
+public static partial class ExtendData
 {
     #region 关于依赖注入
     #region 注入一个简易的日志记录方法

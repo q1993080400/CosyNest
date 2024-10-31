@@ -15,6 +15,10 @@ sealed class EFDataPipeToContext(DbContext dbContext) : IDataPipeToContext
         where Data : class
         => dbContext.Set<Data>();
     #endregion
+    #region 获取所有受支持的实体类型
+    public IEnumerable<Type>? EntityTypes
+        => dbContext.EntityTypes();
+    #endregion
     #region 添加或更新数据
     public async Task AddOrUpdate<Data>(IEnumerable<Data> datas, AddOrUpdateInfo<Data>? info = null, CancellationToken cancellation = default)
         where Data : class

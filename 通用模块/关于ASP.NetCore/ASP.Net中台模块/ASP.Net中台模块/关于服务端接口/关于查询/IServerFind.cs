@@ -1,6 +1,4 @@
-﻿using System.NetFrancis.Http;
-
-namespace Microsoft.AspNetCore;
+﻿namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -19,7 +17,6 @@ public interface IServerFind<Parameter, Obj>
     /// </summary>
     /// <param name="withID">这个对象包含对象的ID，或本身就是ID</param>
     /// <returns></returns>
-    [HttpMethodPost]
     Task<Obj?> Find(Parameter withID);
     #endregion
 }

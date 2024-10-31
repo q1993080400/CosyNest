@@ -8,9 +8,9 @@
 
   如何使用本模块：
   
-  1.将以下代码添加到根页面：
+  将以下代码添加到根页面：
   
   <link href="_content/ToolRazor/css/style.css" rel="stylesheet" />
-  <script src="_content/ToolRazor/js/ToolRazor.js"></script>
+  <script src="_content/ToolRazor/js/script.js"></script>
 
-  */
+ */

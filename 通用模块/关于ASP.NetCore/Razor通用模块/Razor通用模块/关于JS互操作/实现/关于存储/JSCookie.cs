@@ -93,7 +93,7 @@ sealed class JSCookie : ICookie
     public JSCookie(IJSRuntime jsRuntime)
     {
         JSRuntime = jsRuntime;
-        IndexAsync = CreateTasks.AsyncIndex<string, string>(
+        IndexAsync = CreateTask.AsyncIndex<string, string>(
            async (key, cancellation) =>
            {
                var (_, value) = await TryGetValueAsync(key, cancellation);

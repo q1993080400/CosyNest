@@ -4,7 +4,6 @@ public static partial class ExtendEnumerable
 {
     /*所有有关字典的扩展方法，全部放在这个部分类中*/
 
-    #region 关于索引器
     #region 安全索引
     #region 如果不存在键，获取值并将其添加到字典中
     /// <summary>
@@ -44,115 +43,8 @@ public static partial class ExtendEnumerable
         {
             IDictionary<Key, Value> d => d.TryGetValue(key, out Value? value) ? (true, value) : (false, noFound.Value()),
             IReadOnlyDictionary<Key, Value> d => d.TryGetValue(key, out Value? v) ? (true, v) : (false, noFound.Value()),
-            _ => throw new TypeUnlawfulException(dictionary, typeof(IDictionary<Key, Value>), typeof(IReadOnlyDictionary<Key, Value>)),
+            _ => throw new NotSupportedException($"{dictionary.GetType()}既不是一个字典，也不是一个只读字典"),
         };
-    #endregion
-    #endregion
-    #endregion
-    #region 关于字典转换
-    #region 适配字典
-    /// <summary>
-    /// 将字典适配为<see cref="DictionaryFit{Key, Value}"/>
-    /// </summary>
-    /// <typeparam name="Key">字典的键类型</typeparam>
-    /// <typeparam name="Value">字典的值类型</typeparam>
-    /// <param name="dictionary">要适配的字典</param>
-    /// <param name="canModify">指定是否可以修改已经存在的键值对，
-    /// 注意：<see cref="ICollection{T}.IsReadOnly"/>为<see langword="true"/>时，它永远为<see langword="false"/></param>
-    /// <returns></returns>
-    public static DictionaryFit<Key, Value> FitDictionary<Key, Value>(this IDictionary<Key, Value> dictionary, bool canModify = true)
-        where Key : notnull
-        => new(dictionary, canModify);
-    #endregion
-    #region 将集合转换为字典
-    #region 将任意集合转换为字典
-    /// <summary>
-    /// 从集合中提取键和值，并将集合转换为字典
-    /// </summary>
-    /// <typeparam name="Key">字典的键类型</typeparam>
-    /// <typeparam name="Value">字典的值类型</typeparam>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="collection">待转换的集合</param>
-    /// <param name="delegate">这个委托传入集合的元素，并返回一个元组，它的项分别是字典的键和值</param>
-    /// <param name="checkRepetition">如果这个值为<see langword="true"/>，在向字典添加重复键的时候会报错，否则会覆盖旧有键的值</param>
-    /// <returns></returns>
-    public static DictionaryFit<Key, Value> ToDictionary<Key, Value, Obj>(this IEnumerable<Obj> collection, Func<Obj, (Key, Value)> @delegate, bool checkRepetition)
-        where Key : notnull
-    {
-        var dict = new DictionaryFit<Key, Value>();
-        foreach (var item in collection)
-        {
-            var (k, v) = @delegate(item);
-            if (checkRepetition)
-                dict.Add(k, v);
-            else dict[k] = v;
-        }
-        return dict;
-    }
-    #endregion
-    #region 将键值对集合直接转换为字典
-    /// <summary>
-    /// 将键值对集合直接转换为字典
-    /// </summary>
-    /// <typeparam name="Key">键的类型</typeparam>
-    /// <typeparam name="Value">值的类型</typeparam>
-    /// <param name="collection">要转换为字典的键值对集合</param>
-    /// <param name="checkRepetition">如果这个值为<see langword="true"/>，在向字典添加重复键的时候会报错，否则会覆盖旧有键的值</param>
-    /// <returns></returns>
-    public static DictionaryFit<Key, Value> ToDictionary<Key, Value>(this IEnumerable<KeyValuePair<Key, Value>> collection, bool checkRepetition)
-        where Key : notnull
-        => collection.ToDictionary(x => (x.Key, x.Value), checkRepetition);
-    #endregion
-    #region 将元组集合直接转换为字典
-    /// <summary>
-    /// 将一个元组集合直接转换为字典
-    /// </summary>
-    /// <typeparam name="Key">字典的键类型</typeparam>
-    /// <typeparam name="Value">字典的值类型</typeparam>
-    /// <param name="collection">待转换的元组集合</param>
-    /// <param name="checkRepetition">如果这个值为<see langword="true"/>，在向字典添加重复键的时候会报错，否则会覆盖旧有键的值</param>
-    /// <returns></returns>
-    public static DictionaryFit<Key, Value> ToDictionary<Key, Value>(this IEnumerable<(Key, Value)> collection, bool checkRepetition)
-        where Key : notnull
-        => collection.ToDictionary(x => (x.Item1, x.Item2), checkRepetition);
-    #endregion
-    #endregion
-    #endregion
-    #region 关于键值对
-    #region 将元组转换为键值对
-    /// <summary>
-    /// 将一个二元组转换为键值对
-    /// </summary>
-    /// <typeparam name="Key">键值对的键类型</typeparam>
-    /// <typeparam name="Value">键值对的值类型</typeparam>
-    /// <param name="tupts">待转换的元组</param>
-    /// <returns></returns>
-    public static KeyValuePair<Key, Value> ToKV<Key, Value>(this (Key, Value) tupts)
-        where Key : notnull
-        => new(tupts.Item1, tupts.Item2);
-    #endregion
-    #region 批量转换元组为键值对
-    /// <summary>
-    /// 将二元组集合转换为键值对集合
-    /// </summary>
-    /// <typeparam name="Key">键值对的键类型</typeparam>
-    /// <typeparam name="Value">键值对的值类型</typeparam>
-    /// <param name="collection">待转换的二元组集合</param>
-    /// <returns></returns>
-    public static IEnumerable<KeyValuePair<Key, Value>> ToKV<Key, Value>(this IEnumerable<(Key, Value)> collection)
-        where Key : notnull
-        => collection.Select(ToKV);
-    #endregion
-    #region 批量解构键值对
-    /// <summary>
-    /// 批量将键值对解构为元组
-    /// </summary>
-    /// <typeparam name="Key">键值对的键类型</typeparam>
-    /// <typeparam name="Value">键值对的值类型</typeparam>
-    /// <param name="collection">要解构的键值对集合</param>
-    /// <returns></returns>
-    public static IEnumerable<(Key Key, Value Value)> ToTupts<Key, Value>(this IEnumerable<KeyValuePair<Key, Value>> collection)
-        => collection.Select(x => (x.Key, x.Value));
     #endregion
     #endregion
 }

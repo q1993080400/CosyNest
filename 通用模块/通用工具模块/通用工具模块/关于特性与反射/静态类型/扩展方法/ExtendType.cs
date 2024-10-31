@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace System;
+﻿namespace System;
 
 public static partial class ExtendReflection
 {
@@ -74,17 +72,11 @@ public static partial class ExtendReflection
     /// <param name="type">待检查的类型</param>
     /// <returns></returns>
     public static bool IsNum(this Type type)
-    {
-        #region 本地函数
-        static bool Fun(Type type)
-              => !type.IsEnum && Type.GetTypeCode(type) is not (TypeCode.Object or TypeCode.DBNull or
+        => Nullable.GetUnderlyingType(type) is { } underlyingType ?
+        underlyingType.IsNum() :
+        !type.IsEnum && Type.GetTypeCode(type) is not (TypeCode.Object or TypeCode.DBNull or
           TypeCode.Empty or TypeCode.DateTime or
           TypeCode.Char or TypeCode.String or TypeCode.Boolean);
-        #endregion
-        return type.IsGenericRealize(typeof(Nullable<>)) ?
-            Fun(type.GetGenericArguments()[0]) :
-            Fun(type);
-    }
     #endregion
     #region 判断一个类型是否为通用类型
     /// <summary>
@@ -101,7 +93,7 @@ public static partial class ExtendReflection
             { IsEnum: true } => true,
             var t => Type.GetTypeCode(t) switch
             {
-                TypeCode.Object when t.IsGenericRealize(typeof(Nullable<>)) => t.GenericTypeArguments[0].IsCommonType(),
+                TypeCode.Object when Nullable.GetUnderlyingType(t) is { } underlyingType => underlyingType.IsCommonType(),
                 TypeCode.Object => t == typeof(DateTimeOffset) || t == typeof(Guid),
                 TypeCode.DBNull => false,
                 _ => true
@@ -173,36 +165,19 @@ public static partial class ExtendReflection
     #endregion
     #endregion
     #endregion
-    #region 获取一个对象的类型数据
+    #region 搜索与指定参数类型匹配的构造函数，并创建实例
     /// <summary>
-    /// 对一个对象或类型进行反射，返回它的<see cref="ITypeData"/>
+    /// 搜索与指定参数类型匹配的构造函数，
+    /// 并调用它，然后创建这个类型的实例
     /// </summary>
-    /// <param name="obj">如果这个对象是<see cref="Type"/>，则获取它本身，
-    /// 如果不是，则调用它的<see cref="object.GetType"/>方法，获取它的<see cref="Type"/></param>
+    /// <typeparam name="Obj">要创建实例的类型</typeparam>
+    /// <param name="type">要搜索构造函数的类型</param>
+    /// <param name="parameters">传递给构造函数的参数数组，
+    /// 函数会获取它们的类型，以确定应该调用哪个构造函数，
+    /// 警告：这个数组的元素不可为<see langword="null"/>，
+    /// 否则函数无法获取它的类型</param>
     /// <returns></returns>
-    public static ITypeData GetTypeData(this object obj)
-        => TypeData.TypeCache[obj is Type t ? t : obj.GetType()];
-    #endregion
-    #region 增强版获取对象类型
-    /// <summary>
-    /// 如果一个对象是<see cref="Type"/>，则返回它本身，
-    /// 如果不是，则调用<see cref="object.GetType"/>获取它的类型
-    /// </summary>
-    /// <param name="obj">要获取类型的对象</param>
-    /// <returns></returns>
-    internal static Type GetTypeObj(this object obj)
-        => obj is Type a ? a : obj.GetType();
-    #endregion
-    #region 获取是否存在某个特性
-    /// <summary>
-    /// 获取一个成员是否存在某个特性
-    /// </summary>
-    /// <typeparam name="Attribute">特性的类型</typeparam>
-    /// <param name="member">要搜索特性的成员</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="MemberInfo.IsDefined(Type, bool)"/>
-    public static bool IsDefined<Attribute>(this MemberInfo member, bool inherit = true)
-        where Attribute : System.Attribute
-        => member.IsDefined(typeof(Attribute), inherit);
+    public static Obj ConstructorsInvoke<Obj>(this Type type, params object[] parameters)
+        => (Obj)Activator.CreateInstance(type, parameters)!;
     #endregion
 }

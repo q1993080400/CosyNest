@@ -54,9 +54,9 @@ public static class CommonlyRegex
     /// <param name="text">要提取键值对的字符串</param>
     /// <returns></returns>
     /// <inheritdoc cref="KeyValuePair(string, string)"/>
-    public static DictionaryFit<string, string> KeyValuePairExtraction(string text, string separator, string separatorKey = "=")
+    public static IReadOnlyDictionary<string, string> KeyValuePairExtraction(string text, string separator, string separatorKey = "=")
         => KeyValuePair(separator, separatorKey).Matches(text).Matches.
-        ToDictionary(x => (x["key"].Match, x["value"].Match), true);
+        ToDictionary(x => x["key"].Match, x => x["value"].Match);
     #endregion
     #endregion
 }

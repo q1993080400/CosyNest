@@ -19,7 +19,7 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
     private IAsyncIndex<string, string>? IndexField;
 
     public IAsyncIndex<string, string> Index
-        => IndexField ??= CreateTasks.AsyncIndex<string, string>(
+        => IndexField ??= CreateTask.AsyncIndex<string, string>(
             (name, _) => Task.FromResult(Element.GetDomProperty(name) ?? Element.GetCssValue(name)),
             (_, _, _) => throw new NotImplementedException());
     #endregion
@@ -39,8 +39,7 @@ abstract class ElementBrowserWebDriverBase(BrowserWebDriver browser) : IElementB
         #endregion
         var last = LastTab();
         last?.Select();
-        return FastRealize.Disposable(null,
-            last is null ?
+        return FastRealize.Disposable(last is null ?
             () => { }
         :
             () =>

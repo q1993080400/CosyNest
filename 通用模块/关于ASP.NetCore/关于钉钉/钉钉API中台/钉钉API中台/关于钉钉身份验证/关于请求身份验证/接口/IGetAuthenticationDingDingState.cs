@@ -1,6 +1,4 @@
-﻿using System.NetFrancis.Http;
-
-namespace System.DingDing;
+﻿namespace System.DingDing;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -14,7 +12,6 @@ public interface IGetAuthenticationDingDingState
     /// </summary>
     /// <param name="parameter">用来获取身份验证状态的参数</param>
     /// <returns></returns>
-    [HttpMethodPost]
     Task<APIPackDingDing> GetAuthenticationDingDingState
         (AuthenticationDingDingRequest parameter);
     #endregion

@@ -1,7 +1,8 @@
 ﻿namespace System.DataFrancis;
 
 /// <summary>
-/// 这个特性可以用来描述如何渲染数据
+/// 这个特性表示数据应该被渲染，
+/// 并指定了渲染数据的方式
 /// </summary>
 public sealed class RenderDataAttribute : RenderDataBaseAttribute
 {

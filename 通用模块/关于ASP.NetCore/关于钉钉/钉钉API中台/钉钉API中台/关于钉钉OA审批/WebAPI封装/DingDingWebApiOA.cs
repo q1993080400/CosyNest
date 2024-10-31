@@ -1,8 +1,6 @@
 ﻿using System.Design.Direct;
 using System.NetFrancis.Http;
 
-using Microsoft.Extensions.DependencyInjection;
-
 namespace System.DingDing;
 
 /// <summary>
@@ -22,7 +20,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
     public async IAsyncEnumerable<DingDingOAFormTemplate> GetOAFormTemplate(string? userId = null)
     {
         var accessToken = await GetCompanyToken();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         long? nextToken = 0L;
         while (nextToken is { })
         {
@@ -69,7 +67,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
     public async IAsyncEnumerable<string> GetOAInstanceID(GetOAInstanceIDParameter parameter)
     {
         var accessToken = await GetCompanyToken();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         long? nextToken = 0L;
         while (nextToken is { })
         {
@@ -117,7 +115,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
     public async Task<DingDingOAInstance> GetOAInstance(string instanceID)
     {
         var accessToken = await GetCompanyToken();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         await Delay();
         var response = await http.RequestJsonGet("https://api.dingtalk.com/v1.0/workflow/processInstances",
             [("processInstanceId", instanceID)], transformation: TransformAccessToken(accessToken));
@@ -325,7 +323,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
     public async Task<DingDingOAAttachmentDownloadInfo?> DownloadOAAttachment(string instanceID, string fileID)
     {
         var accessToken = await GetCompanyToken();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         await Delay();
         var response = await http.RequestJsonPost("https://api.dingtalk.com/v1.0/workflow/processInstances/spaces/files/urls/download",
             new

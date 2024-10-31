@@ -25,7 +25,8 @@ public sealed partial class ModelDialog : ComponentBase, IContentComponent<Rende
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JSWindow.InvokeVoidAsync("OpenModelDialog", ID);
+        if (firstRender)
+            await JSWindow.InvokeVoidAsync("OpenModelDialog", ID);
     }
     #endregion
     #endregion

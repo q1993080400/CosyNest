@@ -1,17 +1,26 @@
-﻿namespace System.DataFrancis;
+﻿using System.Linq.Expressions;
+
+namespace System.DataFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
 /// 都可以视为一个具有寿命的数据实体，
 /// 它可以指示实体是否已经过期
 /// </summary>
-public interface IWithLife
+/// <typeparam name="Entity">实体类的类型</typeparam>
+public interface IWithLife<Entity>
+    where Entity : class, IWithLife<Entity>
 {
-    #region 是否过期
+    #region 静态成员：获取筛选过期或未过期的实体的表达式
     /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示这个实体已经过期，否则尚未过期
+    /// 获取一个表达式，它可以用来筛选过期或未过期的实体
     /// </summary>
-    bool IsExpire { get; }
+    /// <typeparam name="DerivativeEntity">实体的派生实体，
+    /// 它可以用于为派生类生成表达式</typeparam>
+    /// <param name="filterExpire">如果这个值为<see langword="true"/>，
+    /// 则筛选已经过期的实体，否则筛选未过期的实体</param>
+    /// <returns></returns>
+    static abstract Expression<Func<DerivativeEntity, bool>> GetFilterExpression<DerivativeEntity>(bool filterExpire)
+        where DerivativeEntity : Entity;
     #endregion
 }

@@ -90,31 +90,6 @@ label button
 {
 }
 
-/*媒体视图容器的样式*/
-.mediaViewerContainer
-{
-    display: flex;
-    flex-wrap: wrap;
-    background-color: white;
-    gap: var(--mediaViewerContainerGap);
-}
-
-/*媒体封面样式*/
-.mediaCover
-{
-    cursor: pointer;
-    flex-grow: 1;
-}
-
-/*图片封面样式*/
-.imageCover
-{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
 /*表单视图容器的父容器样式*/
 :has(> :is(.bootstrapFormViewerContainer,.bootstrapFormViewerTopContainer))
 {

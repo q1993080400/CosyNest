@@ -7,6 +7,6 @@
 sealed record FaceRecognitionInfo : IFaceRecognitionInfo
 {
     #region 人脸检测的数量
-    public int FaceCount { get; init; }
+    public required int FaceCount { get; init; }
     #endregion 
 }

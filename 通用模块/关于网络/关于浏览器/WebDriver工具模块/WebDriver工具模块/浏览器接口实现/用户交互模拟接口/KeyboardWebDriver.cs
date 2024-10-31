@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 
+using System.Reflection;
 using System.Underlying.PC;
 
 using Keys = System.Underlying.PC.Keys;
@@ -22,12 +23,13 @@ sealed class KeyboardWebDriver(WebDriver webDriver) : IKeyBoard
     #region 按下按键
     public void Down(params Keys[] keys)
     {
-        var files = typeof(OpenQA.Selenium.Keys).GetTypeData().FieldDictionary;
+        var files = typeof(OpenQA.Selenium.Keys).GetFields(CreateReflection.BindingFlagsAll).
+            ToDictionary(x => x.Name, x => x);
         var keysSelenium = keys.Select(key =>
         {
             var k = key.ToString();
-            var (exist, value) = files.TryGetValue(k);
-            return exist ? value.Single().GetValue<string>(null)! : k;
+            return files.TryGetValue(k, out var value) ?
+            value.GetValue<string>(null)! : k;
         }).ToArray();
         var action = new Actions(WebDriver);
         if (keys[0] is Keys.ControlKey)

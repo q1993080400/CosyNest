@@ -1,5 +1,4 @@
 ﻿using System.MathFrancis;
-using System.MathFrancis.Plane;
 
 namespace System.Underlying;
 
@@ -19,30 +18,13 @@ public interface IScreen
     /// <summary>
     /// 获取屏幕的物理分辨率
     /// </summary>
-    ISizePixel Resolution { get; }
+    ISize<int> Resolution { get; }
     #endregion
     #region 逻辑分辨率
     /// <summary>
     /// 获取屏幕的逻辑分辨率
     /// </summary>
-    ISizePixel LogicalResolution { get; }
-    #endregion
-    #region 获取屏幕的物理大小
-    /// <summary>
-    /// 获取屏幕的物理大小
-    /// </summary>
-    (IUnit<IUTLength> Width, IUnit<IUTLength> Height) Size
-    {
-        get
-        {
-            var (w, h) = Resolution;
-            #region 本地函数
-            static IUnit<IUTLength> Fun(Num pixel, int dpi)
-                => CreateBaseMath.Unit(pixel / dpi, IUTLength.Inches);
-            #endregion
-            return (Fun(w, DPIX), Fun(h, DPIY));
-        }
-    }
+    ISize<double> LogicalResolution { get; }
     #endregion
     #region 获取DPI
     #region X轴DPI
@@ -58,31 +40,11 @@ public interface IScreen
     int DPIY { get; }
     #endregion
     #endregion
-    #region 获取像素长度
-    #region X轴像素
-    /// <summary>
-    /// 获取X轴像素的长度单位
-    /// </summary>
-    IUTLength LengthPixelX
-        => IUTLength.Create("X轴像素",
-        x => IUTLength.Inches.ToMetric(x / DPIX),
-        x => IUTLength.Inches.FromMetric(x) * DPIX);
-    #endregion
-    #region Y轴像素
-    /// <summary>
-    /// 获取Y轴像素的长度单位
-    /// </summary>
-    IUTLength LengthPixelY
-        => IUTLength.Create("Y轴像素",
-        x => IUTLength.Inches.ToMetric(x / DPIY),
-        x => IUTLength.Inches.FromMetric(x) * DPIY);
-    #endregion
-    #endregion
     #region 获取屏幕类型
     /// <summary>
     /// 获取这个屏幕的类型
     /// </summary>
-    ScreenType ScreenType => LogicalResolution.PixelCount.Horizontal switch
+    ScreenType ScreenType => LogicalResolution.Width switch
     {
         >= 1224 => ScreenType.PC,
         >= 667 => ScreenType.Tablet,

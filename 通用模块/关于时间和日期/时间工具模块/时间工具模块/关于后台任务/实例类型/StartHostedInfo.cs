@@ -11,20 +11,11 @@ public sealed record StartHostedInfo
     /// </summary>
     public required Timer Timer { get; init; }
     #endregion
-    #region 定时器到期后触发的委托
+    #region 服务提供者对象
     /// <summary>
-    /// 定时器到期后触发的委托，
-    /// 它的一个参数是服务提供对象，
-    /// 第二个参数是用于取消这个后台任务的令牌
+    /// 获取服务提供者对象
     /// </summary>
-    public required Func<IServiceProvider, CancellationToken, Task> Expire { get; init; }
-    #endregion
-    #region 用来配置主机的委托
-    /// <summary>
-    /// 用于配置后台服务主机的委托，
-    /// 返回值是这个主机是否应该启动，返回<see langword="false"/>可以在开发阶段跳过主机启动
-    /// </summary>
-    public required Func<IHostApplicationBuilder, bool> Configuration { get; init; }
+    public required IServiceProvider ServiceProvider { get; init; }
     #endregion
     #region 获取是否在出现异常的情况下立即退出
     /// <summary>
@@ -32,6 +23,6 @@ public sealed record StartHostedInfo
     /// 在发生异常的时候，会立即退出整个主机，
     /// 否则只会忽略异常，等待下一个循环
     /// </summary>
-    public required bool ExitImmediately { get; init; }
+    public bool ExitImmediately { get; init; }
     #endregion
 }

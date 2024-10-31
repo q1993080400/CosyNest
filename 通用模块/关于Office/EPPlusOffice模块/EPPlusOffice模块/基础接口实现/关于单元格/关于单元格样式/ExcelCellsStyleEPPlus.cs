@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using System.Media.Drawing;
+using System.Media;
 
 using OfficeOpenXml.Style;
 
@@ -22,7 +22,7 @@ sealed class ExcelCellsStyleEPPlus(ExcelCellsEPPlus cell) : IRangeStyle
         {
             var fill = Style.Fill;
             return fill.PatternType is ExcelFillStyle.Solid ?
-                CreateDrawingObj.Color(fill.BackgroundColor.Rgb) : null;
+                CreateMedia.Color(fill.BackgroundColor.Rgb) : null;
         }
         set
         {

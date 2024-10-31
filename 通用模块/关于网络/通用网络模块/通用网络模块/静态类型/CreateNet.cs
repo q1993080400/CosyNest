@@ -1,5 +1,4 @@
 ﻿using System.NetFrancis.Http;
-using System.Text.Json;
 
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,45 +10,8 @@ namespace System.NetFrancis;
 /// </summary>
 public static class CreateNet
 {
-    #region 返回公用的IHttpClient对象
-    private static IServiceProvider ServiceProvider { get; }
-
-    /// <summary>
-    /// 返回一个公用的<see cref="IHttpClient"/>对象，
-    /// 它在内部通过<see cref="IHttpClientFactory"/>进行池化，可以放心使用
-    /// </summary>
-    public static IHttpClient HttpClientShared
-        => ServiceProvider.GetRequiredService<IHttpClientFactory>().ToHttpClient();
-    #endregion
-    #region 创建IObjectHeaderValue
-    #region 直接封装Json文本
-    /// <summary>
-    /// 创建一个<see cref="IObjectHeaderValue"/>，
-    /// 它在Http标头中封装了一个Json文本
-    /// </summary>
-    /// <param name="json">要封装的Json文本</param>
-    /// <returns></returns>
-    public static IObjectHeaderValue ObjectHeaderValue(string json)
-        => new ObjectHeaderValue(json);
-    #endregion
-    #region 封装对象
-    /// <summary>
-    /// 创建一个<see cref="IObjectHeaderValue"/>，
-    /// 它将对象序列化为Json，并封装到Http标头中
-    /// </summary>
-    /// <typeparam name="Obj">要封装的对象类型</typeparam>
-    /// <param name="obj">要封装的对象</param>
-    /// <param name="options">用于序列化的配置选项</param>
-    /// <returns></returns>
-    public static IObjectHeaderValue ObjectHeaderValue<Obj>(Obj obj, JsonSerializerOptions? options = null)
-    {
-        var json = JsonSerializer.Serialize(obj, options);
-        return ObjectHeaderValue(json);
-    }
-    #endregion 
-    #endregion
     #region 有关创建ISignalRProvide
-    #region 正式方法
+    #region 创建ISignalRProvide
     /// <summary>
     /// 创建一个<see cref="ISignalRProvide"/>，
     /// 它可以用来提供SignalR连接
@@ -63,7 +25,7 @@ public static class CreateNet
             return Task.FromResult<IHubConnectionBuilder>(builder);
         }, toAbs ??= x => x);
     #endregion
-    #region 辅助方法：配置IHubConnectionBuilder
+    #region 配置IHubConnectionBuilder的默认方法
     /// <summary>
     /// 对一个<see cref="IHubConnectionBuilder"/>进行基本配置
     /// </summary>
@@ -118,13 +80,5 @@ public static class CreateNet
             };
         };
     #endregion
-    #endregion
-    #region 静态构造函数
-    static CreateNet()
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddHttpClient();
-        ServiceProvider = serviceCollection.BuildServiceProvider();
-    }
     #endregion
 }

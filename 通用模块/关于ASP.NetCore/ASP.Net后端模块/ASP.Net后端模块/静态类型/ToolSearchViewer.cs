@@ -27,7 +27,7 @@ public static class ToolSearchViewer
             return renderConditionGroup ?? throw new NullReferenceException("获取到的缓存为null");
         var typeAttribute = entityType.GetCustomAttributes<FilterConditionAttribute<BusinessInterface>>().
             Select(x => x.ConvertConditioGroup(entityType));
-        var almightyPropertys = entityType.GetTypeData().AlmightyPropertys;
+        var almightyPropertys = entityType.GetPropertyInfoAlmighty();
         var propertyAttribute = almightyPropertys.Select(x =>
         {
             var attributes = x.GetCustomAttributes<FilterConditionAttribute<BusinessInterface>>();

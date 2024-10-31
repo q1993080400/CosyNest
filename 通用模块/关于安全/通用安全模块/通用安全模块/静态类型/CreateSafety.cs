@@ -12,16 +12,7 @@ namespace System.SafetyFrancis;
 /// </summary>
 public static class CreateSafety
 {
-    #region 辅助方法：将字符串编码为UTF8
-    /// <summary>
-    /// 将字符串编码为UTF8，
-    /// 并返回读取编码结果的管道
-    /// </summary>
-    /// <param name="text">待编码的字符串</param>
-    /// <returns></returns>
-    private static IBitRead Coding(string text)
-        => Encoding.UTF8.GetBytes(text).ToBitRead();
-    #endregion
+    #region 公开成员
     #region 创建IIdentity
     /// <summary>
     /// 使用指定的验证类型，用户名和声明创建<see cref="IIdentity"/>对象
@@ -136,116 +127,17 @@ public static class CreateSafety
     #endregion
     #endregion
     #endregion
-    #region 创建非对称加密管道
-    #region 使用RSA
-    /// <summary>
-    /// 使用RSA非对称算法创建一个<see cref="BitMapping"/>
-    /// </summary>
-    /// <returns>该管道可以使用RSA加密或解密数据</returns>
-    /// <inheritdoc cref="RSAPack(string)"/>
-    public static BitMapping RSA(string key)
-        => new RSAPack(key).Convert;
     #endregion
-    #endregion
-    #region 关于对称加密管道
-    #region 创建向量和密钥
-    #region 字节数组形式
+    #region 内部成员
+    #region 辅助方法：将字符串编码为UTF8
     /// <summary>
-    /// 创建一个AES加密算法的向量和密钥
+    /// 将字符串编码为UTF8，
+    /// 并返回读取编码结果的管道
     /// </summary>
+    /// <param name="text">待编码的字符串</param>
     /// <returns></returns>
-    public static (byte[] IV, byte[] Key) AesKey()
-    {
-        using var aes = Aes.Create();
-        return (aes.IV, aes.Key);
-    }
-    #endregion
-    #region 字符串形式
-    /// <param name="encoded">用来将字节数组形式的向量和密钥，
-    /// 转换为字符串形式的委托，如果为<see langword="null"/>，使用Base64转换</param>
-    /// <inheritdoc cref="AesKey"/>
-    public static (string IV, string Key) AesKeyText(Func<byte[], string>? encoded = null)
-    {
-        var (iv, key) = AesKey();
-        encoded ??= Convert.ToBase64String;
-        return (encoded(iv), encoded(key));
-    }
-    #endregion
-    #endregion
-    #region 创建对称加密算法工厂
-    #region 使用字节数组
-    /// <summary>
-    /// 创建对称加密算法工厂，
-    /// 它可以用来返回具备相同IV和Key参数的对称算法对象
-    /// </summary>
-    /// <param name="iv">初始化向量</param>
-    /// <param name="key">密钥</param>
-    /// <returns></returns>
-    public static Func<SymmetricAlgorithm> AlgorithmFactory(byte[] iv, byte[] key)
-        => () =>
-        {
-            var algorithm = Aes.Create();
-            algorithm.IV = iv;
-            algorithm.Key = key;
-            return algorithm;
-        };
-    #endregion
-    #region 使用字符串
-    /// <param name="encoding">一个用来将字符串转换为字节数组的函数，
-    /// 如果为<see langword="null"/>，默认使用Base64转换</param>
-    /// <inheritdoc cref="AlgorithmFactory(byte[], byte[])"/>
-    public static Func<SymmetricAlgorithm> AlgorithmFactory(string iv, string key, Func<string, byte[]>? encoding = null)
-    {
-        encoding ??= Convert.FromBase64String;
-        return AlgorithmFactory(encoding(iv), encoding(key));
-    }
-    #endregion
-    #endregion
-    #region 创建转换字节数组的管道
-    /// <summary>
-    /// 创建一个通过对称算法，
-    /// 加密或解密字节数组的双向管道
-    /// </summary>
-    /// <param name="algorithmFactory">对称加密算法的工厂，
-    /// 本函数的功能依赖于它的返回值，为正确使用本函数，
-    /// 它返回的<see cref="Security.Cryptography.SymmetricAlgorithm"/>的IV和Key必须相同</param>
-    /// <returns></returns>
-    public static Cryptography SymmetricAlgorithm(Func<SymmetricAlgorithm> algorithmFactory)
-    {
-        #region 加密本地函数
-        IBitRead Encryption(IBitRead x) => new SymmetricAlgorithmPipe()
-        {
-            AlgorithmFactory = algorithmFactory,
-            IsEncryptor = true,
-            Source = x
-        };
-        #endregion
-        #region 解密本地函数
-        IBitRead Decrypt(IBitRead x) => new SymmetricAlgorithmPipe()
-        {
-            AlgorithmFactory = algorithmFactory,
-            IsEncryptor = false,
-            Source = x
-        };
-        #endregion
-        return new Cryptography(Encryption, Decrypt);
-    }
-    #endregion
-    #region 创建转换字符串的管道
-    /// <summary>
-    /// 创建一个通过对称算法，
-    /// 加密或解密字符串的双向管道，
-    /// 字符串使用Base64编码
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="SymmetricAlgorithm(Func{SymmetricAlgorithm})"/>
-    public static (Func<string, Task<string>> Encryption, Func<string, Task<string>> Decrypt) SymmetricAlgorithmText
-        (Func<SymmetricAlgorithm> algorithmFactory)
-    {
-        var (encryption, decrypt) = SymmetricAlgorithm(algorithmFactory);
-        return (encryption.ConvertText(),
-            decrypt.ConvertText(Convert.FromBase64String, Encoding.UTF8.GetString));
-    }
+    private static IBitRead Coding(string text)
+        => Encoding.UTF8.GetBytes(text).ToBitRead();
     #endregion
     #endregion
 }

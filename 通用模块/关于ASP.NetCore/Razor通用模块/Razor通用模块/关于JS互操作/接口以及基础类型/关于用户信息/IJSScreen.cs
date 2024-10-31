@@ -18,6 +18,6 @@ public interface IJSScreen : IScreen
     /// <summary>
     /// 返回本设备的设备像素比
     /// </summary>
-    Num DevicePixelRatio { get; }
+    double DevicePixelRatio { get; }
     #endregion
 }

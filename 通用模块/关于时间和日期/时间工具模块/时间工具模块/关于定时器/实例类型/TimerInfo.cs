@@ -14,11 +14,13 @@ public sealed record TimerInfo
     /// </summary>
     public required Task<bool> Wait { get; init; }
     #endregion
-    #region 定时器下一次触发的日期
+    #region 定时器下一次触发的状态
     /// <summary>
-    /// 获取定时器下一次触发的日期，
-    /// 如果不会有下一次，则返回<see langword="null"/>
+    /// 返回一个元组，
+    /// 它的第一个项指示是否存在下一次触发，
+    /// 第二个项指示如果存在下一次触发，
+    /// 而且时间确定，则返回下一次触发的时间
     /// </summary>
-    public required DateTimeOffset? Next { get; init; }
+    public required (NextTimeState State, DateTimeOffset NextDate) NextTimeState { get; init; }
     #endregion
 }

@@ -44,6 +44,21 @@ public static partial class ExtendReflection
         return canRead && canWrite ? null : canRead;
     }
     #endregion
+    #region 返回属性是否为Init
+    /// <summary>
+    /// 返回属性是否为Init，
+    /// 如果属性不可写，则返回<see langword="false"/>
+    /// </summary>
+    /// <param name="property">待判断的属性</param>
+    /// <returns></returns>
+    public static bool IsInitOnly(this PropertyInfo property)
+    {
+        if (property.SetMethod is not { } setMethod)
+            return false;
+        var customModifiers = setMethod.ReturnParameter.GetRequiredCustomModifiers();
+        return customModifiers.Contains(typeof(IsExternalInit));
+    }
+    #endregion
     #region 返回属性的访问修饰符
     /// <summary>
     /// 获取一个属性读写访问器的访问修饰符，
@@ -101,29 +116,8 @@ public static partial class ExtendReflection
         => property.GetPermissions() is null &&
         property.IsPublic() &&
         !property.IsStatic() &&
-        !property.IsIndexing() &&
-        property.BackingField() is not { IsInitOnly: true };
-    #endregion
-    #region 获取自动属性的背景字段
-    /// <summary>
-    /// 获取自动属性的背景字段，
-    /// 如果该属性不是自动属性，则返回<see langword="null"/>
-    /// </summary>
-    /// <param name="property">要获取背景字段的自动属性</param>
-    /// <returns></returns>
-    /// <exception cref="NullReferenceException"><paramref name="property"/>是全局成员，它没有所属类型</exception>
-    /// <exception cref="NotSupportedException">由于派生类隐藏基类的字段，找到了多个字段，无法判断谁是该属性的背景字段</exception>
-    public static FieldInfo? BackingField(this PropertyInfo property)
-    {
-        var type = property.DeclaringType ?? throw new NullReferenceException($"{property}是全局成员，它没有所属类型");
-        var fields = type.GetTypeData().FieldDictionary[$"<{property.Name}>k__BackingField"].ToArray();
-        return fields.Length switch
-        {
-            1 => fields[0],
-            0 => null,
-            _ => throw new NotSupportedException($"由于派生类隐藏基类的字段，找到了多个字段，无法判断谁是该属性的背景字段")
-        };
-    }
+        !property.IsInitOnly() &&
+        !property.IsIndexing();
     #endregion
     #region 返回属性的可为空信息
     /// <summary>
@@ -135,7 +129,6 @@ public static partial class ExtendReflection
         => new NullabilityInfoContext().Create(property);
     #endregion
     #endregion
-    #region 关于属性的值
     #region 返回一个属性的值
     /// <summary>
     /// 通过Get访问器，返回一个属性的值，如果属性不可读，直接报错
@@ -148,45 +141,28 @@ public static partial class ExtendReflection
     public static Ret GetValue<Ret>(this PropertyInfo property, object? source = null, params object[] parameters)
         => (Ret)property.GetValue(source, parameters)!;
     #endregion
-    #region 打包属性的Get和Set访问器
+    #region 递归获取属性
     /// <summary>
-    /// 打包一个属性的Get访问器和Set访问器，并作为委托返回，
-    /// 如果属性不可读或不可写，则对应的访问器返回<see langword="null"/>
+    /// 递归获取类型的属性，
+    /// 如果该类型是一个接口，
+    /// 它可以保证接口能够正常获取基接口的所有属性
     /// </summary>
-    /// <typeparam name="Obj">属性所依附的对象类型</typeparam>
-    /// <typeparam name="Pro">属性本身的类型</typeparam>
-    /// <param name="property">要打包的属性</param>
     /// <returns></returns>
-    public static (Func<Obj, Pro>? Get, Action<Obj, Pro>? Set) GetGS<Obj, Pro>(this PropertyInfo property)
-    {
-        var get = property.GetMethod?.CreateDelegate<Func<Obj, Pro>>();
-        var set = property.SetMethod?.CreateDelegate<Action<Obj, Pro>>();
-        return (get, set);
-    }
+    /// <inheritdoc cref="GetMemberInfoRecursion{Member}(Type, Func{Type, BindingFlags, Member[]}, BindingFlags)"/>
+    public static PropertyInfo[] GetPropertyInfoRecursion(this Type type, BindingFlags bindingFlags = CreateReflection.BindingFlagsAll)
+        => type.GetMemberInfoRecursion((type, bindingFlags) => type.GetProperties(bindingFlags), bindingFlags);
     #endregion
-    #region 复制属性的值
+    #region 获取所有全能属性
     /// <summary>
-    /// 将一个对象属性的值复制到另一个对象
+    /// 获取一个类型中的所有全能属性，
+    /// 全能属性指的是可读，可写，公开，且非静态，非索引器的属性，
+    /// 注意：init属性不是全能属性
     /// </summary>
-    /// <param name="property">待复制的属性</param>
-    /// <param name="source">复制的源对象</param>
-    /// <param name="target">复制的目标</param>
-    public static void Copy(this PropertyInfo property, object? source, object? target)
-        => property.SetValue(target, property.GetValue(source));
-    #endregion
-    #endregion
-    #region 获取虚属性的定义
-    /// <summary>
-    /// 如果一个属性是重写后的虚属性，
-    /// 则返回它的定义，否则返回它自己
-    /// </summary>
-    /// <param name="property">待检查的属性</param>
+    /// <param name="type">要获取全能属性的类型</param>
     /// <returns></returns>
-    public static PropertyInfo GetBaseDefinition(this PropertyInfo property)
-    {
-        var baseType = property.GetAccessors().First().GetBaseDefinition().DeclaringType!;
-        return baseType.GetTypeData().PropertyDictionary[property.Name].Single();
-    }
+    public static PropertyInfo[] GetPropertyInfoAlmighty(this Type type)
+        => type.GetPropertyInfoRecursion(BindingFlags.Public | BindingFlags.Instance).
+        Where(x => x.CanRead && x.CanWrite && !x.IsInitOnly() && !x.IsIndexing()).ToArray();
     #endregion
     #endregion
     #region 关于成员
@@ -256,10 +232,37 @@ public static partial class ExtendReflection
     /// </summary>
     /// <typeparam name="Attribute">要检查的特性</typeparam>
     /// <param name="member">要检查的成员</param>
+    /// <param name="inherit">如果要搜索此成员的继承链以查找属性，
+    /// 则为<see langword="true"/>，否则为<see langword="false"/>，
+    /// 会忽略属性和事件的此参数</param>
     /// <returns></returns>
-    public static bool HasAttributes<Attribute>(this MemberInfo member)
+    public static bool IsDefined<Attribute>(this MemberInfo member, bool inherit = true)
         where Attribute : System.Attribute
-        => member.GetCustomAttribute<Attribute>() is { };
+        => member.IsDefined(typeof(Attribute), inherit);
+    #endregion
+    #region 递归获取类型成员
+    /// <summary>
+    /// 递归获取类型的成员，
+    /// 如果该类型是一个接口，
+    /// 它可以保证接口能够正常获取基接口的所有成员
+    /// </summary>
+    /// <typeparam name="Member">类型成员的类型</typeparam>
+    /// <param name="type">要获取成员的类型</param>
+    /// <param name="getMember">用来获取成员的委托</param>
+    /// <param name="bindingFlags">用来搜索成员的条件</param>
+    /// <returns></returns>
+    private static Member[] GetMemberInfoRecursion<Member>(this Type type, Func<Type, BindingFlags, Member[]> getMember, BindingFlags bindingFlags)
+        where Member : MemberInfo
+    {
+        var members = getMember(type, bindingFlags);
+        if (!type.IsInterface)
+            return members;
+        foreach (var @base in type.GetInterfaces())
+        {
+            members = [.. members, .. @base.GetMemberInfoRecursion(getMember, bindingFlags)];
+        }
+        return members;
+    }
     #endregion
     #endregion
 }

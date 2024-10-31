@@ -14,14 +14,8 @@ namespace System.DingDing;
 /// <param name="serviceProvider">用来请求服务的对象</param>
 public abstract class DingDingWebApi
     (IServiceProvider serviceProvider) :
-    WebApi(serviceProvider.GetRequiredService<IHttpClient>)
+    WebApi(serviceProvider)
 {
-    #region 用来请求服务的对象
-    /// <summary>
-    /// 获取一个用来请求服务的对象
-    /// </summary>
-    protected IServiceProvider ServiceProvider { get; } = serviceProvider;
-    #endregion
     #region 获取用户Token
     /// <summary>
     /// 返回真正可用于身份验证的Token，
@@ -34,7 +28,7 @@ public abstract class DingDingWebApi
         var dataProtector = GetDataProtection();
         var newAuthenticationRequest = authenticationRequest.Decryption(dataProtector);
         var configuration = ServiceProvider.GetRequiredService<DingDingConfiguration>();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         object httpParameter = newAuthenticationRequest switch
         {
             { IsToken: true, RefreshToken: { } refreshToken } =>
@@ -91,7 +85,7 @@ public abstract class DingDingWebApi
     protected async Task<string> GetCompanyToken()
     {
         var configuration = ServiceProvider.GetRequiredService<DingDingConfiguration>();
-        var http = ServiceProvider.GetRequiredService<IHttpClient>();
+        var http = HttpClient;
         var info = new
         {
             appKey = configuration.ClientID,

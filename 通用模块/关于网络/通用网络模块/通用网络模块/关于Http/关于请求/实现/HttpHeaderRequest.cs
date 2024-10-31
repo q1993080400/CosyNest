@@ -13,8 +13,8 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
     #region 获取身份验证标头
     public AuthenticationHeaderValue? Authorization
     {
-        get => GetHeader("Authorization", v => AuthenticationHeaderValue.Parse(v.Join(" ")));
-        init => SetHeader("Authorization", value, v => v.ToString().Split(' '));
+        get => GetHeader("Authorization", v => AuthenticationHeaderValue.Parse(v.Single()));
+        init => SetHeader("Authorization", value, v => [v.ToString()]);
     }
     #endregion
     #region Cookie标头
@@ -27,8 +27,8 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
     #region User-Agent标头
     public string? UserAgent
     {
-        get => GetHeader("User-Agent", v => v.Join(" "));
-        init => SetHeader("User-Agent", value, v => v.Split(";"));
+        get => GetHeader("User-Agent", v => v.Single());
+        init => SetHeader("User-Agent", value, v => [v]);
     }
 
     /*警告：

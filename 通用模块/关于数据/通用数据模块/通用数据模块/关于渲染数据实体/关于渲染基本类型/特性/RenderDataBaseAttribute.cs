@@ -19,11 +19,10 @@ public abstract class RenderDataBaseAttribute : Attribute
     /// </summary>
     public int Order { get; init; }
     #endregion
-    #region 是否仅显示
+    #region 指示如何判断属性是否可以编辑
     /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示仅提供数据显示功能，不提供数据编辑功能
+    /// 指示如何判断这个属性是否可以编辑
     /// </summary>
-    public bool IsReadOnly { get; init; } = true;
+    public CanEditMod CanEditMod { get; init; }
     #endregion
 }

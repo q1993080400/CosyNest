@@ -7,13 +7,14 @@ public static class CreateRazor
 {
     #region 关于不会刷新的EventCallback
     #region 创建IHandleEvent
+    #region 正式方法
     /// <summary>
     /// 返回一个<see cref="IHandleEvent"/>，
     /// 与默认实现不同的是，它不会刷新组件，
     /// 在某些情况下，使用它可以提高性能
     /// </summary>
     public static IHandleEvent HandleEventInvalid { get; }
-        = new HandleEventInvalid();
+        = new HandleEventInvalidRealize();
 
     /*问：如何使用这个类型来提高性能？
       答：举例说明，假设你需要一个这样的功能：
@@ -29,6 +30,20 @@ public static class CreateRazor
     
       这样一来，onclick执行完毕后，不会刷新整个界面，
       你可以在M中手动调用StateHasChanged来仅刷新菜单*/
+    #endregion
+    #region 内部类型：IHandleEvent的实现
+    /// <summary>
+    /// 本类型是<see cref="IHandleEvent"/>的实现，
+    /// 它不会刷新组件，在某些时候使用本类型可以提高性能
+    /// </summary>
+    private sealed class HandleEventInvalidRealize : IHandleEvent
+    {
+        #region 通知组件需要刷新
+        public Task HandleEventAsync(EventCallbackWorkItem item, object? arg)
+            => item.InvokeAsync(arg);
+        #endregion
+    }
+    #endregion
     #endregion
     #region 创建不会刷新的EventCallback
     #region 非泛型版本
@@ -64,18 +79,5 @@ public static class CreateRazor
     /// <inheritdoc cref="ElementNumber.ElementNumber(IJSRuntime, string?, string?)"/>
     public static IElementNumber ElementNumber(IJSRuntime js, string? prefix = null, string? scrollingContextCSS = null)
         => new ElementNumber(js, prefix ?? CreateASP.JSObjectName(), scrollingContextCSS);
-    #endregion
-    #region 创建UploadTaskFactory
-    /// <summary>
-    /// 创建一个上传任务工厂
-    /// </summary>
-    /// <param name="serviceProvider">服务提供者对象</param>
-    /// <param name="uploadTaskFactoryInfo">用来上传的参数</param>
-    /// <returns></returns>
-    public static UploadTaskFactory<decimal> UploadTaskFactory(IServiceProvider serviceProvider, UploadTaskFactoryInfo uploadTaskFactoryInfo)
-    {
-        var uploadTaskFactory = new UploadTaskFactory(serviceProvider, uploadTaskFactoryInfo);
-        return uploadTaskFactory.CreateUploadTask;
-    }
     #endregion
 }

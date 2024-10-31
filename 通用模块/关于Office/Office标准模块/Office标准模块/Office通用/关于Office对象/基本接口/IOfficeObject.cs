@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 
 namespace System.Office;
 
@@ -12,14 +12,14 @@ public interface IOfficeObject
     /// <summary>
     /// 获取这个对象左上角的坐标
     /// </summary>
-    IPoint Pos { get; set; }
+    IPoint<double> Pos { get; set; }
     #endregion
     #region 对象的大小
     /// <summary>
     /// 获取对象的大小，
     /// 注意：为符合Office的习惯，单位是厘米
     /// </summary>
-    ISize Size { get; set; }
+    ISize<double> Size { get; set; }
     #endregion
     #region 是否置于文字的顶层
     /// <summary>

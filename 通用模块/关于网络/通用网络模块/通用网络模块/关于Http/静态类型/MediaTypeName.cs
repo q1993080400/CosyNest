@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-
-namespace System.NetFrancis;
+﻿namespace System.NetFrancis;
 
 /// <summary>
 /// 这个静态类枚举HTTP协议的媒体类型的名称
@@ -32,32 +30,6 @@ public static class MediaTypeName
     /// 返回二进制类型的文件数据
     /// </summary>
     public const string Stream = "application/octet-stream";
-    #endregion
-    #region 媒体类型
-    #region 创建媒体类型
-    /// <summary>
-    /// 根据扩展名，创建视频或者音频的媒体类型
-    /// </summary>
-    /// <param name="extensions">扩展名，不带点号</param>
-    /// <returns></returns>
-    public static string CreateMediumType(string extensions)
-    {
-        var small = extensions.ToLower();
-        var prefix = small switch
-        {
-            var s when FileTypeCom.WebVideo.IsCompatible(s) => "video",
-            var s when FileTypeCom.WebAudio.IsCompatible(s) => "audio",
-            var s => throw new NotSupportedException($"{s}不是一个已知的视频或者音频文件")
-        };
-        return prefix + "/" + small;
-    }
-    #endregion
-    #region M3U8格式
-    /// <summary>
-    /// 获取M3U8格式的媒体类型
-    /// </summary>
-    public const string MediumM3U8 = "application/x-mpegURL";
-    #endregion
     #endregion
     #region 其他类型
     #region 表单类型

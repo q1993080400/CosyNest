@@ -13,7 +13,7 @@ public static class ExtendTime
     /// </summary>
     /// <param name="date">要返回日期的<see cref="DateTimeOffset"/></param>
     /// <returns></returns>
-    public static DateTimeOffset ToDate(this DateTimeOffset date)
+    public static DateTimeOffset Today(this DateTimeOffset date)
         => date - date.TimeOfDay;
     #endregion
     #region 返回TimeOnly
@@ -28,8 +28,9 @@ public static class ExtendTime
         return time;
     }
     #endregion
-    #region 返回日期部分
+    #region 返回DateOnly
     /// <summary>
+    /// 以<see cref="System.DateOnly"/>的形式，
     /// 返回一个<see cref="DateTimeOffset"/>的日期部分
     /// </summary>
     /// <param name="dateTimeOffset">待返回日期部分的<see cref="DateTimeOffset"/></param>
@@ -42,31 +43,6 @@ public static class ExtendTime
     #endregion
     #endregion
     #region 关于TimeSpan
-    #region 对TimSpan进行取余运算
-    #region 传入任意数字
-    /// <summary>
-    /// 对一个<see cref="TimeSpan"/>进行取余运算
-    /// </summary>
-    /// <param name="divided">取余的被除数</param>
-    /// <param name="divisor">取余的除数</param>
-    /// <returns>取余运算之后的结果</returns>
-    public static TimeSpan Modulus(this TimeSpan divided, Num divisor)
-    {
-        Num ticks = divided.Ticks;
-        return TimeSpan.FromTicks(ticks % divisor);
-    }
-    #endregion
-    #region 传入另一个TimeSpan
-    /// <summary>
-    /// 对一个<see cref="TimeSpan"/>进行取余运算
-    /// </summary>
-    /// <param name="divided">取余的被除数</param>
-    /// <param name="divisor">取余的除数</param>
-    /// <returns>取余运算之后的结果</returns>
-    public static TimeSpan Modulus(this TimeSpan divided, TimeSpan divisor)
-        => divided.Modulus(divisor.Ticks);
-    #endregion
-    #endregion
     #region 格式化TimeSpan
     /// <summary>
     /// 将时间间隔格式化为常用格式

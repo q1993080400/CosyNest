@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 using System.Office.Excel.Realize;
 
 namespace System.Office.Excel;
@@ -126,7 +126,7 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
     /// <summary>
     /// 返回数学地址，也就是代表单元格的平面
     /// </summary>
-    ISizePosPixel AddressMath
+    ISizePos<int> AddressMath
     {
         get
         {
@@ -246,29 +246,6 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
     /*实现本API请遵循以下规范：
       如果本单元格没有合并，但是位于一个合并单元格的内部，
       即便该单元格完全将它包括进来，这个属性仍然应该返回false*/
-    #endregion
-    #region 变换单元格
-    #region 复杂方法
-    /// <summary>
-    /// 改变单元格的位置和大小，
-    /// 并返回一个新的单元格
-    /// </summary>
-    /// <param name="transform">该委托的参数是当前单元格范围，返回值是新单元格范围</param>
-    /// <returns></returns>
-    IExcelCells Transform(Func<ISizePosPixel, ISizePosPixel> transform)
-        => Sheet[transform(AddressMath)];
-    #endregion
-    #region 简单方法
-    /// <summary>
-    /// 将单元格偏移指定的位置，
-    /// 并返回一个新的单元格
-    /// </summary>
-    /// <param name="offsetRow">偏移的行数</param>
-    /// <param name="offsetColumns">偏移的列数</param>
-    /// <returns></returns>
-    IExcelCells Transform(int offsetRow = 0, int offsetColumns = 0)
-        => Transform(x => x.Transform(offsetRight: offsetColumns, offsetTop: -offsetRow));
-    #endregion
     #endregion
     #endregion
 }

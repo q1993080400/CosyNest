@@ -1,8 +1,7 @@
-﻿using System.IOFrancis.Bit;
-using System.Net.Http.Json;
+﻿using System.Design;
 using System.Design.Direct;
+using System.Net.Http.Json;
 using System.Text.Json;
-using System.Design;
 
 namespace System.NetFrancis.Http;
 
@@ -49,10 +48,10 @@ public interface IHttpClient
     /// <inheritdoc cref="RequestJsonPost{Obj}(string, Obj, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?, CancellationToken)"/>
     async Task<IDirect> RequestJson(HttpRequestRecording request, HttpRequestTransform? transformation = null, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
+        options ??= CreateDesign.JsonCommonOptions(JsonSerializerDefaults.Web);
         using var response = await Request(request, transformation, cancellationToken);
-        var newOptions = options.CanConverter(typeof(IDirect)) ?
-           options : CreateDesign.JsonCommonOptions(JsonSerializerDefaults.Web);
-        return await response.Content.ReadFromJsonAsync<IDirect>(newOptions, cancellationToken) ?? CreateDesign.DirectEmpty();
+        return await response.Content.ReadFromJsonAsync<IDirect>(options, cancellationToken) ??
+            CreateDesign.DirectEmpty();
     }
     #endregion
     #region 发起Get请求，并返回Json对象
@@ -90,15 +89,18 @@ public interface IHttpClient
         return await RequestJson(requestRecording, transformation, options, cancellationToken);
     }
     #endregion
-    #region 返回IBitRead
+    #region 返回Stream
     /// <summary>
-    /// 发起Http请求，并以二进制管道的形式返回，
+    /// 发起Http请求，并以二进制流的形式返回，
     /// 它可以用于下载
     /// </summary>
+    /// <param name="simulateBrowser">如果这个值为<see langword="true"/>，
+    /// 则函数会改变请求中的User-Agent标头，将自身模拟为一个浏览器，
+    /// 在某些情况下，它可以用来绕过某些下载限制</param>
     /// <returns></returns>
     /// <inheritdoc cref="Request(HttpRequestRecording, HttpRequestTransform?, CancellationToken)"/>
     /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?,CancellationToken)"/>
-    Task<IBitRead> RequestBitRead(string uri, CancellationToken cancellationToken = default);
+    Task<Stream> RequestStream(string uri, bool simulateBrowser = false, CancellationToken cancellationToken = default);
     #endregion
     #region 强类型Http请求
     /// <summary>

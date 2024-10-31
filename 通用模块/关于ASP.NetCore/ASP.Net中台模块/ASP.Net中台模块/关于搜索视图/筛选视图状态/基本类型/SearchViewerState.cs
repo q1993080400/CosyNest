@@ -155,14 +155,59 @@ public sealed class SearchViewerState
     /// <summary>
     /// 清除所有查询或排序条件
     /// </summary>
-    /// <param name="clearQuery">如果这个值为<see langword="true"/>，则清除查询条件</param>
-    /// <param name="clearSort">如果这个值为<see langword="true"/>，则清除排序条件</param>
-    public void Clear(bool clearQuery = true, bool clearSort = true)
+    /// <param name="renderFilterGroup">如果这个值不为<see langword="null"/>，
+    /// 则在清除条件之后，还会重新初始化默认值</param>
+    public void Clear(IEnumerable<RenderFilterGroup>? renderFilterGroup = null)
     {
-        if (clearQuery)
-            QueryCondition = QueryCondition.Clear();
-        if (clearSort)
-            SortCondition = SortCondition.Clear();
+        QueryCondition = QueryCondition.Clear();
+        SortCondition = SortCondition.Clear();
+        if (renderFilterGroup is { })
+            InitializeDefaultValue(renderFilterGroup);
+    }
+    #endregion
+    #region 初始化默认值
+    /// <summary>
+    /// 如果有默认值，则初始化这些默认值
+    /// </summary>
+    /// <param name="renderFilterGroup">所有渲染筛选条件，
+    /// 函数会寻找它们当中具有默认值的筛选条件，并初始化这些默认值</param>
+    public void InitializeDefaultValue(IEnumerable<RenderFilterGroup> renderFilterGroup)
+    {
+        var hasDefaultValue = renderFilterGroup.Where(x => x.HasDefaultValue).ToArray();
+        var identifying = QueryCondition.Values.Select(x => x.GenerateFilter()).
+            SelectMany(x => x).
+            WhereNotNull().
+            Select(x => x.Identification).ToHashSet();
+        foreach (var item in hasDefaultValue)
+        {
+            if (identifying.Contains(item.Identification))
+                continue;
+            var filterQuery = item.RenderFilterQuery;
+            #region 本地函数
+            void Bind<Property>()
+                => this.Bind<Property>(filterQuery);
+            #endregion
+            switch (filterQuery.FilterTarget.FilterObjectType)
+            {
+                case FilterObjectType.Bool:
+                    Bind<bool>();
+                    break;
+                case FilterObjectType.Text:
+                    Bind<string>();
+                    break;
+                case FilterObjectType.Num:
+                    Bind<double?>();
+                    break;
+                case FilterObjectType.Date:
+                    Bind<DateTimeOffset?>();
+                    break;
+                case FilterObjectType.Enum:
+                    Bind<string?>();
+                    break;
+                case var filterObjectType:
+                    throw new NotSupportedException($"不能识别筛选对象类型{filterObjectType}");
+            }
+        }
     }
     #endregion
     #endregion

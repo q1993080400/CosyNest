@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.Numerics;
 
 namespace System.MathFrancis;
 
@@ -7,181 +7,118 @@ namespace System.MathFrancis;
 /// </summary>
 public static class CreateMath
 {
-    #region 创建坐标
     #region 创建IPoint
-    #region 指定水平位置和垂直位置
     /// <summary>
     /// 使用指定的水平位置和垂直位置创建坐标
     /// </summary>
+    /// <typeparam name="Num">用来描述坐标的数字类型</typeparam>
     /// <param name="right">指定的水平位置，这个值越大代表坐标越靠近右边</param>
     /// <param name="top">指定的垂直位置，这个值越大代表坐标越靠近顶部</param>
-    public static IPoint Point(Num right, Num top)
-        => new Point(right, top);
-    #endregion
-    #region 指定元组
-    /// <summary>
-    /// 使用指定的位置创建坐标
-    /// </summary>
-    /// <param name="pos">这个元组封装了坐标的水平位置和垂直位置</param>
-    public static IPoint Point((Num Right, Num Top) pos)
-        => new Point(pos.Right, pos.Top);
-    #endregion
-    #endregion
-    #region 创建IVector
-    #region 指定长度和方向
-    /// <summary>
-    /// 用指定的长度和方向创建向量
-    /// </summary>
-    /// <param name="length">向量的长度</param>
-    /// <param name="direction">向量的方向</param>
-    public static IVector Vector(Num length, IUnit<IUTAngle> direction)
-        => new Vector(length, direction);
-    #endregion
-    #region 指定开始和结束位置
-    /// <summary>
-    /// 使用指定的开始位置和结束位置创建向量
-    /// </summary>
-    /// <param name="begin">开始位置</param>
-    /// <param name="end">结束位置</param>
-    /// <returns></returns>
-    public static IVector Vector(IPoint begin, IPoint end)
-        => end.ToPC(begin);
-    #endregion
-    #endregion
+    public static IPoint<Num> Point<Num>(Num right, Num top)
+        where Num : INumber<Num>
+        => new Point<Num>
+        {
+            Right = right,
+            Top = top,
+        };
     #endregion
     #region 创建平面
     #region 创建ISize
     #region 传入宽和高
     /// <summary>
-    /// 用指定的宽和高创建<see cref="ISize"/>
+    /// 用指定的宽和高创建<see cref="ISize{Num}"/>
     /// </summary>
+    /// <typeparam name="Num">平面数字的类型</typeparam>
     /// <param name="width">指定的宽</param>
     /// <param name="height">指定的高</param>
-    public static ISize Size(Num width, Num height)
-        => new SizeRealize(width, height);
-    #endregion
-    #region 传入元组
-    /// <summary>
-    /// 使用指定的宽和高创建<see cref="ISize"/>
-    /// </summary>
-    /// <param name="size">这个元组描述二维平面的宽和高</param>
-    public static ISize Size((Num Width, Num Height) size)
-        => new SizeRealize(size.Width, size.Height);
+    public static ISize<Num> Size<Num>(Num width, Num height)
+        where Num : INumber<Num>
+        => new Size<Num>()
+        {
+            Width = width,
+            Height = height
+        };
     #endregion
     #endregion
     #region 创建ISizePos
+    #region 仅限整数
     #region 传入位置和大小
     /// <summary>
-    /// 用指定的位置和大小创建<see cref="ISizePos"/>
+    /// 用指定的位置和大小创建<see cref="ISizePos{Num}"/>
     /// </summary>
-    /// <param name="pos">指定的位置</param>
-    /// <param name="size">指定的大小</param>
-    public static ISizePos SizePos(IPoint pos, ISize size)
-        => SizePos(pos, size.Size.Width, size.Size.Height);
+    /// <typeparam name="Num">用来描述平面的数字类型</typeparam>
+    /// <param name="pos">平面左上角的坐标</param>
+    /// <param name="size">平面的大小</param>
+    /// <returns></returns>
+    public static ISizePos<Num> SizePosInteger<Num>(IPoint<Num> pos, ISize<Num> size)
+        where Num : IBinaryInteger<Num>
+        => new SizePosInteger<Num>()
+        {
+            Position = pos,
+            Size = size
+        };
     #endregion
     #region 传入开始位置和结束位置
     /// <summary>
-    /// 使用指定的开始位置和结束位置创建<see cref="ISizePos"/>，
-    /// 本方法不要求<paramref name="begin"/>在<paramref name="end"/>的左上角
-    /// </summary>
-    /// <param name="begin">开始位置</param>
-    /// <param name="end">结束位置</param>
-    /// <returns></returns>
-    public static ISizePos SizePos(IPoint begin, IPoint end)
-    {
-        var (lx, ly) = begin;
-        var (rx, ry) = end;
-        if (lx > rx)
-            (lx, rx) = (rx, lx);
-        if (ly < ry)
-            (ly, ry) = (ry, ly);
-        return SizePos(Point(lx, ly), rx - lx, ly - ry);
-    }
-    #endregion
-    #region 传入位置，宽度和高度
-    /// <summary>
-    /// 用指定的位置，宽度和高度创建<see cref="ISizePos"/>
-    /// </summary>
-    /// <param name="pos">平面的位置</param>
-    /// <param name="width">平面的宽度</param>
-    /// <param name="height">平面的高度</param>
-    public static ISizePos SizePos(IPoint pos, Num width, Num height)
-        => new SizePos(pos, width, height);
-    #endregion
-    #region 传入垂直位置，水平位置，宽度和高度
-    /// <summary>
-    /// 用指定的垂直位置，水平位置，宽度和高度创建<see cref="ISizePos"/>
-    /// </summary>
-    /// <param name="top">指定的垂直位置</param>
-    /// <param name="right">指定的水平位置</param>
-    /// <param name="width">指定的宽度</param>
-    /// <param name="height">指定的宽度</param>
-    public static ISizePos SizePos(Num top, Num right, Num width, Num height)
-        => SizePos(new Point(right, top), width, height);
-    #endregion
-    #endregion
-    #endregion
-    #region 创建像素平面
-    #region 创建ISizePixel
-    /// <summary>
-    /// 指定水平和垂直方向的像素数量，
-    /// 然后创建一个<see cref="ISizePixel"/>
-    /// </summary>
-    /// <param name="horizontal">水平方向的像素数量</param>
-    /// <param name="vertical">垂直方向的像素数量</param>
-    /// <returns></returns>
-    public static ISizePixel SizePixel(int horizontal, int vertical)
-        => new SizePixel(horizontal, vertical);
-    #endregion
-    #region 创建ISizePosPixel
-    #region 传入位置和大小
-    /// <summary>
-    /// 指定位置和大小，然后创建一个<see cref="ISizePosPixel"/>
-    /// </summary>
-    /// <param name="firstPixel">像素平面左上角像素的位置</param>
-    /// <param name="size">像素平面的大小</param>
-    /// <returns></returns>
-    public static ISizePosPixel SizePosPixel(IPoint firstPixel, ISizePixel size)
-    {
-        var (h, v) = size;
-        return new SizePosPixel(firstPixel, h, v);
-    }
-    #endregion
-    #region 传入开始位置和结束位置
-    /// <summary>
-    /// 使用指定的开始位置和结束位置创建<see cref="ISizePosPixel"/>，
+    /// 使用指定的开始位置和结束位置创建<see cref="ISizePos{Num}"/>，
     /// 本方法不要求<paramref name="begin"/>在<paramref name="end"/>的左上方
     /// </summary>
     /// <param name="begin">开始位置</param>
     /// <param name="end">结束位置</param>
     /// <returns></returns>
-    public static ISizePosPixel SizePosPixel(IPoint begin, IPoint end)
+    /// <inheritdoc cref="SizePosInteger{Num}(IPoint{Num}, ISize{Num})"/>
+    public static ISizePos<Num> SizePosInteger<Num>(IPoint<Num> begin, IPoint<Num> end)
+        where Num : IBinaryInteger<Num>
     {
-        var (width, height, pos) = SizePos(begin, end);
-        return SizePosPixel(pos, width + 1, height + 1);
+        var (br, bt) = begin;
+        var (er, et) = end;
+        if (er < br)
+            (br, er) = (er, br);
+        if (bt < et)
+            (bt, et) = (et, bt);
+        var point = Point(br, bt);
+        var size = Size(er - br + Num.One, bt - et + Num.One);
+        return SizePosInteger(point, size);
     }
     #endregion
-    #region 传入位置和像素数量
+    #region 传入位置，高度，宽度
     /// <summary>
-    /// 指定位置，以及水平和垂直方向的像素数量，
-    /// 然后创建一个<see cref="ISizePosPixel"/>
+    /// 指定位置，宽度和高度，
+    /// 然后创建一个<see cref="ISizePos{Num}"/>
     /// </summary>
-    /// <param name="firstPixel">像素平面左上角的像素所处于的位置</param>
-    /// <param name="horizontal">水平方向的像素数量</param>
-    /// <param name="vertical">垂直方向的像素数量</param>
+    /// <param name="width">平面的宽度</param>
+    /// <param name="height">平面的高度</param>
     /// <returns></returns>
-    public static ISizePosPixel SizePosPixel(IPoint firstPixel, int horizontal, int vertical)
-        => new SizePosPixel(firstPixel, horizontal, vertical);
+    /// <inheritdoc cref="SizePosInteger{Num}(IPoint{Num}, ISize{Num})"/>
+    public static ISizePos<Num> SizePosInteger<Num>(IPoint<Num> pos, Num width, Num height)
+        where Num : IBinaryInteger<Num>
+        => SizePosInteger(pos, Size(width - Num.One, height - Num.One));
     #endregion
-    #region 传入水平和垂直的位置和大小
+    #region 传入X坐标，Y坐标，高度，宽度
     /// <summary>
-    /// 指定水平，垂直方向的位置和大小，
-    /// 然后创建一个<see cref="ISizePosPixel"/>
+    /// 指定X坐标，Y坐标，宽度和高度，
+    /// 然后创建一个<see cref="ISizePos{Num}"/>
     /// </summary>
-    /// <inheritdoc cref="Point(Num, Num)"/>
-    /// <inheritdoc cref="SizePosPixel(IPoint, int, int)"/>
-    public static ISizePosPixel SizePosPixel(int right, int top, int horizontal, int vertical)
-        => new SizePosPixel(Point(right, top), horizontal, vertical);
+    /// <param name="right">平面左上角的X坐标</param>
+    /// <param name="top">平面左上角的Y坐标</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="SizePosInteger{Num}(IPoint{Num}, Num, Num)"/>
+    public static ISizePos<Num> SizePosInteger<Num>(Num right, Num top, Num width, Num height)
+        where Num : IBinaryInteger<Num>
+        => SizePosInteger(Point(right, top), width, height);
+    #endregion
+    #endregion
+    #endregion
+    #region 仅限浮点数
+    #region 传入位置和大小
+    /// <inheritdoc cref="SizePosInteger{Num}(IPoint{Num}, ISize{Num})"/>
+    public static ISizePos<Num> SizePosFloatingPoint<Num>(IPoint<Num> pos, ISize<Num> size)
+        where Num : IFloatingPoint<Num>
+        => new SizePosFloatingPoint<Num>()
+        {
+            Position = pos,
+            Size = size
+        };
     #endregion
     #endregion
     #endregion

@@ -14,10 +14,12 @@ public sealed record EdgeDriverOptions : WebDriverOptions
         var options = new EdgeOptions()
         {
             EnableDownloads = true,
-            ImplicitWaitTimeout= TimeOut
+            ImplicitWaitTimeout = TimeOut
         };
         if (Maximize)
             options.AddArgument("--start-maximized");
+        if (IsHeadLess)
+            options.AddArgument("--headless");
         if (Proxy is { } proxy)
         {
             if (proxy.Credentials is { })

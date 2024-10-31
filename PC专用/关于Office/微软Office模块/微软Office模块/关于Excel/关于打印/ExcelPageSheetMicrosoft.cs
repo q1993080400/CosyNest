@@ -1,4 +1,4 @@
-﻿using System.MathFrancis.Plane;
+﻿using System.MathFrancis;
 using System.Office.Excel;
 using System.Office.Excel.Realize;
 
@@ -32,7 +32,7 @@ sealed class ExcelPageSheetMicrosoft(IExcelSheet sheet, Worksheet worksheet) : I
     }
     #endregion
     #region 设置打印区域
-    public ISizePosPixel? PrintRegional
+    public ISizePos<int>? PrintRegional
     {
         get
         {
@@ -58,12 +58,12 @@ sealed class ExcelPageSheetMicrosoft(IExcelSheet sheet, Worksheet worksheet) : I
     #endregion
     #endregion
     #region 未实现的成员
-    public (int PageCount, Task Wait) PrintFromRegional(ISizePosPixel? regional = null, int number = 1, string? printer = null)
+    public (int PageCount, Task Wait) PrintFromRegional(ISizePos<int>? regional = null, int number = 1, string? printer = null)
     {
         throw new NotImplementedException();
     }
 
-    public (int PageCount, Task Wait) PrintFromRegionalToFile(ISizePosPixel? regional, string filePath)
+    public (int PageCount, Task Wait) PrintFromRegionalToFile(ISizePos<int>? regional, string filePath)
     {
         throw new NotImplementedException();
     }

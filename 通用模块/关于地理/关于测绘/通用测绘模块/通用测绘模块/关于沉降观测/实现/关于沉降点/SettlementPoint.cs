@@ -68,7 +68,7 @@ sealed class SettlementPoint : SettlementPointBase
                 if (item is SettlementPointBase p && (p.Name == Name || (IsKnown && p.IsKnown)))        //检查是否为闭合或附合
                     return [.. list];
             }
-            return CreateCollection.EmptyArray(list);
+            return [];
         }
         #endregion
         var closed = Closed();

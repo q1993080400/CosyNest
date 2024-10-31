@@ -70,7 +70,6 @@ public interface IServerSearch<Parameter, Obj>
     /// </summary>
     /// <param name="parameter">搜索的参数</param>
     /// <returns></returns>
-    [HttpMethodPost]
     Task<Obj[]> Search(Parameter parameter);
     #endregion
 }
