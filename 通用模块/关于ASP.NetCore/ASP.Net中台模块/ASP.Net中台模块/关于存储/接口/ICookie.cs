@@ -24,7 +24,9 @@ public interface ICookie : IAsyncDictionary<string, string>
     /// <returns></returns>
     async ValueTask SetCookieFromHttp(HttpResponseMessage httpResponse, CancellationToken cancellation = default)
     {
-        var setCookie = httpResponse.Headers.GetValues("Set-Cookie");
+        httpResponse.Headers.TryGetValues("Set-Cookie", out var setCookie);
+        if (setCookie is null)
+            return;
         foreach (var item in setCookie)
         {
             var cookie = item.Remove("; httponly");

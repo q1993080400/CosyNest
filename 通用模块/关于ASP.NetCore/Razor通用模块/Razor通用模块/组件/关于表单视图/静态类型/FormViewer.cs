@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.NetFrancis.Http;
+﻿using System.NetFrancis.Http;
 
 namespace Microsoft.AspNetCore.Components;
 

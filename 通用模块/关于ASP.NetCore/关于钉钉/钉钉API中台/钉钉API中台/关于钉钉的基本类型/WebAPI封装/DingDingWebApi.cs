@@ -25,44 +25,52 @@ public abstract class DingDingWebApi
     /// <returns></returns>
     protected async Task<AuthenticationDingDingRequest?> GetUserToken(AuthenticationDingDingRequest authenticationRequest)
     {
-        var dataProtector = GetDataProtection();
-        var newAuthenticationRequest = authenticationRequest.Decryption(dataProtector);
-        var configuration = ServiceProvider.GetRequiredService<DingDingConfiguration>();
-        var http = HttpClient;
-        object httpParameter = newAuthenticationRequest switch
+        try
         {
-            { IsToken: true, RefreshToken: { } refreshToken } =>
-            new
+            var dataProtector = GetDataProtection();
+            var newAuthenticationRequest = authenticationRequest.Decryption(dataProtector);
+            var configuration = ServiceProvider.GetRequiredService<DingDingConfiguration>();
+            var http = HttpClient;
+            object httpParameter = newAuthenticationRequest switch
             {
-                clientId = configuration.ClientID,
-                refreshToken = newAuthenticationRequest.RefreshToken,
-                grantType = "refresh_token",
-                clientSecret = configuration.ClientSecret
-            },
-            { IsToken: false, RefreshToken: null } =>
-            new
+                { IsToken: true, RefreshToken: { } refreshToken } =>
+                new
+                {
+                    clientId = configuration.ClientID,
+                    refreshToken = newAuthenticationRequest.RefreshToken,
+                    grantType = "refresh_token",
+                    clientSecret = configuration.ClientSecret
+                },
+                { IsToken: false, RefreshToken: null } =>
+                new
+                {
+                    clientId = configuration.ClientID,
+                    code = newAuthenticationRequest.Code,
+                    grantType = "authorization_code",
+                    clientSecret = configuration.ClientSecret
+                },
+                _ => throw new NotSupportedException($"{nameof(AuthenticationDingDingRequest)}对象的配置不正确")
+            };
+            var uri = "https://api.dingtalk.com/v1.0/oauth2/userAccessToken";
+            var response = await http.RequestJsonPost(uri, httpParameter);
+            var access = response.GetValueOrDefault("accessToken")?.ToString();
+            var refresh = response.GetValueOrDefault("refreshToken")?.ToString();
+            if (access is null || refresh is null)
+                return null;
+            var returnAuthenticationRequest = new AuthenticationDingDingRequest()
             {
-                clientId = configuration.ClientID,
-                code = newAuthenticationRequest.Code,
-                grantType = "authorization_code",
-                clientSecret = configuration.ClientSecret
-            },
-            _ => throw new NotSupportedException($"{nameof(AuthenticationDingDingRequest)}对象的配置不正确")
-        };
-        var uri = "https://api.dingtalk.com/v1.0/oauth2/userAccessToken";
-        var response = await http.RequestJsonPost(uri, httpParameter);
-        var access = response.GetValueOrDefault("accessToken")?.ToString();
-        var refresh = response.GetValueOrDefault("refreshToken")?.ToString();
-        if (access is null || refresh is null)
+                Code = access,
+                RefreshToken = refresh,
+                IsToken = true,
+                IsEncryption = false
+            };
+            return returnAuthenticationRequest;
+        }
+        catch (Exception ex)
+        {
+            ex.Log(ServiceProvider);
             return null;
-        var returnAuthenticationRequest = new AuthenticationDingDingRequest()
-        {
-            Code = access,
-            RefreshToken = refresh,
-            IsToken = true,
-            IsEncryption = false
-        };
-        return returnAuthenticationRequest;
+        }
     }
     #endregion
     #region 获取加密对象
@@ -102,10 +110,14 @@ public abstract class DingDingWebApi
     /// </summary>
     /// <param name="token">要添加的访问令牌</param>
     /// <returns></returns>
-    protected static HttpRequestTransform TransformAccessToken(string token)
-        => x => x with
+    protected static Func<HttpRequestTransform, HttpRequestTransform> TransformAccessToken(string token)
+        => transform => request =>
         {
-            Header = x.Header.With(x => x.Add("x-acs-dingtalk-access-token", [token]))
+            var newRequest = transform(request);
+            return newRequest with
+            {
+                Header = newRequest.Header.With(x => x.Add("x-acs-dingtalk-access-token", [token]))
+            };
         };
     #endregion
     #region 验证返回值

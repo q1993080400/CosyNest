@@ -29,7 +29,7 @@ public static class ToolASP
             null :
             new()
             {
-                FailureReason = verificationResults.FailureReason.Join(x => x.Prompt, Environment.NewLine)
+                FailureReason = verificationResults.FailureReason.Join(static x => x.Prompt, Environment.NewLine)
             };
     }
     #endregion

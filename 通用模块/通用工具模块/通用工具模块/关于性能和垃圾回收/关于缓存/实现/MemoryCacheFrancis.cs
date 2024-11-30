@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Performance;
 
@@ -6,19 +7,27 @@ namespace System.Performance;
 /// 这个接口是一个通过内存实现的缓存
 /// </summary>
 /// <param name="getOrCreate">当缓存中不存在这个键的时候，
-/// 通过这个委托创建并获取值，它的第一个参数是键，第二个参数是缓存条目，返回值就是被缓存的值</param>
+/// 通过这个委托创建并获取值，它的参数是键，返回值就是被缓存的值</param>
 /// <inheritdoc cref="ICache{Key, Value}"/>
-sealed class MemoryCacheFrancis<Key, Value>(Func<Key, ICacheEntry, Value> getOrCreate) : ICache<Key, Value>
+sealed class MemoryCacheFrancis<Key, Value>(Func<Key, Value> getOrCreate) : ICache<Key, Value>
     where Key : notnull
 {
     #region 公开成员
     #region 通过键获取值
     public Value this[Key key]
-        => MemoryCache.GetOrCreate(key,
-            x => getOrCreate((Key)x.Key, x))!;
+    {
+        get
+        {
+            if (MemoryCache.TryGetValue(key, out var value))
+                return value;
+            value = getOrCreate(key);
+            SetValue(key, value);
+            return value;
+        }
+    }
     #endregion
     #region 尝试获取元素
-    public bool TryGetValue(Key key, out Value? value)
+    public bool TryGetValue(Key key, [NotNullWhen(true)] out Value? value)
     {
         var exist = MemoryCache.TryGetValue(key, out var objValue);
         value = objValue is Value v ? v : default;
@@ -27,7 +36,7 @@ sealed class MemoryCacheFrancis<Key, Value>(Func<Key, ICacheEntry, Value> getOrC
     #endregion
     #region 显式设置元素
     public void SetValue(Key key, Value value)
-         => MemoryCache.Set(key, value);
+         => MemoryCache = MemoryCache.SetItem(key, value);
     #endregion
     #endregion
     #region 内部成员
@@ -35,8 +44,8 @@ sealed class MemoryCacheFrancis<Key, Value>(Func<Key, ICacheEntry, Value> getOrC
     /// <summary>
     /// 获取内存缓存，本对象的功能就是通过它实现的
     /// </summary>
-    private MemoryCache MemoryCache { get; }
-        = new(new MemoryCacheOptions());
+    private ImmutableDictionary<Key, Value> MemoryCache { get; set; }
+        = ImmutableDictionary<Key, Value>.Empty;
     #endregion
-    #endregion 
+    #endregion
 }

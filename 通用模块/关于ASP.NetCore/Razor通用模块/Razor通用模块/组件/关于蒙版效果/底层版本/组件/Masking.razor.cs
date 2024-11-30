@@ -21,7 +21,7 @@ public sealed partial class Masking : ComponentBase, IContentComponent<RenderFra
     #region 子内容
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderMasking> ChildContent { get; set; } = _ => _ => { };
+    public RenderFragment<RenderMasking> ChildContent { get; set; } = static _ => static _ => { };
     #endregion
     #region 占满全屏
     [Parameter]

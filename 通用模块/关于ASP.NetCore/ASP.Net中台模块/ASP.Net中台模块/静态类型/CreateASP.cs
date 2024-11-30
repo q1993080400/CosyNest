@@ -28,7 +28,7 @@ public static class CreateASP
     /// <returns></returns>
     public static string JSObjectName(Guid? existing = null)
     {
-        var guid = (existing ?? Guid.NewGuid()).ToString();
+        var guid = (existing ?? Guid.CreateVersion7()).ToString();
         return $"a{guid.Remove("-")}";
     }
     #endregion

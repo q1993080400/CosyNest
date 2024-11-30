@@ -150,19 +150,20 @@ public static partial class ExtendReflection
     /// <returns></returns>
     /// <inheritdoc cref="GetMemberInfoRecursion{Member}(Type, Func{Type, BindingFlags, Member[]}, BindingFlags)"/>
     public static PropertyInfo[] GetPropertyInfoRecursion(this Type type, BindingFlags bindingFlags = CreateReflection.BindingFlagsAll)
-        => type.GetMemberInfoRecursion((type, bindingFlags) => type.GetProperties(bindingFlags), bindingFlags);
+        => type.GetMemberInfoRecursion(static (type, bindingFlags) => type.GetProperties(bindingFlags), bindingFlags);
     #endregion
     #region 获取所有全能属性
     /// <summary>
     /// 获取一个类型中的所有全能属性，
-    /// 全能属性指的是可读，可写，公开，且非静态，非索引器的属性，
-    /// 注意：init属性不是全能属性
+    /// 全能属性指的是可读，可写，公开，且非静态，非索引器的属性
     /// </summary>
     /// <param name="type">要获取全能属性的类型</param>
+    /// <param name="includeInit">如果这个值为<see langword="true"/>，
+    /// 则包括Init属性，否则排除Init属性</param>
     /// <returns></returns>
-    public static PropertyInfo[] GetPropertyInfoAlmighty(this Type type)
+    public static PropertyInfo[] GetPropertyInfoAlmighty(this Type type, bool includeInit = false)
         => type.GetPropertyInfoRecursion(BindingFlags.Public | BindingFlags.Instance).
-        Where(x => x.CanRead && x.CanWrite && !x.IsInitOnly() && !x.IsIndexing()).ToArray();
+        Where(x => x.CanRead && x.CanWrite && (includeInit || !x.IsInitOnly()) && !x.IsIndexing()).ToArray();
     #endregion
     #endregion
     #region 关于成员

@@ -193,7 +193,7 @@ public static partial class ExcelRealizeHelp
             throw new Exception($"{addressA1}不是合法的A1地址格式");
         #region 用来获取列号的本地函数
         static int Get(IMatch add)
-            => ToolBit.ToDecimal(26, add.Match.Select(x => x - 64).ToArray()) - 1;
+            => ToolBit.ToDecimal(26, add.Match.Select(static x => x - 64).ToArray()) - 1;
         #endregion
         var bc = Get(mathce["bc"]);
         var br = mathce["br"].Match.To<int>() - 1;

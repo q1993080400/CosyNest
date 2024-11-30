@@ -33,7 +33,7 @@ public static partial class ExtendReflection
     /// <returns></returns>
     public static bool CanNew(this Type type)
         => !type.IsAbstract && !type.IsInterface && !type.ContainsGenericParameters &&
-        type.GetConstructors().Any(x => x.IsPublic && x.GetParameters().Length is 0);
+        type.GetConstructors().Any(static x => x.IsPublic && x.GetParameters().Length is 0);
     #endregion
     #region 判断一个类型是否为静态类
     /// <summary>

@@ -17,7 +17,7 @@ sealed class FileSystemRealize : IFileSystem
     #endregion
     #region IFileSystem版本
     public IEnumerable<IDrive> Son { get; }
-    = DriveInfo.GetDrives().Select(x => new DriveRealize(x)).ToArray();
+    = DriveInfo.GetDrives().Select(static x => new DriveRealize(x)).ToArray();
     #endregion
     #endregion
 }

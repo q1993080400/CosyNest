@@ -1,6 +1,6 @@
 ﻿
 /*超大容器，一般出现在超大屏PC平台*/
-@container (min-width : 612px)
+@container (min-width : 1836px)
 {
     /*属性渲染容器属性标签样式*/
     .bootstrapFormViewerPropertyLabel
@@ -22,7 +22,7 @@
 }
 
 /*大容器，一般出现在普通屏PC平台*/
-@container (min-width : 306px) and (max-width : 612px)
+@container (min-width : 1224px) and (max-width : 1836px)
 {
     /*属性渲染容器属性标签样式*/
     .bootstrapFormViewerPropertyLabel
@@ -44,7 +44,7 @@
 }
 
 /*中容器，一般出现在平板平台*/
-@container (min-width : 167px) and (max-width : 306px)
+@container (min-width : 667px) and (max-width : 1224px)
 {
     /*表单视图容器样式*/
     .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
@@ -59,7 +59,7 @@
 }
 
 /*小容器，一般出现在手机平台*/
-@container (max-width : 167px)
+@container (max-width : 667px)
 {
     /*表单视图容器样式*/
     .bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer
@@ -103,11 +103,11 @@ label button
     gap: var(--gapMedium);
 }
 
-    /*表单视图顶层容器的子容器样式*/
-    .bootstrapFormViewerTopContainer > *
-    {
-        flex-grow: 1;
-    }
+/*表单视图容器的子容器样式*/
+:is(.bootstrapFormViewerContainer, .bootstrapFormViewerTopContainer) > *
+{
+    flex-grow: 1;
+}
 
 /*属性渲染容器样式*/
 .bootstrapFormViewerPropertyContainer

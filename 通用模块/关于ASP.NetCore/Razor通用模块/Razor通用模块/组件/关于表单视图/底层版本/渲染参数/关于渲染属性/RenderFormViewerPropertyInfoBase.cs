@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Microsoft.AspNetCore.Components;
 
@@ -22,6 +21,14 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// 获取要渲染的属性
     /// </summary>
     public required PropertyInfo Property { get; init; }
+    #endregion
+    #region 对封装可预览文件的描述
+    /// <summary>
+    /// 获取对这个属性封装可预览文件的性质的描述，
+    /// 如果它没有封装可预览文件，
+    /// 则返回<see langword="null"/>
+    /// </summary>
+    public required PreviewFilePropertyDescribe? PreviewFilePropertyDescribe { get; init; }
     #endregion
     #region 分组的名字
     /// <summary>

@@ -26,11 +26,4 @@ public interface IHardwareInfo
     /// </summary>
     MotherboardInfo MotherboardInfo { get; }
     #endregion
-    #region 硬件哈希
-    /// <summary>
-    /// 获取一个哈希值，
-    /// 它被用来标记这个主机的硬件
-    /// </summary>
-    string HardwareHash { get; }
-    #endregion
 }

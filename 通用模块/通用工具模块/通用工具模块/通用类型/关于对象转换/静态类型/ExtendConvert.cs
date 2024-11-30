@@ -20,7 +20,7 @@ public static partial class ExtendTool
     /// </summary>
     private static MethodInfo ToMethod
         => ToMethodField ??= typeof(ExtendTool).GetMethods().First
-        (x => x.Name is nameof(To) &&
+        (static x => x.Name is nameof(To) &&
         x.GetParameters().Length is 3 &&
         x.IsGenericMethod);
     #endregion

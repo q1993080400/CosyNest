@@ -12,7 +12,7 @@ public sealed record AsynchronousPackage<Progress>
     /// 这个委托可以用来报告进度，
     /// 它的参数就是当前进度
     /// </summary>
-    public Func<Progress, Task> ReportProgress { get; init; } = _ => Task.CompletedTask;
+    public Func<Progress, Task> ReportProgress { get; init; } = static _ => Task.CompletedTask;
     #endregion
     #region 取消令牌
     /// <summary>

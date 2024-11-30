@@ -43,8 +43,8 @@ sealed record HttpStrongTypeRequestParameterInfo
     /// <param name="value">这个参数的值</param>
     public HttpStrongTypeRequestParameterInfo(ParameterInfo parameter, object? value)
     {
-        this.Parameter = parameter;
-        this.Value = value;
+        Parameter = parameter;
+        Value = value;
         IsCommonType = parameter.ParameterType.IsCommonType();
         ParameterSource = parameter.GetCustomAttribute<HttpRequestParameterSourceAttribute>()?.
             ParameterSource ?? HttpRequestParameterSource.Auto;

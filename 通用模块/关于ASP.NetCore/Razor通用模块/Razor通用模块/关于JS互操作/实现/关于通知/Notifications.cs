@@ -42,7 +42,7 @@ sealed class Notifications(IJSRuntime jSRuntime) : INotifications
     public async Task Close(IEnumerable<string>? tags)
     {
         var script = $$"""
-            var tags={{(tags is null ? "null" : $"[{tags.Join(x => $"'{x}'", ",")}]")}};
+            var tags={{(tags is null ? "null" : $"[{tags.Join(static x => $"'{x}'", ",")}]")}};
             var swUri='/js/sw.js';
             navigator.serviceWorker.register(swUri,{scope: swUri}).
             then(x=>x.update()).then(x=>x.getNotifications()).

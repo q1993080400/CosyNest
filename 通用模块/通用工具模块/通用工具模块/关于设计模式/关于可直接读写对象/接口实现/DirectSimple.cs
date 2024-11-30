@@ -71,6 +71,6 @@ sealed class DirectSimple : IDirect
     #endregion
     #region 重写ToString
     public override string ToString()
-        => this.Join(x => $"{x.Key}:{x.Value}", Environment.NewLine);
+        => this.Join(static x => $"{x.Key}:{x.Value}", Environment.NewLine);
     #endregion
 }

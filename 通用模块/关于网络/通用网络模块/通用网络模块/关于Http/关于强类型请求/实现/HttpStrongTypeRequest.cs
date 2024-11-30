@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.DataFrancis;
+using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Reflection;
@@ -19,7 +20,7 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     #region 接口实现
     #region 发起强类型请求
     public async Task<HttpResponseMessage> RequestResponse<Ret>
-        (Expression<Func<API, Ret>> request, HttpRequestTransform? transformation = null,
+        (Expression<Func<API, Ret>> request, Func<HttpRequestTransform, HttpRequestTransform>? transformation = null,
         JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
         if (request is not
@@ -53,7 +54,7 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
         var callPath = GetCallUri(method);
         var prameterInfos = method.GetParameters().
             Zip(arguments).
-            Select(x => new HttpStrongTypeRequestParameterInfo(x.First, x.Second.CalValue())).
+            Select(static x => new HttpStrongTypeRequestParameterInfo(x.First, x.Second.CalValue())).
             ToArray();
         var httpMethod = GetRequestMethod(method, prameterInfos);
         var uriParameter = GetRequestUriParameter(method, httpMethod, prameterInfos);
@@ -102,8 +103,8 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
         switch (appoint)
         {
             case HttpRequestMethod.Auto:
-                var isPost = prameterInfos.Any(x =>
-                x is { ParameterSource: not (HttpRequestParameterSource.Auto or HttpRequestParameterSource.FromQuery) } or
+                var isPost = prameterInfos.Any(static x =>
+                x is { ParameterSource: HttpRequestParameterSource.FromBody } or
                 { IsCommonType: false });
                 return isPost ? HttpMethod.Post : HttpMethod.Get;
             case HttpRequestMethod.Get:
@@ -130,21 +131,18 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
         {
             foreach (var prameterInfo in prameterInfos)
             {
-                var parameterSource = prameterInfo.ParameterSource;
-                if (parameterSource is not (HttpRequestParameterSource.Auto or HttpRequestParameterSource.FromQuery))
-                    continue;
-                if (httpMethod == HttpMethod.Get || parameterSource is HttpRequestParameterSource.FromQuery)
+                switch (prameterInfo)
                 {
-                    var name = prameterInfo.Parameter.Name!;
-                    if (prameterInfo.IsCommonType)
-                    {
+                    case { ParameterSource: HttpRequestParameterSource.FromQuery }:
+                    case { ParameterSource: HttpRequestParameterSource.Auto } when httpMethod == HttpMethod.Get:
+                        var name = prameterInfo.Parameter.Name!;
+                        if (!prameterInfo.IsCommonType)
+                            throw new NotSupportedException($"{typeof(API)}.{methodInfo.Name}的{name}参数是一个复杂的类型，" +
+                            $"它不能放在HttpGet方法中，或被指定为来自查询Uri参数");
                         var value = prameterInfo.Value;
                         if (value is { })
                             yield return (name, value.ToString());
-                    }
-                    else
-                        throw new NotSupportedException($"{typeof(API)}.{methodInfo.Name}的{name}参数是一个复杂的类型，" +
-                            $"它不能放在HttpGet方法中，或被指定为来自查询Uri参数");
+                        break;
                 }
             }
         }
@@ -165,7 +163,7 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
         if (httpMethod == HttpMethod.Get)
             return null;
         var filterParameter = prameterInfos.
-            Where(x => x is { IsCommonType: false } or { ParameterSource: HttpRequestParameterSource.Auto or HttpRequestParameterSource.FromBody }).ToArray();
+            Where(static x => x is { IsCommonType: false } or { ParameterSource: HttpRequestParameterSource.FromBody }).ToArray();
         return filterParameter switch
         {
             null or [] => null,
@@ -183,25 +181,52 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     /// <inheritdoc cref="GetRequest(MethodInfo, IEnumerable{Expression}, JsonSerializerOptions?)"/>
     private static HttpContent GetRequestContentFinal(HttpStrongTypeRequestParameterInfo info, JsonSerializerOptions? options)
     {
-        #region 用来返回上传正文的本地函数
-        static MultipartFormDataContent GetContent(IEnumerable<IUploadFile> uploadFiles)
+        #region 用来返回Json正文的本地函数
+        static HttpContent GetJsonContent(object? value, Type valueType, JsonSerializerOptions? options)
         {
-            var content = new MultipartFormDataContent();
-            foreach (var file in uploadFiles)
+            var jsonContent = JsonContent.Create(value, valueType, options: options ?? JsonSerializerOptions.Web);
+            var previewFilePropertyNatureState = HasPreviewFilePropertyNatureState.Get(valueType);
+            if (!previewFilePropertyNatureState.HasPreviewFile)
+                return jsonContent;
+            var content = new MultipartFormDataContent
             {
-                var fileContent = new StreamContent(file.FileStream());
-                fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
-                content.Add(fileContent, "\"files\"", file.FileName);
+                { jsonContent, IHasPreviewFile.ContentKey }
+            };
+            if (value is null)
+                return content;
+            foreach (var item in previewFilePropertyNatureState.PreviewFilePropertyDescribe.Values.Where(x => x.IsStrict))
+            {
+                var property = item.Property;
+                var propertyName = property.Name;
+                if (item.Multiple)
+                {
+                    var previewFiles = property.GetValue<IEnumerable<IHasPreviewFile>?>(value) ?? [];
+                    AddPreviewFileContent(content, previewFiles, propertyName);
+                }
+                else
+                {
+                    var previewFile = property.GetValue<IHasPreviewFile?>(value);
+                    AddPreviewFileContent(content, [previewFile], propertyName);
+                }
             }
             return content;
         }
         #endregion
-        return info.Value switch
+        #region 向MultipartFormDataContent添加预览文件的本地函数
+        static void AddPreviewFileContent(MultipartFormDataContent content, IEnumerable<IHasPreviewFile?> uploadFiles, string propertyName)
         {
-            IUploadFile uploadFile => GetContent([uploadFile]),
-            IEnumerable<IUploadFile> uploadFiles => GetContent(uploadFiles),
-            var value => JsonContent.Create(value, info.Parameter.ParameterType, options: options)
-        };
+            foreach (var (index, file) in uploadFiles.WhereEnable().Index())
+            {
+                if (file is not IHasUploadFile { UploadFile: { } uploadFile })
+                    continue;
+                var fileContent = new StreamContent(uploadFile.OpenFileStream());
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(uploadFile.ContentType);
+                var name = $"\"{propertyName}-{index}\"";
+                content.Add(fileContent, name, file.FileName);
+            }
+        }
+        #endregion
+        return GetJsonContent(info.Value, info.Parameter.ParameterType, options);
     }
     #endregion
     #endregion

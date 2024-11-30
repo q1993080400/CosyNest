@@ -33,20 +33,19 @@ public interface IHttpClient
     /// 发起Http请求，并返回结果
     /// </summary>
     /// <param name="request">请求消息的内容</param>
-    /// <param name="transformation">用来转换Http请求的函数，
-    /// 如果为<see langword="null"/>，使用当前<see cref="IHttpClient"/>的默认配置，
-    /// 注意：默认配置不等于不进行转换</param>
+    /// <param name="transformation">这个委托的第一个参数是默认Http转换函数，
+    /// 返回值是新的Http转换函数，如果为<see langword="null"/>，则不转换默认转换函数</param>
     /// <param name="cancellationToken">一个用于取消操作的令牌</param>
     /// <returns>Http请求的结果</returns>
-    Task<HttpResponseMessage> Request(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default);
+    Task<HttpResponseMessage> Request(HttpRequestRecording request, Func<HttpRequestTransform, HttpRequestTransform>? transformation = null, CancellationToken cancellationToken = default);
     #endregion
     #region 返回Json对象
     /// <summary>
     /// 发起Http请求，并将结果反序列化为<see cref="IDirect"/>对象返回
     /// </summary>
     /// <returns></returns>
-    /// <inheritdoc cref="RequestJsonPost{Obj}(string, Obj, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?, CancellationToken)"/>
-    async Task<IDirect> RequestJson(HttpRequestRecording request, HttpRequestTransform? transformation = null, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="RequestJsonPost{Obj}(string, Obj, ValueTuple{string, string}[], Func{HttpRequestTransform, HttpRequestTransform}?, JsonSerializerOptions?, CancellationToken)"/>
+    async Task<IDirect> RequestJson(HttpRequestRecording request, Func<HttpRequestTransform, HttpRequestTransform>? transformation = null, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
         options ??= CreateDesign.JsonCommonOptions(JsonSerializerDefaults.Web);
         using var response = await Request(request, transformation, cancellationToken);
@@ -62,8 +61,9 @@ public interface IHttpClient
     /// <param name="parameters">枚举请求的参数名称和值（如果有）</param>
     /// <param name="options">用来执行序列化的对象，
     /// 就算为<see langword="null"/>，它仍自带有对<see cref="IDirect"/>的支持</param>
-    /// <inheritdoc cref="Request(HttpRequestRecording,HttpRequestTransform?,CancellationToken)"/>
-    Task<IDirect> RequestJsonGet(string uri, (string Parameter, string? Value)[]? parameters = null, HttpRequestTransform? transformation = null,
+    /// <inheritdoc cref="Request(HttpRequestRecording, Func{HttpRequestTransform, HttpRequestTransform}?, CancellationToken)"/>
+    Task<IDirect> RequestJsonGet(string uri, (string Parameter, string? Value)[]? parameters = null,
+        Func<HttpRequestTransform, HttpRequestTransform>? transformation = null,
         JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         => RequestJson(new HttpRequestRecording()
         {
@@ -76,9 +76,9 @@ public interface IHttpClient
     /// </summary>
     /// <param name="content">这个对象会被序列化，并放在请求体的内部</param>
     /// <typeparam name="Obj">请求参数的类型</typeparam>
-    /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?,CancellationToken)"/>
+    /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], Func{HttpRequestTransform, HttpRequestTransform}?, JsonSerializerOptions?, CancellationToken)"/>
     async Task<IDirect> RequestJsonPost<Obj>(string uri, Obj content, (string Parameter, string? Value)[]? parameters = null,
-       HttpRequestTransform? transformation = null, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+       Func<HttpRequestTransform, HttpRequestTransform>? transformation = null, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
         var requestRecording = new HttpRequestRecording()
         {
@@ -98,8 +98,8 @@ public interface IHttpClient
     /// 则函数会改变请求中的User-Agent标头，将自身模拟为一个浏览器，
     /// 在某些情况下，它可以用来绕过某些下载限制</param>
     /// <returns></returns>
-    /// <inheritdoc cref="Request(HttpRequestRecording, HttpRequestTransform?, CancellationToken)"/>
-    /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], HttpRequestTransform?, JsonSerializerOptions?,CancellationToken)"/>
+    /// <inheritdoc cref="Request(HttpRequestRecording, Func{HttpRequestTransform, HttpRequestTransform}?, CancellationToken)"/>
+    /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], Func{HttpRequestTransform, HttpRequestTransform}?, JsonSerializerOptions?, CancellationToken)"/>
     Task<Stream> RequestStream(string uri, bool simulateBrowser = false, CancellationToken cancellationToken = default);
     #endregion
     #region 强类型Http请求

@@ -52,7 +52,8 @@ public static class ExtendIO
         if (!stream.CanRead)
             throw new NotSupportedException("这个流不可读取");
         stream.Reset();
-        File.Delete(path);
+        if (File.Exists(path))
+            File.Delete(path);
         using var fileStream = CreateIO.FileStream(path, FileMode.Create);
         await stream.CopyToAsync(fileStream, cancellationToken);
     }
@@ -174,7 +175,7 @@ public static class ExtendIO
     /// <param name="bytes">待计算校验和的数据</param>
     /// <returns></returns>
     public static int Checksum(this IEnumerable<byte> bytes)
-        => bytes.Select(x => (int)x).Sum();
+        => bytes.Select(static x => (int)x).Sum();
     #endregion
     #region 关于转换管道
     #region 连接转换管道

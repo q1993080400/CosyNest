@@ -11,7 +11,7 @@ public interface IDirectoryBase : IIOBase
     /// 但是不将目录本身删除
     /// </summary>
     void Clear()
-        => Son.ForEach(x => x.Delete());
+        => Son.ForEach(static x => x.Delete());
     #endregion
     #region 直达子文件或目录
     /// <summary>
@@ -49,7 +49,7 @@ public interface IDirectoryBase : IIOBase
     File CreateFile<File>(string? nameSimple = null, string? nameExtended = null)
         where File : IFileBase
     {
-        var name = (nameSimple ?? Guid.NewGuid().ToString()) + (nameExtended is null ? null : $".{nameExtended}");
+        var name = (nameSimple ?? Guid.CreateVersion7().ToString()) + (nameExtended is null ? null : $".{nameExtended}");
         return Create<File>(name);
     }
     #endregion

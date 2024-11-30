@@ -1,4 +1,4 @@
-﻿using System.Net;
+﻿using System.Buffers.Text;
 using System.Text;
 
 namespace System;
@@ -15,16 +15,15 @@ public static partial class ExtendNet
     /// 将字符串转换为Base64字符串
     /// </summary>
     /// <param name="text">封装要转换的字符串的对象</param>
-    /// <param name="replaceUnsafe">如果这个值为<see langword="true"/>，
-    /// 则还会替换所有不安全字符</param>
+    /// <param name="isUrlBase64">如果这个值为<see langword="true"/>，
+    /// 则遵循UrlBase64的格式，否则遵循普通Base64的格式</param>
     /// <returns></returns>
-    public static string ToBase64(this StringOperate text, bool replaceUnsafe = true)
+    public static string ToBase64(this StringOperate text, bool isUrlBase64 = true)
     {
         var plainTextBytes = text.Text.ToBytes();
-        var base64 = Convert.ToBase64String(plainTextBytes);
-        return replaceUnsafe ?
-            base64.Replace('+', '-').Replace('/', '_').TrimEnd('=') :
-            base64;
+        return isUrlBase64 ?
+            Base64Url.EncodeToString(plainTextBytes) :
+            Convert.ToBase64String(plainTextBytes);
     }
     #endregion
     #region 从Base64字符串转换
@@ -32,20 +31,15 @@ public static partial class ExtendNet
     /// 将Base64字符串解码，然后将其转换为字符串
     /// </summary>
     /// <param name="text">封装要转换的字符串的对象</param>
+    /// <param name="isUrlBase64">如果这个值为<see langword="true"/>，
+    /// 则遵循UrlBase64的格式，否则遵循普通Base64的格式</param>
     /// <returns></returns>
-    public static string FromBase64(this StringOperate text)
+    public static string FromBase64(this StringOperate text, bool isUrlBase64 = true)
     {
-        var secureUrlBase64 = text.Text.Replace('-', '+').Replace('_', '/');
-        switch (secureUrlBase64.Length % 4)
-        {
-            case 2:
-                secureUrlBase64 += "==";
-                break;
-            case 3:
-                secureUrlBase64 += "=";
-                break;
-        }
-        var bytes = Convert.FromBase64String(secureUrlBase64);
+        var originalText = text.Text;
+        var bytes = isUrlBase64 ?
+            Convert.FromBase64String(originalText) :
+            Base64Url.DecodeFromChars(originalText);
         return Encoding.UTF8.GetString(bytes);
     }
     #endregion
@@ -61,7 +55,7 @@ public static partial class ExtendNet
     public static string ToHex(this StringOperate text)
     {
         var hex = Convert.ToHexString(text.Text.ToBytes());
-        var result = hex.Chunk(2).Join(x => $"{x[0]}{x[1]}", "%");
+        var result = hex.Chunk(2).Join(static x => $"{x[0]}{x[1]}", "%");
         return result.IsVoid() ? "" : "%" + result;
     }
     #endregion
@@ -138,27 +132,6 @@ public static partial class ExtendNet
     public static string ToRealityPath(this StringOperate realityPath)
         => Path.Combine("wwwroot", realityPath.Text.TrimStart('\\'));
     #endregion
-    #endregion
-    #region Web编码
-    /// <summary>
-    /// 将路径编码为兼容Web的格式
-    /// </summary>
-    /// <param name="path">要编码的路径</param>
-    /// <returns></returns>
-    public static string ToWebEncode(this StringOperate path)
-    {
-        #region 本地函数
-        static string Fun(string path, char delimiter, Func<string, string>? recursion)
-        {
-            var split = path.Split(delimiter);
-            var part = split.Select(x => recursion?.Invoke(x) ?? WebUtility.UrlEncode(x).Replace("+", "%20")).ToArray();
-            return part.Join(delimiter.ToString());
-        }
-        #endregion
-        return Fun(path.Text, '/',
-            x => Fun(x, '?',
-            x => Fun(x, '#', null)));
-    }
     #endregion
     #endregion
     #endregion

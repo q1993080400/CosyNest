@@ -32,11 +32,11 @@ sealed class WordRangeMicrosoft(MSWordRange wordRange) : IWordRange
         get
         {
             var inlineShapes = WordRange.InlineShapes.OfType<InlineShape>().
-                    Where(x => x.Type is WdInlineShapeType.wdInlineShapePicture).
-                    Select(x => new WordInlineImageMicrosoft()).ToArray();
+                    Where(static x => x.Type is WdInlineShapeType.wdInlineShapePicture).
+                    Select(static x => new WordInlineImageMicrosoft()).ToArray();
             var shape = WordRange.ShapeRange.OfType<Shape>().
-                Where(x => x.Type is MsoShapeType.msoPicture).
-                Select(x => new WordImageMicrosoft(x)).ToArray();
+                Where(static x => x.Type is MsoShapeType.msoPicture).
+                Select(static x => new WordImageMicrosoft(x)).ToArray();
             var array = inlineShapes.Concat<IWordImage>(shape).ToArray();
             return array;
         }

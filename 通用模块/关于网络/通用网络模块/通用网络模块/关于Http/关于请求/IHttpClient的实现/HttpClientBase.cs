@@ -6,21 +6,21 @@ namespace System.NetFrancis.Http;
 /// 这个类型是<see cref="IHttpClient"/>的实现，
 /// 可以用来发起Http请求
 /// </summary>
-/// <param name="defaultTransform">用来转换Http请求的函数，
-/// 它可以用来改变Http请求的默认值，并具有较低的优先级，
-/// 如果为<see langword="null"/>，则不做转换</param>
+/// <param name="defaultTransform">用来转换Http请求的默认函数，
+/// 它可以用来改变Http请求的默认值，并作为管道的第一个输入，
+/// 如果为<see langword="null"/>，则不进行转换</param>
 abstract class HttpClientBase(HttpRequestTransform? defaultTransform) : IHttpClient
 {
     #region 接口实现
     #region 发起Http请求
     #region 返回HttpResponseMessage
-    public async Task<HttpResponseMessage> Request(HttpRequestRecording request, HttpRequestTransform? transformation = null, CancellationToken cancellationToken = default)
+    public async Task<HttpResponseMessage> Request(HttpRequestRecording request, Func<HttpRequestTransform, HttpRequestTransform>? transformation = null, CancellationToken cancellationToken = default)
     {
+        var requestMiddle = transformation is null ? DefaultTransform : transformation(DefaultTransform);
         #region 本地函数
         async Task<HttpResponseMessage> Fun(HttpRequestRecording request)      //解决重定向问题
         {
-            var requestMiddle = defaultTransform?.Invoke(request) ?? request;
-            var transformationRequest = transformation?.Invoke(requestMiddle) ?? requestMiddle;
+            var transformationRequest = requestMiddle(request);
             using var bclRequest = transformationRequest.ToHttpRequestMessage();
             var response = await HttpClient.SendAsync(bclRequest, cancellationToken);
             if (response.StatusCode is HttpStatusCode.Found)
@@ -61,6 +61,15 @@ abstract class HttpClientBase(HttpRequestTransform? defaultTransform) : IHttpCli
     public IHttpStrongTypeRequest<API> StrongType<API>()
         where API : class
         => new HttpStrongTypeRequest<API>(this);
+    #endregion
+    #endregion
+    #region 内部成员
+    #region 转换函数
+    /// <summary>
+    /// 这个函数用来在请求的时候，
+    /// 对<see cref="HttpRequestRecording"/>进行转换
+    /// </summary>
+    private HttpRequestTransform DefaultTransform { get; } = defaultTransform ??= static x => x;
     #endregion
     #endregion
     #region 抽象成员

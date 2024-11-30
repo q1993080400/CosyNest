@@ -14,7 +14,7 @@ public sealed record UriParameter : UriBase
     #region 公开成员
     #region 参数部分文本
     public override string Text
-        => Parameter.Join(x => $"{x.Key}={x.Value}", "&");
+        => Parameter.Join(static x => $"{x.Key}={x.Value}", "&");
     #endregion
     #region 参数字典
     /// <summary>
@@ -62,7 +62,7 @@ public sealed record UriParameter : UriBase
         var (isMatch, matches) = Regex.Matches(uriParameter);
         if (!isMatch)
             throw new ArgumentException($"{uriParameter}不是合法的Uri参数字符串");
-        Parameter = matches.Select(x =>
+        Parameter = matches.Select(static x =>
         {
             var key = x["key"].Match;
             var value = x.GroupsNamed.GetValueOrDefault("value")?.Match;

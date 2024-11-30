@@ -47,7 +47,7 @@ sealed partial class ExcelBookMicrosoft : ExcelBook, IExcelBook, IOfficeUpdate
     #region 升级Office文件
     public string Update()
     {
-        var newPath = ToolPath.RefactoringPath(Path!, newExtension: _ => "xlsx");
+        var newPath = ToolPath.RefactoringPath(Path!, newExtension: static _ => "xlsx");
         Workbook.SaveAs(newPath, XlFileFormat.xlWorkbookDefault);
         return newPath;
     }

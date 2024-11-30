@@ -49,7 +49,7 @@ public static partial class ExtendReflection
     /// <param name="method">要获取参数类型的方法或构造函数</param>
     /// <returns></returns>
     public static Type[] GetParameterTypes(this MethodBase method)
-        => method.GetParameters().Select(p => p.ParameterType).ToArray();
+        => method.GetParameters().Select(static p => p.ParameterType).ToArray();
     #endregion
     #region 判断方法是否与指定的签名兼容
     #region 仅指定方法参数
@@ -63,7 +63,7 @@ public static partial class ExtendReflection
     {
         var methodParameter = method.GetParameterTypes();
         return methodParameter.Length == parameterType.Length &&
-            methodParameter.Zip(parameterType).All(x =>
+            methodParameter.Zip(parameterType).All(static x =>
             {
                 var (fromMethod, fromExternal) = x;
                 return fromMethod.IsAssignableFrom(fromExternal);
@@ -104,7 +104,7 @@ public static partial class ExtendReflection
     /// <returns></returns>
     /// <inheritdoc cref="GetMemberInfoRecursion{Member}(Type, Func{Type, BindingFlags, Member[]}, BindingFlags)"/>
     public static MethodInfo[] GetMethodInfoRecursion(this Type type, BindingFlags bindingFlags = CreateReflection.BindingFlagsAll)
-        => type.GetMemberInfoRecursion((type, bindingFlags) => type.GetMethods(bindingFlags), bindingFlags);
+        => type.GetMemberInfoRecursion(static (type, bindingFlags) => type.GetMethods(bindingFlags), bindingFlags);
     #endregion
     #endregion
     #region 关于构造函数
@@ -148,7 +148,7 @@ public static partial class ExtendReflection
     /// <returns></returns>
     /// <inheritdoc cref="GetMemberInfoRecursion{Member}(Type, Func{Type, BindingFlags, Member[]}, BindingFlags)"/>
     public static EventInfo[] GetEventInfoRecursion(this Type type, BindingFlags bindingFlags = CreateReflection.BindingFlagsAll)
-        => type.GetMemberInfoRecursion((type, bindingFlags) => type.GetEvents(bindingFlags), bindingFlags);
+        => type.GetMemberInfoRecursion(static (type, bindingFlags) => type.GetEvents(bindingFlags), bindingFlags);
     #endregion
     #endregion
 }

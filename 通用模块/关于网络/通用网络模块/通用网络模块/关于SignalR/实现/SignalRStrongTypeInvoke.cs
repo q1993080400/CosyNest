@@ -55,7 +55,7 @@ sealed class SignalRStrongTypeInvoke<Hub>(HubConnection connection) : ISignalRSt
                 }
             })
             throw new ArgumentException($"无法识别表达式{invoke}，它的格式不正确");
-        var p = parameter.Select(x => x.CalValue()).ToArray();
+        var p = parameter.Select(static x => x.CalValue()).ToArray();
         return (name, p);
     }
     #endregion

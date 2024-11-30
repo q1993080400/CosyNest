@@ -14,12 +14,14 @@ sealed class DirectoryRealize : IORealize, IDirectory
     protected override DirectoryInfo PackFS => new(Path);
     #endregion
     #region 封装本对象的接口形式
+#pragma warning disable 
     /// <summary>
     /// 返回本对象的接口形式，
     /// 它使本对象的成员可以访问显式接口实现的成员
     /// </summary>
     private IDirectory Directory
         => this;
+#pragma warning restore
     #endregion
     #endregion
     #region 关于目录的信息
@@ -72,7 +74,7 @@ sealed class DirectoryRealize : IORealize, IDirectory
         where IO : IIOBase
     {
         var type = typeof(IO);
-        var newName = name ?? Guid.NewGuid().ToString();
+        var newName = name ?? Guid.CreateVersion7().ToString();
         var path = System.IO.Path.Combine(Path, newName);
         if (type == typeof(IFile) || type == typeof(IFileBase))
             return (IO)CreateIO.File(path, false);

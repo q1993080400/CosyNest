@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8</TargetFramework>
+		<TargetFramework>net9</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>preview</LangVersion>
 		<AssemblyName>CommonWebApi</AssemblyName>
 		<RootNamespace>System.NetFrancis.Api</RootNamespace>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

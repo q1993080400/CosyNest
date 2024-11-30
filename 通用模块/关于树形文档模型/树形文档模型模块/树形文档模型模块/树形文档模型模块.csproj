@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8</TargetFramework>
+		<TargetFramework>net9</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<AssemblyName>ToolTreeObject</AssemblyName>
 		<RootNamespace>System.TreeObject</RootNamespace>

@@ -78,7 +78,7 @@ public abstract record HttpHeader : IHttpHeader
     #endregion
     #region 重写的ToString方法
     public sealed override string ToString()
-        => HeadersImmutable.Join(x => $"{x.Key}:{x.Value.Join(",")}", Environment.NewLine);
+        => HeadersImmutable.Join(static x => $"{x.Key}:{x.Value.Join(",")}", Environment.NewLine);
     #endregion
     #region 构造函数
     #region 传入标头集合
@@ -89,9 +89,9 @@ public abstract record HttpHeader : IHttpHeader
     /// <param name="headers">使用指定的自定义标头集合初始化对象</param>
     public HttpHeader(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
     {
-        var h = headers.Select(x => new KeyValuePair<string, IEnumerable<string>>
-        (x.Key, x.Value.Where(x => !x.IsVoid()).ToArray())).
-            Where(x => (x.Key.IsVoid(), x.Value.Count()) is (false, > 0)).ToArray();
+        var h = headers.Select(static x => new KeyValuePair<string, IEnumerable<string>>
+        (x.Key, x.Value.Where(static x => !x.IsVoid()).ToArray())).
+            Where(static x => (x.Key.IsVoid(), x.Value.Count()) is (false, > 0)).ToArray();
         HeadersImmutable = ImmutableDictionary<string, IEnumerable<string>>.Empty.AddRange(h);
     }
     #endregion

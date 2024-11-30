@@ -20,9 +20,15 @@ sealed class ExcelCellsMicrosoft(ExcelSheetMicrosoft sheet, MSExcelRange range) 
         await Task.Delay(50);
     }
     #endregion
+    #region 单元格的值
+    public override RangeValue Value
+    {
+        get => new(range.Value);
+        set => range.Value = value.Content;
+    }
+    #endregion
     #endregion
     #region 未实现的成员
-    public override RangeValue Value { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public override string? FormulaA1 { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public override string? FormulaR1C1 { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public override string? Link { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

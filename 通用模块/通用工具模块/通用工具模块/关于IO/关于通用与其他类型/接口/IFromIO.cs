@@ -1,4 +1,5 @@
 ﻿using System.Design;
+using System.IOFrancis.FileSystem;
 
 namespace System.IOFrancis;
 
@@ -41,6 +42,18 @@ public interface IFromIO : IInstruct, IAsyncDisposable
     /// 如果为<see langword="null"/>，代表尚未保存到文件中
     /// </summary>
     string? Path { get; }
+    #endregion
+    #region 返回文件的文件名，扩展名和全名
+    /// <summary>
+    /// 返回一个元组，
+    /// 它的项分别是文件的文件名，扩展名（如果有）和全名，
+    /// 如果<see cref="Path"/>为<see langword="null"/>，
+    /// 则引发异常
+    /// </summary>
+    (string Simple, string? Extended, string FullName) PathInfo
+        => Path is { } path ?
+        ToolPath.SplitFilePath(path) :
+        throw new NotSupportedException($"文件还尚未保存到硬盘中，不知道它的路径");
     #endregion
     #region 是否存在于硬盘
     /// <summary>

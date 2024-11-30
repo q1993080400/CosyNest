@@ -29,7 +29,7 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
                 dept_id = departmentID
             }, parameters: [("access_token", accessToken)],
             transformation: TransformAccessToken(accessToken));
-        return response.GetValue<double[]>("result.dept_id_list")?.Select(x => x.ToString()).ToArray() ?? [];
+        return response.GetValue<double[]>("result.dept_id_list")?.Select(static x => x.ToString()).ToArray() ?? [];
     }
     #endregion
     #region 获取所有子部门和员工
@@ -131,11 +131,7 @@ public sealed class DingDingWebApiBasis(IServiceProvider serviceProvider) :
         var (accessToken, refreshToken) = (token.Code, token.RefreshToken);
         var uri = $"https://api.dingtalk.com/v1.0/contact/users/me";
         var transform = ServiceProvider.GetService<HttpRequestTransform>();
-        var response = await http.RequestJsonGet(uri, transformation:
-           x => x with
-           {
-               Header = x.Header.With(x => x.Add("x-acs-dingtalk-access-token", [accessToken]))
-           });
+        var response = await http.RequestJsonGet(uri, transformation: TransformAccessToken(accessToken));
         var companyToken = await GetCompanyToken();
         var unionId = response["unionId"]?.ToString() ?? "";
         var userIDResponse = await http.RequestJsonPost("https://oapi.dingtalk.com/topapi/user/getbyunionid",

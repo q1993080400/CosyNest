@@ -1,4 +1,4 @@
-﻿namespace System.NetFrancis.Api.Bing.Image;
+﻿namespace System.NetFrancis.Api;
 
 /// <summary>
 /// 凡是实现这个接口的类型，

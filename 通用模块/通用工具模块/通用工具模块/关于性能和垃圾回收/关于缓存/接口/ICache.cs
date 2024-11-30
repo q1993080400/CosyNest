@@ -1,4 +1,6 @@
-﻿namespace System.Performance;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace System.Performance;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -25,7 +27,7 @@ public interface ICache<Key, Value>
     /// <param name="value">如果找到了元素，
     /// 元素的值会被初始化为这个变量</param>
     /// <returns></returns>
-    bool TryGetValue(Key key, out Value? value);
+    bool TryGetValue(Key key, [NotNullWhen(true)] out Value? value);
     #endregion
     #region 显式设置元素
     /// <summary>

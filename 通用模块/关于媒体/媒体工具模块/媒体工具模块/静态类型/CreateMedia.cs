@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.IOFrancis.FileSystem;
 using System.MathFrancis;
 
 namespace System.Media;
@@ -40,24 +39,5 @@ public static class CreateMedia
         return System.Drawing.Color.FromArgb(alpha, Fun(), Fun(), Fun());
     }
     #endregion
-    #endregion
-    #region 创建媒体文件类型
-    /// <summary>
-    /// 根据路径或扩展名，创建媒体文件类型
-    /// </summary>
-    /// <param name="pathOrExtended">要创建媒体文件类型的路径或扩展名</param>
-    /// <returns></returns>
-    public static MediumFileType MediumFileType(string pathOrExtended)
-    {
-        var extended = ToolPath.SplitFilePath(pathOrExtended).Extended ??
-            pathOrExtended.TrimStart('.');
-        return extended switch
-        {
-            "png" or "jpg" or "jpeg" or "gif" or "svg" or "webp" or "bmp" or "avif" => Media.MediumFileType.Image,
-            "mp4" or "webm" or "mov" => Media.MediumFileType.Video,
-            "mp3" or "acc" or "ogg" or "flac" => Media.MediumFileType.Audio,
-            _ => Media.MediumFileType.NotMediumFile
-        };
-    }
     #endregion
 }

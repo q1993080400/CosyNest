@@ -66,4 +66,16 @@ public static partial class ExtendTool
     public static string FormatCommon(this decimal num)
         => num.ToString(Tool.FormattedNumCommon);
     #endregion
+    #region 如果一个对象为null，则引发异常
+    /// <summary>
+    /// 如果一个对象为<see langword="null"/>，
+    /// 则引发异常，否则返回它本身
+    /// </summary>
+    /// <typeparam name="Obj">要检查的对象的类型</typeparam>
+    /// <param name="obj">要检查的对象</param>
+    /// <returns></returns>
+    public static Obj ThrowIfNull<Obj>(this Obj? obj)
+        where Obj : class
+        => obj ?? throw new NullReferenceException($"指定的{typeof(Obj)}对象为null");
+    #endregion
 }

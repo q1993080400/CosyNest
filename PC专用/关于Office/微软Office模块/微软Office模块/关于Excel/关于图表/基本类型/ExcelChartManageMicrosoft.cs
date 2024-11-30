@@ -17,7 +17,7 @@ sealed class ExcelChartManageMicrosoft(Shapes shapes) : IOfficeObjectManageCommo
     #endregion
     #region 枚举所有图表
     public IEnumerator<IOfficeChart> GetEnumerator()
-        => Charts.Select(x => new ExcelChartMicrosoft(x)).
+        => Charts.Select(static x => new ExcelChartMicrosoft(x)).
         GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()

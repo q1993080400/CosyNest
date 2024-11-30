@@ -10,7 +10,7 @@
   
   将以下代码添加到根页面：
   
-  <link href="_content/ToolRazor/css/style.css" rel="stylesheet" />
-  <script src="_content/ToolRazor/js/script.js"></script>
+  <link href="@Assets["_content/ToolRazor/css/style.css" rel="stylesheet"]" />
+  <script src="@Assets["_content/ToolRazor/js/script.js"]"></script>
 
  */

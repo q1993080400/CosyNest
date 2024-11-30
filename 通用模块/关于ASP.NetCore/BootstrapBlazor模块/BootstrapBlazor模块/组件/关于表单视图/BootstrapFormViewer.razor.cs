@@ -80,7 +80,7 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     #region 用来提交表单的业务逻辑
     /// <inheritdoc cref="BusinessFormViewer{Model}.Submit"/>
     [Parameter]
-    public Func<Model, Task<bool>> Submit { get; set; } = _ => Task.FromResult(true);
+    public Func<Model, Task<bool>> Submit { get; set; } = static _ => Task.FromResult(true);
     #endregion
     #region 是否提交后自动重置表单
     /// <inheritdoc cref="BusinessFormViewer{Model}.ResetAfterSubmission"/>
@@ -90,12 +90,12 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     #region 用来重置表单的业务逻辑
     /// <inheritdoc cref="BusinessFormViewer{Model}.Resetting"/>
     [Parameter]
-    public Func<Task> Resetting { get; set; } = () => Task.CompletedTask;
+    public Func<Task> Resetting { get; set; } = static () => Task.CompletedTask;
     #endregion
     #region 用来删除表单的业务逻辑
     /// <inheritdoc cref="BusinessFormViewer{Model}.Delete"/>
     [Parameter]
-    public Func<Model, Task<bool>> Delete { get; set; } = _ => Task.FromResult(true);
+    public Func<Model, Task<bool>> Delete { get; set; } = static _ => Task.FromResult(true);
     #endregion
     #region 用来取消表单的业务逻辑
     /// <inheritdoc cref="BusinessFormViewer{Model}.Cancellation"/>

@@ -13,22 +13,22 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
     #region 获取身份验证标头
     public AuthenticationHeaderValue? Authorization
     {
-        get => GetHeader("Authorization", v => AuthenticationHeaderValue.Parse(v.Single()));
-        init => SetHeader("Authorization", value, v => [v.ToString()]);
+        get => GetHeader("Authorization", static v => AuthenticationHeaderValue.Parse(v.Single()));
+        init => SetHeader("Authorization", value, static v => [v.ToString()]);
     }
     #endregion
     #region Cookie标头
     public string? Cookie
     {
-        get => GetHeader("Cookie", v => v.Join(";"));
-        init => SetHeader("Cookie", value, v => v.Split(";"));
+        get => GetHeader("Cookie", static v => v.Join(";"));
+        init => SetHeader("Cookie", value, static v => v.Split(";"));
     }
     #endregion
     #region User-Agent标头
     public string? UserAgent
     {
-        get => GetHeader("User-Agent", v => v.Single());
-        init => SetHeader("User-Agent", value, v => [v]);
+        get => GetHeader("User-Agent", static v => v.Single());
+        init => SetHeader("User-Agent", value, static v => [v]);
     }
 
     /*警告：
@@ -38,8 +38,8 @@ public sealed record HttpHeaderRequest : HttpHeader, IHttpHeaderRequest
     #region Host标头
     public string? Host
     {
-        get => GetHeader("Host", v => v.First());
-        init => SetHeader("Host", value, v => [v]);
+        get => GetHeader("Host", static v => v.First());
+        init => SetHeader("Host", value, static v => [v]);
     }
     #endregion
     #endregion

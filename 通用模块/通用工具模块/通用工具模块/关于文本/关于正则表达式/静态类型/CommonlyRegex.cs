@@ -56,7 +56,7 @@ public static class CommonlyRegex
     /// <inheritdoc cref="KeyValuePair(string, string)"/>
     public static IReadOnlyDictionary<string, string> KeyValuePairExtraction(string text, string separator, string separatorKey = "=")
         => KeyValuePair(separator, separatorKey).Matches(text).Matches.
-        ToDictionary(x => x["key"].Match, x => x["value"].Match);
+        ToDictionary(static x => x["key"].Match, static x => x["value"].Match);
     #endregion
     #endregion
 }

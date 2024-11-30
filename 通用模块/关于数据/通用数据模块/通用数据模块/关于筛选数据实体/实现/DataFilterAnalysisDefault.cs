@@ -17,7 +17,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         var description = info.Description;
         var data = info.DataSource;
         var query = GenerateQueryExpression(info);
-        var sort = info.SortFunction?.Invoke(query) ?? query.OrderBy(x => 0);
+        var sort = info.SortFunction?.Invoke(query) ?? query.OrderBy(static x => 0);
         return GenerateSortExpression(description.SortCondition, info.SkipVirtualization, info.GenerateVirtuallySort, sort);
     }
     #endregion
@@ -34,7 +34,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     {
         var dataSource = info.DataSource;
         var condition = info.Description.QueryCondition;
-        var (isVirtually, isTrue) = condition.Split(x => x.IsVirtually);
+        var (isVirtually, isTrue) = condition.Split(static x => x.IsVirtually);
         if (isTrue.Count > 0)
         {
             var where = GenerateWhereExpression<Obj>(isTrue, info.Reconsitution);
@@ -188,7 +188,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// </summary>
     private static MethodInfo MethodAny { get; }
         = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static).
-        SingleOrDefaultSecure(x => x.Name is nameof(Enumerable.Any) && x.GetParameters().Length is 2) ??
+        SingleOrDefaultSecure(static x => x.Name is nameof(Enumerable.Any) && x.GetParameters().Length is 2) ??
         throw new NotSupportedException($"{nameof(Enumerable)}中存在多个名为{nameof(Enumerable.Any)}，且参数数量为2的方法，" +
             $"您可以检查下，是不是升级Net版本后新增了这个方法？如果是，请将这个属性重构");
     #endregion
@@ -219,7 +219,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         Func<SortCondition, IOrderedQueryable<Obj>, IOrderedQueryable<Obj>>? generateVirtuallySort,
         IOrderedQueryable<Obj> dataSource)
     {
-        var (isVirtually, isTrue) = sortConditions.Split(x => x.IsVirtually);
+        var (isVirtually, isTrue) = sortConditions.Split(static x => x.IsVirtually);
         dataSource = isTrue.Aggregate(dataSource, GenerateSortSingleExpression);
         if (skipVirtualization)
             return dataSource;

@@ -49,7 +49,7 @@ public static class ToolRazor
         {
             (null, _) => null,
             ({ }, []) => template,
-            _ => $"{template}?{parameter.Join(x => $"{x.Name}={x.Value}", "&")}"
+            _ => $"{template}?{parameter.Join(static x => $"{x.Name}={x.Value}", "&")}"
         };
     }
     #endregion

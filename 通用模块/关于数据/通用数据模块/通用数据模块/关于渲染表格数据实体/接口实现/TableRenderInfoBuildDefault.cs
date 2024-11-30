@@ -45,13 +45,13 @@ sealed class TableRenderInfoBuildDefault<Model> : ITableRenderInfoBuild<Model>
     public TableRenderInfoBuildDefault()
     {
         var type = typeof(Model);
-        CacheRenderInfo = [.. type.GetProperties().Where(x => !x.IsStatic()).
+        CacheRenderInfo = [.. type.GetProperties().Where(static x => !x.IsStatic()).
             Cast<MemberInfo>().Append(type).
-            Select(x =>  (x,x.GetCustomAttribute<RenderTableBaseAttribute>()!)).
-            Where(x => x.Item2 is { }).ToArray().
-            OrderBy(x => x.Item2.Order)];
+            Select(static x =>  (x,x.GetCustomAttribute<RenderTableBaseAttribute>()!)).
+            Where(static x => x.Item2 is { }).ToArray().
+            OrderBy(static x => x.Item2.Order)];
         RenderHeaderColumnsInfoCache = CacheRenderInfo.
-            Select(x => x.Attribute.GetTableHeaderColumnsInfo(x.MemberInfo)).ToArray();
+            Select(static x => x.Attribute.GetTableHeaderColumnsInfo(x.MemberInfo)).ToArray();
     }
     #endregion
 }

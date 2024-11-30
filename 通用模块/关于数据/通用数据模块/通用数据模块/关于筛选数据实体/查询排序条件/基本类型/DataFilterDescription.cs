@@ -47,7 +47,7 @@ public sealed record DataFilterDescription
     /// </summary>
     public IReadOnlySet<string> Highlight
         => QueryCondition.
-        Select(x => x.CompareValue).
+        Select(static x => x.CompareValue).
         OfType<string>().ToHashSet();
     #endregion
 }

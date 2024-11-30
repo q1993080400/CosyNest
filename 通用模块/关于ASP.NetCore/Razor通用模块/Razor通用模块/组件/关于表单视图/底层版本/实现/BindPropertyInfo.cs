@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Microsoft.AspNetCore.Components;
 

@@ -3,7 +3,7 @@
 /// <summary>
 /// 这个静态类可以用来创建和Razor有关的对象
 /// </summary>
-public static class CreateRazor
+public static partial class CreateRazor
 {
     #region 关于不会刷新的EventCallback
     #region 创建IHandleEvent

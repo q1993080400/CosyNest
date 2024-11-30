@@ -9,14 +9,22 @@
         --lengthReference: 2.25;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2.5);
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 60vw;
+    }
+}
+
+/*超大容器，一般出现在超大屏PC平台*/
+@container (min-width : 1836px)
+{
+    .arrange
+    {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 4;
         /*列表容器的中等数量*/
         --arrangeParticleMedium: 5;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 6;
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 60vw;
     }
 }
 
@@ -30,14 +38,22 @@
         --lengthReference: 1.75;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2);
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 70vw;
+    }
+}
+
+/*大容器，一般出现在普通屏PC平台*/
+@container (min-width : 1224px) and (max-width : 1836px)
+{
+    .arrange
+    {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 3;
         /*列表容器的中等数量*/
-        --arrangeParticleMedium: 4;
+        --arrangeParticleMedium: 3;
         /*列表容器的较多数量*/
-        --arrangeParticleMost: 5;
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 70vw;
+        --arrangeParticleMost: 4;
     }
 }
 
@@ -51,14 +67,22 @@
         --lengthReference: 1.25;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 1.5);
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 80vw;
+    }
+}
+
+/*中容器，一般出现在平板平台*/
+@container (min-width : 667px) and (max-width : 1224px)
+{
+    .arrange
+    {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 2;
         /*列表容器的中等数量*/
-        --arrangeParticleMedium: 3;
+        --arrangeParticleMedium: 2;
         /*列表容器的较多数量*/
-        --arrangeParticleMost: 4;
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 80vw;
+        --arrangeParticleMost: 3;
     }
 }
 
@@ -72,14 +96,22 @@
         --lengthReference: 1;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: var(--topLayoutPaddingVertical);
+        /*最大弹窗宽度*/
+        --maxPopUpWidth: 90vw;
+    }
+}
+
+/*小容器，一般出现在手机平台*/
+@container (max-width : 667px)
+{
+    .arrange
+    {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 1;
         /*列表容器的中等数量*/
         --arrangeParticleMedium: 1;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 2;
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 90vw;
     }
 }
 
@@ -415,6 +447,12 @@ input[type=file]
 {
     display: grid;
     gap: var(--gapMedium);
+}
+
+/*依次排列元素的父容器样式*/
+:has(> .arrange)
+{
+    container-type: inline-size;
 }
 
 /*依次排列元素，且元素数量较少时的样式*/

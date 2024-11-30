@@ -104,7 +104,7 @@ public sealed partial class SearchPanel : ComponentBase
         if (!firstRender)
             return;
         CacheRenderCondition = await GetRenderCondition();
-        this.SearchViewerState.InitializeDefaultValue(CacheRenderCondition);
+        SearchViewerState.InitializeDefaultValue(CacheRenderCondition);
         await SubmitFunction();
     }
     #endregion

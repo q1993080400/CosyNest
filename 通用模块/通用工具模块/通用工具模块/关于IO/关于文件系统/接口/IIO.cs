@@ -100,11 +100,11 @@ public interface IIO : IIOBase
     #region 执行完毕后删除
     /// <summary>
     /// 返回一个<see cref="IDisposable"/>，
-    /// 在它被using的时候，自动删除这个文件或目录
+    /// 在它被释放的时候，会自动删除这个文件或目录
     /// </summary>
     /// <returns></returns>
     IDisposable DeleteHandle()
-        => FastRealize.Disposable(this.Delete);
+        => FastRealize.Disposable(Delete);
     #endregion
     #endregion
 }

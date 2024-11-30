@@ -65,7 +65,7 @@ public static partial class ExtendText
     /// <returns></returns>
     public static string Remove(this string text, params string[] remove)
         => remove.Length <= 4 ?
-            remove.Aggregate(text, (seed, text) => seed.Replace(text, "")) :
+            remove.Aggregate(text, static (seed, text) => seed.Replace(text, "")) :
             $"({remove.Join("|")})".Op().Regex().Remove(text);
 
     //当要替换的字符比较多时，使用正则表达式，提高性能
@@ -109,7 +109,7 @@ public static partial class ExtendText
     /// <param name="chars">待连接的集合</param>
     /// <returns></returns>
     public static string[] JoinChar(this IEnumerable<IEnumerable<char>> chars)
-        => chars.Select(x => x.Join()).ToArray();
+        => chars.Select(static x => x.Join()).ToArray();
     #endregion
     #region 用指定的字符连接一个集合
     /// <summary>

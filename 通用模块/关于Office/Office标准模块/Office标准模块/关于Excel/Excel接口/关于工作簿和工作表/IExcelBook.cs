@@ -52,5 +52,15 @@ public interface IExcelBook : IFromIO
     /// </summary>
     IExcelSheetManage SheetManage { get; }
     #endregion
+    #region 返回工作表，为null时引发异常
+    /// <summary>
+    /// 根据工作表名，返回工作表，
+    /// 如果该工作表不存在，则引发异常
+    /// </summary>
+    /// <param name="name">工作表名称</param>
+    /// <returns></returns>
+    IExcelSheet this[string name]
+        => SheetManage[name];
+    #endregion
     #endregion
 }

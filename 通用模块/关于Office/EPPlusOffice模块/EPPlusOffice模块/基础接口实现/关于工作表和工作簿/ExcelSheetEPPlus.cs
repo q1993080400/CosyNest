@@ -51,7 +51,7 @@ sealed class ExcelSheetEPPlus : ExcelSheet
     {
         collection ??= Book.SheetManage;
         var sheets = collection.To<ExcelSheetManageEPPlus>().EPPlusSheets;
-        var newName = ExcelRealizeHelp.SheetRepeat(sheets.Select(x => x.Name), Name, renamed);
+        var newName = ExcelRealizeHelp.SheetRepeat(sheets.Select(static x => x.Name), Name, renamed);
         var newSheet = sheets.Add(newName, Sheet);
         return new ExcelSheetEPPlus(collection, newSheet);
     }

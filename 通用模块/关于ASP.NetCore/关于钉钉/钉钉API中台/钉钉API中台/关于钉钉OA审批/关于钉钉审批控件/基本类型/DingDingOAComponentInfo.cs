@@ -37,7 +37,7 @@ public abstract record DingDingOAComponentInfo
                     };
                 case DingDingOAComponentType.DDAttachment:
                     var files = JsonSerializer.Deserialize<IDirect[]>(valueJson, options)!;
-                    var attachmentInfo = files.Select(x => new DingDingOAAttachmentInfo()
+                    var attachmentInfo = files.Select(static x => new DingDingOAAttachmentInfo()
                     {
                         SpaceID = x.GetValue<string>("spaceId")!,
                         FileName = x.GetValue<string>("fileName")!,
@@ -68,7 +68,7 @@ public abstract record DingDingOAComponentInfo
                     static DingDingOAFormComponentValue[] Fun(IDirect json)
                     {
                         var rowValue = json.GetValue<object[]>("rowValue")!.Cast<IDirect>().ToArray();
-                        return rowValue.Select(x =>
+                        return rowValue.Select(static x =>
                         {
                             var componentType = x.GetValue<string>("key")!.Split('-', '_')[0];
                             return new DingDingOAFormComponentValue()

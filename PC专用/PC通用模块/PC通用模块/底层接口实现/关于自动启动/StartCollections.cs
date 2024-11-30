@@ -25,8 +25,8 @@ sealed class StartCollections : ICollection<string>
     #region 枚举自启项
     public IEnumerator<string> GetEnumerator()
         => AutomaticStart.SonAll.OfType<IOFrancis.FileSystem.IFile>().
-        Where(x => x.NameFull is not "desktop.ini").        //这个文件是用户个性化设置，它不会被枚举
-        Select(x =>
+        Where(static x => x.NameFull is not "desktop.ini").        //这个文件是用户个性化设置，它不会被枚举
+        Select(static x =>
         {
             var path = x.Path;
             if (path.EndsWith(".lnk"))

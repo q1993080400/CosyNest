@@ -60,4 +60,22 @@ public static partial class ExtendEnumerable
         };
     */
     #endregion
+    #region 批量删除元素
+    /// <summary>
+    /// 批量删除元素
+    /// </summary>
+    /// <typeparam name="Obj">要批量删除元素的集合的元素类型</typeparam>
+    /// <param name="list">要批量删除元素的集合</param>
+    /// <param name="predicate">用来判断是否删除某元素的委托</param>
+    public static void RemoveAll<Obj>(this IList<Obj> list, Func<Obj, bool> predicate)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (predicate(list[i]))
+            {
+                list.RemoveAt(i--);
+            }
+        }
+    }
+    #endregion
 }

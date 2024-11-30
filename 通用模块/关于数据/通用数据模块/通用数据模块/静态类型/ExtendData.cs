@@ -29,7 +29,6 @@ public static partial class ExtendData
             await using var pipe = serviceProvider.RequiredDataPipe();
             await pipe.Push(context => context.AddOrUpdate([log]));
         });
-        loggingBuilder.SetMinimumLevel(LogLevel.Warning);
         return loggingBuilder;
     }
     #endregion
@@ -58,7 +57,7 @@ public static partial class ExtendData
     {
         if (!type.IsEnum)
             yield break;
-        foreach (var field in type.GetFields().Where(x => x.IsStatic))
+        foreach (var field in type.GetFields().Where(static x => x.IsStatic))
         {
             var @enum = (Enum)field.GetValue(null)!;
             var renderDataName = field.GetCustomAttribute<RenderDataAttribute>()?.Name;

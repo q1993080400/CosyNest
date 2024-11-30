@@ -19,7 +19,7 @@ public static class ExtendException
     public static void Log(this Exception exception, IServiceProvider serviceProvider, string additionalMessage = "")
     {
         var log = serviceProvider.GetService<ILoggerProvider>();
-        log?.CreateLogger("").Log(LogLevel.Error, default, additionalMessage, exception, (_, _) => "");
+        log?.CreateLogger("").Log(LogLevel.Error, default, additionalMessage, exception, static (_, _) => "");
     }
     #endregion
     #region 将不认识的枚举转换为异常

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8</TargetFramework>
+		<TargetFramework>net9</TargetFramework>
 		<AssemblyName>ToolMath</AssemblyName>
 		<RootNamespace>System.MathFrancis</RootNamespace>
 		<LangVersion>preview</LangVersion>

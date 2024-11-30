@@ -73,14 +73,24 @@ public static class CreateIO
     #endregion
     #region 泛型方法
     /// <typeparam name="IO">返回值会被转换为这个类型</typeparam>
-    /// <inheritdoc cref="IO(PathText)"/>
+    /// <inheritdoc cref="IO(string)"/>
     public static IO? IO<IO>(string path)
         where IO : IIO
         => CreateIO.IO(path) is IO i ? i : default;
     #endregion
     #endregion
     #endregion
-    #endregion 
+    #region 创建临时路径
+    /// <summary>
+    /// 创建一个<see cref="IDisposable"/>，
+    /// 当它被释放的时候，会自动删除临时路径上面的文件或目录
+    /// </summary>
+    /// <param name="path">临时文件或目录的路径</param>
+    /// <returns></returns>
+    public static IDisposable TemporaryPath(string path)
+        => FastRealize.Disposable(() => IO(path)?.Delete());
+    #endregion
+    #endregion
     #region 创建管道
     #region 创建全双工管道
     /// <summary>

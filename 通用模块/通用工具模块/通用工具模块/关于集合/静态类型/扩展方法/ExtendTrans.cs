@@ -69,7 +69,7 @@ public static partial class ExtendEnumerable
     /// <returns></returns>
     /// <inheritdoc cref="ZipFill{ObjA, ObjB, Ret}(IEnumerable{ObjA}, IEnumerable{ObjB}, Func{ObjA, ObjB, Ret})"/>
     public static IEnumerable<(ObjA? A, ObjB? B)> ZipFill<ObjA, ObjB>(this IEnumerable<ObjA> collectionsA, IEnumerable<ObjB> collectionsB)
-        => collectionsA.ZipFill(collectionsB, (x, y) => (x, y));
+        => collectionsA.ZipFill(collectionsB, static (x, y) => (x, y));
     #endregion
     #endregion
     #region 填补集合的元素
@@ -133,7 +133,7 @@ public static partial class ExtendEnumerable
     /// <param name="objs">要筛选的集合元素</param>
     /// <returns></returns>
     public static IEnumerable<Obj> WhereNotNull<Obj>(this IEnumerable<Obj?> objs)
-        => objs.Where(x => x is { })!;
+        => objs.Where(static x => x is { })!;
     #endregion
     #region 摊平嵌套集合
     /// <summary>
@@ -143,6 +143,6 @@ public static partial class ExtendEnumerable
     /// <param name="list">待摊平的嵌套集合</param>
     /// <returns></returns>
     public static IEnumerable<Obj> SelectMany<Obj>(this IEnumerable<IEnumerable<Obj>> list)
-        => list.SelectMany(x => x);
+        => list.SelectMany(static x => x);
     #endregion
 }

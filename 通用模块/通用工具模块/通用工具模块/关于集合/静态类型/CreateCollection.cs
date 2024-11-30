@@ -32,7 +32,7 @@ public static class CreateCollection
     #region 简单方法
     /// <inheritdoc cref="RangeBE{Obj}(int, int, Func{int, Obj})"/>
     public static IEnumerable<int> RangeBE(int begin, int end)
-        => RangeBE(begin, end, x => x);
+        => RangeBE(begin, end, static x => x);
     #endregion
     #endregion
     #endregion

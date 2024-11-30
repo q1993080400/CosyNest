@@ -27,7 +27,7 @@ sealed class ComparableStringChinese : IComparer<string>
                     $"0{c}";            //非汉字字符和汉字字符分开排列
                 #endregion
                 var comparer = Comparer<string>.Default;
-                foreach (var (xPinYin, yPinYin) in x.Select(GetPinYin).ZipFill(y.Select(GetPinYin), (x, y) => (x, y)))
+                foreach (var (xPinYin, yPinYin) in x.Select(GetPinYin).ZipFill(y.Select(GetPinYin), static (x, y) => (x, y)))
                 {
                     if (comparer.Compare(xPinYin, yPinYin) is { } c and not 0)
                         return c;

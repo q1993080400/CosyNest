@@ -24,7 +24,7 @@ public static class ToolSearchViewer
         var interfaceType = typeof(BusinessInterface);
         var key = (entityType, interfaceType);
         if (CacheRenderCondition.TryGetValue(key, out var renderConditionGroup))
-            return renderConditionGroup ?? throw new NullReferenceException("获取到的缓存为null");
+            return renderConditionGroup;
         var typeAttribute = entityType.GetCustomAttributes<FilterConditionAttribute<BusinessInterface>>().
             Select(x => x.ConvertConditioGroup(entityType));
         var almightyPropertys = entityType.GetPropertyInfoAlmighty();
@@ -44,7 +44,7 @@ public static class ToolSearchViewer
     /// </summary>
     private static ICache<(Type Entity, Type BusinessInterface), RenderFilterGroup[]> CacheRenderCondition { get; }
     = CreatePerformance.MemoryCache<(Type Entity, Type BusinessInterface), RenderFilterGroup[]>
-        ((_, _) => throw new NotSupportedException("不支持自动获取元素，请显式添加元素，然后获取"));
+        (static _ => throw new NotSupportedException("不支持自动获取元素，请显式添加元素，然后获取"));
     #endregion
     #endregion
 }

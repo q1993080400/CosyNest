@@ -23,7 +23,7 @@ public static partial class ExcelRealizeHelp
     /// <returns>新的工作表名称，保证不重复</returns>
     public static string SheetRepeat(IEnumerable<string> sheetNames, string sheetName, Func<string, int, string>? renamed = null)
     {
-        renamed ??= (x, y) => $"{x}({y})";
+        renamed ??= static (x, y) => $"{x}({y})";
         return sheetNames.ToArray().Distinct(sheetName, renamed);
     }
     #endregion

@@ -85,7 +85,7 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     /// 返回值是业务逻辑是否成功
     /// </summary>
     [Parameter]
-    public Func<Model, Task<bool>> Submit { get; set; } = _ => Task.FromResult(true);
+    public Func<Model, Task<bool>> Submit { get; set; } = static _ => Task.FromResult(true);
     #endregion
     #region 是否提交后自动重置表单
     /// <summary>
@@ -100,7 +100,7 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     /// 当执行这个委托的时候，模型已被恢复为初始状态
     /// </summary>
     [Parameter]
-    public Func<Task> Resetting { get; set; } = () => Task.CompletedTask;
+    public Func<Task> Resetting { get; set; } = static () => Task.CompletedTask;
     #endregion
     #region 用来删除表单的业务逻辑
     /// <summary>
@@ -109,7 +109,7 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     /// 返回值是业务逻辑是否成功
     /// </summary>
     [Parameter]
-    public Func<Model, Task<bool>> Delete { get; set; } = _ => Task.FromResult(true);
+    public Func<Model, Task<bool>> Delete { get; set; } = static _ => Task.FromResult(true);
     #endregion
     #region 用来取消表单的业务逻辑
     /// <summary>
@@ -118,6 +118,16 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
     /// </summary>
     [Parameter]
     public Func<Task>? Cancellation { get; set; }
+    #endregion
+    #region 级联参数：上传上下文
+    /// <summary>
+    /// 获取级联的上传上下文，
+    /// 当本组件存在正在上传的任务的时候，
+    /// 会阻止用户离开页面，
+    /// 它可以避免用户在尚未上传完毕时离开页面
+    /// </summary>
+    [CascadingParameter]
+    private IFileUploadNavigationContext? FileUploadNavigationContext { get; set; }
     #endregion
     #endregion 
     #endregion
@@ -149,7 +159,14 @@ public sealed partial class BusinessFormViewer<Model> : ComponentBase
             : null,
             Submit = async () =>
             {
+                #region 获取上传锁的本地函数
+                IDisposable UploadLock()
+                => HasPreviewFilePropertyNatureState.Get(typeof(Model)).HasPreviewFile ?
+                FileUploadNavigationContext.UploadLockSecure() :
+                FastRealize.DisposableEmpty();
+                #endregion
                 var model = info.FormModel;
+                using var uploadLock = UploadLock();
                 var isSuccess = await Submit(model);
                 if (isSuccess)
                 {

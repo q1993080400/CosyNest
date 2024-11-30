@@ -148,7 +148,7 @@ public static class ExtendEFCoreDB
     /// <returns></returns>
     internal static IEnumerable<Type> EntityTypes(this DbContext dbContext)
         => dbContext.Model.GetEntityTypes().
-        Where(x => !x.HasSharedClrType).Select(x => x.ClrType);
+        Where(static x => !x.HasSharedClrType).Select(static x => x.ClrType);
     #endregion
     #endregion
 }

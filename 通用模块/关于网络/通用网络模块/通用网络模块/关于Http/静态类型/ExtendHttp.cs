@@ -17,14 +17,14 @@ public static partial class ExtendNet
     /// 以单例模式注入一个<see cref="IHttpClient"/>，
     /// 它可以用来发起Http请求，
     /// 如果服务容器中注册了<see cref="HttpRequestTransform"/>，
-    /// 那么还会将它作为<see cref="IHttpClient"/>的请求转换函数
+    /// 那么还会将它作为<see cref="IHttpClient"/>的默认请求转换函数
     /// </summary>
     /// <param name="services">要注入的服务集合</param>
     /// <returns></returns>
     public static IServiceCollection AddIHttpClient(this IServiceCollection services)
     {
         services.AddHttpClient();
-        return services.AddSingleton(x =>
+        return services.AddSingleton(static x =>
         {
             var requestTransform = x.GetService<HttpRequestTransform>();
             return x.GetRequiredService<IHttpClientFactory>().ToHttpClient(requestTransform);
@@ -41,7 +41,7 @@ public static partial class ExtendNet
     /// <returns></returns>
     public static IServiceCollection AddHttpRequestTransformUri(this IServiceCollection services)
     {
-        services.AddSingleton(x =>
+        services.AddSingleton(static x =>
         {
             var hostProvide = x.GetRequiredService<IHostProvide>();
             return CreateNet.TransformBaseUri(hostProvide.Host);

@@ -31,7 +31,7 @@ public sealed record VerificationResults
     public string? ErrorMessage
         => IsSuccess ?
         null :
-        FailureReason.Join(x => x.Prompt, Environment.NewLine);
+        FailureReason.Join(static x => x.Prompt, Environment.NewLine);
     #endregion
     #region 是否验证成功
     /// <summary>

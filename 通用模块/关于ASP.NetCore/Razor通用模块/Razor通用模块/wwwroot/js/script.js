@@ -208,8 +208,10 @@ async function SetPlayerState(playerID, stateOperational) {
 function UpdatePlayerTime(player, currentTimeElementID, totalTimeElementID) {
     const currentTimeElement = document.getElementById(currentTimeElementID);
     const totalTimeElement = document.getElementById(totalTimeElementID);
-    currentTimeElement.textContent = toTimeString(player.currentTime);
-    totalTimeElement.textContent = toTimeString(player.duration);
+    if (currentTimeElement && totalTimeElement) {
+        currentTimeElement.textContent = toTimeString(player.currentTime);
+        totalTimeElement.textContent = toTimeString(player.duration);
+    }
 }
 
 //获取播放器的播放进度，并返回一个double
@@ -327,24 +329,22 @@ function CreateSVGUri(svgID) {
     return URL.createObjectURL(blob);
 }
 
-//释放预览图片
-function DisposablePreviewImage(imageUrls) {
-    for (let url of imageUrls) {
+//批量释放对象Url
+function DisposableObjectURL(objectURLs) {
+    for (let url of objectURLs) {
         URL.revokeObjectURL(url)
     }
 }
 
-//初始化预览图片，并返回它们的ObjectURL
-function InitializationPreviewImage(inputElementID, previewIndexs) {
+//返回待上传文件的的ObjectURL
+function GetUploadFileURL(inputElementID) {
     const files = document.getElementById(inputElementID).files;
-    const indexMap = new Map(previewIndexs);
-    const indexs = [];
+    const urls = [];
     for (let i = 0; i < files.length; i++) {
-        const url = indexMap.has(i) ?
-            URL.createObjectURL(files.item(i)) : null;
-        indexs.push(url);
+        const url = URL.createObjectURL(files.item(i));
+        urls.push(url);
     }
-    return indexs;
+    return urls;
 }
 
 //这是一个读写cookie的小框架

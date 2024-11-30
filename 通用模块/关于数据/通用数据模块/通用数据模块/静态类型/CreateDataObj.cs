@@ -1,17 +1,17 @@
-﻿using System.Reflection;
-using System.DataFrancis.EntityDescribe;
+﻿using System.DataFrancis.EntityDescribe;
+using System.Reflection;
 
 namespace System.DataFrancis;
 
 /// <summary>
 /// 这个静态类可以用来帮助创建一些关于数据的对象
 /// </summary>
-public static class CreateDataObj
+public static partial class CreateDataObj
 {
     #region 创建表达式解析器
     /// <summary>
     /// 返回一个<see cref="IDataFilterAnalysis"/>的默认实现，
-    /// 它可以将<see cref="DataFilterDescription{Obj}"/>解析为表达式树
+    /// 它可以将<see cref="DataFilterDescription"/>解析为表达式树
     /// </summary>
     public static IDataFilterAnalysis DataFilterAnalysis { get; }
         = new DataFilterAnalysisDefault();

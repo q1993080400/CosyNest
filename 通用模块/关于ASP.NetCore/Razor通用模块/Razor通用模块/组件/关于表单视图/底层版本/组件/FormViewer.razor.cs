@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Microsoft.AspNetCore.Components;
 
@@ -212,6 +211,8 @@ public sealed partial class FormViewer<Model> : ComponentBase
             var groupName = attribute.GroupName;
             var isReadOnly = formViewer.IsReadOnlyProperty(property, model);
             var readOnlyConvert = isReadOnly ? formViewer.PropertyValueConvert : null;
+            var previewFilePropertyDescribe = HasPreviewFilePropertyNatureState.Get(typeof(Model)).
+            PreviewFilePropertyDescribe.GetValueOrDefault(property.Name);
             var renderInfo = attribute switch
             {
                 RenderDataAttribute renderDataAttribute => (RenderFormViewerPropertyInfoBase<Model>)new RenderFormViewerPropertyInfo<Model>()
@@ -223,6 +224,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     Name = renderDataAttribute.Name,
                     PropertyValueConvert = readOnlyConvert,
                     OnPropertyChange = null,
+                    PreviewFilePropertyDescribe = previewFilePropertyDescribe,
                     RenderPreference = new()
                     {
                         Format = renderDataAttribute.Format,
@@ -237,7 +239,8 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     IsReadOnly = isReadOnly,
                     Property = property,
                     PropertyValueConvert = readOnlyConvert,
-                    OnPropertyChange = null
+                    OnPropertyChange = null,
+                    PreviewFilePropertyDescribe = previewFilePropertyDescribe,
                 },
                 _ => throw new NotSupportedException("无法识别这个渲染数据特性")
             };
@@ -325,7 +328,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
             Resetting = () =>
             {
                 InitializationFormModel();
-                this.StateHasChanged();
+                StateHasChanged();
                 return Task.CompletedTask;
             },
             ExistingForms = ExistingForms(FormModel),

@@ -13,7 +13,7 @@ sealed class OSSAliyun(AliyunOSSToken token) : IOSS
     public Task<string> Upload(Stream stream, string? objectName, string? objectExtension)
     {
         var newObjectExtension = objectExtension.IsVoid() ? null : "." + objectExtension;
-        var newObjectName = (objectName ?? Guid.NewGuid().ToString()) + newObjectExtension;
+        var newObjectName = (objectName ?? Guid.CreateVersion7().ToString()) + newObjectExtension;
         var client = CreateClient();
         using var result = client.PutObject(token.Bucket, newObjectName, stream);
         return Task.FromResult(newObjectName);

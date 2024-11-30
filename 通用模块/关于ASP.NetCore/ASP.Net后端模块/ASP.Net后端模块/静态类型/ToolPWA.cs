@@ -57,7 +57,7 @@ public static class ToolPWA
     public static void UpdatePWAVersion(string manifestPath = @"wwwroot\manifest.webmanifest")
     {
 #if DEBUG
-        UpdateManifest(manifest =>
+        UpdateManifest(static manifest =>
         {
             var now = DateTime.Now.ToString("yyyy.MM.dd");
             var version = manifest.TryGetValue(KeyVersion).Value?.ToString();

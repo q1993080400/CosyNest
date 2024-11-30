@@ -258,7 +258,7 @@ public static partial class ExtendEnumerable
     /// <param name="text">要检查的文本</param>
     /// <returns></returns>
     public static string Distinct(this IEnumerable<string> collections, string text)
-        => collections.Distinct(text, (x, y) => $"{x}({y})");
+        => collections.Distinct(text, static (x, y) => $"{x}({y})");
     #endregion
     #endregion
     #endregion

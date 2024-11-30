@@ -1,6 +1,4 @@
-﻿using System.DataFrancis;
-
-namespace Microsoft.AspNetCore.Components;
+﻿namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
 /// 这个记录是用来渲染<see cref="FormViewer{Model}"/>的中每个属性的参数

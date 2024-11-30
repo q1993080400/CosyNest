@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8</TargetFramework>
+		<TargetFramework>net9</TargetFramework>
 		<AssemblyName>PDFRealizeIText</AssemblyName>
 		<RootNamespace>System.Media.Drawing.PDF</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -13,7 +13,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="itext" Version="8.0.5" PrivateAssets="compile" />
+		<PackageReference Include="itext" Version="9.0.0" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

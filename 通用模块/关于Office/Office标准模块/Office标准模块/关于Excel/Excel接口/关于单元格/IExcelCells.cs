@@ -168,7 +168,7 @@ public interface IExcelCells : IExcelRange, IExcelCellsCommunity
     /// 获取一个枚举所有非空子单元格的枚举器
     /// </summary>
     IEnumerable<IExcelCells> CellsNotNull
-        => Cells.Where(x => x.Value.Content is not (null or "" or 0) || x.FormulaR1C1 is { });
+        => Cells.Where(static x => x.Value.Content is not (null or "" or 0) || x.FormulaR1C1 is { });
     #endregion
     #region 枚举所有子单元格
     /// <summary>

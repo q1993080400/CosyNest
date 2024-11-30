@@ -58,7 +58,7 @@ sealed class WordDocumentMicrosoft : WordDocument, IOfficeUpdate
     public string Update()
     {
         Document.Convert();
-        var newPath = ToolPath.RefactoringPath(Path!, newExtension: _ => "docx");
+        var newPath = ToolPath.RefactoringPath(Path!, newExtension: static _ => "docx");
         Document.SaveAs(newPath, WdSaveFormat.wdFormatDocumentDefault);
         return newPath;
     }

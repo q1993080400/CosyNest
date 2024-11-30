@@ -1,5 +1,4 @@
-﻿using System.DataFrancis;
-using System.Design;
+﻿using System.Design;
 using System.NetFrancis.Api;
 
 namespace Microsoft.AspNetCore;

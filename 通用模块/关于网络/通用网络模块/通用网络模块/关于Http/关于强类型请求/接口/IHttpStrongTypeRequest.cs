@@ -37,12 +37,13 @@ public interface IHttpStrongTypeRequest<API>
     /// </summary>
     /// <typeparam name="Ret">返回值类型</typeparam>
     /// <param name="request">用于描述请求路径和参数的表达式</param>
-    /// <param name="transformation">用来转换请求的委托</param>
+    /// <param name="transformation">这个委托的第一个参数是默认Http转换函数，
+    /// 返回值是新的Http转换函数，如果为<see langword="null"/>，则不转换默认转换函数</param>
     /// <param name="options">一个用于Json转换的对象，它仅用来序列化请求，不用来反序列化响应</param>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
     Task<HttpResponseMessage> RequestResponse<Ret>(Expression<Func<API, Ret>> request,
-        HttpRequestTransform? transformation = null, JsonSerializerOptions? options = null,
+        Func<HttpRequestTransform, HttpRequestTransform>? transformation = null, JsonSerializerOptions? options = null,
         CancellationToken cancellationToken = default);
 
     /*问：如何使用这个方法？
@@ -58,8 +59,8 @@ public interface IHttpStrongTypeRequest<API>
     /// <summary>
     /// 发起强类型Http请求，并将结果反序列化为Json后返回
     /// </summary>
-    /// <inheritdoc cref="RequestResponse{Ret}(Expression{Func{API, Ret}}, HttpRequestTransform?, JsonSerializerOptions?, CancellationToken)"/>
-    async Task Request(Expression<Func<API, Task>> request, HttpRequestTransform? transformation = null,
+    /// <inheritdoc cref="RequestResponse{Ret}(Expression{Func{API, Ret}}, Func{HttpRequestTransform, HttpRequestTransform}?, JsonSerializerOptions?, CancellationToken)"/>
+    async Task Request(Expression<Func<API, Task>> request, Func<HttpRequestTransform, HttpRequestTransform>? transformation = null,
        JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
         using var response = await RequestResponse(request, transformation, options, cancellationToken);
@@ -70,8 +71,8 @@ public interface IHttpStrongTypeRequest<API>
     /// 发起强类型Http请求，并将结果反序列化为Json后返回
     /// </summary>
     /// <param name="options">一个用于Json转换的对象，它用来转换请求和响应</param>
-    /// <inheritdoc cref="RequestResponse{Ret}(Expression{Func{API, Ret}}, HttpRequestTransform?, JsonSerializerOptions?, CancellationToken)"/>
-    async Task<Ret> Request<Ret>(Expression<Func<API, Task<Ret>>> request, HttpRequestTransform? transformation = null,
+    /// <inheritdoc cref="RequestResponse{Ret}(Expression{Func{API, Ret}}, Func{HttpRequestTransform, HttpRequestTransform}?, JsonSerializerOptions?, CancellationToken)"/>
+    async Task<Ret> Request<Ret>(Expression<Func<API, Task<Ret>>> request, Func<HttpRequestTransform, HttpRequestTransform>? transformation = null,
        JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
     {
         using var response = await RequestResponse(request, transformation, options, cancellationToken);

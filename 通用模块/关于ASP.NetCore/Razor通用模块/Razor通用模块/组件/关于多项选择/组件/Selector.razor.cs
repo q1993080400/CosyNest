@@ -78,7 +78,7 @@ public sealed partial class Selector<Candidate> : ComponentBase
             Candidates = Candidates,
             Submit = async () =>
             {
-                await this.Submit(SelectElement);
+                await Submit(SelectElement);
             },
             SelectOrCancel = x =>
             {
@@ -89,7 +89,7 @@ public sealed partial class Selector<Candidate> : ComponentBase
                 var isSelect = !SelectElement.Remove(x);
                 if (isSelect)
                     SelectElement.Add(x);
-                this.StateHasChanged();
+                StateHasChanged();
                 return isSelect;
             },
             IsSelect = SelectElement.Contains,

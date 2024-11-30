@@ -38,7 +38,7 @@ public static partial class ExtendExpressions
             ConstantExpression e => e.Value,
             MemberExpression e => e.Member.To<dynamic>().GetValue(e.Expression.CalValue()),
             MethodCallExpression e => e.CalValue(),
-            NewExpression e => e.Constructor!.Invoke(e.Arguments.Select(x => x.CalValue()).ToArray()),
+            NewExpression e => e.Constructor!.Invoke(e.Arguments.Select(static x => x.CalValue()).ToArray()),
             LambdaExpression e => e.Body.CalValue(),    //仅对没有参数或不使用参数的表达式有效
             BinaryExpression e => e.CalValue(),
             UnaryExpression e => e.CalValue(),
@@ -104,7 +104,7 @@ public static partial class ExtendExpressions
     private static object? CalValue(this MethodCallExpression methodCall)
         => methodCall.Method.Invoke(
             methodCall.Object.CalValue(),
-            methodCall.Arguments.Select(x => x.CalValue()).ToArray());
+            methodCall.Arguments.Select(static x => x.CalValue()).ToArray());
     #endregion
     #region 针对二元运算符表达式
     #region 会引发异常
@@ -167,7 +167,7 @@ public static partial class ExtendExpressions
     {
         if (expression.NodeType is ExpressionType.NewArrayBounds)
             throw new NotSupportedException($"暂不支持计算{nameof(Expression.NodeType)}为{nameof(ExpressionType.NewArrayBounds)}的表达式");
-        var array = expression.Expressions.Select(x => x.CalValue()).ToArray();
+        var array = expression.Expressions.Select(static x => x.CalValue()).ToArray();
         var @return = Array.CreateInstance(expression.Type.GetElementType()!, array.Length);
         Array.Copy(array, @return, array.Length);
         return @return;

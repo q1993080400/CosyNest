@@ -8,11 +8,11 @@
 @using System.ComponentModel.DataAnnotations.Schema;
 
 @{
-    var propertyTitle = RenderInfo.Name;
+    var propertyTitle = RenderPropertyInfo.Name;
     var name = propertyTitle.EndsWith(':') ? propertyTitle : propertyTitle + ":";
-    var property = RenderInfo.Property;
+    var property = RenderPropertyInfo.Property;
     var propertyType = property.PropertyType;
-    var renderPreference = RenderInfo.RenderPreference;
+    var renderPreference = RenderPropertyInfo.RenderPreference;
     var format = renderPreference.Format;
     #region 获取渲染特性
     Obj? GetRenderAttribute<Obj>()
@@ -27,12 +27,12 @@
 
 <div class="bootstrapFormViewerPropertyContainer">
     <div class="bootstrapFormViewerPropertyItem">
-        @if (RenderInfo.IsReadOnly)
+        @if (RenderPropertyInfo.IsReadOnly)
         {
             #region 获取文本值的本地函数
             string? GetText()
             {
-                var value = RenderInfo.Value;
+                var value = RenderPropertyInfo.Value;
                 return (value, format) switch
                 {
                     (Enum @enum, _) => @enum.GetDescription(),
@@ -51,7 +51,7 @@
                 <div class="bootstrapFormViewerPropertyLabel">@name</div>
                 <pre class="bootstrapFormViewerPropertyText">
                 <TextRenderingSimple Highlight="Highlight" Value="text" />
-                                                                                                                                                </pre>
+                </pre>
             </div>
         }
         else
@@ -59,7 +59,7 @@
             @switch (propertyType)
             {
                 case var t when t == typeof(string):
-                    var valueText = RenderInfo.BindValue<string>();
+                    var valueText = RenderPropertyInfo.BindValue<string>();
                     var stringRender = renderPreference.RenderString;
                     @switch (stringRender)
                     {
@@ -85,13 +85,13 @@
                         @switch (numRender)
                         {
                             case FormNumRender.Default or FormNumRender.Num:
-                                var value = RenderInfo.BindValue<T>();
+                                var value = RenderPropertyInfo.BindValue<T>();
                                 <BootstrapInputNumber TValue="T" ShowLabel="true"
                                                       DisplayText="@name" @bind-Value=value.Value
                                                       FormatString="@(format??Tool.FormattedNumCommon)" />
                                 break;
                             case FormNumRender.Grade when typeof(T) == typeof(double):
-                                var v = RenderInfo.BindValue<double>();
+                                var v = RenderPropertyInfo.BindValue<double>();
                                 <div>
                                     <div class="form-label bootstrapFormViewerPropertyLabel">@name</div>
                                     <Rate @bind-Value=v.Value />
@@ -124,7 +124,7 @@
                     var boolRender = renderPreference.RenderBool;
                     var trueDescribe = "打开";
                     var flaseDescribe = "关闭";
-                    var valueBool = RenderInfo.BindValue<bool>();
+                    var valueBool = RenderPropertyInfo.BindValue<bool>();
                     switch (boolRender)
                     {
                         case FormBoolRender.Default or FormBoolRender.Radio:
@@ -153,12 +153,12 @@
                 case { IsEnum: true } t:
                     var enumRender = renderPreference.RenderEnum;
                     Func<int, Task>? onEnumChange =
-                    RenderInfo.OnPropertyChange is null ?
+                    RenderPropertyInfo.OnPropertyChange is null ?
                     null :
                     async value =>
                     {
-                        var enumValue = value.To(RenderInfo.ValueType);
-                        await RenderInfo.OnPropertyChange(enumValue);
+                        var enumValue = value.To(RenderPropertyInfo.ValueType);
+                        await RenderPropertyInfo.OnPropertyChange(enumValue);
                     };
                     var enumSelect = Enum.GetNames(t).
                     Select(x => t.GetField(x)!).
@@ -174,7 +174,7 @@
                             Text = x.Item2,
                             Value = x.Item1.ToString()
                         }).ToArray();
-                    var valueEnum = RenderInfo.BindValue<int>();
+                    var valueEnum = RenderPropertyInfo.BindValue<int>();
                     @switch (enumRender)
                     {
                         case FormEnumRender.Default or FormEnumRender.Radio:
@@ -189,9 +189,12 @@
                     break;
                 case var t when t == typeof(DateTimeOffset):
                     var formatDate = format.IsVoid() ? "d" : format;
-                    var valueDate = RenderInfo.BindValue<DateTimeOffset>();
+                    var valueDate = RenderPropertyInfo.BindValue<DateTimeOffset>();
                     <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true"
                                     DisplayText="@name" DateFormat="@formatDate" />
+                    break;
+                case var t when RenderPropertyInfo.PreviewFilePropertyDescribe is { } previewFilePropertyDescribe:
+                    var uploadDescribeAttribute = property.GetCustomAttribute<UploadDescribeAttribute>();
                     break;
                 case var t:
                     throw new NotSupportedException($"无法识别属性{name}的类型{t}，不能生成表单");

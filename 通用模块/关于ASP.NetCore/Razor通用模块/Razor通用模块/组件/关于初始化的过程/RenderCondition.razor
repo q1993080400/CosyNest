@@ -1,0 +1,8 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Condition where Condition : class
+
+@if (CacheCondition is { })
+{
+    @ChildContent(CacheCondition)
+}

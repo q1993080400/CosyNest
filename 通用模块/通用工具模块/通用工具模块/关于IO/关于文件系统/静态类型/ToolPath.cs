@@ -65,7 +65,7 @@ public static class ToolPath
     /// 执行这个委托获取不重复的名称，委托的第一个参数是带扩展名的原始名称，第二个参数是尝试次数，从2开始</param>
     /// <returns></returns>
     public static string Distinct(IDirectory father, string fullName, Func<string, int, string> change)
-        => father.Son.Select(x => x.NameFull).Distinct(fullName, change);
+        => father.Son.Select(static x => x.NameFull).Distinct(fullName, change);
     #endregion
     #region 组合文件的名称和扩展名
     /// <summary>
@@ -77,7 +77,7 @@ public static class ToolPath
     /// 如果为<see langword="null"/>，代表没有扩展名</param>
     /// <returns></returns>
     public static string GetFullName(string? nameSimple = null, string? nameExtension = null)
-        => (nameSimple ?? Guid.NewGuid().ToString()) + (nameExtension.IsVoid() ? null : $".{nameExtension}");
+        => (nameSimple ?? Guid.CreateVersion7().ToString()) + (nameExtension.IsVoid() ? null : $".{nameExtension}");
     #endregion
     #endregion
     #region 检查路径

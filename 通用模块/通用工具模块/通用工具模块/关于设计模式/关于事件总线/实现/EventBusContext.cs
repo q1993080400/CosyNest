@@ -17,7 +17,7 @@ sealed class EventBusContext<Event> : IEventBusContext<Event>
     #endregion
     #region 创建事件总线注册器
     public IEventBusRegister<Event> CreateRegister()
-        => new EventBusRegister<Event>(this, Guid.NewGuid());
+        => new EventBusRegister<Event>(this, Guid.CreateVersion7());
     #endregion
     #endregion
     #region 内部成员

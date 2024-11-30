@@ -13,7 +13,7 @@ public sealed record EnumItem
     /// <param name="type">要获取枚举描述和值的类型</param>
     /// <returns></returns>
     public static EnumItem[] Create(Type type)
-       => type.GetEnumDescription().Select(x => new EnumItem()
+       => type.GetEnumDescription().Select(static x => new EnumItem()
        {
            Describe = x.Describe,
            Value = x.Value.ToString()

@@ -21,8 +21,8 @@ public sealed class SearchViewerState
         #region 本地函数
         static IReadOnlyCollection<Obj> Fun<Obj>(IEnumerable<IGenerateFilter> generates)
             where Obj : DataCondition
-            => generates.Select(x => x.GenerateFilter()).
-            SelectMany(x => x).
+            => generates.Select(static x => x.GenerateFilter()).
+            SelectMany(static x => x).
             OfType<Obj>().ToArray();
         #endregion
         return new()

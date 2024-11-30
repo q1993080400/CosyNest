@@ -42,7 +42,7 @@ sealed class ExcelSheetManageEPPlus(IExcelBook excelBook) : ExcelSheetManage(exc
     #region 插入空白表
     public override IExcelSheet Add(string name = "Sheet", Index? pos = null)
     {
-        var newName = ExcelRealizeHelp.SheetRepeat(EPPlusSheets.Select(x => x.Name), name);
+        var newName = ExcelRealizeHelp.SheetRepeat(EPPlusSheets.Select(static x => x.Name), name);
         var sheet = EPPlusSheets.Add(newName);
         var newSheet = PackEPPlusSheet(sheet);
         var index = (pos ?? Index.End).GetOffset(Count) - 1;
@@ -56,7 +56,7 @@ sealed class ExcelSheetManageEPPlus(IExcelBook excelBook) : ExcelSheetManage(exc
         if (sheet is not ExcelSheetEPPlus { Sheet: { } epSheet })
             throw new NotSupportedException($"不能将非EPPlus工作表复制到EPPlus工作表集合中");
         var name = epSheet.Name;
-        var newName = ExcelRealizeHelp.SheetRepeat(EPPlusSheets.Select(x => x.Name), name);
+        var newName = ExcelRealizeHelp.SheetRepeat(EPPlusSheets.Select(static x => x.Name), name);
         var newEPPlusSheet = EPPlusSheets.Copy(name, newName);
         var newSheet = PackEPPlusSheet(newEPPlusSheet);
         var index = (pos ?? Index.End).GetOffset(Count);

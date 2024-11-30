@@ -1,4 +1,4 @@
-﻿using System.Realize;
+﻿using System.Design;
 using System.Text.RegularExpressions;
 
 namespace System;
@@ -40,6 +40,7 @@ public static class FastRealize
     #endregion
     #endregion
     #region 实现IDisposable
+    #region 释放时执行某些操作
     /// <summary>
     /// 获取一个实现<see cref="IDisposable"/>的锁，
     /// 它可以利用using语句自动完成某些操作，以免遗漏
@@ -47,7 +48,30 @@ public static class FastRealize
     /// <param name="dispose">在锁被释放的时候，这个委托会被执行</param>
     /// <returns></returns>
     public static IDisposable Disposable(Action dispose)
-        => new Lock(dispose);
+        => new Realize.Lock(dispose);
+    #endregion
+    #region 空的IDisposable
+    #region 正式方法
+    /// <summary>
+    /// 返回一个空的<see cref="IDisposable"/>，
+    /// 在释放它的时候，不执行任何操作
+    /// </summary>
+    /// <returns></returns>
+    public static IDisposable DisposableEmpty()
+        => CreateSingle<DisposableEmptyRealize>.Single;
+    #endregion
+    #region 私有辅助类
+    /// <summary>
+    /// 实现空<see cref="IDisposable"/>的私有辅助类
+    /// </summary>
+    private sealed class DisposableEmptyRealize : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+    #endregion 
+    #endregion
     #endregion
     #region 实现IComparer
     #region 通用类型

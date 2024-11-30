@@ -49,7 +49,7 @@ public static class ExtendJson
         => json.ValueKind switch
         {
             JsonValueKind.Object => DeserializeDirect(json),
-            JsonValueKind.Array => json.EnumerateArray().Select(x => x.DeserializeToObject()).ToArray(),
+            JsonValueKind.Array => json.EnumerateArray().Select(static x => x.DeserializeToObject()).ToArray(),
             JsonValueKind.Null => null,
             JsonValueKind.True => true,
             JsonValueKind.False => false,

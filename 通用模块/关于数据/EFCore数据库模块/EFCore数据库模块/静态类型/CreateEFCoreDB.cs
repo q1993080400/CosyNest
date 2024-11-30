@@ -61,7 +61,7 @@ public static class CreateEFCoreDB
     /// <inheritdoc cref="DataContextFactory(Func{DbContext})"/>
     public static IDataContextFactory<IDataPipe> DataContextFactory<DB>()
         where DB : DbContext, new()
-        => DataContextFactory(() => new DB());
+        => DataContextFactory(static () => new DB());
     #endregion
     #endregion
     #endregion

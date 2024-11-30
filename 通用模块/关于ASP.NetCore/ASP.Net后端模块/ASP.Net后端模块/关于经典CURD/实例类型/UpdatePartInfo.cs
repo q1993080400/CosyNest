@@ -1,6 +1,4 @@
-﻿using System.DataFrancis;
-
-namespace Microsoft.AspNetCore;
+﻿namespace Microsoft.AspNetCore;
 
 /// <summary>
 /// 这个记录是<see cref="ToolCRUD.UpdatePart{Entity}(ServerUpdateEntityInfo, Func{UpdatePartInfo{Entity}, Task}, IDataPipe)"/>的参数
