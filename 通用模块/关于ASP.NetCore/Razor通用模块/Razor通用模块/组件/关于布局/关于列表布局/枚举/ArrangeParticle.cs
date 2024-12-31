@@ -18,5 +18,10 @@ public enum ArrangeParticle
     /// 可以拥有较多数量的元素，
     /// 它可能会使每个元素变得更紧凑
     /// </summary>
-    Most
+    Most,
+    /// <summary>
+    /// 指示应该拥有特别多的元素，
+    /// 它适合大量而且紧凑的列表
+    /// </summary>
+    EspeciallyMany
 }

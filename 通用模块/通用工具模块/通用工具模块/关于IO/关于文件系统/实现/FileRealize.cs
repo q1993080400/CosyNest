@@ -1,5 +1,4 @@
-﻿using System.IOFrancis.Bit;
-using System.MathFrancis.Tree;
+﻿using System.MathFrancis.Tree;
 
 namespace System.IOFrancis.FileSystem;
 
@@ -13,14 +12,6 @@ sealed class FileRealize : IORealize, IFile
     #region 获取文件对象
     protected override FileInfo PackFS => new(Path);
     #endregion
-    #region 封装本对象的接口形式
-    /// <summary>
-    /// 获取本对象的接口形式，
-    /// 它使本类型的成员可以访问显式实现接口的成员
-    /// </summary>
-    private IFile File
-        => this;
-    #endregion
     #endregion
     #region 关于文件的信息
     #region 文件的信息
@@ -28,16 +19,14 @@ sealed class FileRealize : IORealize, IFile
     public string NameSimple
     {
         get => IO.Path.GetFileNameWithoutExtension(Path);
-        set => Path = ToolPath.RefactoringPath(Path,
-            newSimple: _ => value ?? throw new ArgumentNullException($"{NameSimple}禁止写入null值"), newExtension: null);
+        set => Path = ToolPath.RefactoringPath(Path, refactoringSimplee: _ => value ?? throw new ArgumentNullException($"{NameSimple}禁止写入null值"));
     }
     #endregion
     #region 读写扩展名
     public string NameExtension
     {
         get => IO.Path.GetExtension(Path).TrimStart('.');
-        set => Path = ToolPath.RefactoringPath(Path, newSimple: null,
-          newExtension: _ => value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
+        set => Path = ToolPath.RefactoringPath(Path, refactoringExtended: _ => value ?? throw new ArgumentNullException($"{NameExtension}禁止写入null值"));
     }
     #endregion
     #endregion
@@ -49,13 +38,14 @@ sealed class FileRealize : IORealize, IFile
     #region 复制文件
     public override IIO Copy(IDirectory? target, string? newName = null, Func<string, int, string>? rename = null)
     {
-        target ??= File.Father ?? throw new ArgumentNullException(nameof(target), $"父目录不能为null");
-        newName ??= File.NameFull;
+#pragma warning disable
+        IFile file = this;
+#pragma warning restore
+        target ??= file.Father ?? throw new ArgumentNullException(nameof(target), $"父目录不能为null");
+        newName ??= file.NameFull;
         if (rename is { })
         {
-            var (simple, extended, _) = ToolPath.SplitFilePath(newName);
-            newName = ToolPath.Distinct(target, newName,
-                (x, y) => ToolPath.GetFullName(rename(simple, y), extended));
+            newName = ToolPath.Distinct(target, newName, rename);
         }
         var newPath = IO.Path.Combine(target.Path, newName);
         if (newPath == Path)
@@ -69,10 +59,6 @@ sealed class FileRealize : IORealize, IFile
     {
         PackFS.Delete();
     }
-    #endregion
-    #region 创建数据管道
-    public IFullDuplex GetBitPipe()
-          => CreateIO.FullDuplexFile(Path);
     #endregion
     #region 构造函数
     /// <summary>

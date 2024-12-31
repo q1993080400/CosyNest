@@ -14,7 +14,7 @@ sealed record BindPropertyInfo<Obj>(object FormModel, PropertyInfo Property) : I
     #region 属性的值
     public Obj? Value
     {
-        get => (Obj?)Property.GetValue(FormModel);
+        get => Property.GetValue(FormModel).To<Obj?>();
         set
         {
             Property.SetValue(FormModel, value.To(Property.PropertyType));

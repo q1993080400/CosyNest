@@ -1,4 +1,5 @@
 ﻿using System.NetFrancis.Http;
+using System.Reflection;
 
 namespace Microsoft.AspNetCore.Components;
 
@@ -16,10 +17,10 @@ public static class FormViewer
     /// </summary>
     /// <param name="ifNullText">为<see langword="null"/>时显示的替代字符串</param>
     /// <returns></returns>
-    public static Func<Type, object?, object?> RenderTextIfNull(string ifNullText)
-        => (type, value) => (type, value) switch
+    public static Func<PropertyInfo, object?, object?> RenderTextIfNull(string ifNullText)
+        => (property, value) => (property.PropertyType, value) switch
         {
-            (var t, null) when t == typeof(string) => ifNullText,
+            (var type, null) when type == typeof(string) => ifNullText,
             _ => value
         };
     #endregion

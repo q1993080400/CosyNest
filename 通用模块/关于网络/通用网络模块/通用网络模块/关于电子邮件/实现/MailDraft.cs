@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.Bit;
-
-namespace System.NetFrancis.Mail;
+﻿namespace System.NetFrancis.Mail;
 
 /// <summary>
 /// 这个类型是<see cref="IMailDraft"/>的实现，
@@ -14,13 +12,6 @@ public sealed record MailDraft : IMailDraft
     #endregion
     #region 正文
     public (bool IsText, string Body) Body { get; init; } = (true, "");
-    #endregion
-    #region 附件
-    IEnumerable<IBitRead> IMail.Attachment
-        => Attachment;
-
-    public IList<IBitRead> Attachment { get; }
-    = [];
     #endregion
     #region 收件人
     public IList<string> To { get; }

@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore;
 /// 都可以在服务端执行删除操作
 /// </summary>
 /// <typeparam name="Parameter">执行删除的参数</typeparam>
-public interface IServerDelete<Parameter>
+public interface IServerDelete<in Parameter>
 {
     #region 执行删除操作
     /// <summary>

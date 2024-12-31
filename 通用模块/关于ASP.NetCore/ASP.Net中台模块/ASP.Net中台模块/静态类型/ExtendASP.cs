@@ -28,6 +28,14 @@ public static class ExtendASP
             filterObjectType is FilterObjectType.Text ?
             LogicalOperator.Contain :
             throw new NotSupportedException($"{filterObjectType}不能使用{RenderLogicalOperator.Contain}逻辑运算符"),
+            (_, FilterObjectType.Enum or FilterObjectType.Num or FilterObjectType.Date) => renderLogicalOperator switch
+            {
+                RenderLogicalOperator.GreaterThan => LogicalOperator.GreaterThan,
+                RenderLogicalOperator.GreaterThanOrEqual => LogicalOperator.GreaterThanOrEqual,
+                RenderLogicalOperator.LessThan => LogicalOperator.LessThan,
+                RenderLogicalOperator.LessThanOrEqual => LogicalOperator.LessThanOrEqual,
+                _ => throw new NotSupportedException($"不能将运算符{renderLogicalOperator}用于类型{filterObjectType}")
+            },
             _ => throw new NotSupportedException($"无法将{renderLogicalOperator}和{filterObjectType}的组合正确地转换为逻辑运算符")
         };
     #endregion

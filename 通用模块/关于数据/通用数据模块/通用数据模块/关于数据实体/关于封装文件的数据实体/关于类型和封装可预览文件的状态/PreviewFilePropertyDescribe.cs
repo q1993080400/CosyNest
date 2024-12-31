@@ -74,5 +74,24 @@ public sealed record PreviewFilePropertyDescribe
     /// </summary>
     public required bool IsStrict { get; init; }
     #endregion
-    #endregion 
+    #region 获取可预览文件属性的值
+    /// <summary>
+    /// 获取可预览文件属性的值，
+    /// 注意，无论<see cref="Multiple"/>的值是什么，它都返回一个集合，
+    /// 如果<see cref="Multiple"/>为<see langword="false"/>，
+    /// 则返回只有一个文件的集合，
+    /// 为<see langword="null"/>则返回空集合
+    /// </summary>
+    /// <param name="target">属性依附的对象实例</param>
+    /// <returns></returns>
+    public IEnumerable<IHasReadOnlyPreviewFile> GetFiles(object target)
+    {
+        var value = Property.GetValue(target);
+        if (Multiple)
+            return value.To<IEnumerable<IHasReadOnlyPreviewFile>>() ?? [];
+        var file = value.To<IHasReadOnlyPreviewFile>();
+        return file is null ? [] : [file];
+    }
+    #endregion
+    #endregion
 }

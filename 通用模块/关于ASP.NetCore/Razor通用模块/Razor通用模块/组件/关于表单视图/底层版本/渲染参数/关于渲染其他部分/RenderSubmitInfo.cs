@@ -31,10 +31,39 @@ public sealed record RenderSubmitInfo<Model>
     /// </summary>
     public required bool ExistingForms { get; init; }
     #endregion
+    #region 用来提交表单的业务逻辑
+    /// <summary>
+    /// 获取提交表单的业务逻辑
+    /// </summary>
+    public required Func<Task> Submit { get; init; }
+    #endregion
+    #region 用来删除表单的业务逻辑
+    /// <summary>
+    /// 获取用来删除表单的业务逻辑，
+    /// 如果为<see langword="null"/>，表示不支持删除
+    /// </summary>
+    public required Func<Task>? Delete { get; init; }
+    #endregion
+    #region 用来取消表单的业务逻辑
+    /// <summary>
+    /// 用于取消表单，回到上级页面的业务逻辑，
+    /// 如果为<see langword="null"/>，表示不支持取消
+    /// </summary>
+    public required Func<Task>? Cancellation { get; set; }
+    #endregion
     #region 表单模型
     /// <summary>
     /// 获取要渲染的表单模型
     /// </summary>
     public required Model FormModel { get; set; }
+    #endregion
+    #region 是否正在上传
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示这个组件的模型含有需要上传的元素，
+    /// 而且正在上传，你可以给予一些提示，
+    /// 提醒用户上传完毕前不要离开
+    /// </summary>
+    public required bool InUpload { get; init; }
     #endregion
 }

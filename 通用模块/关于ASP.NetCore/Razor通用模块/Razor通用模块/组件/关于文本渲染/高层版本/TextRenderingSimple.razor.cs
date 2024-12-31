@@ -16,20 +16,13 @@ public sealed partial class TextRenderingSimple : ComponentBase
     [Parameter]
     public object? Value { get; set; }
     #endregion
-    #region 高亮文本
-    /// <summary>
-    /// 获取高亮文本的集合
-    /// </summary>
-    [Parameter]
-    public IReadOnlyCollection<string>? Highlight { get; set; }
-    #endregion
-    #region 高亮组
+    #region 级联参数：高亮组
     /// <summary>
     /// 获取高亮组，
     /// 通过指定它，可以为高亮指定不同的样式
     /// </summary>
-    [Parameter]
-    public string HighlightGroup { get; set; } = "highlightGroup";
+    [CascadingParameter(Name = ToolRazor.HighlightGroupParameter)]
+    private string HighlightGroup { get; set; } = "highlightGroup";
     #endregion
     #endregion
 }

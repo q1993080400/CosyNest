@@ -24,8 +24,8 @@ sealed class JSNavigator(IJSRuntime jsRuntime) : IJSNavigator
     }
     #endregion
     #region 获取定位对象
-    public IPosition Geolocation { get; }
-        = new JSGeolocation(jsRuntime);
+    public IPosition Geolocation
+        => throw new NotImplementedException();
     #endregion
     #region 剪切板对象
     public IJSClipboard Clipboard { get; }

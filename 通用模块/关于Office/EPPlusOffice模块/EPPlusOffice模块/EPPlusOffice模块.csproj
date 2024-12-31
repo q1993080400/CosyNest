@@ -7,14 +7,11 @@
 		<LangVersion>preview</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+		<NoWarn>1701;1702;IDE0130</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EPPlus" Version="7.5.1" PrivateAssets="compile" />
+		<PackageReference Include="EPPlus" Version="7.5.2" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

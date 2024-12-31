@@ -1,4 +1,6 @@
-﻿namespace System;
+﻿using System.Reflection;
+
+namespace System;
 
 public static partial class ExtendReflection
 {
@@ -179,5 +181,36 @@ public static partial class ExtendReflection
     /// <returns></returns>
     public static Obj ConstructorsInvoke<Obj>(this Type type, params object[] parameters)
         => (Obj)Activator.CreateInstance(type, parameters)!;
+    #endregion
+    #region 创建集合类型，并将元素复制到集合
+    /// <summary>
+    /// 创建一个集合，并将指定的元素复制到集合中
+    /// </summary>
+    /// <typeparam name="Element">集合元素的类型</typeparam>
+    /// <param name="type">集合的类型，
+    /// 如果它不是可以容纳<typeparamref name="Element"/>的集合类型，则引发异常</param>
+    /// <param name="elements">要复制到集合中的元素</param>
+    /// <returns></returns>
+    public static IEnumerable<Element> CreateCollection<Element>(this Type type, IEnumerable<Element> elements)
+    {
+        var elementType = typeof(Element);
+        if (!typeof(IEnumerable<Element>).IsAssignableFrom(type))
+            throw new NotSupportedException($"{type}不是可以容纳{elementType}的集合类型");
+        var addMethod = type.GetMethod(nameof(ICollection<int>.Add), BindingFlags.Public | BindingFlags.Instance, [elementType]);
+        if (type.IsArray || addMethod is null)
+        {
+            var array = elements.ToArray();
+            var length = array.Length;
+            var copyArray = Array.CreateInstance(type.GetGenericArguments()[0], length);
+            Array.Copy(array, copyArray, length);
+            return (IEnumerable<Element>)copyArray;
+        }
+        var list = type.ConstructorsInvoke<IEnumerable<Element>>();
+        foreach (var element in elements)
+        {
+            addMethod.Invoke(list, [element]);
+        }
+        return list;
+    }
     #endregion
 }

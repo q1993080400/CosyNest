@@ -59,14 +59,14 @@ public sealed record RenderPlayerState
             var name when name.IsVoid()
             => RenderPlayerStateOperational.MediumSource switch
             {
-                [{ } uri, ..] => uri,
+            [{ } uri, ..] => uri,
                 _ => null
             },
             var name => name
         };
         return newMediaName is null ?
             null :
-            ToolPath.SplitFilePath(WebUtility.UrlDecode(newMediaName)).Simple;
+            new FileNameInfo(WebUtility.UrlDecode(newMediaName)).Simple;
     }
     #endregion
     #endregion

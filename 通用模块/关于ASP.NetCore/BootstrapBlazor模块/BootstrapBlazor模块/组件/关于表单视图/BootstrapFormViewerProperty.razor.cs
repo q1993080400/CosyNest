@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.DataFrancis;
+
+using Microsoft.AspNetCore.Components;
 
 namespace BootstrapBlazor.Components;
 
@@ -18,24 +20,25 @@ public sealed partial class BootstrapFormViewerProperty<Model> : ComponentBase
     [EditorRequired]
     public RenderFormViewerPropertyInfo<Model> RenderPropertyInfo { get; set; }
     #endregion
-    #region 高亮文本
-    /// <summary>
-    /// 获取高亮文本的集合
-    /// </summary>
-    [CascadingParameter(Name = SearchPanel.HighlightParameter)]
-    private IReadOnlyCollection<string>? Highlight { get; set; }
-    #endregion
     #endregion
     #region 内部成员
-    #region 用来上传的方法
+    #region 当上传时触发的事件
     /// <summary>
     /// 当上传文件时，触发这个事件
     /// </summary>
-    /// <param name="info">用来描述上传任务的对象</param>
+    /// <param name="info">用来上传文件的参数</param>
+    /// <param name="files">所有文件，它会被写入模型的属性</param>
     /// <returns></returns>
-    private async Task OnUpload(UploadTaskInfo info)
+    private Task OnUpload(UploadTaskInfo info, IReadOnlyList<IHasReadOnlyPreviewFile> files)
     {
-
+        var previewFilePropertyDescribe = RenderPropertyInfo.PreviewFilePropertyDescribe;
+        if (previewFilePropertyDescribe is null)
+            return Task.CompletedTask;
+        object? value = previewFilePropertyDescribe.Multiple ?
+            previewFilePropertyDescribe.Property.PropertyType.CreateCollection(files) :
+            files.SingleOrDefault();
+        RenderPropertyInfo.Property.SetValue(RenderPropertyInfo.FormModel, value);
+        return Task.CompletedTask;
     }
     #endregion
     #endregion

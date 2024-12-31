@@ -1,0 +1,19 @@
+﻿@namespace BootstrapBlazor.Components
+@using System.Media
+@inherits ComponentBase
+
+@{
+    var file = RenderFileInfo.File;
+    var disableDownload = DisableDownload ?? Attributes?.ContainsKey("onclick") ?? false;
+}
+@switch (file.MediumFileType)
+{
+    case MediumFileType.NotMediumFile or MediumFileType.Audio or MediumFileType.Video:
+        <FileRendering FileName="@file.FileName" Uri="@file.Uri" DisableDownload="disableDownload" Attributes="Attributes" />
+        break;
+    case MediumFileType.Image:
+        <img src="@file.CoverUri" class="bootstrapSingleFileImage" alt="@file.FileName" loading="lazy" @attributes=Attributes />
+        break;
+    case var mediumFileType:
+        throw mediumFileType.Unrecognized();
+}

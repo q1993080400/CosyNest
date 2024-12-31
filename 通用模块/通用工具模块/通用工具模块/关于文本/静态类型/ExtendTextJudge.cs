@@ -40,18 +40,6 @@ public static partial class ExtendText
     public static bool Contains(this string text, params string[] character)
         => character.Any(text.Contains);
     #endregion
-    #region 判断是否与开头结尾匹配
-    /// <summary>
-    /// 检查字符串的开头和结尾是否与某一字符串匹配
-    /// </summary>
-    /// <param name="text">要检查的字符串</param>
-    /// <param name="withStart">匹配开头的字符串</param>
-    /// <param name="withEnd">匹配结尾的字符串，
-    /// 如果为<see langword="null"/>，则与<paramref name="withStart"/>相同</param>
-    /// <returns></returns>
-    public static bool With(this string? text, string withStart, string? withEnd = null)
-        => text is { } && text.StartsWith(withStart) && text.EndsWith(withEnd ?? withStart);
-    #endregion
     #region 关于重复字符
     #region 判断是否为重复字符
     /// <summary>

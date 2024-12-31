@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
-/// 这个类型是<see cref="IElementJS"/>的实现，
+/// 这个类型是<see cref="IElementNumber"/>的实现，
 /// 可以为元素编号
 /// </summary>
 /// <param name="js">JS运行时对象</param>
@@ -15,10 +15,10 @@ sealed class ElementNumber(IJSRuntime js, string prefix, string? scrollingContex
         => prefix + index;
     #endregion
     #region 跳转到指定元素
-    public Func<Task> JumpToElement(int index, bool smooth = true)
+    public async Task JumpToElement(int index, bool smooth = true)
     {
         var id = GetElementID(index);
-        return async () => await js.InvokeVoidAsync("JumpTo", id, smooth, scrollingContextCSS);
+        await js.InvokeVoidAsync("JumpTo", id, smooth, scrollingContextCSS);
     }
     #endregion 
 }

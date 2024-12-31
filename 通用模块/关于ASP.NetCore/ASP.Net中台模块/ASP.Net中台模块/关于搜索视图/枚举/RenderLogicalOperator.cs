@@ -20,5 +20,21 @@ public enum RenderLogicalOperator
     /// <summary>
     /// 包含
     /// </summary>
-    Contain
+    Contain,
+    /// <summary>
+    /// 大于
+    /// </summary>
+    GreaterThan,
+    /// <summary>
+    /// 大于等于
+    /// </summary>
+    GreaterThanOrEqual,
+    /// <summary>
+    /// 小于
+    /// </summary>
+    LessThan,
+    /// <summary>
+    /// 小于等于
+    /// </summary>
+    LessThanOrEqual,
 }

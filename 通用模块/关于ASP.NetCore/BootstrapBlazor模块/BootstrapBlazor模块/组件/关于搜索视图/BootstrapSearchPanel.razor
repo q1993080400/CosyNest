@@ -3,7 +3,7 @@
 @typeparam BusinessInterface where BusinessInterface : class, IGetRenderAllFilterCondition
 @inject IHttpClient HttpClient
 
-<SearchPanel GetRenderCondition="@(GetRenderCondition??IGetRenderAllFilterCondition.GetConditionFunction<BusinessInterface>(HttpClient))"
+<SearchPanel GetRenderCondition="@(GetRenderCondition??ToolServerInterface.GetConditionFunction<BusinessInterface>(HttpClient))"
              SearchViewerState="SearchViewerState" Submit="Submit"
              ElementNumber=ElementNumber OnClear=OnClear!>
     <RenderComponent>
@@ -38,8 +38,8 @@
         @if (RenderSubmit is null)
         {
             <div class="compactCentered">
-                <Button Text="搜索" OnClick="@context.Submit" />
-                <Button Text="清除" OnClick="@context.Clear" />
+                <Button Text="执行搜索" OnClick="@context.Submit" />
+                <Button Text="清除搜索" OnClick="@context.Clear" />
                 <Button Text="回到顶部" OnClick="@context.GoToTop" />
             </div>
         }

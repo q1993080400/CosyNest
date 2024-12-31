@@ -9,8 +9,10 @@
         --lengthReference: 2.25;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2.5);
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 60vw;
+        /*更宽的弹窗宽度*/
+        --popUpWidthWide: 60vw;
+        /*更窄的弹窗宽度*/
+        --popUpWidthNarrow: min(var(--popUpWidthWide),50ic);
     }
 }
 
@@ -25,6 +27,10 @@
         --arrangeParticleMedium: 5;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 6;
+        /*列表容器的特别多数量*/
+        --arrangeParticleEspeciallyMany: 9;
+        /*列表容器元素的建议高度*/
+        --arrangeElementSuggestedHeight: 14ic;
     }
 }
 
@@ -38,8 +44,10 @@
         --lengthReference: 1.75;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2);
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 70vw;
+        /*更宽的弹窗宽度*/
+        --popUpWidthWide: 70vw;
+        /*更窄的弹窗宽度*/
+        --popUpWidthNarrow: min(var(--popUpWidthWide),40ic);
     }
 }
 
@@ -54,6 +62,10 @@
         --arrangeParticleMedium: 3;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 4;
+        /*列表容器的特别多数量*/
+        --arrangeParticleEspeciallyMany: 6;
+        /*列表容器元素的建议高度*/
+        --arrangeElementSuggestedHeight: 12ic;
     }
 }
 
@@ -67,8 +79,10 @@
         --lengthReference: 1.25;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 1.5);
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 80vw;
+        /*更宽的弹窗宽度*/
+        --popUpWidthWide: 80vw;
+        /*更窄的弹窗宽度*/
+        --popUpWidthNarrow: min(var(--popUpWidthWide),30ic);
     }
 }
 
@@ -83,6 +97,10 @@
         --arrangeParticleMedium: 2;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 3;
+        /*列表容器的特别多数量*/
+        --arrangeParticleEspeciallyMany: 4;
+        /*列表容器元素的建议高度*/
+        --arrangeElementSuggestedHeight: 10ic;
     }
 }
 
@@ -96,8 +114,10 @@
         --lengthReference: 1;
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: var(--topLayoutPaddingVertical);
-        /*最大弹窗宽度*/
-        --maxPopUpWidth: 90vw;
+        /*更宽的弹窗宽度*/
+        --popUpWidthWide: 90vw;
+        /*更窄的弹窗宽度*/
+        --popUpWidthNarrow: var(--popUpWidthWide);
     }
 }
 
@@ -112,6 +132,10 @@
         --arrangeParticleMedium: 1;
         /*列表容器的较多数量*/
         --arrangeParticleMost: 2;
+        /*列表容器的特别多数量*/
+        --arrangeParticleEspeciallyMany: 2;
+        /*列表容器元素的建议高度*/
+        --arrangeElementSuggestedHeight: 8ic;
     }
 }
 
@@ -473,8 +497,14 @@ input[type=file]
     grid-template-columns: repeat(var(--arrangeParticleMost),1fr)
 }
 
+/*依次排列元素，且元素数量特别多时的样式*/
+.arrangeEspeciallyMany
+{
+    grid-template-columns: repeat(var(--arrangeParticleEspeciallyMany),1fr)
+}
+
 /*弹窗宽度样式*/
 .popUpWidth
 {
-    max-width: var(--maxPopUpWidth);
+    max-width: var(--popUpWidthWide);
 }

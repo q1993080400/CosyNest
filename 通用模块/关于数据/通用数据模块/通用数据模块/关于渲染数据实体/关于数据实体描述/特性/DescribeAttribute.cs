@@ -1,4 +1,4 @@
-﻿namespace System.DataFrancis.EntityDescribe;
+﻿namespace System.DataFrancis;
 
 /// <summary>
 /// 这个特性用来生成对数据属性的描述

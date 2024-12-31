@@ -1,4 +1,4 @@
-﻿namespace System.DataFrancis.EntityDescribe;
+﻿namespace System.DataFrancis;
 
 /// <summary>
 /// 对数据进行验证，并返回验证结果

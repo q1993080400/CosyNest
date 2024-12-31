@@ -9,11 +9,8 @@ sealed class JSClipboard(IJSRuntime jsRuntime) : IJSClipboard
     #region 公开成员
     #region 写入剪切板文本
     #region 标准实现
-    public Task<bool> Write(string? text, CancellationToken cancellationToken = default)
-        => jsRuntime.AwaitPromise(_ => true, (successMethod, failMethod) => $"""
-        navigator.clipboard.writeText({text.ToJSSecurity()}).
-            then({successMethod}).catch({failMethod});
-        """, cancellationToken: cancellationToken);
+    public async Task<bool> Write(string? text, CancellationToken cancellationToken = default)
+        => await jsRuntime.InvokeAsync<bool>("WriteCopyText", cancellationToken, text);
     #endregion
     #region 为IOS优化后的实现
     public string WriteTextScript(string getCopyTextScript, string callbackFunctionName)
@@ -27,7 +24,7 @@ sealed class JSClipboard(IJSRuntime jsRuntime) : IJSClipboard
     #region 读取剪切板文本
     public async Task<(bool IsSuccess, string? Text)> Read(CancellationToken cancellationToken = default)
     {
-        var info = await jsRuntime.InvokeAsync<ReadCopyTextInfo>("ReadCopyText");
+        var info = await jsRuntime.InvokeAsync<ReadCopyTextInfo>("ReadCopyText", cancellationToken);
         return (info.IsSuccess, info.Text);
     }
     #endregion

@@ -8,7 +8,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+		<NoWarn>1701;1702;IDE0130</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

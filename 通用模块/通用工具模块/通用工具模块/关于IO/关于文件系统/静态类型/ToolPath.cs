@@ -7,7 +7,7 @@ namespace System.IOFrancis.FileSystem;
 /// </summary>
 public static class ToolPath
 {
-    #region 修改路径
+    #region 修改和创建路径
     #region Trim路径
     /// <summary>
     /// 进行一次路径Trim，删除掉一些可能导致路径失效的字符
@@ -26,29 +26,31 @@ public static class ToolPath
     /// 并返回重构后的新完整路径
     /// </summary>
     /// <param name="path">待重构的路径，注意，它是路径，不是文件的名字</param>
-    /// <param name="newDirectory">这个委托传入旧的父目录路径，
+    /// <param name="refactoringDirectory">这个委托传入旧的父目录路径，
     /// 返回重构后的新父目录路径，如果为<see langword="null"/>，则不改变</param>
-    /// <param name="newSimple">这个委托传入旧名称，返回文件或目录重构后的新名称，
-    /// 不带扩展名，如果为<see langword="null"/>，代表不更改</param>
-    /// <param name="newExtension">这个委托传入旧扩展名，返回文件重构后的新扩展名，不带点号，
-    /// 如果为<see langword="null"/>，代表该路径不是文件，或不更改扩展名</param>
+    /// <param name="refactoringSimplee">这个委托传入旧的文件简称，返回文件或目录重构后的新简称，
+    /// 如果为<see langword="null"/>，代表不更改</param>
+    /// <param name="refactoringExtended">这个委托传入旧的文件扩展名，返回文件重构后的扩展名，
+    /// 如果为<see langword="null"/>，代表不更改</param>
     /// <returns></returns>
     public static string RefactoringPath(string path,
-        Func<string?, string?>? newDirectory = null,
-        Func<string, string>? newSimple = null,
-        Func<string?, string?>? newExtension = null)
+        Func<string?, string?>? refactoringDirectory = null,
+        Func<string, string>? refactoringSimplee = null,
+        Func<string?, string?>? refactoringExtended = null)
     {
-        var (simple, extended, _) = SplitFilePath(path);
         var father = Path.GetDirectoryName(path);
-        #region 本地函数
-        static string? Fun(string? old, Func<string?, string?>? fun)
-            => fun is null ? old : fun(old);
-        #endregion
-        var name = GetFullName(Fun(simple, newSimple!), Fun(extended, newExtension));
-        return father switch
+        var fatherRefactoring = refactoringDirectory is null ?
+            father : refactoringDirectory(father);
+        var (simplee, extended, _) = new FileNameInfo(path);
+        var simpleeRefactoring = refactoringSimplee is null ?
+            simplee : refactoringSimplee(simplee);
+        var extendedRefactoring = refactoringExtended is null ?
+            extended : refactoringExtended(extended);
+        var fileFullName = new FileNameInfo(simpleeRefactoring, extendedRefactoring).FullName;
+        return fatherRefactoring switch
         {
-            null or "" => name,
-            var f => Path.Combine(Fun(f, newDirectory)!, name)
+            null or "" => fileFullName,
+            var f => Path.Combine(f, fileFullName)
         };
     }
     #endregion
@@ -66,18 +68,6 @@ public static class ToolPath
     /// <returns></returns>
     public static string Distinct(IDirectory father, string fullName, Func<string, int, string> change)
         => father.Son.Select(static x => x.NameFull).Distinct(fullName, change);
-    #endregion
-    #region 组合文件的名称和扩展名
-    /// <summary>
-    /// 将文件的名称和不带点号的扩展名组合为全名
-    /// </summary>
-    /// <param name="nameSimple">文件的名称，
-    /// 如果为<see langword="null"/>，则赋予一个随机名称</param>
-    /// <param name="nameExtension">文件的扩展名，不带点号，
-    /// 如果为<see langword="null"/>，代表没有扩展名</param>
-    /// <returns></returns>
-    public static string GetFullName(string? nameSimple = null, string? nameExtension = null)
-        => (nameSimple ?? Guid.CreateVersion7().ToString()) + (nameExtension.IsVoid() ? null : $".{nameExtension}");
     #endregion
     #endregion
     #region 检查路径
@@ -125,31 +115,7 @@ public static class ToolPath
             null => File.Exists(path) || Directory.Exists(path)
         };
     #endregion
-    #region 拆分路径
-    #region 拆分为文件名和扩展名
-    /// <summary>
-    /// 将文件或目录的名称，以及它的扩展名（如果有）从路径中分离开来
-    /// </summary>
-    /// <param name="path">待拆分的路径</param>
-    /// <param name="withDot">在路径带有扩展名的情况下，
-    /// 如果这个值为<see langword="true"/>，代表扩展名应带点号，否则不带点号</param>
-    /// <returns>一个元组，它的项分别是文件或目录的名称，
-    /// 以及文件的扩展名（如果没有扩展名，则返回<see langword="null"/>，只会出现小写），
-    /// 以及文件的全名</returns>
-    public static (string Simple, string? Extended, string FullName) SplitFilePath(string path, bool withDot = false)
-    {
-        var fullName = Path.GetFileName(path);
-        if (fullName.IsVoid())
-            return ("", null, "");
-        var index = fullName.LastIndexOf('.');
-        if (index < 0)
-            return (fullName, null, fullName);
-        var simple = fullName[..index];
-        var extended = fullName[(withDot ? index : index + 1)..].ToLower();
-        return (simple, extended, fullName);
-    }
-    #endregion
-    #region 拆分为父目录和文件/目录
+    #region 拆分路径为父目录和文件/目录
     /// <summary>
     /// 将路径拆分为父目录的路径，以及文件/目录的名称
     /// </summary>
@@ -157,7 +123,6 @@ public static class ToolPath
     /// <returns></returns>
     public static (string FatherPath, string Name) SplitPath(string path)
         => (Path.GetDirectoryName(path) ?? "", Path.GetFileName(path));
-    #endregion
     #endregion
     #region 检查路径是文件或者目录，并返回名称
     /// <summary>

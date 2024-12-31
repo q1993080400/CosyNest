@@ -32,7 +32,7 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     #region 用来渲染提交部分的委托
     /// <inheritdoc cref="FormViewer{Model}.RenderSubmit"/>
     [Parameter]
-    public RenderFragment<RenderBusinessFormViewerInfo<Model>>? RenderSubmit { get; set; }
+    public RenderFragment<RenderSubmitInfo<Model>>? RenderSubmit { get; set; }
     #endregion
     #region 是否只读
     /// <inheritdoc cref="FormViewer{Model}.IsReadOnlyProperty"/>
@@ -44,6 +44,16 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     /// <inheritdoc cref="FormViewer{Model}.RenderRegion"/>
     [Parameter]
     public RenderFragment<RenderFormViewerRegionInfo<Model>> RenderRegion { get; set; }
+    #endregion
+    #region 用来渲染上传遮罩的委托
+    /// <summary>
+    /// 当本组件正在执行提交逻辑时，
+    /// 如果这个逻辑包含一个正在进行的上传操作，
+    /// 则渲染本委托，遮罩屏幕提醒用户正在上传，
+    /// 如果为<see langword="null"/>，则不进行渲染
+    /// </summary>
+    [Parameter]
+    public RenderFragment? RenderUploadMask { get; set; }
     #endregion
     #endregion
     #region 关于模型
@@ -62,7 +72,7 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     #region 值转换函数
     /// <inheritdoc cref="FormViewer{Model}.PropertyValueConvert"/>
     [Parameter]
-    public Func<Type, object?, object?>? PropertyValueConvert { get; set; }
+    public Func<PropertyInfo, object?, object?>? PropertyValueConvert { get; set; }
     #endregion
     #region 创建值改变时的函数的高阶函数
     /// <inheritdoc cref="FormViewer{Model}.CreatePropertyChangeEvent"/>
@@ -78,30 +88,40 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     #endregion
     #region 关于业务逻辑
     #region 用来提交表单的业务逻辑
-    /// <inheritdoc cref="BusinessFormViewer{Model}.Submit"/>
+    /// <inheritdoc cref="FormViewer{Model}.Submit"/>
     [Parameter]
     public Func<Model, Task<bool>> Submit { get; set; } = static _ => Task.FromResult(true);
     #endregion
     #region 是否提交后自动重置表单
-    /// <inheritdoc cref="BusinessFormViewer{Model}.ResetAfterSubmission"/>
+    /// <inheritdoc cref="FormViewer{Model}.ResetAfterSubmission"/>
     [Parameter]
     public bool ResetAfterSubmission { get; set; }
     #endregion
     #region 用来重置表单的业务逻辑
-    /// <inheritdoc cref="BusinessFormViewer{Model}.Resetting"/>
+    /// <inheritdoc cref="FormViewer{Model}.Resetting"/>
     [Parameter]
     public Func<Task> Resetting { get; set; } = static () => Task.CompletedTask;
     #endregion
     #region 用来删除表单的业务逻辑
-    /// <inheritdoc cref="BusinessFormViewer{Model}.Delete"/>
+    /// <inheritdoc cref="FormViewer{Model}.Delete"/>
     [Parameter]
-    public Func<Model, Task<bool>> Delete { get; set; } = static _ => Task.FromResult(true);
+    public Func<Model, Task<bool>>? Delete { get; set; }
     #endregion
     #region 用来取消表单的业务逻辑
-    /// <inheritdoc cref="BusinessFormViewer{Model}.Cancellation"/>
+    /// <inheritdoc cref="FormViewer{Model}.Cancellation"/>
     [Parameter]
     public Func<Task>? Cancellation { get; set; }
     #endregion
-    #endregion 
+    #endregion
+    #endregion
+    #region 构造函数
+    public BootstrapFormViewer()
+    {
+        Resetting = () =>
+        {
+            this.StateHasChanged();
+            return Task.CompletedTask;
+        };
+    }
     #endregion
 }

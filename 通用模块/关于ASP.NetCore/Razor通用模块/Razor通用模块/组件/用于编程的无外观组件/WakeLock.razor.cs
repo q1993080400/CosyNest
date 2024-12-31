@@ -10,8 +10,15 @@ public sealed partial class WakeLock : ComponentBase, IAsyncDisposable
     #region 公开成员
     public async ValueTask DisposeAsync()
     {
-        if (JSWakeLock is { })
+        if (JSWakeLock is null)
+            return;
+        try
+        {
             await JSWakeLock.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
     }
     #endregion
     #region 内部成员

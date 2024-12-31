@@ -89,72 +89,11 @@ sealed class JSWindow(IJSRuntime jsRuntime) : IJSWindow
     #region 关于通知
     #region 请求通知权限
     public Task<bool> RequestNotifications()
-        => jsRuntime.AwaitPromise(x => true,
-            (success, fail) =>
-            $$"""
-            if(!("Notification" in window))
-            {
-                {{fail}}('浏览器不支持通知API');
-                return;
-            }
-            Notification.requestPermission().then(state=>
-            {
-                if(state=='granted')
-                    {{success}}(state);
-                else
-                    {{fail}}(state);
-            }).catch(error=>
-            {
-                {{fail}}(error);
-            });
-            """);
+        => throw new NotImplementedException();
     #endregion
     #region 返回通知对象
-    #region 正式属性
-    public async Task<INotifications?> Notifications(bool requestNotifications)
-    {
-        if (NotificationsFiled is { })
-            return NotificationsFiled;
-        return await jsRuntime.AwaitPromise(_ => NotificationsFiled = new Notifications(jsRuntime), (success, fail) =>
-         $$"""
-                if(!("Notification" in window))
-                {
-                    {{fail}}('浏览器不支持通知API');
-                    return;
-                }
-                if(Notification.permission=='granted')
-                {
-                    {{success}}(1);
-                }
-                else
-                {
-                    if({{(!requestNotifications).ToJSSecurity()}}||Notification.permission=='denied')
-                    {
-                        {{fail}}(1);
-                    }
-                    else
-                    {
-                        Notification.requestPermission().then(state=>
-                        {
-                            if(state=='granted')
-                                {{success}}(state);
-                            else
-                                {{fail}}(state);
-                        }).catch(error=>
-                        {
-                            {{fail}}(error);
-                        });
-                    }
-                }
-                """);
-    }
-    #endregion
-    #region 缓存通知对象
-    /// <summary>
-    /// 获取缓存的通知对象
-    /// </summary>
-    private INotifications? NotificationsFiled { get; set; }
-    #endregion
+    public Task<INotifications?> Notifications(bool requestNotifications)
+        => throw new NotImplementedException();
     #endregion
     #endregion
 }

@@ -7,7 +7,7 @@
 /// <typeparam name="Obj">要寻找的对象的类型</typeparam>
 /// <typeparam name="Parameter">用来搜索对象的类型，
 /// 它应该包含实体类的ID，或本身就是ID</typeparam>
-public interface IServerFind<Parameter, Obj>
+public interface IServerFind<in Parameter, Obj>
     where Obj : class
 {
     #region 寻找对象

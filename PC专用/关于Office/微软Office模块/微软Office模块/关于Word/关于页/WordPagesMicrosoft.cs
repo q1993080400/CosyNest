@@ -30,7 +30,7 @@ sealed class WordPagesMicrosoft(Document document) : IWordPages
         document.PrintOut(Range: WdPrintOutRange.wdPrintRangeOfPages,
             Pages: pageRange, PrintToFile: true, OutputFileName: filePath);
         var pageCount = end - start + 1;
-        return (pageCount, Task.Delay(300 * pageCount));
+        return (pageCount, Task.Delay(350 * (pageCount + 1)));
     }
     #endregion
     #region 枚举所有页面

@@ -12,4 +12,11 @@ public sealed record RenderArrangeInfo
     /// </summary>
     public required string CSS { get; init; }
     #endregion
+    #region 颗粒度
+    /// <summary>
+    /// 获取颗粒度，
+    /// 它指示每一行应该有多少元素
+    /// </summary>
+    public required ArrangeParticle Particle { get; init; }
+    #endregion
 }

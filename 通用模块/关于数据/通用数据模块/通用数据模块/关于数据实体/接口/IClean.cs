@@ -8,7 +8,6 @@
 /// </summary>
 /// <typeparam name="Entity">实体的类型</typeparam>
 public interface IClean<in Entity>
-    where Entity : class, IClean<Entity>
 {
     #region 说明文档
     /*问：为什么清理实体的方法设计为一个静态抽象方法，
@@ -23,9 +22,8 @@ public interface IClean<in Entity>
     /// 执行收尾操作
     /// </summary>
     /// <param name="entities">要执行收尾操作的实体</param>
-    /// <param name="serviceProvider">一个用来请求服务的对象，
-    /// 根据实现的不同，这个函数可能不需要它</param>
+    /// <param name="serviceProvider">一个用来请求服务的对象</param>
     /// <returns></returns>
-    abstract static Task Clean(IEnumerable<Entity> entities, IServiceProvider? serviceProvider = null);
+    abstract static Task Clean(IEnumerable<Entity> entities, IServiceProvider serviceProvider);
     #endregion
 }

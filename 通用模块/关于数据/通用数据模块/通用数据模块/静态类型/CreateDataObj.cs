@@ -1,7 +1,4 @@
-﻿using System.DataFrancis.EntityDescribe;
-using System.Reflection;
-
-namespace System.DataFrancis;
+﻿namespace System.DataFrancis;
 
 /// <summary>
 /// 这个静态类可以用来帮助创建一些关于数据的对象
@@ -15,61 +12,6 @@ public static partial class CreateDataObj
     /// </summary>
     public static IDataFilterAnalysis DataFilterAnalysis { get; }
         = new DataFilterAnalysisDefault();
-    #endregion
-    #region 创建数据验证默认委托
-    #region 正式方法
-    /// <summary>
-    /// 创建一个用于验证数据的委托
-    /// </summary>
-    /// <param name="getVerifyPropertys">这个委托的参数是待验证的实体类，
-    /// 返回值是需要验证的属性，如果为<see langword="null"/>，
-    /// 则默认筛选所有具有<see cref="RenderDataAttribute"/>的属性</param>
-    /// <returns></returns>
-    public static DataVerify DataVerifyDefault(Func<object, IEnumerable<PropertyInfo>>? getVerifyPropertys = null)
-    {
-        if ((getVerifyPropertys, DataVerifyDefaultCache) is (null, { }))
-            return DataVerifyDefaultCache;
-        var newGetVerifyPropertys = getVerifyPropertys ??= obj =>
-         {
-             var propertys = obj.GetType().GetProperties().
-             Where(x => x.IsDefined<RenderDataAttribute>()).ToArray();
-             return propertys;
-         };
-        #region 验证本地函数
-        VerificationResults Fun(object obj)
-        {
-            var propertys = newGetVerifyPropertys(obj);
-            var verify = propertys.Select(x =>
-            {
-                var name = x.GetCustomAttribute<RenderDataAttribute>()?.Name ?? x.Name;
-                var value = x.GetValue(obj);
-                var nullabilityInfo = x.GetNullabilityInfo();
-                if ((nullabilityInfo.ReadState, value) is (NullabilityState.NotNull, null or ""))
-                    return (x, $"{name}不可为空");
-                var attribute = x.GetCustomAttribute<VerifyAttribute>();
-                if (attribute is null)
-                    return (x, null);
-                var verify = attribute.Verify(value, name);
-                return (x, verify is null ? null : attribute.Message ?? verify);
-            }).Where(x => x.Item2 is { }).ToArray();
-            return new()
-            {
-                Data = obj,
-                FailureReason = verify!
-            };
-        }
-        #endregion
-        if ((getVerifyPropertys, DataVerifyDefaultCache) is (null, null))
-            DataVerifyDefaultCache = Fun;
-        return Fun;
-    }
-    #endregion  
-    #region 缓存
-    /// <summary>
-    /// 默认验证方法的缓存
-    /// </summary>
-    private static DataVerify? DataVerifyDefaultCache { get; set; }
-    #endregion
     #endregion
     #region 创建错误日志
     /// <summary>

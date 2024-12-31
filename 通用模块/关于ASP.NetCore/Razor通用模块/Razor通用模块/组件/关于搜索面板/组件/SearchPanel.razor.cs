@@ -83,14 +83,6 @@ public sealed partial class SearchPanel : ComponentBase
     #endregion
     #endregion
     #endregion
-    #region 公开成员
-    #region 高亮文字参数名称
-    /// <summary>
-    /// 获取高亮文字的参数名称
-    /// </summary>
-    public const string HighlightParameter = "4F8A7B08-C197-4D0C-B645-2FC403193F3D";
-    #endregion
-    #endregion
     #region 内部成员
     #region 缓存描述如何渲染筛选条件的对象
     /// <summary>
@@ -108,6 +100,14 @@ public sealed partial class SearchPanel : ComponentBase
         await SubmitFunction();
     }
     #endregion
+    #region 跳转到顶层的方法
+    /// <summary>
+    /// 跳转到顶层
+    /// </summary>
+    /// <returns></returns>
+    private Task JumpToTop()
+        => ElementNumber.JumpToElement();
+    #endregion
     #region 用来提交搜索的方法
     /// <summary>
     /// 这个方法是最终用来提交搜索的方法
@@ -120,7 +120,7 @@ public sealed partial class SearchPanel : ComponentBase
             DataFilterDescription = SearchViewerState.GenerateFilter()
         };
         await Submit.InvokeAsync(info);
-        await ElementNumber.JumpToElement(0, false)();
+        await JumpToTop();
     }
     #endregion
     #region 获取渲染参数
@@ -148,7 +148,7 @@ public sealed partial class SearchPanel : ComponentBase
             {
                 Clear = Clear,
                 Submit = SubmitFunction,
-                GoToTop = ElementNumber.JumpToElement(0)
+                GoToTop = JumpToTop
             }),
             RenderCondition = CacheRenderCondition.Select(x =>
             {

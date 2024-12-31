@@ -6,10 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>System.DingDing</RootNamespace>
 		<AssemblyName>DingDing.Shared</AssemblyName>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+		<NoWarn>1701;1702;IDE0130</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

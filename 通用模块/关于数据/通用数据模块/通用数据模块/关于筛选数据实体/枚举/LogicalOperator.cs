@@ -14,6 +14,10 @@ public enum LogicalOperator
     /// </summary>
     NotEqual,
     /// <summary>
+    /// 包含
+    /// </summary>
+    Contain,
+    /// <summary>
     /// 大于
     /// </summary>
     GreaterThan,
@@ -28,9 +32,5 @@ public enum LogicalOperator
     /// <summary>
     /// 小于等于
     /// </summary>
-    LessThanOrEqual,
-    /// <summary>
-    /// 包含
-    /// </summary>
-    Contain
+    LessThanOrEqual
 }

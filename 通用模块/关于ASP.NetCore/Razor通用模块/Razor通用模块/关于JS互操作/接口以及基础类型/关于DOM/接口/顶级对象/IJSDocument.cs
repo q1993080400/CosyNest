@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 
 namespace Microsoft.JSInterop;
 
@@ -37,18 +35,5 @@ public interface IJSDocument
     /// 返回页面的可见状态
     /// </summary>
     Task<VisibilityState> VisibilityState { get; }
-    #endregion
-    #region 将Net方法注册为JS方法
-    /// <summary>
-    /// 将Net方法注册为一个JS方法
-    /// </summary>
-    /// <typeparam name="Obj">方法的参数类型，
-    /// 它只支持<see cref="JsonElement"/>和<see cref="IJSStreamReference"/></typeparam>
-    /// <param name="action">待包装的Net方法</param>
-    /// <param name="jsMethodName">指定要创建的JS的方法的名字，
-    /// 如果为<see langword="null"/>，则自动生成一个不重复的名称</param>
-    /// <param name="cancellation">一个用于取消异步操作的令牌</param>
-    /// <returns>一个元组，它的项分别是封装完成后的JS方法的名称，以及一个用来释放封装的Net对象的对象</returns>
-    ValueTask<(string MethodName, IDisposable Freed)> PackNetMethod<Obj>(Action<Obj> action, string? jsMethodName = null, CancellationToken cancellation = default);
     #endregion
 }

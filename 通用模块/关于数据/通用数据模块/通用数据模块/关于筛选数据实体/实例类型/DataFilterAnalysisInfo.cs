@@ -47,7 +47,9 @@ public sealed record DataFilterAnalysisInfo<Obj>
     #endregion
     #region 高优先级排序函数
     /// <summary>
-    /// 这个函数允许在执行筛选之后，执行排序之前对<see cref="DataSource"/>进行高优先级的排序，
+    /// 这个函数允许在执行筛选之后，
+    /// 执行排序之前对<see cref="DataSource"/>进行高优先级的排序，
+    /// 它比<see cref="Description"/>指定的排序条件优先级更高，
     /// 如果为<see langword="null"/>，则不执行它
     /// </summary>
     public Func<IQueryable<Obj>, IOrderedQueryable<Obj>>? SortFunction { get; init; }

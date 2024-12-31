@@ -4,7 +4,7 @@
 /// 这个类型封装了一个<see cref="string"/>，
 /// 它可以用于字符串的特化扩展方法
 /// </summary>
-public sealed class StringOperate
+public sealed record StringOperate
 {
     #region 说明文档
     /*问：这个类型有什么意义？
@@ -19,7 +19,7 @@ public sealed class StringOperate
     /// 获取封装的字符串，
     /// 扩展方法可以通过这个属性获取操作的目标
     /// </summary>
-    public string Text { get; init; } = "";
+    public required string Text { get; init; }
     #endregion
     #region 重写ToString
     public override string ToString()

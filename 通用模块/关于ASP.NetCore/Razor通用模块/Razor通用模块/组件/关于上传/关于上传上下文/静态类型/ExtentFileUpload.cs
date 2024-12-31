@@ -12,8 +12,8 @@ public static partial class ExtendRazor
     /// </summary>
     /// <param name="services">待注入服务的容器</param>
     /// <returns></returns>
-    /// <inheritdoc cref="CreateRazor.FileUploadNavigationContext(NavigationManager, Func{IReadOnlyList{UploadTaskInfo}, Task{bool}})"/>
-    public static IServiceCollection AddFileUploadNavigationContext(this IServiceCollection services, Func<IReadOnlyList<UploadTaskInfo>, Task<bool>> blockNavigation)
+    /// <inheritdoc cref="CreateRazor.FileUploadNavigationContext(NavigationManager, Func{IReadOnlyList{IHasUploadFile}, Task{bool}})"/>
+    public static IServiceCollection AddFileUploadNavigationContext(this IServiceCollection services, Func<IReadOnlyList<IHasUploadFile>, Task<bool>> blockNavigation)
         => services.AddCascadingValue(serviceProvider =>
         {
             var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();

@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.Bit;
-
-namespace System.NetFrancis.Mail;
+﻿namespace System.NetFrancis.Mail;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -29,12 +27,6 @@ public interface IMailDraft : IMail
     /// 第二个项是邮件的正文部分
     /// </summary>
     new (bool IsText, string Body) Body { get; }
-    #endregion
-    #region 附件
-    /// <summary>
-    /// 枚举邮件中的所有附件
-    /// </summary>
-    new IList<IBitRead> Attachment { get; }
     #endregion
     #region 收件人
     /// <summary>

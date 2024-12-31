@@ -1,0 +1,40 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+
+<FileViewer Files="Files">
+    <RenderComponent Context="renderFileViewer">
+        @if (RenderComponent is null)
+        {
+            <Arrange Context="renderArrange" Particle="ArrangeParticle.EspeciallyMany">
+                <div class="@renderArrange.CSS">
+                    @renderFileViewer.RenderAllFile
+                </div>
+            </Arrange>
+            @renderFileViewer.RenderFilePreview
+        }
+        else
+        {
+            @RenderComponent(renderFileViewer)
+        }
+    </RenderComponent>
+    <RenderFile Context="renderFile">
+        @if (RenderFile is null)
+        {
+            <BootstrapSingleFile RenderFileInfo="renderFile" />
+        }
+        else
+        {
+            @RenderFile(renderFile)
+        }
+    </RenderFile>
+    <RenderFilePreview Context="renderFilePreview">
+        @if (RenderFilePreview is null)
+        {
+            <BootstrapFileViewerPreview RenderFilePreviewInfo="renderFilePreview" />
+        }
+        else
+        {
+            @RenderFilePreview(renderFilePreview)
+        }
+    </RenderFilePreview>
+</FileViewer>

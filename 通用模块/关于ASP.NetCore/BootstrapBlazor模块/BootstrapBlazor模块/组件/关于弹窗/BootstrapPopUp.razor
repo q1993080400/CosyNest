@@ -1,12 +1,12 @@
 ﻿@namespace BootstrapBlazor.Components
 @inherits ComponentBase
 
-<PopUp Cancellation="Cancellation" Title="@Title">
-    <RenderComponent>
+<ModelDialog Context="dialogID">
+    <dialog id="@dialogID">
         <Card>
             <HeaderTemplate>
                 <Center>
-                    <div>@context.Title</div>
+                    <div>@Title</div>
                 </Center>
             </HeaderTemplate>
             <BodyTemplate>
@@ -15,15 +15,15 @@
             <FooterTemplate>
                 @if (RenderFooter is { })
                 {
-                    @RenderFooter(context.Cancellation)
+                    @RenderFooter(Cancellation)
                 }
                 else
                 {
                     <div class="compactCentered">
-                        <Button Text="取消" OnClick="@context.Cancellation" />
+                        <Button Text="取消" OnClick="@Cancellation" />
                     </div>
                 }
             </FooterTemplate>
         </Card>
-    </RenderComponent>
-</PopUp>
+    </dialog>
+</ModelDialog>

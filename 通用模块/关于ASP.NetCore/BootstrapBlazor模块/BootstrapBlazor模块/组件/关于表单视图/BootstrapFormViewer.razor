@@ -2,13 +2,13 @@
 @inherits ComponentBase
 @typeparam Model
 
-<BusinessFormViewer GetRenderPropertyInfo=GetRenderPropertyInfo
-                    InitializationModel="InitializationModel"
-                    ExistingForms=ExistingForms IsReadOnlyProperty=IsReadOnlyProperty
-                    Delete="Delete" Cancellation="Cancellation"
-                    ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
-                    PropertyValueConvert="PropertyValueConvert" CreatePropertyChangeEvent="CreatePropertyChangeEvent"
-                    Submit="Submit">
+<FormViewer GetRenderPropertyInfo=GetRenderPropertyInfo
+            InitializationModel="InitializationModel"
+            ExistingForms=ExistingForms IsReadOnlyProperty=IsReadOnlyProperty
+            Delete="Delete" Cancellation="Cancellation"
+            ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
+            PropertyValueConvert="PropertyValueConvert" CreatePropertyChangeEvent="CreatePropertyChangeEvent"
+            Submit="Submit">
     <RenderComponent>
         @if (RenderComponent is null)
         {
@@ -57,29 +57,32 @@
             @RenderProperty(context)
         }
     </RenderProperty>
-    <RenderSubmit>
+    <RenderSubmit Context="renderInfo">
         @if (RenderSubmit is null)
         {
-            var baseInfo = context.BaseRenderInfo;
-            @if (baseInfo.CanEdit)
+            @if (renderInfo.CanEdit)
             {
                 <div class="compactCentered">
-                    <Button Text="@(baseInfo.ExistingForms?"修改":"提交")" OnClick="context.Submit"></Button>
-                    <Button Text="重置" OnClick="baseInfo.Resetting"></Button>
-                    @if (context.Delete is { } deleteValue)
+                    <Button Text="@(renderInfo.ExistingForms?"修改":"提交")" OnClick="renderInfo.Submit"></Button>
+                    <Button Text="重置" OnClick="renderInfo.Resetting"></Button>
+                    @if (renderInfo.Delete is { } deleteValue)
                     {
                         <Button Text="删除" OnClick="deleteValue"></Button>
                     }
-                    @if (context.Cancellation is { } cancellationValue)
+                    @if (renderInfo.Cancellation is { } cancellationValue)
                     {
                         <Button Text="取消" OnClick="cancellationValue"></Button>
                     }
                 </div>
+                @if ((renderInfo.InUpload, RenderUploadMask) is (true, { }))
+                {
+                    @RenderUploadMask
+                }
             }
         }
         else
         {
-            @RenderSubmit(context)
+            @RenderSubmit(renderInfo)
         }
     </RenderSubmit>
-</BusinessFormViewer>
+</FormViewer>

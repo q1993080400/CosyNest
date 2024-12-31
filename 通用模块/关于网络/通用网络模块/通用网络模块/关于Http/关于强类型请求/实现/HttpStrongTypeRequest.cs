@@ -48,7 +48,8 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     /// 他会被映射到一个控制器操作</param>
     /// <param name="arguments">调用API传入的方法参数</param>
     /// <param name="options">一个用于转换Json的对象</param>
-    /// <returns></returns>
+    /// <returns>一个元组，它的项分别是Http请求对象，
+    /// 以及一个委托，被用来在成功请求后指示上传完成（如果有上传任务）</returns>
     private static HttpRequestRecording GetRequest(MethodInfo method, IEnumerable<Expression> arguments, JsonSerializerOptions? options)
     {
         var callPath = GetCallUri(method);
@@ -59,7 +60,7 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
         var httpMethod = GetRequestMethod(method, prameterInfos);
         var uriParameter = GetRequestUriParameter(method, httpMethod, prameterInfos);
         var httpContent = GetRequestContent(method, httpMethod, prameterInfos, options);
-        return new()
+        var httpRequest = new HttpRequestRecording()
         {
             Uri = callPath with
             {
@@ -68,6 +69,7 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
             HttpMethod = httpMethod,
             Content = httpContent,
         };
+        return httpRequest;
     }
     #endregion
     #region 生成调用Uri
@@ -155,7 +157,8 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     /// <summary>
     /// 生成请求内容，并返回
     /// </summary>
-    /// <returns></returns>
+    /// <returns>一个元组，它的项分别是Http请求内容对象，
+    /// 以及一个委托，被用来在成功请求后指示上传完成（如果有上传任务）</returns>
     /// <inheritdoc cref="GetRequestUriParameter(MethodInfo, HttpMethod, IEnumerable{HttpStrongTypeRequestParameterInfo})"/>
     /// <inheritdoc cref="GetRequest(MethodInfo, IEnumerable{Expression}, JsonSerializerOptions?)"/>
     private static HttpContent? GetRequestContent(MethodInfo methodInfo, HttpMethod httpMethod, IEnumerable<HttpStrongTypeRequestParameterInfo> prameterInfos, JsonSerializerOptions? options)
@@ -177,8 +180,8 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
     /// 生成最终的请求内容
     /// </summary>
     /// <param name="info">请求参数的信息</param>
-    /// <returns></returns>
     /// <inheritdoc cref="GetRequest(MethodInfo, IEnumerable{Expression}, JsonSerializerOptions?)"/>
+    /// <inheritdoc cref="GetRequestContent(MethodInfo, HttpMethod, IEnumerable{HttpStrongTypeRequestParameterInfo}, JsonSerializerOptions?)"/>
     private static HttpContent GetRequestContentFinal(HttpStrongTypeRequestParameterInfo info, JsonSerializerOptions? options)
     {
         #region 用来返回Json正文的本地函数
@@ -194,30 +197,25 @@ sealed class HttpStrongTypeRequest<API>(IHttpClient httpClient) : IHttpStrongTyp
             };
             if (value is null)
                 return content;
-            foreach (var item in previewFilePropertyNatureState.PreviewFilePropertyDescribe.Values.Where(x => x.IsStrict))
+            var previewFilePropertyDescribes = previewFilePropertyNatureState.
+                PreviewFilePropertyDescribe.Values.
+                Where(x => x.IsStrict).ToArray();
+            foreach (var previewFilePropertyDescribe in previewFilePropertyDescribes)
             {
-                var property = item.Property;
+                var property = previewFilePropertyDescribe.Property;
                 var propertyName = property.Name;
-                if (item.Multiple)
-                {
-                    var previewFiles = property.GetValue<IEnumerable<IHasPreviewFile>?>(value) ?? [];
-                    AddPreviewFileContent(content, previewFiles, propertyName);
-                }
-                else
-                {
-                    var previewFile = property.GetValue<IHasPreviewFile?>(value);
-                    AddPreviewFileContent(content, [previewFile], propertyName);
-                }
+                var files = previewFilePropertyDescribe.GetFiles(value);
+                AddPreviewFileContent(content, files, propertyName);
             }
             return content;
         }
         #endregion
         #region 向MultipartFormDataContent添加预览文件的本地函数
-        static void AddPreviewFileContent(MultipartFormDataContent content, IEnumerable<IHasPreviewFile?> uploadFiles, string propertyName)
+        static void AddPreviewFileContent(MultipartFormDataContent content, IEnumerable<IHasReadOnlyPreviewFile?> uploadFiles, string propertyName)
         {
-            foreach (var (index, file) in uploadFiles.WhereEnable().Index())
+            foreach (var (index, file) in uploadFiles.Index())
             {
-                if (file is not IHasUploadFile { UploadFile: { } uploadFile })
+                if (file is not IHasUploadFileClient { UploadFile: { } uploadFile, IsEnable: true, IsUploadCompleted: false } hasUploadFile)
                     continue;
                 var fileContent = new StreamContent(uploadFile.OpenFileStream());
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(uploadFile.ContentType);

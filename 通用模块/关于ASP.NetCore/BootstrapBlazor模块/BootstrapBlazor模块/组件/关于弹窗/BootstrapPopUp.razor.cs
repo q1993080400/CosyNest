@@ -13,8 +13,7 @@ public sealed partial class BootstrapPopUp : ComponentBase
     #region 标题
     /// <inheritdoc cref="PopUp.Title"/>
     [Parameter]
-    [EditorRequired]
-    public string Title { get; set; }
+    public string Title { get; set; } = "";
     #endregion
     #region 用来取消弹窗的委托
     /// <inheritdoc cref="PopUp.Cancellation"/>

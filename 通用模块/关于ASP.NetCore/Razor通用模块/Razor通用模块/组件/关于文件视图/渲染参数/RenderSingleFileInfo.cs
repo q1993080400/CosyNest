@@ -17,11 +17,24 @@ public sealed record RenderSingleFileInfo
     /// </summary>
     public required int Index { get; init; }
     #endregion
-    #region 预览文件的集合
+    #region 取消选择文件的委托
     /// <summary>
-    /// 假设从本文件开始预览文件，
-    /// 则依次返回应该预览的文件列表
+    /// 这个委托可以用来取消对这个文件的选择，
+    /// 使该文件不可用，或不再上传
     /// </summary>
-    public required IEnumerable<IHasReadOnlyPreviewFile> PreviewFile { get; init; }
+    public required EventCallback CancelFile { get; init; }
+    #endregion
+    #region 是否可预览
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示可以预览这个文件，否则不可预览
+    /// </summary>
+    public required bool CanPreview { get; init; }
+    #endregion
+    #region 用于进入预览的委托
+    /// <summary>
+    /// 这个委托可以用来进入预览文件的状态
+    /// </summary>
+    public required EventCallback OpenPreview { get; init; }
     #endregion
 }

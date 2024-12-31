@@ -92,8 +92,8 @@ public static partial class ExtendReflection
     /// <param name="target">调用方法的目标，如果是静态方法，则为<see langword="null"/></param>
     /// <param name="parameters">方法的参数列表</param>
     /// <returns>方法的返回值</returns>
-    public static Ret? Invoke<Ret>(this MethodInfo method, object? target, params object?[] parameters)
-        => (Ret?)method.Invoke(target, parameters);
+    public static Ret Invoke<Ret>(this MethodInfo method, object? target, params object?[] parameters)
+        => (Ret)method.Invoke(target, parameters)!;
     #endregion
     #region 递归获取方法
     /// <summary>
@@ -123,22 +123,6 @@ public static partial class ExtendReflection
     #endregion
     #endregion
     #region 关于事件
-    #region 根据布尔值，注册或注销事件
-    /// <summary>
-    /// 根据一个布尔值，从事件中注册或注销委托
-    /// </summary>
-    /// <param name="event">待注册或注销委托的事件</param>
-    /// <param name="target">事件所依附的对象实例，如果为静态事件，则为<see langword="null"/></param>
-    /// <param name="isAdd">如果这个值为<see langword="true"/>，则注册事件，否则注销事件</param>
-    /// <param name="delegate">待注册或注销的委托</param>
-    public static void AddOrRemove(this EventInfo @event, object? target, bool isAdd, Delegate @delegate)
-    {
-        if (isAdd)
-            @event.AddEventHandler(target, @delegate);
-        else
-            @event.RemoveEventHandler(target, @delegate);
-    }
-    #endregion
     #region 递归获取事件
     /// <summary>
     /// 递归获取类型的事件，

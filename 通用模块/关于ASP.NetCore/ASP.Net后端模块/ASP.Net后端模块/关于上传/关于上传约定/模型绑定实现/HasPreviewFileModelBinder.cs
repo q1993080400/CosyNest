@@ -42,18 +42,23 @@ sealed class HasPreviewFileModelBinder : IModelBinder
             {
                 var value = property.GetValue(bindingModel);
                 #region 转换值的本地函数
-                IHasPreviewFile ConvertValue(IHasPreviewFile previewFile, int index)
+                IHasPreviewFile? ConvertValue(IHasPreviewFile previewFile, int index)
                 {
+                    if (!previewFile.IsEnable)
+                        return null;
                     var key = $"{property.Name}-{index}";
+                    var id = previewFile.ID;
+                    var coverUri = previewFile.CoverUri;
+                    var uri = previewFile.Uri;
                     return uploadFileDictionary.TryGetValue(key, out var uploadFile) ?
-                      new HasUploadFileOnlyServer(uploadFile) :
-                      CreateDataObj.PreviewFile(previewFile.CoverUri, previewFile.Uri, previewFile.FileName);
+                      CreateDataObj.UploadFileServer(coverUri, uri, uploadFile, id) :
+                      CreateDataObj.PreviewFile(coverUri, uri, previewFile.FileName, id);
                 }
                 #endregion
                 return value switch
                 {
                     IHasPreviewFile previewFile => ConvertValue(previewFile, 0),
-                    IEnumerable<IHasPreviewFile> previewFiles => previewFiles.Select(ConvertValue).ToArray(),
+                    IEnumerable<IHasPreviewFile> previewFiles => previewFiles.Select(ConvertValue).WhereNotNull().ToArray(),
                     null => null,
                     _ => throw new NotSupportedException($"无法将{value.GetType()}类型的数据绑定为包含可预览文件的对象")
                 };

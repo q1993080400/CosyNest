@@ -5,54 +5,40 @@
 /// </summary>
 public sealed record UploadTaskInfo
 {
-    #region 公开成员
-    #region 应该上传的文件
+    #region 所有合法文件
     /// <summary>
-    /// 获取所有应该上传的文件，
-    /// 它不包含被取消选择的文件
+    /// 获取所有选择，且大小没有超出限制的文件
     /// </summary>
-    public IReadOnlyList<IHasUploadFile> UploadFileInfo
-        => AllUploadFileInfo.WhereEnable().ToArray();
+    public required IReadOnlyList<IHasUploadFile> UploadFiles { get; init; }
     #endregion
-    #region 是否为空
+    #region 大小超出限制的文件
+    /// <summary>
+    /// 获取所有因为大小超出限制，
+    /// 而不能上传的文件
+    /// </summary>
+    public required IReadOnlyList<IBrowserFile> HugeFiles { get; init; }
+    #endregion
+    #region 是否存在大小超出限制的文件
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
-    /// 表示没有任何需要上传的文件
+    /// 表示存在因为大小超出限制，
+    /// 而不能上传的文件
     /// </summary>
-    public bool IsEmpty
-        => UploadFileInfo.Count is 0;
+    public bool HasHugeFile
+        => HugeFiles.Count > 0;
     #endregion
-    #region 释放所有文件
+    #region 上传文件的选项
     /// <summary>
-    /// 释放所有上传文件对象的ObjectURL
+    /// 获取上传文件的选项
     /// </summary>
-    /// <param name="jsRuntime">JS运行时对象，它可以用来执行JS互操作</param>
-    /// <returns></returns>
-    public async Task DisposeUploadFileObjectURL(IJSRuntime jsRuntime)
-    {
-        if (AllUploadFileInfo.Length is 0)
-            return;
-        var uploadFileUri = AllUploadFileInfo.Select(static x => x.Uri).ToArray();
-        await jsRuntime.InvokeVoidAsync("DisposableObjectURL", uploadFileUri);
-    }
+    public required UploadFileOptions UploadFileOptions { get; init; }
     #endregion
-    #endregion
-    #region 内部成员
-    #region 所有待上传的文件
+    #region 枚举所有BlobUri
     /// <summary>
-    /// 获取所有待上传的文件
+    /// 枚举本次上传任务的所有BlobUri，
+    /// 它们需要在合适的时机被释放
     /// </summary>
-    private IHasUploadFile[] AllUploadFileInfo { get; }
-    #endregion
-    #endregion
-    #region 构造函数
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="uploadFileInfo">所有待上传的文件</param>
-    public UploadTaskInfo(IEnumerable<IHasUploadFile> uploadFileInfo)
-    {
-        AllUploadFileInfo = uploadFileInfo.ToArray();
-    }
+    public IEnumerable<string> AllBlobUri
+        => UploadFiles.Select(static x => x.Uri);
     #endregion
 }

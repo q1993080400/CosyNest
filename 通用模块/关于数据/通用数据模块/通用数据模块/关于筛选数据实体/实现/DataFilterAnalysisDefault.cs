@@ -148,33 +148,41 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <inheritdoc cref="GenerateWhereBodyPartExpression(Expression, string[], LogicalOperator, object?)"/>
     private static Expression GenerateCompareExpression(Expression left, LogicalOperator logicalOperator, object? compareValue)
     {
-        Expression<Func<decimal?, decimal, bool>> a = (x, y) => x == y;
         var @const = Constant(compareValue);
+        var leftType = left.Type;
+        var leftTrueType = Nullable.GetUnderlyingType(leftType) ?? leftType;
+        var isNullStruct = leftType != leftTrueType;
         #region 将转换左右节点的本地函数
-        Expression Fun(Func<Expression, Expression, Expression> fun)
+        Expression ConvertNode(Func<Expression, Expression, Expression> fun, bool isComparisonOperator = false)
         {
-            var leftType = left.Type;
-            if (leftType.IsEnum)
+            if (leftTrueType.IsEnum)
             {
                 var @enum = compareValue switch
                 {
-                    int num => Enum.Parse(leftType, num.ToString()),
-                    string text => Enum.Parse(leftType, text),
+                    int num => Enum.Parse(leftTrueType, num.ToString()),
+                    string text => Enum.Parse(leftTrueType, text),
+                    null when isNullStruct => null,
                     var obj => throw new NotSupportedException($"无法将{obj}类型和枚举进行比较")
                 };
-                return fun(left, Constant(@enum, leftType));
+                var enumExpression = Constant(@enum, leftType);
+                if (isComparisonOperator)
+                {
+                    var comparisonType = isNullStruct ? typeof(int) : typeof(int?);
+                    return fun(Convert(left, comparisonType), Convert(enumExpression, comparisonType));
+                }
+                return fun(left, Convert(enumExpression, leftType));
             }
-            return fun(left, Convert(@const, left.Type));
+            return fun(left, Convert(@const, leftType));
         }
         #endregion
         return logicalOperator switch
         {
-            LogicalOperator.Equal => Fun(Equal),
-            LogicalOperator.NotEqual => Fun(NotEqual),
-            LogicalOperator.GreaterThan => Fun(GreaterThan),
-            LogicalOperator.GreaterThanOrEqual => Fun(GreaterThanOrEqual),
-            LogicalOperator.LessThan => Fun(LessThan),
-            LogicalOperator.LessThanOrEqual => Fun(LessThanOrEqual),
+            LogicalOperator.Equal => ConvertNode(Equal),
+            LogicalOperator.NotEqual => ConvertNode(NotEqual),
+            LogicalOperator.GreaterThan => ConvertNode(GreaterThan, true),
+            LogicalOperator.GreaterThanOrEqual => ConvertNode(GreaterThanOrEqual, true),
+            LogicalOperator.LessThan => ConvertNode(LessThan, true),
+            LogicalOperator.LessThanOrEqual => ConvertNode(LessThanOrEqual, true),
             LogicalOperator.Contain when @const.Type == typeof(string) => Call(left, MethodContains, @const),
             LogicalOperator.Contain => throw new NotSupportedException($"表达式的逻辑运算符是{LogicalOperator.Contain}，但是它的主体部分不是string"),
             var l => throw new NotSupportedException($"未能识别{l}类型的表达式")

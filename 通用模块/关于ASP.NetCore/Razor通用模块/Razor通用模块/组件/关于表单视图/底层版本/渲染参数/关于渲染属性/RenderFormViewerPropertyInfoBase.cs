@@ -30,6 +30,14 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// </summary>
     public required PreviewFilePropertyDescribe? PreviewFilePropertyDescribe { get; init; }
     #endregion
+    #region 是否正在上传
+    /// <summary>
+    /// 指示这个属性是否是一个可上传文件的属性，
+    /// 且正在执行上传操作，你可以给予用户一些提示，
+    /// 告诉它们正在上传
+    /// </summary>
+    public required bool InUpload { get; init; }
+    #endregion
     #region 分组的名字
     /// <summary>
     /// 获取分组的名字，
@@ -48,7 +56,7 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
             var value = Property.GetValue(FormModel);
             return PropertyValueConvert is null ?
                 value :
-                PropertyValueConvert(Property.PropertyType, value);
+                PropertyValueConvert(Property, value);
         }
     }
     #endregion
@@ -64,13 +72,13 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     #endregion
     #region 值转换函数
     /// <summary>
-    /// 这个函数的第一个参数是值的类型，
-    /// 第二个参数是真正的值，
+    /// 这个函数的第一个参数是属性，
+    /// 第二个参数是属性的值，
     /// 返回值是渲染的时候应该渲染的值，
     /// 通过它可以实现某些特殊操作，
     /// 例如把空字符串渲染成不明
     /// </summary>
-    public required Func<Type, object?, object?>? PropertyValueConvert { get; init; }
+    public required Func<PropertyInfo, object?, object?>? PropertyValueConvert { get; init; }
     #endregion
     #region 值改变时的函数
     /// <summary>

@@ -1,0 +1,19 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+
+<BootstrapPopUp Cancellation="RenderFilePreviewInfo.ClosePreview">
+    <RenderBody>
+        <div class="bootstrapFileViewerPreviewContainer">
+            <Carousel PlayMode="CarouselPlayMode.Manually" ShowIndicators="false">
+                @foreach (var file in RenderFilePreviewInfo.PreviewFile)
+                {
+                    <CarouselItem @key=file.Uri>
+                        <div class="bootstrapFileViewerPreviewItem">
+                            <img src="@file.Uri" alt="@file.FileName" class="bootstrapFileViewerPreviewItemImage" loading="lazy" />
+                        </div>
+                    </CarouselItem>
+                }
+            </Carousel>
+        </div>
+    </RenderBody>
+</BootstrapPopUp>

@@ -47,7 +47,7 @@ public static partial class ExtendData
     /// <param name="serviceProvider">一个用来请求服务的对象，
     /// 根据实现的不同，这个函数可能不需要它</param>
     /// <returns></returns>
-    public static async Task ExecuteDeleteAndClean<Clean>(this IQueryable<Clean> entitys, IDataPipeToContext dataPipe, IServiceProvider? serviceProvider = null)
+    public static async Task ExecuteDeleteAndClean<Clean>(this IQueryable<Clean> entitys, IDataPipeToContext dataPipe, IServiceProvider serviceProvider)
         where Clean : class, IClean<Clean>
     {
         var array = entitys.ToArray();

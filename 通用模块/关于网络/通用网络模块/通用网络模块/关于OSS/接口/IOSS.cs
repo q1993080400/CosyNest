@@ -1,4 +1,6 @@
-﻿namespace System.NetFrancis;
+﻿using System.IOFrancis.FileSystem;
+
+namespace System.NetFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -15,19 +17,20 @@ public interface IOSS
     /// <param name="objectName">上传后的对象名称，不要加上扩展名，
     /// 如果为<see langword="null"/>，则自动生成一个</param>
     /// <returns>上传后的对象名</returns>
-    Task<string> Upload(string filePath, string? objectName = null)
+    Task<FileNameInfo> Upload(string filePath, string? objectName = null)
     {
-        var extension = Path.GetExtension(filePath).TrimStart('.');
+        var extension = Path.GetExtension(filePath);
+        var fileNameInfo = FileNameInfo.Create(objectName, extension);
         using var fileStream = new FileStream(filePath, FileMode.Open);
-        return Upload(fileStream, objectName, extension);
+        return Upload(fileStream, fileNameInfo);
     }
     #endregion
     #region 上传流
     /// <param name="stream">用来读取要上传的文件的流</param>
-    /// <param name="objectExtension">上传对象的扩展名，不要带上点号，
-    /// 如果为<see langword="null"/>，表示没有任何扩展名</param>
+    /// <param name="fileNameInfo">指定上传后的对象名称，
+    /// 如果为<see langword="null"/>，则随机生成一个</param>
     /// <inheritdoc cref="Upload(string, string?)"/>
-    Task<string> Upload(Stream stream, string? objectName = null, string? objectExtension = null);
+    Task<FileNameInfo> Upload(Stream stream, FileNameInfo? fileNameInfo);
     #endregion
     #endregion
     #region 生成下载链接

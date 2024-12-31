@@ -1,8 +1,4 @@
 ﻿@namespace Microsoft.AspNetCore.Components
 @inherits ComponentBase
 
-@{
-    var info = GetRenderInfoReplace is { } replace ?
-            replace(this) : GetRenderInfo();
-}
-@ChildContent(info)
+@ChildContent(GetRenderInfo())

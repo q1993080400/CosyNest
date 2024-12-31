@@ -4,11 +4,9 @@ function InvokeCode(code) {
     return Function(code)();
 }
 
-//注册net方法为JS方法
-function RegisterNetMethod(net, jsMethodName, netMethodName) {
-    window[jsMethodName] = async function (parameter) {
-        await net.invokeMethodAsync(netMethodName, parameter);
-    }
+//调用net实例方法
+async function InvokeNetInstanceMethod(netObjectInstance, netMethodName, ...arguments) {
+    return await netObjectInstance.invokeMethodAsync(netMethodName, arguments)
 }
 
 //获取复制文本
@@ -28,16 +26,30 @@ async function ReadCopyText() {
     }
 }
 
+//写入复制文本
+async function WriteCopyText(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+
+    } catch (e) {
+        return false;
+    }
+}
+
 //跳转到指定的元素
 function JumpTo(elementID, smooth, scrollingContextCSS) {
-    document.querySelector(scrollingContextCSS)?.scrollIntoView(
-        {
-            behavior: "instant",
-            block: "start"
-        });
+    const behavior = smooth ? "smooth" : "instant";
+    if (scrollingContextCSS) {
+        document.querySelector(scrollingContextCSS)?.scrollIntoView(
+            {
+                behavior: behavior,
+                block: "start"
+            });
+    }
     document.getElementById(elementID)?.scrollIntoView(
         {
-            behavior: smooth ? "smooth" : "instant",
+            behavior: behavior,
             block: "end"
         });
 }
@@ -209,8 +221,8 @@ function UpdatePlayerTime(player, currentTimeElementID, totalTimeElementID) {
     const currentTimeElement = document.getElementById(currentTimeElementID);
     const totalTimeElement = document.getElementById(totalTimeElementID);
     if (currentTimeElement && totalTimeElement) {
-        currentTimeElement.textContent = toTimeString(player.currentTime);
-        totalTimeElement.textContent = toTimeString(player.duration);
+        currentTimeElement.textContent = ToTimeString(player.currentTime);
+        totalTimeElement.textContent = ToTimeString(player.duration);
     }
 }
 
@@ -234,13 +246,13 @@ function CheckIntersecting(id) {
 }
 
 //观察虚拟化容器
-function ObservingVirtualizationContainers(netMethod, endID) {
+function ObservingVirtualizationContainers(netObjectInstance, netMethodName, endID) {
     const observer = CacheObservation(endID,
         () => new IntersectionObserver(async (entries, observer) => {
             for (let i of entries) {
                 if (i.isIntersecting) {
                     try {
-                        await netMethod(0);
+                        await InvokeNetInstanceMethod(netObjectInstance, netMethodName);
                     } catch (e) {
                         observer.disconnect();
                         console.error(e);
@@ -282,7 +294,7 @@ function ObserveVisiblePlay(id) {
     for (let i of element) {
         observe.observe(i);
     }
-    function callback(mutationList, observer) {
+    function Callback(mutationList, observer) {
         for (let i of mutationList) {
             if (i.type != "childList")
                 continue;
@@ -298,7 +310,7 @@ function ObserveVisiblePlay(id) {
             }
         }
     }
-    const observerDOM = CacheObservation(id + 'ObserveDOM', () => new MutationObserver(callback));
+    const observerDOM = CacheObservation(id + 'ObserveDOM', () => new MutationObserver(Callback));
     observerDOM.observe(document.getElementById(id),
         {
             subtree: true,
@@ -307,7 +319,7 @@ function ObserveVisiblePlay(id) {
 }
 
 //将秒转化为时间字符串
-function toTimeString(totalSeconds) {
+function ToTimeString(totalSeconds) {
     if (Number.isNaN(totalSeconds))
         totalSeconds = 0;
     const totalMs = totalSeconds * 1000;
@@ -337,12 +349,15 @@ function DisposableObjectURL(objectURLs) {
 }
 
 //返回待上传文件的的ObjectURL
-function GetUploadFileURL(inputElementID) {
+function GetUploadFileURL(inputElementID, maxAllowedSize) {
     const files = document.getElementById(inputElementID).files;
     const urls = [];
     for (let i = 0; i < files.length; i++) {
-        const url = URL.createObjectURL(files.item(i));
-        urls.push(url);
+        const file = files.item(i);
+        if (file.size <= maxAllowedSize) {
+            const url = URL.createObjectURL(file);
+            urls.push(url);
+        }
     }
     return urls;
 }

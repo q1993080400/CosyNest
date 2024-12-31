@@ -8,13 +8,30 @@
     var fileName = FileName ?? Path.GetFileName(Uri);
     var canPreview = ToolMediaType.MediumType(fileName).CanPreview;
     var download = canPreview ? null : fileName;
+    var extension = Path.GetExtension(Uri);
 }
-<a href="@Uri" download="@download" target="_blank" title="@fileName" @attributes=Attributes>
-    <Center>
-        <TofuCubesSimple Text="@fileName" Highlight="Highlight" HighlightGroup="@HighlightGroup">
-            <RenderIcon>
-                <FileIcon Extension="@Path.GetExtension(Uri)" />
-            </RenderIcon>
-        </TofuCubesSimple>
-    </Center>
-</a>
+
+@if (DisableDownload)
+{
+    <div title="@fileName" @attributes=Attributes>
+        <Center>
+            <TofuCubesSimple Text="@fileName">
+                <RenderIcon>
+                    <FileIcon Extension="@extension" />
+                </RenderIcon>
+            </TofuCubesSimple>
+        </Center>
+    </div>
+}
+else
+{
+    <a href="@Uri" download="@download" target="_blank" title="@fileName" @attributes=Attributes>
+        <Center>
+            <TofuCubesSimple Text="@fileName">
+                <RenderIcon>
+                    <FileIcon Extension="@extension" />
+                </RenderIcon>
+            </TofuCubesSimple>
+        </Center>
+    </a>
+}

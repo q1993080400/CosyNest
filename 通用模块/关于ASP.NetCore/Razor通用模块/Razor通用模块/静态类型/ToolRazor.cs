@@ -66,4 +66,17 @@ public static class ToolRazor
     #endregion
     #endregion
     #endregion
+    #region 高亮文字参数名称
+    /// <summary>
+    /// 获取高亮文字的参数名称
+    /// </summary>
+    public const string HighlightParameter = "4F8A7B08-C197-4D0C-B645-2FC403193F3D";
+    #endregion
+    #region 高亮组参数名称
+    /// <summary>
+    /// 获取高亮组的参数名称，
+    /// 通过指定它，可以为高亮指定不同的样式
+    /// </summary>
+    public const string HighlightGroupParameter = "11625127-E33E-4404-9CC9-326A3E8DC8A4";
+    #endregion
 }

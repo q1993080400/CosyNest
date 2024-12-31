@@ -176,28 +176,6 @@ public static partial class ExtendReflection
     public static bool IsCompilerGenerated(this MemberInfo member)
         => member.IsDefined(typeof(CompilerGeneratedAttribute));
     #endregion
-    #region 获取一个成员的真正类型
-    /// <summary>
-    /// 获取一个成员的真正类型
-    /// </summary>
-    /// <param name="member">要获取真正类型的成员</param>
-    /// <returns></returns>
-    public static Type GetTypeTrue(this MemberInfo member)
-        => member.MemberType switch
-        {
-            MemberTypes.Constructor => typeof(ConstructorInfo),
-            MemberTypes.Event => typeof(EventInfo),
-            MemberTypes.Field => typeof(FieldInfo),
-            MemberTypes.Method => typeof(MethodInfo),
-            MemberTypes.Property => typeof(PropertyInfo),
-            MemberTypes.TypeInfo => typeof(Type),
-            _ => typeof(MemberTypes)     //此为占位，后续会加以修改
-        };
-
-    /*需要这个方法的原因在于：
-      MemberInfo的GetType方法貌似返回一个动态类型，
-      通过它无法方便的判断这个MemberInfo到底是什么类型*/
-    #endregion
     #region 获取成员的访问修饰符
     /// <summary>
     /// 获取一个成员的访问修饰符

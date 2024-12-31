@@ -28,7 +28,7 @@ sealed class ExcelPageSheetMicrosoft(IExcelSheet sheet, Worksheet worksheet) : I
         worksheet.PrintOutEx(From: start + 1, To: end + 1,
             PrintToFile: true, PrToFileName: filePath, ActivePrinter: printer);
         var pageCount = end - start + 1;
-        return (pageCount, Task.Delay(300 * pageCount));
+        return (pageCount, Task.Delay(350 * (pageCount + 1)));
     }
     #endregion
     #region 设置打印区域

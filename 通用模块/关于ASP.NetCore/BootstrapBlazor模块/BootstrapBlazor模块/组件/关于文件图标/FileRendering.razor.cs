@@ -26,20 +26,14 @@ public sealed partial class FileRendering : ComponentBase
     [Parameter]
     public string? FileName { get; set; }
     #endregion
-    #region 高亮文本
+    #region 是否禁用下载
     /// <summary>
-    /// 获取高亮文本的集合
+    /// 如果这个值为<see langword="true"/>，
+    /// 则使用div标签渲染容器，
+    /// 否则使用a标签渲染容器，它可以提供下载功能
     /// </summary>
     [Parameter]
-    public IReadOnlyCollection<string>? Highlight { get; set; }
-    #endregion
-    #region 高亮组
-    /// <summary>
-    /// 获取高亮组，
-    /// 通过指定它，可以为高亮指定不同的样式
-    /// </summary>
-    [Parameter]
-    public string HighlightGroup { get; set; } = "highlightGroup";
+    public bool DisableDownload { get; set; }
     #endregion
     #region 参数展开
     /// <summary>

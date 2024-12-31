@@ -1,0 +1,46 @@
+﻿
+/*遮罩文字样式*/
+.uploadMaskText
+{
+    color: white;
+}
+
+/*超大屏PC平台*/
+@media all and (min-width : 2448px)
+{
+    /*遮罩文字样式*/
+    .uploadMaskText
+    {
+        font-size: 400%;
+    }
+}
+
+/*普通屏PC平台*/
+@media all and (min-width : 1224px) and (max-width : 2448px)
+{
+    /*遮罩文字样式*/
+    .uploadMaskText
+    {
+        font-size: 350%;
+    }
+}
+
+/*平板平台*/
+@media all and (min-width : 667px) and (max-width : 1224px)
+{
+    /*遮罩文字样式*/
+    .uploadMaskText
+    {
+        font-size: 300%;
+    }
+}
+
+/*手机平台*/
+@media all and (max-width : 667px)
+{
+    /*遮罩文字样式*/
+    .uploadMaskText
+    {
+        font-size: 250%;
+    }
+}

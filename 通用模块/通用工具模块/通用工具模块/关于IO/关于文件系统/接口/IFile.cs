@@ -17,13 +17,22 @@ public interface IFile : IIO, IFileBase
     /// <returns>复制后的新文件</returns>
     /// <inheritdoc cref="IIO.Copy(IDirectory?, string?, Func{string, int, string}?)"/>
     IFile Copy(IDirectory? target, string? newSimple, string? newExtension, Func<string, int, string>? rename = null)
-        => (IFile)Copy(target,
-            ToolPath.GetFullName(newSimple ?? NameSimple, newExtension ?? NameExtension), rename);
+    {
+        if ((newSimple, newExtension) is (null, null))
+            return (IFile)Copy(target, null, rename);
+        var fullName = new FileNameInfo(newSimple ?? NameSimple, newExtension ?? NameExtension).FullName;
+        return (IFile)Copy(target, fullName, rename);
+    }
     #endregion
     #region 传入目录路径
     /// <inheritdoc cref="Copy(IDirectory?, string?, string?, Func{string, int, string}?)"/>
     IFile Copy(string? target, string? newSimple, string? newExtension, Func<string, int, string>? rename = null)
-        => Copy(CreateIO.Directory(target ?? Father!.Path), newSimple, newExtension, rename);
+    {
+        if (target is null)
+            return Copy((IDirectory?)null, newSimple, newExtension, rename);
+        var directory = CreateIO.Directory(Father!.Path);
+        return Copy(directory, newSimple, newExtension, rename);
+    }
     #endregion
     #endregion
 }

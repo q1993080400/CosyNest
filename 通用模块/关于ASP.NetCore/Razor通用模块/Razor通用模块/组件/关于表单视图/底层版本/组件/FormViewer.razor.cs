@@ -124,8 +124,8 @@ public sealed partial class FormViewer<Model> : ComponentBase
     #region 初始模型
     /// <summary>
     /// 获取初始的模型，
-    /// 注意：<see cref="FormModel"/>只是它的副本，
-    /// 不是同一个引用
+    /// 注意：<see cref="FormModel"/>只是它的副本，不是同一个引用，
+    /// 并且它只会在调用<see cref="OnInitialized"/>时初始化一次，重复传入无效
     /// </summary>
     [Parameter]
     [EditorRequired]
@@ -154,14 +154,14 @@ public sealed partial class FormViewer<Model> : ComponentBase
     #endregion
     #region 值转换函数
     /// <summary>
-    /// 这个函数的第一个参数是值的类型，
-    /// 第二个参数是真正的值，
+    /// 这个函数的第一个参数是属性，
+    /// 第二个参数是属性的值，
     /// 返回值是渲染的时候应该渲染的值，
     /// 通过它可以实现某些特殊操作，
     /// 例如把空字符串渲染成不明
     /// </summary>
     [Parameter]
-    public Func<Type, object?, object?>? PropertyValueConvert { get; set; }
+    public Func<PropertyInfo, object?, object?>? PropertyValueConvert { get; set; }
     #endregion
     #region 创建值改变时的函数的高阶函数
     /// <summary>
@@ -191,8 +191,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// <returns></returns>
     public static IEnumerable<RenderFormViewerPropertyInfoBase<Model>> GetRenderPropertyInfoDefault(FormViewer<Model> formViewer)
     {
-        var property = typeof(Model).GetProperties().Where(x => !x.IsStatic()).ToArray();
-        var propertys = property.Select(x =>
+        var propertys = typeof(Model).GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(x =>
         {
             var renderData = x.GetCustomAttribute<RenderDataBaseAttribute>();
             return new
@@ -213,6 +212,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
             var readOnlyConvert = isReadOnly ? formViewer.PropertyValueConvert : null;
             var previewFilePropertyDescribe = HasPreviewFilePropertyNatureState.Get(typeof(Model)).
             PreviewFilePropertyDescribe.GetValueOrDefault(property.Name);
+            var inUpload = formViewer.InUpload && (previewFilePropertyDescribe?.IsStrict ?? false);
             var renderInfo = attribute switch
             {
                 RenderDataAttribute renderDataAttribute => (RenderFormViewerPropertyInfoBase<Model>)new RenderFormViewerPropertyInfo<Model>()
@@ -223,6 +223,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     Property = property,
                     Name = renderDataAttribute.Name,
                     PropertyValueConvert = readOnlyConvert,
+                    InUpload = inUpload,
                     OnPropertyChange = null,
                     PreviewFilePropertyDescribe = previewFilePropertyDescribe,
                     RenderPreference = new()
@@ -241,6 +242,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     PropertyValueConvert = readOnlyConvert,
                     OnPropertyChange = null,
                     PreviewFilePropertyDescribe = previewFilePropertyDescribe,
+                    InUpload = inUpload
                 },
                 _ => throw new NotSupportedException("无法识别这个渲染数据特性")
             };
@@ -274,6 +276,58 @@ public sealed partial class FormViewer<Model> : ComponentBase
     #endregion
     #endregion
     #endregion
+    #region 关于业务逻辑
+    #region 用来提交表单的业务逻辑
+    /// <summary>
+    /// 获取或设置用于提交表单的业务逻辑，
+    /// 返回值是业务逻辑是否成功
+    /// </summary>
+    [Parameter]
+    public Func<Model, Task<bool>> Submit { get; set; } = static _ => Task.FromResult(true);
+    #endregion
+    #region 是否提交后自动重置表单
+    /// <summary>
+    /// 获取提交后是否自动重置表单
+    /// </summary>
+    [Parameter]
+    public bool ResetAfterSubmission { get; set; }
+    #endregion
+    #region 用来重置表单的业务逻辑
+    /// <summary>
+    /// 获取或设置用于重置表单的业务逻辑，
+    /// 当执行这个委托的时候，模型已被恢复为初始状态
+    /// </summary>
+    [Parameter]
+    public Func<Task> Resetting { get; set; }
+    #endregion
+    #region 用来删除表单的业务逻辑
+    /// <summary>
+    /// 获取或设置用于删除表单的业务逻辑，
+    /// 它的参数就是当前表单的模型，
+    /// 返回值是业务逻辑是否成功
+    /// </summary>
+    [Parameter]
+    public Func<Model, Task<bool>>? Delete { get; set; }
+    #endregion
+    #region 用来取消表单的业务逻辑
+    /// <summary>
+    /// 用于取消表单，回到上级页面的业务逻辑，
+    /// 如果不指定它，则不渲染取消按钮
+    /// </summary>
+    [Parameter]
+    public Func<Task>? Cancellation { get; set; }
+    #endregion
+    #region 级联参数：上传上下文
+    /// <summary>
+    /// 获取级联的上传上下文，
+    /// 当本组件存在正在上传的任务的时候，
+    /// 会阻止用户离开页面，
+    /// 它可以避免用户在尚未上传完毕时离开页面
+    /// </summary>
+    [CascadingParameter]
+    private IFileUploadNavigationContext? FileUploadNavigationContext { get; set; }
+    #endregion
+    #endregion 
     #endregion
     #region 公开成员
     #region 表单模型
@@ -284,16 +338,51 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// </summary>
     public Model FormModel => FormModelField;
     #endregion
+    #region 是否正在上传
+    private bool InUploadField;
+
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示这个组件的模型含有需要上传的元素，
+    /// 而且正在上传，你可以给予一些提示，
+    /// 提醒用户上传完毕前不要离开
+    /// </summary>
+    public bool InUpload
+        => InUploadField;
+    #endregion
     #region 初始化表单模型
     /// <summary>
     /// 初始化并写入<see cref="FormModel"/>属性
     /// </summary>
     /// <returns></returns>
     public void InitializationFormModel()
-        => FormModelField = InitializationModel.MemberwiseClone();
+    {
+        FormModelField = CopyModel.MemberwiseClone();
+        var hasPreviewFilePropertyNatureState = HasPreviewFilePropertyNatureState.Get(typeof(Model));
+        if (!hasPreviewFilePropertyNatureState.HasPreviewFile)
+            return;
+        var propertyDescribes = hasPreviewFilePropertyNatureState.PreviewFilePropertyDescribe.Values.
+            Where(x => x.IsStrict).ToArray();
+        foreach (var propertyDescribe in propertyDescribes)
+        {
+            var value = propertyDescribe.GetFiles(FormModelField).
+                Select(x => x.MemberwiseClone()).Cast<IHasPreviewFile>().ToArray();
+            if (value.Length is 0)
+                continue;
+            object setValue = propertyDescribe.Multiple ?
+                value : value.Single();
+            propertyDescribe.Property.SetValue(FormModelField, setValue);
+        }
+    }
     #endregion
     #endregion
     #region 内部成员
+    #region 待复制模型
+    /// <summary>
+    /// 这个模型专门用于复制
+    /// </summary>
+    private Model CopyModel { get; set; }
+    #endregion
     #region 获取渲染参数
     /// <summary>
     /// 获取本组件的渲染参数
@@ -303,6 +392,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     {
         var renderFormViewerPropertyInfo = GetRenderPropertyInfo(this).ToArray();
         var renderPropertyGroup = renderFormViewerPropertyInfo.GroupBy(x => x.GroupName).ToArray();
+        var formModel = FormModel;
         #region 返回渲染组的本地函数
         RenderFragment RenderGroup(IGrouping<string?, RenderFormViewerPropertyInfoBase<Model>> renderProperty)
         {
@@ -311,7 +401,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
             {
                 GroupName = renderProperty.Key,
                 RenderRegion = renderRegion,
-                FormModel = FormModel
+                FormModel = formModel
             };
             return RenderRegion(info);
         }
@@ -321,31 +411,137 @@ public sealed partial class FormViewer<Model> : ComponentBase
         {
             RenderGroup = renderPropertyGroup.Where(x => x.Key is { }).ToDictionary(x => x.Key!, RenderGroup),
             RenderNotGroup = notGroup is null ? _ => { } : RenderGroup(notGroup),
-            FormModel = FormModel
+            FormModel = formModel
         };
+        var existingForms = ExistingForms(formModel);
+        #region 用来刷新的本地函数
+        async Task Resetting()
+        {
+            InitializationFormModel();
+            await this.Resetting();
+        }
+        #endregion
+        #region 用来提交的本地函数
+        async Task OnSubmit()
+        {
+            #region 提交逻辑主体
+            async Task OnSubmitMain()
+            {
+                var hasPreviewFilePropertyNatureState = HasPreviewFilePropertyNatureState.Get(typeof(Model));
+                if (!hasPreviewFilePropertyNatureState.HasPreviewFile)
+                {
+                    await NotUploadFile();
+                    return;
+                }
+                var uploadFiles = hasPreviewFilePropertyNatureState.
+                    PreviewFilePropertyDescribe.Values.Where(x => x.IsStrict).
+                    Select(x => x.GetFiles(formModel)).
+                    SelectMany(x => x).
+                    OfType<IHasUploadFileClient>().
+                    WhereEnableAndNotUpload().ToArray();
+                if (uploadFiles.Length is 0)
+                    await NotUploadFile();
+                else
+                    await HasUploadFile();
+                #region 包含上传逻辑
+                async Task HasUploadFile()
+                {
+                    #region 获取上传锁的本地函数
+                    IDisposable UploadLock()
+                    => HasPreviewFilePropertyNatureState.Get(typeof(Model)).HasPreviewFile ?
+                    FileUploadNavigationContext.UploadLockSecure() :
+                    FastRealize.DisposableEmpty();
+                    #endregion
+                    try
+                    {
+                        using var uploadLock = UploadLock();
+                        InUploadField = true;
+                        this.StateHasChanged();
+                        var isSuccess = await NotUploadFile();
+                        if (isSuccess)
+                        {
+                            foreach (var uploadFile in uploadFiles)
+                            {
+                                uploadFile.UploadCompleted();
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        InUploadField = false;
+                    }
+                }
+                #endregion
+                #region 不包含上传逻辑
+                async Task<bool> NotUploadFile()
+                {
+                    var isSuccess = await Submit(formModel);
+                    if (!isSuccess)
+                        return false;
+                    CopyModel = formModel.MemberwiseClone();
+                    if (Cancellation is { } cancellation)
+                    {
+                        await cancellation();
+                        return true;
+                    }
+                    if (ResetAfterSubmission)
+                    {
+                        await Resetting();
+                        return true;
+                    }
+                    return true;
+                }
+                #endregion
+            }
+            #endregion
+            await OnSubmitMain();
+            this.StateHasChanged();
+        }
+        #endregion
         var renderSubmit = new RenderSubmitInfo<Model>()
         {
-            Resetting = () =>
-            {
-                InitializationFormModel();
-                StateHasChanged();
-                return Task.CompletedTask;
-            },
-            ExistingForms = ExistingForms(FormModel),
-            FormModel = FormModel,
-            CanEdit = renderFormViewerPropertyInfo.Any(x => !x.IsReadOnly)
+            Resetting = Resetting,
+            ExistingForms = existingForms,
+            FormModel = formModel,
+            InUpload = InUpload,
+            CanEdit = renderFormViewerPropertyInfo.Any(x => !x.IsReadOnly),
+            Delete = (existingForms, Delete) is ({ }, { }) ?
+                 async () =>
+                 {
+                     var isSuccess = await Delete(formModel);
+                     if ((isSuccess, Cancellation) is (true, { } cancellation))
+                         await cancellation();
+                 }
+            : null,
+            Submit = OnSubmit,
+            Cancellation = Cancellation is null ?
+                null :
+                Cancellation
         };
         return new()
         {
             RenderMain = RenderMain(renderMain),
             RenderSubmit = RenderSubmit(renderSubmit),
-            FormModel = FormModel
+            FormModel = formModel
         };
     }
     #endregion
-    #region 重写OnParametersSet
-    protected override void OnParametersSet()
-        => InitializationFormModel();
+    #region 重写OnInitialized
+    protected override void OnInitialized()
+    {
+        CopyModel = InitializationModel;
+        InitializationFormModel();
+    }
     #endregion
+    #endregion
+    #region 构造函数
+    public FormViewer()
+    {
+        Resetting = () =>
+        {
+            this.StateHasChanged();
+            return Task.CompletedTask;
+        };
+    }
     #endregion
 }

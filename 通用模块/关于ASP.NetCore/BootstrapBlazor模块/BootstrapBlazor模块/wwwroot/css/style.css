@@ -172,7 +172,7 @@ label button
     display: grid;
     gap: var(--gapMedium);
     grid-template-columns: repeat(auto-fit,18ic);
-    max-width: var(--maxPopUpWidth);
+    max-width: var(--popUpWidthWide);
 }
 
 /*弹窗下页头或页脚样式*/
@@ -205,4 +205,37 @@ dialog .card-footer
 .sticky
 {
     z-index: 1000;
+}
+
+/*文件视图渲染单个图片样式*/
+.bootstrapSingleFileImage
+{
+    object-position: center;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+}
+
+/*文件视图预览容器样式*/
+.bootstrapFileViewerPreviewContainer
+{
+    max-width: var(--popUpWidthNarrow);
+}
+
+/*文件视图预览项样式*/
+.bootstrapFileViewerPreviewItem
+{
+}
+
+/*文件视图预览项下面的图片样式*/
+.bootstrapFileViewerPreviewItemImage
+{
+    object-fit: cover;
+    width: 100%;
+}
+
+/*避免模态框被遮盖，这是因为Bootstrap的模态框实现有问题*/
+body:has(.show) *
+{
+    isolation: unset;
 }

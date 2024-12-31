@@ -43,16 +43,15 @@ public interface IFromIO : IInstruct, IAsyncDisposable
     /// </summary>
     string? Path { get; }
     #endregion
-    #region 返回文件的文件名，扩展名和全名
+    #region 返回文件信息
     /// <summary>
-    /// 返回一个元组，
-    /// 它的项分别是文件的文件名，扩展名（如果有）和全名，
+    /// 返回一个对象，它封装了文件的信息，
     /// 如果<see cref="Path"/>为<see langword="null"/>，
     /// 则引发异常
     /// </summary>
-    (string Simple, string? Extended, string FullName) PathInfo
+    FileNameInfo PathInfo
         => Path is { } path ?
-        ToolPath.SplitFilePath(path) :
+        new FileNameInfo(path) :
         throw new NotSupportedException($"文件还尚未保存到硬盘中，不知道它的路径");
     #endregion
     #region 是否存在于硬盘

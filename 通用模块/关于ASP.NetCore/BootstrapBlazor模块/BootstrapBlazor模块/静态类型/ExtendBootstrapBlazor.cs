@@ -48,7 +48,7 @@ public static class ExtendBootstrapBlazor
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="Show(SwalService, string, string, SwalCategory)"/>
-    public static Task<bool> ShowModal(this SwalService swalService, string message, string title = "提示", SwalCategory category = SwalCategory.Question)
+    public static Task<bool> ShowConfirm(this SwalService swalService, string message, string title = "提示", SwalCategory category = SwalCategory.Question)
         => swalService.ShowModal(new SwalOption()
         {
             Content = message,
@@ -59,16 +59,18 @@ public static class ExtendBootstrapBlazor
     #region 如果一个API响应失败，则弹出信息
     /// <summary>
     /// 如果一个API响应失败，
-    /// 则弹出一个信息说明失败原因
+    /// 则弹出一个信息说明失败原因，
+    /// 如果成功，则弹出响应成功的提示
     /// </summary>
     /// <param name="swalService">消息确认框服务</param>
     /// <param name="apiPack">API响应对象</param>
     /// <returns>API是否响应成功</returns>
     public static async Task<bool> ShowIfFailure(this SwalService swalService, APIPack apiPack)
     {
-        if (!apiPack.IsSuccess)
-            await swalService.Show(apiPack.FailureReason!);
-        return apiPack.IsSuccess;
+        var isSuccess = apiPack.IsSuccess;
+        await swalService.Show(isSuccess ? "操作成功" : apiPack.FailureReason!,
+            category: isSuccess ? SwalCategory.Success : SwalCategory.Error);
+        return isSuccess;
     }
     #endregion
     #endregion

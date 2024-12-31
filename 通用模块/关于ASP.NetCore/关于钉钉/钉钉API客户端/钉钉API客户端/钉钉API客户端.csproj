@@ -6,9 +6,6 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>System.DingDing</RootNamespace>
 		<AssemblyName>DingDing.Client</AssemblyName>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
 	</PropertyGroup>
 

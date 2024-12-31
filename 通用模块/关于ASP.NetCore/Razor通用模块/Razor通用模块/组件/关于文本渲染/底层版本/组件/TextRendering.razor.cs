@@ -23,12 +23,12 @@ public sealed partial class TextRendering : ComponentBase, IContentComponent<Ren
     [EditorRequired]
     public RenderFragment<RenderTextRenderingInfo> ChildContent { get; set; }
     #endregion
-    #region 高亮文本
+    #region 级联参数：高亮文本
     /// <summary>
     /// 获取高亮文本的集合
     /// </summary>
-    [Parameter]
-    public IReadOnlyCollection<string>? Highlight { get; set; }
+    [CascadingParameter(Name = ToolRazor.HighlightParameter)]
+    private IReadOnlySet<string>? Highlight { get; set; }
     #endregion
     #endregion
     #region 内部成员
@@ -69,15 +69,12 @@ public sealed partial class TextRendering : ComponentBase, IContentComponent<Ren
     /// <summary>
     /// 获取用于识别高亮的正则表达式
     /// </summary>
-    private IRegex? RegexHighlight
+    private IRegex? RegexHighlight()
     {
-        get
-        {
-            if (Highlight is null)
-                return null;
-            var regexText = $"({Highlight.Join("|")})";
-            return regexText.Op().Regex();
-        }
+        if (Highlight is null)
+            return null;
+        var regexText = $"({Highlight.Join("|")})";
+        return regexText.Op().Regex();
     }
     #endregion
     #region 识别高亮
@@ -138,7 +135,7 @@ public sealed partial class TextRendering : ComponentBase, IContentComponent<Ren
         var value = Value?.ToString();
         if (value is null)
             yield break;
-        var regexHighlight = RegexHighlight;
+        var regexHighlight = RegexHighlight();
         var splitLineBreak = value.Split(Environment.NewLine);
         foreach (var (_, notLineBreakText, isLast) in splitLineBreak.PackIndex())
         {

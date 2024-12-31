@@ -1,5 +1,4 @@
-﻿using System.IOFrancis.Bit;
-using System.IOFrancis.FileSystem;
+﻿using System.IOFrancis.FileSystem;
 
 namespace System.IOFrancis;
 
@@ -91,70 +90,7 @@ public static class CreateIO
         => FastRealize.Disposable(() => IO(path)?.Delete());
     #endregion
     #endregion
-    #region 创建管道
-    #region 创建全双工管道
-    /// <summary>
-    /// 创建一个全双工管道，
-    /// 它可以同时进行读写
-    /// </summary>
-    /// <param name="read">用来读取的管道</param>
-    /// <param name="write">用来写入的管道</param>
-    /// <returns></returns>
-    public static IFullDuplex FullDuplex(IBitRead read, IBitWrite write)
-        => new FullDuplex(read, write);
-    #endregion
-    #region 创建读写文件的管道
-    /// <summary>
-    /// 创建一个用来读取文件的管道
-    /// </summary>
-    /// <param name="path">文件所在的路径</param>
-    /// <param name="mod">指定打开文件的方式</param>
-    /// <returns></returns>
-    public static IFullDuplex FullDuplexFile(string path, FileMode mod = FileMode.OpenOrCreate)
-    {
-        var extended = ToolPath.SplitFilePath(path).Extended;
-        return new FileStream(path, mod).ToBitPipe(extended);
-    }
-    #endregion
-    #region 创建临时文件管道
-    /// <summary>
-    /// 创建一个能够读取且仅能读取临时文件的管道，
-    /// 当它被释放掉以后，这个临时文件会被删除
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="BitReadTemporaryFile.BitReadTemporaryFile(PathText)"/>
-    public static IBitRead BitReadTemporaryFile(string path)
-        => new BitReadTemporaryFile(path);
-    #endregion
-    #region 创建读写内存的管道
-    /// <summary>
-    /// 创建一个管道，它可以从内存中读写数据
-    /// </summary>
-    /// <returns></returns>
-    public static IFullDuplex FullDuplexMemory()
-        => new MemoryStream().ToBitPipe();
-    #endregion
-    #endregion
     #region 创建流
-    #region 通过迭代器枚举数据
-    #region 同步迭代器
-    /// <summary>
-    /// 创建一个<see cref="Stream"/>，
-    /// 它通过迭代器获取二进制数据
-    /// </summary>
-    /// <param name="data">用来获取数据的迭代器</param>
-    /// <returns></returns>
-    public static Stream StreamEnumerable(IEnumerable<byte[]> data)
-        => new EnumerableStream(data.GetEnumerator());
-    #endregion
-    #region 异步迭代器
-    #region 适配枚举字节集合的迭代器
-    /// <inheritdoc cref="StreamEnumerable(IEnumerable{byte[]})"/>
-    public static Stream StreamEnumerable(IAsyncEnumerable<byte[]> data)
-        => new EnumerableStream(data.ToBlockingEnumerable().GetEnumerator());
-    #endregion
-    #endregion
-    #endregion
     #region 创建文件流
     /// <summary>
     /// 创建一个文件流，它打开或创建一个文件路径，

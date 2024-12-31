@@ -15,13 +15,13 @@ public static partial class ExtendEnumerable
     /// <param name="collections">要拆分的集合</param>
     /// <param name="delegate">对集合元素进行判断的委托</param>
     /// <returns></returns>
-    public static (IReadOnlyCollection<Obj> IsTrue, IReadOnlyCollection<Obj> IsFalse) Split<Obj>(this IEnumerable<Obj> collections, Func<Obj, bool> @delegate)
+    public static (IReadOnlyList<Obj> IsTrue, IReadOnlyList<Obj> IsFalse) Split<Obj>(this IEnumerable<Obj> collections, Func<Obj, bool> @delegate)
     {
-        var (isTrue, isFalse) = (new LinkedList<Obj>(), new LinkedList<Obj>());
+        var (isTrue, isFalse) = (new List<Obj>(), new List<Obj>());
         foreach (var i in collections)
         {
             var list = @delegate(i) ? isTrue : isFalse;
-            list.AddLast(i);
+            list.Add(i);
         }
         return (isTrue, isFalse);
     }

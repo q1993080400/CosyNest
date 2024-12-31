@@ -19,14 +19,6 @@ public sealed partial class Arrange : ComponentBase, IContentComponent<RenderFra
     [Parameter]
     public ArrangeParticle Particle { get; set; } = ArrangeParticle.Medium;
     #endregion
-    #region 替代的获取渲染参数的委托
-    /// <summary>
-    /// 这个委托可以用来代替默认方法生成渲染参数，
-    /// 它的参数就是这个组件本身
-    /// </summary>
-    [Parameter]
-    public Func<Arrange, RenderArrangeInfo>? GetRenderInfoReplace { get; set; }
-    #endregion
     #endregion
     #region 内部成员
     #region 获取渲染参数
@@ -41,12 +33,14 @@ public sealed partial class Arrange : ComponentBase, IContentComponent<RenderFra
             ArrangeParticle.Minority => "arrangeMinority",
             ArrangeParticle.Medium => "arrangeMedium",
             ArrangeParticle.Most => "arrangeMost",
+            ArrangeParticle.EspeciallyMany => "arrangeEspeciallyMany",
             var p => throw new NotSupportedException($"未能识别{p}类型的枚举")
         };
         var css = $"arrange {particle}";
         return new()
         {
             CSS = css,
+            Particle = Particle
         };
     }
     #endregion

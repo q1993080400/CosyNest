@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace System.DataFrancis.EntityDescribe;
+namespace System.DataFrancis;
 
 /// <summary>
 /// 这个记录表示验证数据的结果

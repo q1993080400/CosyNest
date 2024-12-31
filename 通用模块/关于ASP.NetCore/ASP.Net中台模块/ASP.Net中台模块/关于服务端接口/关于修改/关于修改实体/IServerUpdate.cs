@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore;
 /// 都可以在服务端实现添加或更新功能
 /// </summary>
 /// <typeparam name="Parameter">执行添加或更新的参数</typeparam>
-public interface IServerUpdate<Parameter>
+public interface IServerUpdate<in Parameter>
 {
     #region 添加或更新
     /// <summary>

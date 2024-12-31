@@ -1,6 +1,4 @@
-﻿using System.IOFrancis.Bit;
-
-namespace System.IOFrancis.BaseFileSystem;
+﻿namespace System.IOFrancis.BaseFileSystem;
 
 /// <summary>
 /// 该接口为基本文件系统中的文件提供统一抽象
@@ -24,11 +22,4 @@ public interface IFileBase : IIOBase
     string NameExtension { get; set; }
     #endregion
     #endregion 
-    #region 创建数据管道
-    /// <summary>
-    /// 创建一个可以读写文件的数据管道
-    /// </summary>
-    /// <returns></returns>
-    IFullDuplex GetBitPipe();
-    #endregion
 }

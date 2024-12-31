@@ -17,7 +17,7 @@ public static class ToolMediaType
     {
         var extended = pathOrExtended is null ?
             null :
-            ToolPath.SplitFilePath(pathOrExtended).Extended ?? pathOrExtended.TrimStart('.');
+            new FileNameInfo(pathOrExtended).Extended ?? pathOrExtended.TrimStart('.');
         var mime = extended switch
         {
             "svg" => "image/svg+xml",

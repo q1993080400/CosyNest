@@ -3,7 +3,7 @@
 /// <summary>
 /// 这个组件可以用来上传文件
 /// </summary>
-public sealed partial class FileUpload : ComponentBase, IContentComponent<RenderFragment<RenderFileUploadInfo>>, IAsyncDisposable
+public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
 {
     #region 组件参数
     #region 用来上传文件的委托
@@ -15,10 +15,20 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     [EditorRequired]
     public Func<UploadTaskInfo, Task> OnUpload { get; set; }
     #endregion
-    #region 子内容
+    #region 用来进行上传的参数
+    /// <summary>
+    /// 获取用来进行上传的参数
+    /// </summary>
+    [Parameter]
+    public UploadFileOptions UploadFileOptions { get; set; }
+    #endregion
+    #region 用来渲染整个组件的委托
+    /// <summary>
+    /// 获取用来渲染整个组件的委托
+    /// </summary>
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderFileUploadInfo> ChildContent { get; set; }
+    public RenderFragment<RenderFileUploadInfo> RenderComponent { get; set; }
     #endregion
     #region 级联参数：上传上下文
     /// <summary>
@@ -35,7 +45,7 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     #region 释放对象
     public async ValueTask DisposeAsync()
     {
-        await UploadTaskInfo.DisposeUploadFileObjectURL(JSWindow);
+        await DisposableObjectURL();
         FileUploadNavigationContext?.CancelUploadTaskInfo(ID);
     }
     #endregion
@@ -52,7 +62,25 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     /// <summary>
     /// 获取当前正在执行的上传任务
     /// </summary>
-    private UploadTaskInfo UploadTaskInfo { get; set; } = new([]);
+    private UploadTaskInfo UploadTaskInfo { get; set; }
+    #endregion
+    #region 释放文件对象Uri
+    /// <summary>
+    /// 释放JS文件对象
+    /// </summary>
+    /// <returns></returns>
+    private async Task DisposableObjectURL()
+    {
+        try
+        {
+            var blobUri = UploadTaskInfo.AllBlobUri.ToArray();
+            if (blobUri.Length > 0)
+                await JSWindow.InvokeVoidAsync("DisposableObjectURL", blobUri);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
     #endregion
     #region 当选择文件时触发的事件
     /// <summary>
@@ -62,11 +90,16 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     /// <returns></returns>
     private async Task OnChange(InputFileChangeEventArgs args)
     {
-        await UploadTaskInfo.DisposeUploadFileObjectURL(JSWindow);
+        await DisposableObjectURL();
         var uploadFile = args.GetMultipleFiles(args.FileCount);
-        var uploadFileInfos = await GetUploadFileInfo(uploadFile).ToArrayAsync();
-        UploadTaskInfo = new(uploadFileInfos);
-        FileUploadNavigationContext?.RegisterUploadTaskInfo(ID, UploadTaskInfo);
+        var (uploadFileInfos, hugeFiles) = await GetUploadFiles(uploadFile);
+        UploadTaskInfo = new()
+        {
+            UploadFiles = uploadFileInfos,
+            HugeFiles = hugeFiles,
+            UploadFileOptions = UploadFileOptions
+        };
+        FileUploadNavigationContext?.RegisterUploadTaskInfo(ID, uploadFileInfos);
         await OnUpload(UploadTaskInfo);
     }
     #endregion
@@ -75,17 +108,31 @@ public sealed partial class FileUpload : ComponentBase, IContentComponent<Render
     /// 返回所有待上传的文件
     /// </summary>
     /// <param name="browserFiles">原始的，直接从浏览器中读取的待上传文件</param>
-    /// <returns></returns>
-    private async IAsyncEnumerable<IHasUploadFile> GetUploadFileInfo(IReadOnlyCollection<IBrowserFile> browserFiles)
+    /// <returns>一个元组，它的项分别是可以上传的文件，以及因为大小超过限制，而不能上传的文件</returns>
+    private async Task<(IReadOnlyList<IHasUploadFile> UploadFileInfos, IReadOnlyList<IBrowserFile> HugeFiles)> GetUploadFiles(IReadOnlyCollection<IBrowserFile> browserFiles)
     {
         if (browserFiles.Count is 0)
-            yield break;
-        var uploadFileURLs = await JSWindow.InvokeAsync<string[]>("GetUploadFileURL", ID);
-        foreach (var (browserFile, uploadFileURL) in browserFiles.Zip(uploadFileURLs))
+            return ([], []);
+        var maxAllowedSize = UploadFileOptions.MaxAllowedSize;
+        var (uploadFiles, hugeFiles) = browserFiles.Split(x => x.Size <= maxAllowedSize);
+        var uploadFileURLs = await JSWindow.InvokeAsync<string[]>("GetUploadFileURL", ID, maxAllowedSize);
+        var upload = uploadFiles.Zip(uploadFileURLs).Select(tuple =>
         {
-            var uploadFile = CreateDataObj.UploadFile(uploadFileURL, uploadFileURL, browserFile.ToUploadFile());
-            yield return uploadFile;
-        }
+            var (browserFile, uploadFileURL) = tuple;
+            return CreateDataObj.UploadFileClient(uploadFileURL, uploadFileURL, BrowserFileConvert(browserFile, UploadFileOptions));
+        }).ToArray();
+        return (upload, hugeFiles);
+    }
+    #endregion
+    #region 重写OnInitialized方法
+    protected override void OnInitialized()
+    {
+        UploadTaskInfo = new()
+        {
+            UploadFiles = [],
+            HugeFiles = [],
+            UploadFileOptions = UploadFileOptions
+        };
     }
     #endregion
     #region 返回渲染参数

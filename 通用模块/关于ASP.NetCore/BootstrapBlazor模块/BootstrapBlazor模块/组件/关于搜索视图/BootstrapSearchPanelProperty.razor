@@ -77,15 +77,15 @@
             </BootstrapInputGroup>
             @if (IsShow)
             {
-                <PopUp Cancellation="@(()=>IsShow=false)" Title="@($"选择{describe}")">
-                    <RenderComponent Context="renderPopUpInfo">
+                <ModelDialog Context="dialogID">
+                    <dialog id="@dialogID">
                         <Selector Candidates="enumItem.ToHashSet()" Submit="SubmitEnumItem(bindQueryEnum)"
                                   InitializationSelect="@(x=>x.Value==bindQueryEnum.Value)" @ref=Selector>
                             <RenderComponent Context="renderSelectorInfo">
                                 <Card>
                                     <HeaderTemplate>
                                         <Center>
-                                            <div>@renderPopUpInfo.Title</div>
+                                            <div>@($"选择{describe}")</div>
                                         </Center>
                                     </HeaderTemplate>
                                     <BodyTemplate>
@@ -108,14 +108,14 @@
                                         <div class="compactCentered">
                                             <Button Text="清除条件" OnClick="ClearEnumItem(bindQueryEnum)" />
                                             <Button Text="提交搜索" OnClick="renderSelectorInfo.Submit" IsDisabled="@(!renderSelectorInfo.AnySelect)" />
-                                            <Button Text="返回页面" OnClick="renderPopUpInfo.Cancellation" />
+                                            <Button Text="返回页面" OnClick="@(()=>IsShow=false)" />
                                         </div>
                                     </FooterTemplate>
                                 </Card>
                             </RenderComponent>
                         </Selector>
-                    </RenderComponent>
-                </PopUp>
+                    </dialog>
+                </ModelDialog>
             }
             break;
         case (FilterObjectType.Text, _):
@@ -164,7 +164,7 @@
                 @switch (bindQueryDate)
                 {
                     case IBindProperty<DateTimeOffset?> bindQueryDateSingle:
-                        <DateTimePicker @bind-Value=@(bindQueryDateSingle.Value) />
+                        <DateTimePicker @bind-Value=@(bindQueryDateSingle.Value) OnValueChanged="OnSubmit" />
                         break;
                     case IBindRange<DateTimeOffset?> { Range: { } bindQueryDateRange }:
                         var dateTimeRangeValue = new DateTimeRangeValue()

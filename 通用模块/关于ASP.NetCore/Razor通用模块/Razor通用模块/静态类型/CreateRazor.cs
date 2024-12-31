@@ -51,9 +51,10 @@ public static partial class CreateRazor
     /// 创建一个不会刷新的<see cref="EventCallback"/>，
     /// 它可以用于优化性能
     /// </summary>
-    /// <param name="multicastDelegate">绑定到<see cref="EventCallback"/>中的委托</param>
+    /// <param name="multicastDelegate">绑定到<see cref="EventCallback"/>中的委托，
+    /// 如果为<see langword="null"/>，则不绑定任何委托</param>
     /// <returns></returns>
-    public static EventCallback EventCallbackNotRefresh(MulticastDelegate multicastDelegate)
+    public static EventCallback EventCallbackNotRefresh(MulticastDelegate? multicastDelegate = null)
         => new(HandleEventInvalid, multicastDelegate);
     #endregion
     #region 泛型版本
@@ -62,22 +63,12 @@ public static partial class CreateRazor
     /// 它可以用于优化性能
     /// </summary>
     /// <typeparam name="TValue">参数的类型</typeparam>
-    /// <param name="multicastDelegate">绑定到<see cref="EventCallback{TValue}"/>中的委托</param>
+    /// <param name="multicastDelegate">绑定到<see cref="EventCallback{TValue}"/>中的委托，
+    /// 如果为<see langword="null"/>，则不绑定任何委托</param>
     /// <returns></returns>
-    public static EventCallback<TValue> EventCallbackNotRefresh<TValue>(MulticastDelegate multicastDelegate)
+    public static EventCallback<TValue> EventCallbackNotRefresh<TValue>(MulticastDelegate? multicastDelegate = null)
         => new(HandleEventInvalid, multicastDelegate);
     #endregion
     #endregion
-    #endregion
-    #region 创建IElementNumber
-    /// <summary>
-    /// 创建一个<see cref="IElementNumber"/>，
-    /// 它可以为待渲染的元素编号
-    /// </summary>
-    /// <param name="prefix">编号前缀，如果为<see langword="null"/>，则自动生成一个</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="ElementNumber.ElementNumber(IJSRuntime, string?, string?)"/>
-    public static IElementNumber ElementNumber(IJSRuntime js, string? prefix = null, string? scrollingContextCSS = null)
-        => new ElementNumber(js, prefix ?? CreateASP.JSObjectName(), scrollingContextCSS);
     #endregion
 }
