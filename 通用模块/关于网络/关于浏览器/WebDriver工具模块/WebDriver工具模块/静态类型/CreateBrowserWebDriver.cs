@@ -7,7 +7,6 @@ namespace System.NetFrancis.Browser;
 /// </summary>
 public static class CreateBrowserWebDriver
 {
-    #region 公开成员
     #region 创建Edge浏览器
     /// <summary>
     /// 创建Edge浏览器
@@ -22,6 +21,5 @@ public static class CreateBrowserWebDriver
         var driver = new EdgeDriver(browserOptions);
         return new BrowserWebDriver(driver);
     }
-    #endregion
     #endregion
 }

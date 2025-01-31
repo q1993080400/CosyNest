@@ -56,9 +56,9 @@ public static partial class ExtendReflection
     public static bool IsAssignableFrom(this Type type, object? obj)
         => obj is null ? type.CanNull() : type.IsAssignableFrom(obj.GetType());
     #endregion
-    #region 判断一个类型是否可空
+    #region 判断一个类型是否可赋值为null
     /// <summary>
-    /// 判断一个类型是否可空
+    /// 判断一个类型是否可可赋值为null
     /// </summary>
     /// <param name="type">待判断的类型</param>
     /// <returns></returns>
@@ -102,6 +102,28 @@ public static partial class ExtendReflection
             }
         };
     #endregion
+    #region 判断一个类型是否可作为异步返回值
+    /// <summary>
+    /// 判断一个类型是否可以作为异步方法的返回值
+    /// </summary>
+    /// <param name="type">待判断的类型</param>
+    /// <returns>一个元组，它的第一个项是该类型是否可作为异步方法的返回值，
+    /// 第二个项是异步方法await后拆解出来的返回值类型，
+    /// 如果不是异步方法，或者是无返回值的异步方法，则返回<see langword="null"/></returns>
+    public static (bool IsAsyncReturnType, Type? AsyncReturnType) GetAsyncInfo(this Type type)
+    {
+        const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+        var asyncMethod = type.GetMethod("GetAwaiter", bindingFlags, []);
+        var getAwaiterType = asyncMethod?.ReturnType;
+        if (asyncMethod is null || getAwaiterType is null || getAwaiterType == typeof(void))
+            return (false, null);
+        var getResultMethod = getAwaiterType.GetMethod("GetResult", bindingFlags, []);
+        if (getResultMethod is null)
+            return (false, null);
+        var getResultMethodReturnType = getResultMethod.ReturnType;
+        return (true, getResultMethodReturnType == typeof(void) ? null : getResultMethodReturnType);
+    }
+    #endregion
     #region 关于泛型类型
     #region 判断泛型类型实现和定义之间的关系
     /// <summary>
@@ -116,7 +138,7 @@ public static partial class ExtendReflection
         definition.IsGenericTypeDefinition &&
         type.GetGenericTypeDefinition() == definition;
     #endregion
-    #region 判断是否实现泛型
+    #region 判断是否实现泛型类型，接受开放式泛型
     /// <summary>
     /// 返回类型<paramref name="type"/>是否继承或实现了另一个泛型类型<paramref name="generic"/>，
     /// <paramref name="generic"/>可以为开放式泛型
@@ -124,7 +146,7 @@ public static partial class ExtendReflection
     /// <param name="type">要检查的类型</param>
     /// <param name="generic">要检查是否继承或实现的泛型类型</param>
     /// <returns>一个元组，它的项分别是是否继承或实现泛型类型，
-    /// 以及如果继承或实现了，该泛型类型的泛型参数</returns>
+    /// 以及如果继承或实现了，则返回该泛型类型的泛型参数</returns>
     public static (bool IsRealize, Type[] GenericParameter) IsRealizeGeneric(this Type type, Type generic)
     {
         #region 本地函数
@@ -159,7 +181,7 @@ public static partial class ExtendReflection
         if (type.IsArray)
             return type.GetElementType();
         if (type.IsRealizeGeneric(typeof(IEnumerable<>)) is (true, { } elementType))
-            return elementType.First();
+            return elementType.Single();
         if (typeof(Collections.IEnumerable).IsAssignableFrom(type))
             return typeof(object);
         return null;
@@ -193,11 +215,13 @@ public static partial class ExtendReflection
     /// <returns></returns>
     public static IEnumerable<Element> CreateCollection<Element>(this Type type, IEnumerable<Element> elements)
     {
-        var elementType = typeof(Element);
-        if (!typeof(IEnumerable<Element>).IsAssignableFrom(type))
+        var elementType = type.GetCollectionElementType() ??
+            throw new NotSupportedException($"{type}不是一个集合");
+        var collectionType = typeof(IEnumerable<>).MakeGenericType(elementType);
+        if (!collectionType.IsAssignableFrom(type))
             throw new NotSupportedException($"{type}不是可以容纳{elementType}的集合类型");
-        var addMethod = type.GetMethod(nameof(ICollection<int>.Add), BindingFlags.Public | BindingFlags.Instance, [elementType]);
-        if (type.IsArray || addMethod is null)
+        var varCollectionType = typeof(ICollection<>).MakeGenericType(elementType);
+        if (type.IsArray || !varCollectionType.IsAssignableFrom(type))
         {
             var array = elements.ToArray();
             var length = array.Length;
@@ -205,6 +229,7 @@ public static partial class ExtendReflection
             Array.Copy(array, copyArray, length);
             return (IEnumerable<Element>)copyArray;
         }
+        var addMethod = collectionType.GetMethod(nameof(ICollection<int>.Add), BindingFlags.Public | BindingFlags.Instance, [elementType])!;
         var list = type.ConstructorsInvoke<IEnumerable<Element>>();
         foreach (var element in elements)
         {

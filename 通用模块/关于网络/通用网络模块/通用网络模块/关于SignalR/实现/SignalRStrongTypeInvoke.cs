@@ -1,36 +1,47 @@
 ﻿using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
-namespace Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
+
+namespace System.NetFrancis;
 
 /// <summary>
-/// 这个类型是<see cref="ISignalRStrongTypeInvoke{Hub}"/>的实现，
+/// 这个类型是<see cref="IStrongTypeStreamInvoke{API}"/>的实现，
 /// 可以用来封装强类型SignalR调用
 /// </summary>
-/// <param name="connection">封装的SignalR连接对象</param>
-/// <inheritdoc cref="ISignalRStrongTypeInvoke{Hub}"/>
-sealed class SignalRStrongTypeInvoke<Hub>(HubConnection connection) : ISignalRStrongTypeInvoke<Hub>
-    where Hub : class
+/// <param name="createConnection">用来创建SignalR连接的委托，
+/// 当连接被创建时，需要保证它已经处于正常连接状态</param>
+/// <inheritdoc cref="IStrongTypeStreamInvoke{API}"/>
+sealed class SignalRStrongTypeInvoke<API>(Func<Task<HubConnection>> createConnection) : IStrongTypeStreamInvoke<API>
+    where API : class
 {
     #region 公开成员
     #region 有返回值
-    public async Task<Ret> Invoke<Ret>(Expression<Func<Hub, Task<Ret>>> invoke, CancellationToken cancellationToken = default)
+    public async Task<Ret> Invoke<Ret>(Expression<Func<API, Task<Ret>>> invoke, CancellationToken cancellationToken = default)
     {
         var (name, parameter) = AnalysisExpression(invoke);
+        var connection = await createConnection();
         return await connection.InvokeCoreAsync<Ret>(name, parameter, cancellationToken);
     }
     #endregion
     #region 无返回值
-    public async Task Invoke(Expression<Func<Hub, Task>> invoke, CancellationToken cancellationToken = default)
+    public async Task Invoke(Expression<Func<API, Task>> invoke, CancellationToken cancellationToken = default)
     {
         var (name, parameter) = AnalysisExpression(invoke);
+        var connection = await createConnection();
         await connection.InvokeCoreAsync(name, parameter, cancellationToken);
     }
     #endregion
     #region 返回异步流
-    public IAsyncEnumerable<Ret> Invoke<Ret>(Expression<Func<Hub, IAsyncEnumerable<Ret>>> invoke, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<Ret> Invoke<Ret>(Expression<Func<API, IAsyncEnumerable<Ret>>> invoke, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var (name, parameter) = AnalysisExpression(invoke);
-        return connection.StreamAsyncCore<Ret>(name, parameter, cancellationToken);
+        var connection = await createConnection();
+        var list = connection.StreamAsyncCore<Ret>(name, parameter, cancellationToken);
+        await foreach (var item in list)
+        {
+            yield return item;
+        }
     }
     #endregion
     #endregion

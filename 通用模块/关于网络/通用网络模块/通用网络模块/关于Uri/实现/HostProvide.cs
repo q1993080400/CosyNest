@@ -1,4 +1,4 @@
-﻿namespace System.NetFrancis.Http;
+﻿namespace System.NetFrancis;
 
 /// <summary>
 /// 这个类型是<see cref="IHostProvide"/>的实现，

@@ -62,8 +62,8 @@ public sealed partial class Initialization<Interface, Parameter, Content> : Comp
     protected override async Task OnParametersSetAsync()
     {
         FindParameter = await GetFindParameter();
-        Obj = await HttpClient.StrongType<Interface>().
-            Request(x => x.Find(FindParameter));
+        Obj = await StrongTypeInvokeFactory.StrongType<Interface>().
+            Invoke(x => x.Find(FindParameter));
         InitializationComplete = true;
     }
     #endregion

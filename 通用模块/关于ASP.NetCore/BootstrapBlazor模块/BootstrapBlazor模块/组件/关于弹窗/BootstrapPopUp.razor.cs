@@ -11,12 +11,16 @@ public sealed partial class BootstrapPopUp : ComponentBase
 {
     #region 组件参数
     #region 标题
-    /// <inheritdoc cref="PopUp.Title"/>
+    /// <summary>
+    /// 弹窗的标题
+    /// </summary>
     [Parameter]
     public string Title { get; set; } = "";
     #endregion
     #region 用来取消弹窗的委托
-    /// <inheritdoc cref="PopUp.Cancellation"/>
+    /// <summary>
+    /// 用来取消弹窗的委托
+    /// </summary>
     [Parameter]
     [EditorRequired]
     public EventCallback Cancellation { get; set; }
@@ -36,6 +40,13 @@ public sealed partial class BootstrapPopUp : ComponentBase
     /// </summary>
     [Parameter]
     public RenderFragment<EventCallback>? RenderFooter { get; set; }
+    #endregion
+    #region 弹窗CSS样式
+    /// <summary>
+    /// 获取弹窗dialog组件的CSS类名
+    /// </summary>
+    [Parameter]
+    public string? DialogCSS { get; set; }
     #endregion
     #endregion
 }

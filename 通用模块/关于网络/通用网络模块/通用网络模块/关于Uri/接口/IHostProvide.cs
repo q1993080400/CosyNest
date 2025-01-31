@@ -1,4 +1,4 @@
-﻿namespace System.NetFrancis.Http;
+﻿namespace System.NetFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -15,7 +15,6 @@ public interface IHostProvide
       只需获取依赖注入的IHostProvide服务即可，
       区别只是创建服务的方式*/
     #endregion
-    #region 公开成员
     #region 本机Host
     /// <summary>
     /// 获取本机的Host地址
@@ -40,6 +39,5 @@ public interface IHostProvide
             UriHost = toAbs ? Host : null
         };
     }
-    #endregion
     #endregion
 }

@@ -9,6 +9,8 @@ namespace System.DataFrancis;
 [JsonDerivedType(typeof(HasPreviewFile), nameof(HasPreviewFile))]
 [JsonDerivedType(typeof(HasUploadFileClient), nameof(HasUploadFileClient))]
 [JsonDerivedType(typeof(HasUploadFileServer), nameof(HasUploadFileServer))]
+[JsonDerivedType(typeof(HasUploadFileMiddle), nameof(HasUploadFileMiddle))]
+[JsonDerivedType(typeof(HasUploadFileFusion), nameof(HasUploadFileFusion))]
 public interface IHasPreviewFile : IHasReadOnlyPreviewFile
 {
     #region 说明文档

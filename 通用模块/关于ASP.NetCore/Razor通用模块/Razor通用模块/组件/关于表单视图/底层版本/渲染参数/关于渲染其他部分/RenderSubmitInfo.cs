@@ -66,4 +66,13 @@ public sealed record RenderSubmitInfo<Model>
     /// </summary>
     public required bool InUpload { get; init; }
     #endregion
+    #region 用来渲染遮罩的委托
+    /// <summary>
+    /// 当本组件正在执行提交逻辑时，
+    /// 如果这个逻辑包含一个正在进行的上传操作，
+    /// 则渲染本委托，遮罩屏幕提醒用户正在上传，
+    /// 如果不需要渲染遮罩，那么它是一个空委托
+    /// </summary>
+    public required RenderFragment RenderUploadMask { get; init; }
+    #endregion
 }

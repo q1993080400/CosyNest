@@ -5,14 +5,6 @@
 /// </summary>
 public static partial class CreateDataObj
 {
-    #region 创建表达式解析器
-    /// <summary>
-    /// 返回一个<see cref="IDataFilterAnalysis"/>的默认实现，
-    /// 它可以将<see cref="DataFilterDescription"/>解析为表达式树
-    /// </summary>
-    public static IDataFilterAnalysis DataFilterAnalysis { get; }
-        = new DataFilterAnalysisDefault();
-    #endregion
     #region 创建错误日志
     /// <summary>
     /// 创建一个错误日志

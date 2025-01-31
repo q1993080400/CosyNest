@@ -10,16 +10,21 @@
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2.5);
         /*更宽的弹窗宽度*/
-        --popUpWidthWide: 60vw;
+        --popUpWidthMedium: 60dvw;
         /*更窄的弹窗宽度*/
-        --popUpWidthNarrow: min(var(--popUpWidthWide),50ic);
+        --popUpWidthSmall: min(var(--popUpWidthMedium),60ic);
+        /*更高的弹窗高度*/
+        --popUpHeightMedium: 60dvh;
+        /*更矮的弹窗高度*/
+        --popUpHeightSmall: 40dvh;
     }
 }
 
 /*超大容器，一般出现在超大屏PC平台*/
 @container (min-width : 1836px)
 {
-    .arrange
+    /*依次排列元素的变量定义样式*/
+    .arrangeDefinition
     {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 4;
@@ -45,16 +50,21 @@
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 2);
         /*更宽的弹窗宽度*/
-        --popUpWidthWide: 70vw;
+        --popUpWidthMedium: 70dvw;
         /*更窄的弹窗宽度*/
-        --popUpWidthNarrow: min(var(--popUpWidthWide),40ic);
+        --popUpWidthSmall: min(var(--popUpWidthMedium),50ic);
+        /*更高的弹窗高度*/
+        --popUpHeightMedium: 70dvh;
+        /*更矮的弹窗高度*/
+        --popUpHeightSmall: 50dvh;
     }
 }
 
 /*大容器，一般出现在普通屏PC平台*/
 @container (min-width : 1224px) and (max-width : 1836px)
 {
-    .arrange
+    /*依次排列元素的变量定义样式*/
+    .arrangeDefinition
     {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 3;
@@ -80,16 +90,21 @@
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: calc(var(--topLayoutPaddingVertical) * 1.5);
         /*更宽的弹窗宽度*/
-        --popUpWidthWide: 80vw;
+        --popUpWidthMedium: 80dvw;
         /*更窄的弹窗宽度*/
-        --popUpWidthNarrow: min(var(--popUpWidthWide),30ic);
+        --popUpWidthSmall: min(var(--popUpWidthMedium),40ic);
+        /*更高的弹窗高度*/
+        --popUpHeightMedium: 80dvh;
+        /*更矮的弹窗高度*/
+        --popUpHeightSmall: 60dvh;
     }
 }
 
 /*中容器，一般出现在平板平台*/
 @container (min-width : 667px) and (max-width : 1224px)
 {
-    .arrange
+    /*依次排列元素的变量定义样式*/
+    .arrangeDefinition
     {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 2;
@@ -115,16 +130,21 @@
         /*最顶层组件的左边和右边大小*/
         --topLayoutPaddingHorizontal: var(--topLayoutPaddingVertical);
         /*更宽的弹窗宽度*/
-        --popUpWidthWide: 90vw;
+        --popUpWidthMedium: 90dvw;
         /*更窄的弹窗宽度*/
-        --popUpWidthNarrow: var(--popUpWidthWide);
+        --popUpWidthSmall: var(--popUpWidthMedium);
+        /*更高的弹窗高度*/
+        --popUpHeightMedium: 80dvh;
+        /*更矮的弹窗高度*/
+        --popUpHeightSmall: 60dvh;
     }
 }
 
 /*小容器，一般出现在手机平台*/
 @container (max-width : 667px)
 {
-    .arrange
+    /*依次排列元素的变量定义样式*/
+    .arrangeDefinition
     {
         /*列表容器的较少数量*/
         --arrangeParticleMinority: 1;
@@ -204,6 +224,16 @@
     color-scheme: only light;
 }
 
+/*屏蔽深色模式，只有在国产浏览器强制使用深色模式的时候，才适合使用它*/
+@media (prefers-color-scheme: dark)
+{
+    :root
+    {
+        background-color: white !important;
+        color: black !important;
+    }
+}
+
 /*主体样式*/
 body
 {
@@ -232,13 +262,26 @@ input[type=file]
     display: none;
 }
 
-/*完美容器样式，它的子元素依次排列，允许换行*/
+/*完美容器样式，它的子元素依次排列，允许换行，会平分所有剩余空间，但最后一行除外*/
 .perfectContainer
 {
     display: flex;
     flex-wrap: wrap;
     gap: var(--gapMedium);
 }
+
+    /*完美容器的子元素样式*/
+    .perfectContainer > *
+    {
+        flex-grow: 1;
+    }
+
+    /*完美容器的子元素的附加伪元素样式*/
+    .perfectContainer::after
+    {
+        content: '';
+        flex-grow: 99;
+    }
 
 /*占满屏幕，并且在横屏时自动旋转*/
 .horizontalScreen
@@ -249,24 +292,6 @@ input[type=file]
     box-sizing: border-box;
 }
 
-/*平分容器样式，它的子元素平分空间*/
-.bisectContainers
-{
-    display: flex;
-}
-
-    /*平分容器直接子元素样式*/
-    .bisectContainers > *
-    {
-        flex-grow: 1;
-    }
-
-/*不平分样式，它可以避免平分容器的子元素大小改变*/
-.notBsect
-{
-    flex-grow: 0;
-}
-
 /*普通容器样式*/
 .commonContainers
 {
@@ -274,6 +299,18 @@ input[type=file]
     flex-direction: column;
     gap: var(--gapMedium);
 }
+
+/*平等容器样式，它的每个子元素平分所有空间*/
+.equalContainers
+{
+    display: flex;
+}
+
+    /*平等容器的子元素样式*/
+    .equalContainers > *
+    {
+        flex-grow: 1;
+    }
 
 /*占满屏幕布局*/
 .occupyScre
@@ -351,28 +388,41 @@ input[type=file]
     white-space: pre-wrap;
 }
 
-/*相对于父元素的中部居中布局，水平垂直方向皆居中，它还会填满父元素*/
-.centerMiddRelativelyFill
+/*省略文本样式*/
+.omitText
 {
-    left: 0;
-    top: 0;
-    min-width: 100%;
-    min-height: 100%;
-    box-sizing: border-box;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/*占满屏幕的容器，它可以用于帮助实现天地布局*/
+.fullScreenContainer:has(.fullScreenContainerSon)
+{
+    height: 100dvh;
+    overflow: auto;
+}
+
+/*通用居中模式*/
+.centerCommon
+{
     display: flex;
     place-content: center;
     align-items: center;
 }
 
+/*相对于父元素的中部居中布局，水平垂直方向皆居中，它还会填满父元素*/
+.centerMiddRelativelyFill
+{
+    min-width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
 /*相对于父元素的中部居中布局，水平垂直方向皆居中*/
 .centerMiddRelatively
 {
-    left: 0;
-    top: 0;
     box-sizing: border-box;
-    display: flex;
-    place-content: center;
-    align-items: center;
 }
 
 /*相对于屏幕的中部居中布局，水平垂直方向皆居中*/
@@ -453,10 +503,12 @@ input[type=file]
     color: white;
 }
 
-/*被选择的元素的文本样式*/
-.selectElementText
+/*选择器元素容器样式*/
+.selectorElementContainer
 {
-    width: max-content;
+    display: flex;
+    place-content: center;
+    align-items: center;
 }
 
 /*禁止鼠标点击样式*/
@@ -465,46 +517,92 @@ input[type=file]
     pointer-events: none;
 }
 
+/*隐藏的样式*/
+.hidden
+{
+    display: none;
+}
+
+/*依次排列元素，且元素数量较少时的样式*/
+.arrangeMinority
+{
+    /*每一行排列元素的数量*/
+    --arrangeColumnsCount: var(--arrangeParticleMinority);
+}
+
+/*依次排列元素，且元素数量中等时的样式*/
+.arrangeMedium
+{
+    /*每一行排列元素的数量*/
+    --arrangeColumnsCount: var(--arrangeParticleMedium);
+}
+
+/*依次排列元素，且元素数量较多时的样式*/
+.arrangeMost
+{
+    /*每一行排列元素的数量*/
+    --arrangeColumnsCount: var(--arrangeParticleMost);
+}
+
+/*依次排列元素，且元素数量特别多时的样式*/
+.arrangeEspeciallyMany
+{
+    /*每一行排列元素的数量*/
+    --arrangeColumnsCount: var(--arrangeParticleEspeciallyMany);
+}
 
 /*依次排列元素样式*/
 .arrange
 {
     display: grid;
     gap: var(--gapMedium);
+    grid-template-columns: repeat(var(--arrangeColumnsCount),1fr)
 }
+
+/*依次排列元素，并填满所有剩余空间样式*/
+.arrangeFill
+{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+    /*依次排列元素，并填满所有剩余空间的子元素样式*/
+    .arrangeFill > *
+    {
+        flex-grow: 1;
+        flex-basis: calc(100% / var(--arrangeColumnsCount));
+        padding: var(--paddingSmall);
+    }
 
 /*依次排列元素的父容器样式*/
-:has(> .arrange)
+:has(> :where(.arrange,.arrangeFill))
 {
     container-type: inline-size;
-}
-
-/*依次排列元素，且元素数量较少时的样式*/
-.arrangeMinority
-{
-    grid-template-columns: repeat(var(--arrangeParticleMinority),1fr)
-}
-
-/*依次排列元素，且元素数量中等时的样式*/
-.arrangeMedium
-{
-    grid-template-columns: repeat(var(--arrangeParticleMedium),1fr)
-}
-
-/*依次排列元素，且元素数量较多时的样式*/
-.arrangeMost
-{
-    grid-template-columns: repeat(var(--arrangeParticleMost),1fr)
-}
-
-/*依次排列元素，且元素数量特别多时的样式*/
-.arrangeEspeciallyMany
-{
-    grid-template-columns: repeat(var(--arrangeParticleEspeciallyMany),1fr)
 }
 
 /*弹窗宽度样式*/
 .popUpWidth
 {
-    max-width: var(--popUpWidthWide);
+    max-width: var(--popUpWidthMedium);
+}
+
+/*横宽竖高型固定弹窗样式*/
+.fixedModalGiant
+{
+    width: var(--popUpWidthMedium);
+    height: var(--popUpHeightMedium);
+}
+
+/*横窄竖高型固定弹窗样式*/
+.fixedModalLanky
+{
+    width: var(--popUpWidthSmall);
+    height: var(--popUpHeightMedium);
+}
+
+/*圆形圆角样式*/
+.circleRadius
+{
+    border-radius: 50%;
+    text-align: center;
 }

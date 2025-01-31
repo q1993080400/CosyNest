@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.DataFrancis;
-using System.NetFrancis.Http;
+using System.NetFrancis;
 
 namespace Microsoft.AspNetCore;
 
@@ -29,25 +29,40 @@ public static class ToolServerInterface
     #endregion
     #region 根据搜索接口，获取异步枚举器
     #region 按照索引分页
+    #region 复杂方法
     /// <summary>
     /// 根据搜索接口，获取一个异步枚举器，
     /// 它用来枚举符合条件的元素
     /// </summary>
     /// <typeparam name="Interface">服务端搜索接口的类型</typeparam>
-    /// <param name="httpClient">用来发起Http请求的对象</param>
+    /// <typeparam name="Pack">从搜索接口返回的类型，它用来封装元素的集合</typeparam>
+    /// <typeparam name="Element">元素的类型</typeparam>
+    /// <param name="strongTypeInvokeFactory">用来发起强类型调用的对象</param>
     /// <param name="generateParameter">这个委托传入页的索引，返回搜索的参数</param>
+    /// <param name="getElement">这个委托拆解从搜索接口返回的对象，并返回元素的集合</param>
     /// <returns></returns>
     /// <inheritdoc cref="IServerSearch{Parameter, Obj}"/>
-    public static IAsyncEnumerable<Obj> GetAllObj<Interface, Parameter, Obj>(IHttpClient httpClient, Func<int, Parameter> generateParameter)
-        where Interface : class, IServerSearch<Parameter, Obj>
-        => CreateCollection.MergePage<Obj>(
+    public static IAsyncEnumerable<Element> GetAllObj<Interface, Parameter, Pack, Element>(IStrongTypeInvokeFactory strongTypeInvokeFactory,
+        Func<int, Parameter> generateParameter,
+        Func<Pack, IReadOnlyCollection<Element>> getElement)
+        where Interface : class, IServerSearch<Parameter, Pack>
+        => CreateCollection.MergePage<Element>(
         async index =>
         {
             var parameter = generateParameter(index);
-            var objs = await httpClient.StrongType<Interface>().
-            Request(x => x.Search(parameter));
+            var pack = await strongTypeInvokeFactory.StrongType<Interface>().Invoke(x => x.Search(parameter));
+            var objs = getElement(pack);
             return objs;
         });
+    #endregion
+    #region 简单方法
+    /// <inheritdoc cref="GetAllObj{Interface, Parameter, Pack, Element}(IStrongTypeInvokeFactory, Func{int, Parameter}, Func{Pack, IReadOnlyCollection{Element}})"/>
+    public static IAsyncEnumerable<Element> GetAllObj<Interface, Parameter, Pack, Element>(IStrongTypeInvokeFactory strongTypeInvokeFactory,
+        Func<int, Parameter> generateParameter)
+        where Interface : class, IServerSearch<Parameter, Pack>
+        where Pack : class, IReadOnlyCollection<Element>
+        => GetAllObj<Interface, Parameter, Pack, Element>(strongTypeInvokeFactory, generateParameter, x => x);
+    #endregion
     #endregion
     #region 按照排除ID进行分页
     #region 不限制要搜索的对象类型
@@ -61,17 +76,21 @@ public static class ToolServerInterface
     /// 返回值是向后端发起请求的参数</param>
     /// <param name="generateID">这个委托传入实体，返回实体的ID</param>
     /// <returns></returns>
-    /// <inheritdoc cref="GetAllObj{Interface, Parameter, Obj}(IHttpClient, Func{int, Parameter})"/>
-    public static async IAsyncEnumerable<Obj> GetAllObjFromExclude<Interface, Parameter, Obj>
-        (IHttpClient httpClient, Func<IEnumerable<Guid>, Parameter> generateParameter, Func<Obj, Guid> generateID)
-        where Interface : class, IServerSearch<Parameter, Obj>
+    /// <inheritdoc cref="GetAllObj{Interface, Parameter, Pack, Element}(IStrongTypeInvokeFactory, Func{int, Parameter}, Func{Pack, IReadOnlyCollection{Element}})"/>
+    public static async IAsyncEnumerable<Element> GetAllObjFromExclude<Interface, Parameter, Pack, Element>
+        (IStrongTypeInvokeFactory strongTypeInvokeFactory,
+        Func<IEnumerable<Guid>, Parameter> generateParameter,
+        Func<Pack, IReadOnlyCollection<Element>> getElement,
+        Func<Element, Guid> generateID)
+        where Interface : class, IServerSearch<Parameter, Pack>
     {
         var ids = ImmutableHashSet<Guid>.Empty;
         while (true)
         {
             var parameter = generateParameter(ids);
-            var objs = await httpClient.StrongType<Interface>().Request(x => x.Search(parameter));
-            if (objs.Length is 0)
+            var pack = await strongTypeInvokeFactory.StrongType<Interface>().Invoke(x => x.Search(parameter));
+            var objs = getElement(pack);
+            if (objs.Count is 0)
                 yield break;
             foreach (var obj in objs)
             {
@@ -82,12 +101,26 @@ public static class ToolServerInterface
     }
     #endregion
     #region 为IWithID优化
-    /// <inheritdoc cref="GetAllObjFromExclude{Interface, Parameter, Obj}(IHttpClient, Func{IEnumerable{Guid}, Parameter}, Func{Obj, Guid})"/>
-    public static IAsyncEnumerable<Obj> GetAllObjFromExclude<Interface, Parameter, Obj>
-        (IHttpClient httpClient, Func<IEnumerable<Guid>, Parameter> generateParameter)
-        where Interface : class, IServerSearch<Parameter, Obj>
-        where Obj : IWithID
-        => GetAllObjFromExclude<Interface, Parameter, Obj>(httpClient, generateParameter, x => x.ID);
+    #region 复杂方法
+    /// <inheritdoc cref="GetAllObjFromExclude{Interface, Parameter, Pack, Element}(IStrongTypeInvokeFactory, Func{IEnumerable{Guid}, Parameter}, Func{Pack, IReadOnlyCollection{Element}}, Func{Element, Guid})"/>
+    public static IAsyncEnumerable<Element> GetAllObjFromExclude<Interface, Parameter, Pack, Element>
+        (IStrongTypeInvokeFactory strongTypeInvokeFactory,
+        Func<IEnumerable<Guid>, Parameter> generateParameter,
+        Func<Pack, IReadOnlyCollection<Element>> getElement)
+        where Interface : class, IServerSearch<Parameter, Pack>
+        where Element : IWithID
+        => GetAllObjFromExclude<Interface, Parameter, Pack, Element>(strongTypeInvokeFactory, generateParameter, getElement, x => x.ID);
+    #endregion
+    #region 简单方法
+    /// <inheritdoc cref="GetAllObjFromExclude{Interface, Parameter, Pack, Element}(IStrongTypeInvokeFactory, Func{IEnumerable{Guid}, Parameter}, Func{Pack, IReadOnlyCollection{Element}}, Func{Element, Guid})"/>
+    public static IAsyncEnumerable<Element> GetAllObjFromExclude<Interface, Parameter, Pack, Element>
+        (IStrongTypeInvokeFactory strongTypeInvokeFactory,
+        Func<IEnumerable<Guid>, Parameter> generateParameter)
+        where Interface : class, IServerSearch<Parameter, Pack>
+        where Pack : IReadOnlyCollection<Element>
+        where Element : IWithID
+        => GetAllObjFromExclude<Interface, Parameter, Pack, Element>(strongTypeInvokeFactory, generateParameter, x => x, x => x.ID);
+    #endregion
     #endregion
     #endregion
     #endregion
@@ -98,11 +131,11 @@ public static class ToolServerInterface
     /// 然后获取<see cref="RenderFilterGroup"/>
     /// </summary>
     /// <typeparam name="GetRenderAllFilterCondition">后端接口的类型</typeparam>
-    /// <param name="httpClient">发起请求的Http客户端</param>
+    /// <param name="strongTypeInvokeFactory">发起强类型调用的对象</param>
     /// <returns></returns>
-    public static Func<Task<RenderFilterGroup[]>> GetConditionFunction<GetRenderAllFilterCondition>(IHttpClient httpClient)
+    public static Func<Task<RenderFilterGroup[]>> GetConditionFunction<GetRenderAllFilterCondition>(IStrongTypeInvokeFactory strongTypeInvokeFactory)
         where GetRenderAllFilterCondition : class, IGetRenderAllFilterCondition
-        => () => httpClient.StrongType<GetRenderAllFilterCondition>().
-        Request(x => x.GetRenderAllFilterCondition());
+        => () => strongTypeInvokeFactory.StrongType<GetRenderAllFilterCondition>().
+        Invoke(x => x.GetRenderAllFilterCondition());
     #endregion
 }

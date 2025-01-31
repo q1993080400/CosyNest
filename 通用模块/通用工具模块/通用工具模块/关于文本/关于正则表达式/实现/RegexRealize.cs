@@ -47,6 +47,10 @@ sealed class RegexRealize(string regexText, RegexOptions options) : IRegex
         => RegexInstance.Replace(text, replace);
     #endregion
     #endregion
+    #region 拆分字符串
+    public string[] Split(string text)
+        => RegexInstance.Split(text);
+    #endregion
     #endregion
     #region 内部成员
     #region 正则表达式对象

@@ -3,7 +3,7 @@
 /// <summary>
 /// 这个组件能够让放置在其中的子内容自动获得蒙版效果
 /// </summary>
-public sealed partial class Masking : ComponentBase, IContentComponent<RenderFragment<RenderMasking>>, IMaskingParameter
+public sealed partial class Masking : ComponentBase, IContentComponent<RenderFragment<RenderMaskingInfo>>, IMaskingParameter
 {
     #region 如何使用本组件
     /*请按照以下步骤添加蒙版效果：
@@ -21,7 +21,7 @@ public sealed partial class Masking : ComponentBase, IContentComponent<RenderFra
     #region 子内容
     [Parameter]
     [EditorRequired]
-    public RenderFragment<RenderMasking> ChildContent { get; set; } = static _ => static _ => { };
+    public RenderFragment<RenderMaskingInfo> ChildContent { get; set; } = static _ => static _ => { };
     #endregion
     #region 占满全屏
     [Parameter]
@@ -33,7 +33,7 @@ public sealed partial class Masking : ComponentBase, IContentComponent<RenderFra
     /// 如果不指定，默认为亚克力蒙版
     /// </summary>
     [Parameter]
-    public Func<IMaskingParameter, RenderMasking> MaskingMod { get; set; } = MaskingAcrylic;
+    public Func<IMaskingParameter, RenderMaskingInfo> MaskingMod { get; set; } = MaskingAcrylic;
     #endregion
     #endregion
     #region 静态成员
@@ -43,7 +43,7 @@ public sealed partial class Masking : ComponentBase, IContentComponent<RenderFra
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="MaskingBase(IMaskingParameter, string, string)"/>
-    public static RenderMasking MaskingAcrylic(IMaskingParameter parameter)
+    public static RenderMaskingInfo MaskingAcrylic(IMaskingParameter parameter)
         => MaskingBase(parameter, "acrylicContainer", "acrylicMask");
     #endregion
     #region 返回苹果风格蒙版
@@ -53,7 +53,7 @@ public sealed partial class Masking : ComponentBase, IContentComponent<RenderFra
     /// <param name="isDarkness">如果这个值为<see langword="true"/>，
     /// 返回深色模式，否则返回浅色模式</param>
     /// <returns></returns>
-    public static Func<IMaskingParameter, RenderMasking> MaskingIOS(bool isDarkness)
+    public static Func<IMaskingParameter, RenderMaskingInfo> MaskingIOS(bool isDarkness)
         => x => MaskingBase(x, $"iosContainer", isDarkness ? "iosContainerDarkness" : "iosContainerUndertint");
     #endregion
     #region 基础方法
@@ -65,7 +65,7 @@ public sealed partial class Masking : ComponentBase, IContentComponent<RenderFra
     /// <param name="internalCSS">内部容器CSS，
     /// 如果为<see langword="null"/>，表示不需要</param>
     /// <returns></returns>
-    private static RenderMasking MaskingBase(IMaskingParameter parameter, string externalCSS, string? internalCSS = null)
+    private static RenderMaskingInfo MaskingBase(IMaskingParameter parameter, string externalCSS, string? internalCSS = null)
     {
         var isFullScreen = parameter.IsFullScreen;
         var additionalCss = isFullScreen ? "occupyScre" : "";

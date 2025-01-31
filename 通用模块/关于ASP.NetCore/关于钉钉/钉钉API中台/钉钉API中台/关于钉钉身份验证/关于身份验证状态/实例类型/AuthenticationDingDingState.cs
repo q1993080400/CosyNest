@@ -18,4 +18,13 @@ public sealed record AuthenticationDingDingState
     /// </summary>
     public required AuthenticationDingDingResult? AuthenticationResult { get; init; }
     #endregion
+    #region 钉钉用户的ID
+    /// <summary>
+    /// 获取钉钉用户的ID，
+    /// 如果没有登陆成功，
+    /// 则为<see langword="null"/>
+    /// </summary>
+    public string? UserID
+        => AuthenticationResult?.UserInfo.UserID;
+    #endregion
 }

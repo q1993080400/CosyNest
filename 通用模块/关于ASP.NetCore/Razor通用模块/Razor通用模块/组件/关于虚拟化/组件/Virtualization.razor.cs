@@ -55,6 +55,33 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     [Parameter]
     public int Plus { get; set; } = ToolServerInterface.PlusDefault;
     #endregion
+    #region 是否倒序渲染
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则执行倒序渲染，它从容器的底部开始渲染，
+    /// 从顶部增加新元素，需要数据源和渲染方配合
+    /// </summary>
+    [Parameter]
+    public bool IsReverse { get; set; }
+    #endregion
+    #region 末尾元素的ID
+    /// <summary>
+    /// 获取末尾元素的ID，
+    /// 当用户看到末尾元素的时候，会加载新的元素，
+    /// 注意：末尾元素的位置随着<see cref="IsReverse"/>而变化
+    /// </summary>
+    [Parameter]
+    public string EndID { get; set; } = CreateASP.JSObjectName();
+    #endregion
+    #region 对偶元素的ID
+    /// <summary>
+    /// 获取对偶元素的ID，
+    /// 对偶元素是和末尾元素成双成对的一个元素，
+    /// 它们分别位于容器的两端
+    /// </summary>
+    [Parameter]
+    public string PairingID { get; set; } = CreateASP.JSObjectName();
+    #endregion
     #endregion
     #region 公开成员
     #region 释放对象
@@ -65,9 +92,9 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
         await Lock.WaitAsync();
         try
         {
+            DotNetObject.Dispose();
             if (RenderElements is { })
                 await RenderElements.DisposeAsync();
-            DotNetObject.Dispose();
         }
         catch (JSDisconnectedException)
         {
@@ -177,12 +204,6 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     #endregion
     #endregion
     #region 关于渲染
-    #region 末尾元素的ID
-    /// <summary>
-    /// 获取末尾元素的ID
-    /// </summary>
-    private string EndID { get; } = CreateASP.JSObjectName();
-    #endregion
     #region 新增元素并渲染
     /// <summary>
     /// 新增并渲染元素，
@@ -197,9 +218,19 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             if (IsDispose || IsComplete)
                 return;
             var needRedner = await NeedRender();
-            if (needRedner)
-                StateHasChanged();
+            if (!needRedner)
+                return;
+            if (IsReverse && await JSWindow.InvokeAsync<bool>("CheckIntersecting", PairingID))
+                AnchoringReverse = true;
+            StateHasChanged();
         });
+    #endregion
+    #region 是否锚定倒序渲染
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示为了配合倒序渲染，需要将容器滚动到最下方
+    /// </summary>
+    private bool AnchoringReverse { get; set; }
     #endregion
     #endregion
     #region 重写的方法
@@ -215,9 +246,10 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             if (RenderElements is { })
                 await RenderElements.DisposeAsync();
             RenderElements = (Elements ?? Array.Empty<Element>().ToAsyncEnumerable()).GetAsyncEnumerator();
-            IsComplete = Elements is null;
+            IsComplete = false;
             ElementList = [];
             OldElements = Elements;
+            AnchoringReverse = IsReverse;
             await TryAddElement();
         }
         finally
@@ -234,8 +266,18 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             await JSWindow.InvokeVoidAsync("ObservingVirtualizationContainers", DotNetObject, nameof(AddElementAndRender), EndID);
             return;
         }
+        #region 用来跳转到末尾的扩展方法
+        async Task ScrollIntoViewToEnd()
+        {
+            if (IsDispose || !AnchoringReverse || ElementList.Count is 0)
+                return;
+            await JSWindow.InvokeVoidAsync("ScrollIntoViewToEnd", PairingID);
+            AnchoringReverse = false;
+        }
+        #endregion
+        await ScrollIntoViewToEnd();
         await Task.Delay(1000);
-        if (IsComplete || IsDispose)
+        if (IsDispose || IsComplete)
             return;
         var intersecting = await JSWindow.InvokeAsync<bool>("CheckIntersecting", EndID);
         if (intersecting && await NeedRender())
@@ -274,18 +316,23 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             x.CloseElement();
         }
         : RenderEnd(renderEndInfo);
-        var renderElementInfo = ElementList.Select
+        #region 转换渲染参数的方法
+        IReadOnlyCollection<RenderVirtualizationElementInfo<Element>> GenerateRenderElementInfo(IEnumerable<Element> elements)
+            => elements.Select
             ((element, index) => new RenderVirtualizationElementInfo<Element>()
             {
-                ID = ElementNumber?.GetElementID(index),
+                ComponentID = ElementNumber?.GetElementID(index),
                 Index = index,
                 RenderElement = element
             }).ToArray();
+        #endregion
         return new()
         {
-            RenderElementInfo = renderElementInfo,
+            RenderElements = ElementList,
+            GenerateRenderElementInfo = GenerateRenderElementInfo,
             RenderLoadingPoint = renderEnd,
-            RenderEndInfo = renderEndInfo
+            RenderEndInfo = renderEndInfo,
+            PairingID = PairingID
         };
     }
     #endregion

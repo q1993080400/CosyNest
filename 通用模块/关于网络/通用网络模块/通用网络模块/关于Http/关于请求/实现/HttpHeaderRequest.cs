@@ -1,8 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Net.Http.Headers;
-using System.NetFrancis.Http.Realize;
 
-namespace System.NetFrancis.Http;
+namespace System.NetFrancis;
 
 /// <summary>
 /// 这个记录封装了Http请求头

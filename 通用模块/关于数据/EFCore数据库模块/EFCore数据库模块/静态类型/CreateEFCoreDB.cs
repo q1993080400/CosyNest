@@ -47,7 +47,6 @@ public static class CreateEFCoreDB
         }.ToString();
     #endregion
     #region 创建数据上下文工厂
-    #region 指定委托
     /// <summary>
     /// 创建一个数据上下文工厂，并返回
     /// </summary>
@@ -55,14 +54,6 @@ public static class CreateEFCoreDB
     /// <inheritdoc cref="EFDataContextFactory(Func{DbContext})"/>
     public static IDataContextFactory<IDataPipe> DataContextFactory(Func<DbContext> factory)
         => new EFDataContextFactory(factory);
-    #endregion
-    #region 指定类型
-    /// <typeparam name="DB">数据上下文的类型</typeparam>
-    /// <inheritdoc cref="DataContextFactory(Func{DbContext})"/>
-    public static IDataContextFactory<IDataPipe> DataContextFactory<DB>()
-        where DB : DbContext, new()
-        => DataContextFactory(static () => new DB());
-    #endregion
     #endregion
     #endregion
 }

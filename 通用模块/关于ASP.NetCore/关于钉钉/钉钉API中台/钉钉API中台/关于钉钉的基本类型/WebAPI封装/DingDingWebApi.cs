@@ -1,7 +1,7 @@
 ﻿using System.Design;
 using System.Design.Direct;
+using System.NetFrancis;
 using System.NetFrancis.Api;
-using System.NetFrancis.Http;
 
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
@@ -111,9 +111,9 @@ public abstract class DingDingWebApi
     /// <param name="token">要添加的访问令牌</param>
     /// <returns></returns>
     protected static Func<HttpRequestTransform, HttpRequestTransform> TransformAccessToken(string token)
-        => transform => request =>
+        => transform => async request =>
         {
-            var newRequest = transform(request);
+            var newRequest = await transform(request);
             return newRequest with
             {
                 Header = newRequest.Header.With(x => x.Add("x-acs-dingtalk-access-token", [token]))

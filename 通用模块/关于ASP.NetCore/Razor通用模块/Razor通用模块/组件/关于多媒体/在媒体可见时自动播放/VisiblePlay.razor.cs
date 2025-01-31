@@ -8,16 +8,16 @@
 public sealed partial class VisiblePlay : ComponentBase
 {
     #region 组件参数
-    #region 组件的子内容
+    #region 用来渲染整个组件的委托
     /// <summary>
-    /// 获取组件的子内容，
+    /// 获取用来渲染整个组件的委托，
     /// 它的参数是一个ID，
     /// 必须把这个ID赋值给子内容中的一个元素，
     /// 否则本组件无法正常工作
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public RenderFragment<string> ChildContent { get; set; }
+    public RenderFragment<string> RenderComponent { get; set; }
     #endregion
     #endregion
     #region 内部成员

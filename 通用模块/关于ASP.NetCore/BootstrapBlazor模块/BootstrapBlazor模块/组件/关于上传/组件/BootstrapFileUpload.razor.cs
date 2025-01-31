@@ -63,7 +63,7 @@ public sealed partial class BootstrapFileUpload : ComponentBase
     /// 获取用来渲染整个组件的委托
     /// </summary>
     [Parameter]
-    public RenderFragment<RenderBootstrapFileUpload>? RenderComponent { get; set; }
+    public RenderFragment<RenderBootstrapFileUploadInfo>? RenderComponent { get; set; }
     #endregion
     #region 是否正在上传
     /// <summary>
@@ -117,7 +117,7 @@ public sealed partial class BootstrapFileUpload : ComponentBase
     /// 返回本组件的渲染参数
     /// </summary>
     /// <returns></returns>
-    private RenderBootstrapFileUpload GetRenderInfo()
+    private RenderBootstrapFileUploadInfo GetRenderInfo()
         => new()
         {
             Accept = Accept,

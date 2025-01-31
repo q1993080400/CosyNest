@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.NetFrancis;
 
 namespace System;
 
@@ -6,15 +6,27 @@ public static partial class ExtendWebApi
 {
     //这个部分类专门用来声明有关依赖注入的扩展方法
 
-    #region 注入SignalR中心服务，且使用MessagePack协议
+    #region 从HttpContext中读取
     /// <summary>
-    /// 注入SignalR中心服务，且使用MessagePack协议，
-    /// 由于本框架的SignalR客户端只支持MessagePack协议，
-    /// 请务必使用本方法来注入SignalR中心
+    /// 以范围模式注入一个<see cref="IHostProvide"/>，
+    /// 它通过<see cref="HttpContext"/>来提供本机Host地址，
+    /// 注意：某些情况下，不能访问<see cref="HttpContext"/>，
+    /// 此时会引发异常
     /// </summary>
-    /// <param name="serviceCollection">服务容器</param>
+    /// <param name="services">待注入的服务容器</param>
     /// <returns></returns>
-    public static ISignalRServerBuilder AddSignalRWithMessagePackProtocol(this IServiceCollection serviceCollection)
-        => serviceCollection.AddSignalR().AddMessagePackProtocol();
+    public static IServiceCollection AddHostProvideFromHttpContext(this IServiceCollection services)
+    {
+        services.AddHttpContextAccessor();
+        services.AddScoped(static services =>
+        {
+            var httpContextAccessor = services.GetRequiredService<IHttpContextAccessor>();
+            var request = httpContextAccessor.HttpContext?.Request ??
+            throw new NotSupportedException($"{nameof(IHttpContextAccessor)}服务无法获取{nameof(HttpContext)}");
+            var host = $"{request.Scheme}://{request.Host}";
+            return CreateNet.HostProvide(host);
+        });
+        return services;
+    }
     #endregion
 }

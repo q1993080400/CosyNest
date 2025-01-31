@@ -126,6 +126,7 @@ public static partial class ExtendEnumerable
     #endregion
     #endregion
     #region 筛选集合中的非空对象
+    #region 针对引用类型
     /// <summary>
     /// 筛选集合中的非空对象
     /// </summary>
@@ -134,6 +135,18 @@ public static partial class ExtendEnumerable
     /// <returns></returns>
     public static IEnumerable<Obj> WhereNotNull<Obj>(this IEnumerable<Obj?> objs)
         => objs.Where(static x => x is { })!;
+    #endregion
+    #region 针对可空值类型
+    /// <summary>
+    /// 筛选集合中的非空对象
+    /// </summary>
+    /// <typeparam name="Obj">要筛选的集合元素的可空类型</typeparam>
+    /// <param name="objs">要筛选的集合元素</param>
+    /// <returns></returns>
+    public static IEnumerable<Obj> WhereNotNull<Obj>(this IEnumerable<Obj?> objs)
+        where Obj : struct
+        => objs.Where(x => x is { }).Select(x => x!.Value);
+    #endregion
     #endregion
     #region 摊平嵌套集合
     /// <summary>

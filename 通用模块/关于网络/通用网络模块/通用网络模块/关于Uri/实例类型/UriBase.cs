@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace System.NetFrancis.Http;
+namespace System.NetFrancis;
 
 /// <summary>
 /// 这个类型是Uri地址各个部分的共同基类

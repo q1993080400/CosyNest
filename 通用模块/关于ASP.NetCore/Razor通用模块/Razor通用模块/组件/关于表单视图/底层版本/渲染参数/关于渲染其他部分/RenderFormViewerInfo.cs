@@ -1,7 +1,7 @@
 ﻿namespace Microsoft.AspNetCore.Components;
 
 /// <summary>
-/// 这个记录是用来渲染<see cref="FormViewer{Model}"/>的参数
+/// 这个记录是用来渲染<see cref="FormViewer{Model}"/>整个组件的参数
 /// </summary>
 /// <inheritdoc cref="FormViewer{Model}"/>
 public sealed record RenderFormViewerInfo<Model>

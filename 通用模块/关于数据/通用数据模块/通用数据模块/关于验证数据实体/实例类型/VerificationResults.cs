@@ -22,22 +22,19 @@ public sealed record VerificationResults
     /// </summary>
     public required IReadOnlyList<(PropertyInfo Property, string Prompt)> FailureReason { get; init; }
     #endregion
-    #region 验证错误信息
+    #region 验证失败的消息
     /// <summary>
-    /// 获取验证错误信息，
-    /// 如果验证成功，
-    /// 则为<see langword="null"/>
+    /// 获取验证失败的消息，
+    /// 它是由<see cref="FailureReason"/>中的所有消息连接而成
     /// </summary>
-    public string? ErrorMessage
-        => IsSuccess ?
-        null :
-        FailureReason.Join(static x => x.Prompt, Environment.NewLine);
+    public string FailureReasonMessage()
+        => FailureReason.Join(static x => x.Prompt, Environment.NewLine);
     #endregion
     #region 是否验证成功
     /// <summary>
     /// 获取是否验证成功
     /// </summary>
     public bool IsSuccess
-        => !FailureReason.Any();
+        => FailureReason.Count is 0;
     #endregion
 }

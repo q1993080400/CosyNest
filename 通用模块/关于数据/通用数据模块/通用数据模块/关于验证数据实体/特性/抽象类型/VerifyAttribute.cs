@@ -28,7 +28,8 @@ public abstract class VerifyAttribute : Attribute
     /// </summary>
     /// <param name="value">要验证的属性的值</param>
     /// <param name="describe">对验证对象的描述，它影响在验证不通过时，生成的错误文本</param>
+    /// <param name="recursion">这个验证委托可以支持递归验证</param>
     /// <returns>验证不通过的原因，如果为<see langword="null"/>，表示验证通过</returns>
-    public abstract string? Verify(object? value, string describe);
+    public abstract string? Verify(object? value, string describe, DataVerify recursion);
     #endregion
 }

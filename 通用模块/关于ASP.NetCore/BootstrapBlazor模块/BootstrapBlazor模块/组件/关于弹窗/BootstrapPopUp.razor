@@ -2,7 +2,7 @@
 @inherits ComponentBase
 
 <ModelDialog Context="dialogID">
-    <dialog id="@dialogID">
+    <dialog id="@dialogID" class="@DialogCSS">
         <Card>
             <HeaderTemplate>
                 <Center>
@@ -20,7 +20,7 @@
                 else
                 {
                     <div class="compactCentered">
-                        <Button Text="取消" OnClick="@Cancellation" />
+                        <Button Text="关闭" OnClick="@Cancellation" />
                     </div>
                 }
             </FooterTemplate>

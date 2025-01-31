@@ -3,7 +3,7 @@
 /// <summary>
 /// 这个静态类可以用来帮助创建基本数学对象
 /// </summary>
-public static class CreateBaseMath
+public static partial class CreateBaseMath
 {
     #region 创建IRandom
     #region 获取公用的随机数生成器

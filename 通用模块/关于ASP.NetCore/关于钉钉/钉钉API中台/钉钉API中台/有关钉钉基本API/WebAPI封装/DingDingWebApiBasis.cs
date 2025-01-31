@@ -1,5 +1,5 @@
 ﻿using System.Design.Direct;
-using System.NetFrancis.Http;
+using System.NetFrancis;
 
 using Microsoft.Extensions.DependencyInjection;
 

@@ -19,7 +19,7 @@ public sealed partial class MaskingSimple : ComponentBase, IContentComponent<Ren
     #region 蒙版模式
     /// <inheritdoc cref="Masking.MaskingMod"/>
     [Parameter]
-    public Func<IMaskingParameter, RenderMasking> MaskingMod { get; set; } = Masking.MaskingAcrylic;
+    public Func<IMaskingParameter, RenderMaskingInfo> MaskingMod { get; set; } = Masking.MaskingAcrylic;
     #endregion
     #region 参数展开
     /// <summary>

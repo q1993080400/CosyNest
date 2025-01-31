@@ -11,7 +11,7 @@ public sealed class VerifyRegexAttribute([StringSyntax(StringSyntaxAttribute.Reg
 {
     #region 公开成员
     #region 执行验证
-    public override string? Verify(object? value, string describe)
+    public override string? Verify(object? value, string describe, DataVerify recursion)
     {
         if (value is not string t)
             return $"{describe}不是不为null的string类型，无法匹配";

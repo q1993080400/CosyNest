@@ -1,4 +1,4 @@
-﻿namespace Microsoft.AspNetCore.SignalR.Client;
+﻿namespace System.NetFrancis;
 
 /// <summary>
 /// 这个静态类是有关SignalR的工具类

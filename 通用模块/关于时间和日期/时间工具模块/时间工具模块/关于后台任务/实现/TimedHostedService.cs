@@ -51,7 +51,7 @@ public abstract class TimedHostedService : BackgroundService, IHostedServiceExpl
     #endregion
     #region 抽象类实现
     #region 重写的StartAsync方法
-    public override Task StartAsync(CancellationToken cancellationToken)
+    public sealed override Task StartAsync(CancellationToken cancellationToken)
     {
         StartHostedInfo.ServiceProvider.
             GetService<IHostedServiceExplicitIntermediary>()?.

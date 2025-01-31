@@ -1,6 +1,4 @@
-﻿using System.NetFrancis.Http;
-
-namespace System.NetFrancis;
+﻿namespace System.NetFrancis;
 
 public static partial class CreateNet
 {

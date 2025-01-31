@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace System.NetFrancis.Http;
+namespace System.NetFrancis;
 
 /// <summary>
 /// 这个类型是<see cref="IHttpClient"/>的实现，
@@ -9,18 +9,20 @@ namespace System.NetFrancis.Http;
 /// <param name="defaultTransform">用来转换Http请求的默认函数，
 /// 它可以用来改变Http请求的默认值，并作为管道的第一个输入，
 /// 如果为<see langword="null"/>，则不进行转换</param>
-abstract class HttpClientBase(HttpRequestTransform? defaultTransform) : IHttpClient
+abstract class HttpClientBase(HttpRequestTransform defaultTransform) : IHttpClient
 {
     #region 接口实现
     #region 发起Http请求
     #region 返回HttpResponseMessage
-    public async Task<HttpResponseMessage> Request(HttpRequestRecording request, Func<HttpRequestTransform, HttpRequestTransform>? transformation = null, CancellationToken cancellationToken = default)
+    public async Task<HttpResponseMessage> Request(HttpRequestRecording request,
+        Func<HttpRequestTransform, HttpRequestTransform>? transformation = null,
+        CancellationToken cancellationToken = default)
     {
-        var requestMiddle = transformation is null ? DefaultTransform : transformation(DefaultTransform);
+        var requestMiddle = transformation is null ? defaultTransform : transformation(defaultTransform);
         #region 本地函数
         async Task<HttpResponseMessage> Fun(HttpRequestRecording request)      //解决重定向问题
         {
-            var transformationRequest = requestMiddle(request);
+            var transformationRequest = await requestMiddle(request);
             using var bclRequest = transformationRequest.ToHttpRequestMessage();
             var response = await HttpClient.SendAsync(bclRequest, cancellationToken);
             if (response.StatusCode is HttpStatusCode.Found)
@@ -36,7 +38,7 @@ abstract class HttpClientBase(HttpRequestTransform? defaultTransform) : IHttpCli
         }
         #endregion
         var response = await Fun(request);
-        return response;
+        return response.EnsureSuccessStatusCode();
     }
     #endregion
     #region 返回Stream
@@ -56,20 +58,6 @@ abstract class HttpClientBase(HttpRequestTransform? defaultTransform) : IHttpCli
         return await response.Content.ReadAsStreamAsync(cancellationToken);
     }
     #endregion
-    #endregion
-    #region 发起强类型请求
-    public IHttpStrongTypeRequest<API> StrongType<API>()
-        where API : class
-        => new HttpStrongTypeRequest<API>(this);
-    #endregion
-    #endregion
-    #region 内部成员
-    #region 转换函数
-    /// <summary>
-    /// 这个函数用来在请求的时候，
-    /// 对<see cref="HttpRequestRecording"/>进行转换
-    /// </summary>
-    private HttpRequestTransform DefaultTransform { get; } = defaultTransform ??= static x => x;
     #endregion
     #endregion
     #region 抽象成员

@@ -1,4 +1,5 @@
-﻿using System.IOFrancis.FileSystem;
+﻿using System.IOFrancis;
+using System.IOFrancis.FileSystem;
 
 using Aliyun.OSS;
 
@@ -12,12 +13,18 @@ sealed class OSSAliyun(AliyunOSSToken token) : IOSS
 {
     #region 公开成员
     #region 执行上传
-    public Task<FileNameInfo> Upload(Stream stream, FileNameInfo? fileNameInfo)
+    public async Task<FileNameInfo> Upload(Stream stream, FileNameInfo? fileNameInfo)
     {
+        #region 适配流的本地函数
+        async Task<Stream> AdapterStream()
+            => stream is IStreamAdapter streamAdapter ?
+            await streamAdapter.SynchronousAdapter() : stream;
+        #endregion
+        using var adapterStream = await AdapterStream();
         var fullObjectName = fileNameInfo ?? FileNameInfo.Create();
         var client = CreateClient();
-        using var result = client.PutObject(token.Bucket, fullObjectName.FullName, stream);
-        return Task.FromResult(fullObjectName);
+        using var result = client.PutObject(token.Bucket, fullObjectName.FullName, adapterStream);
+        return fullObjectName;
     }
     #endregion
     #region 生成下载链接

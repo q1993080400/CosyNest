@@ -1,6 +1,6 @@
 ﻿using System.Net.Http.Headers;
 
-namespace System.NetFrancis.Http;
+namespace System.NetFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，

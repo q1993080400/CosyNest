@@ -18,11 +18,10 @@ public abstract record BaidupanFD
     #endregion
     #region 文件信息
     /// <summary>
-    /// 获取一个元组，它的项分别是文件或目录的简称，
-    /// 扩展名（如果存在，不带点号），以及全称
+    /// 获取这个文件的信息
     /// </summary>
-    public (string Simple, string? Extended, string FullName) Info
-        => ToolPath.SplitFilePath(Path);
+    public FileNameInfo Info
+        => new(Path);
     #endregion
     #region 文件ID
     /// <summary>

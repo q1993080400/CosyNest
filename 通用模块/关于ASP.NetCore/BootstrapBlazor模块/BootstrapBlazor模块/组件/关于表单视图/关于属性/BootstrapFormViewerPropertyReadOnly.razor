@@ -1,0 +1,46 @@
+﻿@namespace BootstrapBlazor.Components
+@using System.Media
+@inherits ComponentBase
+
+@{
+    #region 用来渲染上传文件的委托
+    void RenderFileViewer(IEnumerable<IHasReadOnlyPreviewFile> files)
+    {
+        <BootstrapFileViewer Files="files">
+            <RenderFile Context="renderFile">
+                @{
+                    var attributes =
+                    renderFile.File.MediumFileType is not MediumFileType.NotMediumFile ?
+                    new Dictionary<string, object>()
+                {
+                    ["onclick"] = renderFile.OpenPreview
+                } : null;
+                }
+                <BootstrapSingleFile RenderFileInfo="renderFile" Attributes="attributes" />
+            </RenderFile>
+        </BootstrapFileViewer>
+    }
+    #endregion
+}
+
+<div class="bootstrapFormViewerPropertyContainer">
+    <div class="bootstrapFormViewerPropertyItem">
+        <div class="bootstrapFormViewerPropertyContainer">
+            <div class="bootstrapFormViewerPropertyLabel">@Title</div>
+            @switch (Value)
+            {
+                case IHasReadOnlyPreviewFile file:
+                    RenderFileViewer([file]);
+                    break;
+                case IEnumerable<IHasReadOnlyPreviewFile> files:
+                    RenderFileViewer(files);
+                    break;
+                case var value:
+                    <pre class="bootstrapFormViewerPropertyText">
+                        <TextRenderingSimple Value="FormatValue()" />
+                    </pre>
+                    break;
+            }
+        </div>
+    </div>
+</div>

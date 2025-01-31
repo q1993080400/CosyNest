@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace System.DataFrancis;
+﻿namespace System.DataFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -12,7 +10,6 @@ public interface IHasUploadFile : IHasPreviewFile
     /// <summary>
     /// 获取要上传的文件
     /// </summary>
-    [JsonIgnore]
     IUploadFile UploadFile { get; }
     #endregion
 }

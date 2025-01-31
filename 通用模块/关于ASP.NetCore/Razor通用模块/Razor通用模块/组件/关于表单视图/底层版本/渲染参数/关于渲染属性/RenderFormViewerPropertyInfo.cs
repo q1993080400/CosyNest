@@ -16,6 +16,14 @@ public sealed record RenderFormViewerPropertyInfo<Model> : RenderFormViewerPrope
     #region 属性名称
     public required string Name { get; init; }
     #endregion
+    #region 带点号的属性名称
+    /// <summary>
+    /// 获取带点号的属性名称，
+    /// 在某些情况下，它是建议的属性名称
+    /// </summary>
+    public string NameWithPoint
+        => Name.EndsWith(':') ? Name : Name + ":";
+    #endregion
     #region 获取属性的值的类型
     public Type ValueType
          => Property.PropertyType;

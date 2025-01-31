@@ -19,11 +19,12 @@ public interface IClean<in Entity>
     #endregion
     #region 清理实体
     /// <summary>
-    /// 执行收尾操作
+    /// 删除实体，并执行收尾操作
     /// </summary>
-    /// <param name="entities">要执行收尾操作的实体</param>
+    /// <param name="entities">要执行删除和收尾操作的实体</param>
+    /// <param name="dataPipe">数据管道对象，它可以用于删除数据</param>
     /// <param name="serviceProvider">一个用来请求服务的对象</param>
     /// <returns></returns>
-    abstract static Task Clean(IEnumerable<Entity> entities, IServiceProvider serviceProvider);
+    abstract static Task CleanAndDelete(IQueryable<Entity> entities, IDataPipe dataPipe, IServiceProvider serviceProvider);
     #endregion
 }

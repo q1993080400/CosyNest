@@ -6,6 +6,75 @@ public static partial class ExtendData
 {
     //这个部分类专门声明有关数据实体的扩展方法
 
+    #region 是否为新实体
+    /// <summary>
+    /// 判断一个实体是否为尚未保存的新实体
+    /// </summary>
+    /// <param name="data">要判断的实体</param>
+    /// <returns></returns>
+    public static bool IsNew(this IWithID data)
+        => data.ID == default;
+    #endregion
+    #region 关于IWithID
+    #region 筛选具有指定ID的实体
+    #region 不可为null
+    /// <summary>
+    /// 筛选具有指定ID的实体
+    /// </summary>
+    /// <typeparam name="Entity">要筛选的实体的类型</typeparam>
+    /// <param name="data">要筛选的数据源</param>
+    /// <param name="id">要筛选的实体的ID</param>
+    /// <returns></returns>
+    public static Entity Find<Entity>(this IQueryable<Entity> data, Guid id)
+        where Entity : IWithID
+        => data.First(x => x.ID == id);
+    #endregion
+    #region 可能为null
+    /// <summary>
+    /// 筛选具有指定ID的实体，
+    /// 如果不存在符合条件的实体，
+    /// 则返回<see langword="null"/>
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="Find{Entity}(IQueryable{Entity}, Guid)"/>
+    public static Entity? FindOrDefault<Entity>(this IQueryable<Entity> data, Guid id)
+        where Entity : IWithID
+        => data.FirstOrDefault(x => x.ID == id);
+    #endregion
+    #endregion
+    #region 判断是否存在具有指定ID的实体
+    /// <summary>
+    /// 判断是否存在具有指定ID的实体
+    /// </summary>
+    /// <typeparam name="Entity">要判断的实体的类型</typeparam>
+    /// <param name="data">要判断的数据源</param>
+    /// <param name="id">要判断的实体的ID</param>
+    /// <returns></returns>
+    public static bool Any<Entity>(this IQueryable<Entity> data, Guid id)
+        where Entity : IWithID
+        => data.Any(x => x.ID == id);
+    #endregion
+    #region 如果指定ID的实体不存在，则添加
+    /// <summary>
+    /// 如果数据库中不存在具有指定ID的实体，
+    /// 则将它们添加进数据库
+    /// </summary>
+    /// <typeparam name="Entity">实体的类型</typeparam>
+    /// <param name="pipe">数据管道对象</param>
+    /// <param name="addEntity">要添加的实体，函数会检查它的ID</param>
+    /// <returns></returns>
+    public static async Task AddIfNotExist<Entity>(this IDataPipeToContext pipe, Entity addEntity)
+        where Entity : class, IWithID
+    {
+        if (pipe.Query<Entity>().Any(addEntity.ID))
+            return;
+        await pipe.AddOrUpdate([addEntity], new()
+        {
+            IsAddData = AddOrUpdateInfo<Entity>.AddAllData
+        });
+    }
+    #endregion
+    #endregion
     #region 筛选已经过期或未过期的实体
     #region 可指定派生类
     /// <summary>
@@ -35,24 +104,5 @@ public static partial class ExtendData
         return data.WhereLife<Data, Data>(filterExpire);
     }
     #endregion 
-    #endregion
-    #region 枚举实体，并执行它们的收尾操作
-    /// <summary>
-    /// 枚举可清理实体，并对它们执行收尾操作，
-    /// 然后删除这些实体
-    /// </summary>
-    /// <typeparam name="Clean">可清理实体的类型</typeparam>
-    /// <param name="entitys">要执行收尾和删除操作的实体</param>
-    /// <param name="dataPipe">用来执行删除操作的数据上下文</param>
-    /// <param name="serviceProvider">一个用来请求服务的对象，
-    /// 根据实现的不同，这个函数可能不需要它</param>
-    /// <returns></returns>
-    public static async Task ExecuteDeleteAndClean<Clean>(this IQueryable<Clean> entitys, IDataPipeToContext dataPipe, IServiceProvider serviceProvider)
-        where Clean : class, IClean<Clean>
-    {
-        var array = entitys.ToArray();
-        await Clean.Clean(array, serviceProvider);
-        await dataPipe.Delete(array);
-    }
     #endregion
 }

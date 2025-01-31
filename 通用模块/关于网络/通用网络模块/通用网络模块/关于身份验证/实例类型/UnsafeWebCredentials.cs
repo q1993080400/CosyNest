@@ -1,4 +1,4 @@
-﻿using System.NetFrancis.Http;
+﻿using System.NetFrancis;
 
 namespace System.SafetyFrancis.Authentication;
 

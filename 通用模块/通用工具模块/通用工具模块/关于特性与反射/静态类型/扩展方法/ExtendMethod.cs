@@ -7,30 +7,6 @@ public static partial class ExtendReflection
     //这个部分类专门声明有关方法，委托，构造函数和事件的扩展方法
 
     #region 关于委托
-    #region 将一个方法对象转换为委托
-    /// <summary>
-    /// 将一个<see cref="MethodInfo"/>转换为委托
-    /// </summary>
-    /// <typeparam name="Del">转换的目标类型</typeparam>
-    /// <param name="method">要创建委托的方法</param>
-    /// <param name="target">用来执行方法的类型实例</param>
-    /// <returns></returns>
-    public static Del CreateDelegate<Del>(this MethodInfo method, object? target = null)
-        where Del : Delegate
-        => (Del)Delegate.CreateDelegate(typeof(Del), target, method);
-
-    /*说明文档：
-       即便met是实例方法，target参数仍然可以传入null，
-       但是在这种情况下，目标委托类型的第一个参数必须为方法实例类型，举例说明：
-
-       假设类型Class有一个实例方法叫Fun，它有一个int参数，无返回值，
-       那么假如target为null，目标委托类型应为Action<Class,int>，
-       或其他与之签名兼容的委托类型
-
-       经测试，这个方法支持委托的协变与逆变，
-       但是按照C#的规范，值类型不在支持范围之内，
-       测试的时候请多加注意*/
-    #endregion
     #region 返回一个类型是否为委托
     /// <summary>
     /// 判断一个类型是否为委托
@@ -39,6 +15,18 @@ public static partial class ExtendReflection
     /// <returns></returns>
     public static bool IsDelegate(this Type type)
         => typeof(Delegate).IsAssignableFrom(type);
+    #endregion
+    #region 返回一个委托的方法
+    /// <summary>
+    /// 返回一个委托Invoke方法的<see cref="MethodInfo"/>，
+    /// 它可以用来检查委托的参数和返回值等情况
+    /// </summary>
+    /// <param name="type">要检查的委托</param>
+    /// <returns></returns>
+    public static MethodInfo GetDelegateMethod(this Type type)
+        => type.IsDelegate() ?
+        type.GetMethod(nameof(Action.Invoke))! :
+        throw new NotSupportedException($"类型{type}不是委托");
     #endregion
     #endregion
     #region 方法和构造函数共用
@@ -105,6 +93,17 @@ public static partial class ExtendReflection
     /// <inheritdoc cref="GetMemberInfoRecursion{Member}(Type, Func{Type, BindingFlags, Member[]}, BindingFlags)"/>
     public static MethodInfo[] GetMethodInfoRecursion(this Type type, BindingFlags bindingFlags = CreateReflection.BindingFlagsAll)
         => type.GetMemberInfoRecursion(static (type, bindingFlags) => type.GetMethods(bindingFlags), bindingFlags);
+    #endregion
+    #region 判断方法是否具有返回值
+    /// <summary>
+    /// 如果这个方法没有返回值，是void方法，
+    /// 则返回<see langword="true"/>，
+    /// 否则返回<see langword="false"/>
+    /// </summary>
+    /// <param name="method">要判断的方法</param>
+    /// <returns></returns>
+    public static bool IsVoid(this MethodInfo method)
+        => method.ReturnType == typeof(void);
     #endregion
     #endregion
     #region 关于构造函数

@@ -31,37 +31,53 @@ public static class ToolCRUD
         var addOrUpdateEntity = info.Select(x =>
         {
             var entity = entityDictionary.GetValueOrDefault(x.ID);
-            return DBEntity.CreateOrFill(entity, x).Object;
+            return DBEntity.CreateOrFill(entity, x, pipe).Object;
         }).ToArray();
         return addOrUpdateEntity;
     }
     #endregion
     #region 添加或更新实体
+    #region 可以包含复杂的参数
     /// <summary>
     /// 添加或更新实体的默认方法，
     /// 它可以用来快速实现<see cref="IServerUpdate{Parameter}"/>接口
     /// </summary>
     /// <typeparam name="DBEntity">数据库实体类的类型</typeparam>
     /// <typeparam name="Info">API实体的类型</typeparam>
+    /// <typeparam name="Parameter">用来提交更新的参数</typeparam>
     /// <param name="serviceProvider">用来请求服务的对象</param>
-    /// <param name="info">要添加或更新的API实体</param>
+    /// <param name="getInfo">通过提交更新参数获取API实体的委托</param>
     /// <returns></returns>
-    public static async Task<APIPack> AddOrUpdate<DBEntity, Info>(IServiceProvider serviceProvider, Info info)
-        where DBEntity : class, IFill<DBEntity, Info>, IWithID
+    public static async Task<APIPackUpdate> AddOrUpdate<DBEntity, Info, Parameter>
+        (IServiceProvider serviceProvider, Parameter parameter, Func<Parameter, Info> getInfo)
+        where DBEntity : class, IFill<DBEntity, Parameter>, IWithID
         where Info : class, IWithID
     {
-        var verify = ToolWebApi.VerifyParameter<APIPack>(serviceProvider, info);
+        var info = getInfo(parameter);
+        var verify = ToolWebApi.VerifyParameter<APIPackUpdate>(serviceProvider, info);
         if (verify is { })
             return verify;
         await using var pipe = serviceProvider.RequiredDataPipe();
-        var id = info.ID;
-        var data = pipe.Query<DBEntity>().FirstOrDefault(x => x.ID == id);
-        var (addOrUpdateData, sideEffect) = DBEntity.CreateOrFill(data, info);
+        var data = pipe.Query<DBEntity>().FindOrDefault(info.ID);
+        var (addOrUpdateData, sideEffect) = DBEntity.CreateOrFill(data, parameter, pipe);
         if (sideEffect is { })
             await sideEffect(serviceProvider);
         await pipe.Push(x => x.AddOrUpdate([addOrUpdateData]));
-        return new();
+        return new()
+        {
+            ReplaceID = addOrUpdateData.ID
+        };
     }
+    #endregion
+    #region 直接使用业务实体
+    /// <param name="info">要添加或更新的API实体</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="AddOrUpdate{DBEntity, Info, Parameter}(IServiceProvider, Parameter, Func{Parameter, Info})"/>
+    public static Task<APIPackUpdate> AddOrUpdate<DBEntity, Info>(IServiceProvider serviceProvider, Info info)
+        where DBEntity : class, IFill<DBEntity, Info>, IWithID
+        where Info : class, IWithID
+        => AddOrUpdate<DBEntity, Info, Info>(serviceProvider, info, x => x);
+    #endregion
     #endregion
     #region 根据ID寻找实体
     /// <summary>
@@ -77,12 +93,13 @@ public static class ToolCRUD
     public static Info? Find<DBEntity, Info>(IDataPipeFromContext pipe, Guid id)
         where DBEntity : class, IProjection<Info>, IWithID
         where Info : class, IWithID
-        => pipe.Query<DBEntity>().FirstOrDefault(x => x.ID == id)?.Projection();
+        => pipe.Query<DBEntity>().FindOrDefault(id)?.Projection();
     #endregion
     #region 执行删除操作
-    #region 通用方法
     /// <summary>
-    /// 执行典型的删除操作
+    /// 执行典型的删除操作，
+    /// 如果实体类实现了<see cref="IClean{Entity}"/>，
+    /// 还会清理它
     /// </summary>
     /// <typeparam name="DBEntity">数据库实体类的类型</typeparam>
     /// <param name="serviceProvider">用来请求服务的对象</param>
@@ -92,48 +109,10 @@ public static class ToolCRUD
         where DBEntity : class, IWithID
     {
         await using var pipe = serviceProvider.RequiredDataPipe();
-        await pipe.Push(pipe => pipe.Delete<DBEntity>(x => ids.Contains(x.ID)));
+        await pipe.Query<DBEntity>().Where(x => ids.Contains(x.ID)).
+            ExecuteDeleteAndClean(pipe, serviceProvider);
         return new();
     }
-    #endregion
-    #region 为IClean特化
-    /// <summary>
-    /// 执行典型删除操作的普通方法，
-    /// 它为<see cref="IClean{Entity}"/>接口进行优化，
-    /// 在执行删除操作以后，还会进行清理操作
-    /// </summary>
-    /// <inheritdoc cref="Delete{DBEntity}(IServiceProvider, IEnumerable{Guid})"/>
-    public static async Task<APIPack> DeleteClean<DBEntity>(IServiceProvider serviceProvider, IEnumerable<Guid> ids)
-        where DBEntity : class, IWithID, IClean<DBEntity>
-    {
-        try
-        {
-            await using var pipe = serviceProvider.RequiredDataPipe();
-            await pipe.Push(async pipe =>
-            {
-                var delete = pipe.Query<DBEntity>().Where(x => ids.Contains(x.ID)).ToArray();
-                await pipe.Delete(delete);
-                try
-                {
-                    await DBEntity.Clean(delete, serviceProvider);
-                }
-                catch (Exception ex)    //不抛出异常，保证成功删除后，数据库不会因此回滚
-                {
-                    ex.Log(serviceProvider);
-                }
-            });
-            return new();
-        }
-        catch (Exception ex)
-        {
-            ex.Log(serviceProvider);
-            return new()
-            {
-                FailureReason = ex.Message,
-            };
-        }
-    }
-    #endregion
     #endregion
     #region 更新部分属性
     /// <summary>

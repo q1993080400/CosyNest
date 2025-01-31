@@ -42,10 +42,9 @@
         await RenderPropertyInfo.Submit();
     };
     #endregion
-    var notBsect = filterObjectType is FilterObjectType.Bool ? "notBsect" : "";
     var @enumItem = query.FilterTarget.EnumItem;
 }
-<div class="bootstrapSearchPanelPropertyContainer @notBsect">
+<div class="bootstrapSearchPanelPropertyContainer">
     @switch ((filterObjectType, enumItem))
     {
         case (FilterObjectType.Enum, _) or (_, { Count: > 0 }):
@@ -90,15 +89,12 @@
                                     </HeaderTemplate>
                                     <BodyTemplate>
                                         <div class="bootstrapSearchPanelSelect">
-                                            @foreach (var item in renderSelectorInfo.Candidates)
+                                            @foreach (var renderSelectorElementInfo in renderSelectorInfo.CandidatesInfo)
                                             {
-                                                var onClick = new EventCallback(Selector!, (MouseEventArgs _) =>
-                                                {
-                                                    renderSelectorInfo.SelectOrCancel(item);
-                                                });
-                                                <div @onclick=onClick>
-                                                    <div class="@(renderSelectorInfo.IsSelect(item)?"selectElement":"") selectElementText">
-                                                        @item.Describe
+                                                var selectorElementDescribe = renderSelectorElementInfo.Element.Describe;
+                                                <div @onclick=@renderSelectorElementInfo.ChangeSelect>
+                                                    <div class="@(renderSelectorElementInfo.IsSelect?"selectElement":"") selectorElementContainer">
+                                                        @selectorElementDescribe
                                                     </div>
                                                 </div>
                                             }
@@ -107,7 +103,7 @@
                                     <FooterTemplate>
                                         <div class="compactCentered">
                                             <Button Text="清除条件" OnClick="ClearEnumItem(bindQueryEnum)" />
-                                            <Button Text="提交搜索" OnClick="renderSelectorInfo.Submit" IsDisabled="@(!renderSelectorInfo.AnySelect)" />
+                                            <Button Text="提交搜索" OnClick="renderSelectorInfo.Submit" IsDisabled="@(renderSelectorInfo.SelectElementInfo.IsInvalid)" />
                                             <Button Text="返回页面" OnClick="@(()=>IsShow=false)" />
                                         </div>
                                     </FooterTemplate>

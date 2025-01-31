@@ -26,7 +26,7 @@ public static class ToolWebApi
             null :
             new()
             {
-                FailureReason = verificationResults.FailureReason.Join(static x => x.Prompt, Environment.NewLine)
+                FailureReason = verificationResults.FailureReasonMessage()
             };
     }
     #endregion

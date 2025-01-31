@@ -13,4 +13,14 @@ public sealed record class Tag<Obj>
     /// </summary>
     public Obj? Content { get; set; }
     #endregion
+    #region 获取对象内容，不可为null
+    /// <summary>
+    /// 获取对象封装的内容，
+    /// 如果为<see langword="null"/>，
+    /// 会引发一个异常
+    /// </summary>
+    /// <returns></returns>
+    public Obj CheckContent()
+        => Content ?? throw new NullReferenceException($"{nameof(Content)}为null，无法获取这个对象");
+    #endregion
 }

@@ -1,5 +1,5 @@
-﻿using System.NetFrancis.Api;
-using System.NetFrancis.Http;
+﻿using System.NetFrancis;
+using System.NetFrancis.Api;
 
 namespace System.AI;
 

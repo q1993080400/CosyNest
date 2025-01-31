@@ -1,9 +1,12 @@
-﻿namespace System.DingDing;
+﻿using System.NetFrancis;
+
+namespace System.DingDing;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
 /// 都可以用来获取钉钉登录的状态
 /// </summary>
+[ServerAPI]
 public interface IGetAuthenticationDingDingState
 {
     #region 获取身份验证状态

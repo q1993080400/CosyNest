@@ -1,7 +1,6 @@
 ﻿using System.DataFrancis;
 using System.Reflection;
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace System;
@@ -31,18 +30,6 @@ public static partial class ExtendData
         });
         return loggingBuilder;
     }
-    #endregion
-    #endregion
-    #region 关于请求服务
-    #region 请求IDataPipe
-    /// <summary>
-    /// 向服务容器请求一个<see cref="IDataContextFactory{Context}"/>，
-    /// 并通过它创建一个<see cref="IDataPipe"/>返回
-    /// </summary>
-    /// <param name="serviceProvider">要请求的服务容器</param>
-    /// <returns></returns>
-    public static IDataPipe RequiredDataPipe(this IServiceProvider serviceProvider)
-        => serviceProvider.GetRequiredService<IDataContextFactory<IDataPipe>>().CreateContext();
     #endregion
     #endregion
     #region 关于枚举
@@ -79,5 +66,5 @@ public static partial class ExtendData
         return description?.Name ?? @enum.ToString();
     }
     #endregion
-    #endregion 
+    #endregion
 }

@@ -65,4 +65,13 @@ public interface IRegex
         => Replace(text, "");
     #endregion
     #endregion
+    #region 拆分字符串
+    /// <summary>
+    /// 将指定的文本按照正则表达式的匹配模式拆分，
+    /// 并返回结果
+    /// </summary>
+    /// <param name="text">待拆分的文本</param>
+    /// <returns></returns>
+    string[] Split(string text);
+    #endregion
 }

@@ -1,5 +1,5 @@
 ﻿using System.Design.Direct;
-using System.NetFrancis.Http;
+using System.NetFrancis;
 
 namespace System.DingDing;
 

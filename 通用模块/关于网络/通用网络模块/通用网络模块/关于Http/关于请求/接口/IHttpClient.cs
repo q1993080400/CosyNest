@@ -3,7 +3,7 @@ using System.Design.Direct;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace System.NetFrancis.Http;
+namespace System.NetFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -101,14 +101,5 @@ public interface IHttpClient
     /// <inheritdoc cref="Request(HttpRequestRecording, Func{HttpRequestTransform, HttpRequestTransform}?, CancellationToken)"/>
     /// <inheritdoc cref="RequestJsonGet(string, ValueTuple{string, string}[], Func{HttpRequestTransform, HttpRequestTransform}?, JsonSerializerOptions?, CancellationToken)"/>
     Task<Stream> RequestStream(string uri, bool simulateBrowser = false, CancellationToken cancellationToken = default);
-    #endregion
-    #region 强类型Http请求
-    /// <summary>
-    /// 返回一个对象，它可以用来发起强类型请求
-    /// </summary>
-    /// <returns></returns>
-    /// <inheritdoc cref="IHttpStrongTypeRequest{API}"/>
-    IHttpStrongTypeRequest<API> StrongType<API>()
-        where API : class;
     #endregion
 }

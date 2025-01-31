@@ -1,11 +1,16 @@
-﻿using System.NetFrancis.Http;
-
-namespace System.NetFrancis;
+﻿namespace System.NetFrancis;
 
 public static partial class CreateNet
 {
     //这个部分类专门用来声明用来创建有关Http的对象的方法
 
+    #region 从IHttpClientFactory中提取HttpClient的默认名称
+    /// <summary>
+    /// 获取一个从<see cref="IHttpClientFactory"/>中提取<see cref="HttpClient"/>的时候，
+    /// 默认使用的名称
+    /// </summary>
+    public const string HttpClientName = "Default";
+    #endregion
     #region 创建HttpRequestTransform
     #region 添加一个基路径
     /// <summary>
@@ -19,7 +24,7 @@ public static partial class CreateNet
         => (request) =>
         {
             var uri = request.Uri;
-            return uri.UriHost is { } ?
+            var newRequest = uri.UriHost is { } ?
             request :
             request with
             {
@@ -28,6 +33,7 @@ public static partial class CreateNet
                     UriHost = baseUri
                 }
             };
+            return Task.FromResult(newRequest);
         };
     #endregion
     #endregion

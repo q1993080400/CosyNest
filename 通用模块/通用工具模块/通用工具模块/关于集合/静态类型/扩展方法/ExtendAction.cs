@@ -78,4 +78,39 @@ public static partial class ExtendEnumerable
         }
     }
     #endregion
+    #region 替换元素
+    #region 按照条件替换
+    /// <summary>
+    /// 替换集合内第一个符合条件的元素，
+    /// 并返回是否替换成功
+    /// </summary>
+    /// <typeparam name="Obj">集合元素的类型</typeparam>
+    /// <param name="list">待替换的集合</param>
+    /// <param name="test">用来测试集合中的元素是否符合要求的委托</param>
+    /// <param name="newElement">要替代旧元素的新元素</param>
+    /// <returns></returns>
+    public static bool Replace<Obj>(this IList<Obj> list, Func<Obj, bool> test, Obj newElement)
+    {
+        if (list.Count is 0)
+            return false;
+        var index = list.IndexOf(test);
+        if (index < 0)
+            return false;
+        list.RemoveAt(index);
+        list.Insert(index, newElement);
+        return true;
+    }
+    #endregion
+    #region 按照元素替换
+    /// <summary>
+    /// 替换集合内的元素，并返回是否替换成功，
+    /// 如果有多个相同的元素，则只替换第一个
+    /// </summary>
+    /// <param name="oldElement">要替换的旧元素</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="Replace{Obj}(IList{Obj}, Func{Obj, bool}, Obj)"/>
+    public static bool Replace<Obj>(this IList<Obj> list, Obj oldElement, Obj newElement)
+        => list.Replace(x => Equals(x, oldElement), newElement);
+    #endregion 
+    #endregion
 }

@@ -12,7 +12,9 @@
         <FileRendering FileName="@file.FileName" Uri="@file.Uri" DisableDownload="disableDownload" Attributes="Attributes" />
         break;
     case MediumFileType.Image:
-        <img src="@file.CoverUri" class="bootstrapSingleFileImage" alt="@file.FileName" loading="lazy" @attributes=Attributes />
+        <div>
+            <img src="@file.CoverUri" class="bootstrapSingleFileImage bootstrapMediaElement" alt="@file.FileName" loading="lazy" @attributes=Attributes />
+        </div>
         break;
     case var mediumFileType:
         throw mediumFileType.Unrecognized();

@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.NetFrancis;
-using System.NetFrancis.Http;
 using System.Text;
 
 using Microsoft.Extensions.Configuration;
@@ -36,9 +35,9 @@ public static partial class ExtendNet
         => services.AddSingleton(static services =>
         {
             var configuration = services.GetRequiredService<IConfiguration>();
-            var baseUri = configuration.GetValue<string>("Host") ??
+            var host = configuration.GetValue<string>("Host") ??
             throw new NotSupportedException("没有在配置中设置主机的Host");
-            return CreateNet.HostProvide(baseUri);
+            return CreateNet.HostProvide(host);
         });
     #endregion
     #endregion

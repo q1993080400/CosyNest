@@ -1,4 +1,4 @@
-﻿using System.NetFrancis.Http;
+﻿using System.NetFrancis;
 using System.Reflection;
 
 namespace Microsoft.AspNetCore.Components;
@@ -32,11 +32,11 @@ public static class FormViewer
     /// <typeparam name="ServerUpdate">服务端接口的类型</typeparam>
     /// <typeparam name="Parameter"><see cref="IServerUpdatePart{Parameter}"/>的参数类型</typeparam>
     /// <typeparam name="Model">实体类的类型</typeparam>
-    /// <param name="http">用来向后端发起请求的Http客户端对象</param>
+    /// <param name="strongTypeInvokeFactory">用来向后端发起请求的强类型调用对象</param>
     /// <param name="createParameter">这个委托传入封装好的属性更改信息，返回向后端请求需要的参数</param>
     /// <returns></returns>
     public static Func<RenderFormViewerPropertyInfoBase<Model>, Func<object?, Task>?> CreatePropertyChangeEvent<ServerUpdate, Parameter, Model>
-        (IHttpClient http, Func<ServerUpdateEntityInfo, Parameter> createParameter)
+        (IStrongTypeInvokeFactory strongTypeInvokeFactory, Func<ServerUpdateEntityInfo, Parameter> createParameter)
         where ServerUpdate : class, IServerUpdatePart<Parameter>
         where Parameter : class
         where Model : class, IWithID
@@ -62,7 +62,7 @@ public static class FormViewer
                     ]
                 };
                 var parameter = createParameter(info);
-                await http.StrongType<ServerUpdate>().Request(x => x.UpdateProperty(parameter));
+                await strongTypeInvokeFactory.StrongType<ServerUpdate>().Invoke(x => x.UpdateProperty(parameter));
             };
         };
     #endregion

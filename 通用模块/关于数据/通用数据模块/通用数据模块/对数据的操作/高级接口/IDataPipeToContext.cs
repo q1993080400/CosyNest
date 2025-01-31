@@ -32,14 +32,29 @@ public interface IDataPipeToContext : IDataPipeFromContext
     Task Delete<Data>(IEnumerable<Data> datas, CancellationToken cancellation = default)
         where Data : class;
     #endregion
+    #region 传入IQueryable
+    /// <inheritdoc cref="Delete{Data}(IEnumerable{Data}, CancellationToken)"/>
+    Task Delete<Data>(IQueryable<Data> datas, CancellationToken cancellation = default)
+        where Data : class;
+    #endregion
     #region 按条件删除数据
     /// <summary>
     /// 直接从数据源中删除符合指定谓词的数据，不返回结果集
     /// </summary>
     /// <param name="expression">一个用来指定删除条件的表达式</param>
-    /// <inheritdoc cref="IDataPipeFromContext.Query{Data}"/>
+    /// <inheritdoc cref="Delete{Data}(IEnumerable{Data}, CancellationToken)"/>
     Task Delete<Data>(Expression<Func<Data, bool>> expression, CancellationToken cancellation = default)
-        where Data : class;
+        where Data : class
+        => Delete(Query<Data>().Where(expression), cancellation);
     #endregion
+    #endregion
+    #region 显式保存数据
+    /// <summary>
+    /// 显式将数据保存到数据库中，
+    /// 它在某些特殊情况下很有用
+    /// </summary>
+    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
+    /// <returns></returns>
+    Task SaveChanges(CancellationToken cancellationToken = default);
     #endregion
 }

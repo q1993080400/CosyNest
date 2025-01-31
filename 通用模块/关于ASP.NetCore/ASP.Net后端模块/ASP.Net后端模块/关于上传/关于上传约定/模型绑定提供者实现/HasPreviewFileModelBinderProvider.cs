@@ -13,7 +13,7 @@ sealed class HasPreviewFileModelBinderProvider : IModelBinderProvider
     public IModelBinder? GetBinder(ModelBinderProviderContext context)
     {
         var modelType = context.Metadata.ModelType;
-        return HasPreviewFilePropertyNatureState.Get(modelType).HasPreviewFile ?
+        return CreateDataObj.GetPreviewFileTypeInfo(modelType).IsStrict ?
             CreateSingle<HasPreviewFileModelBinder>.Single : null;
     }
     #endregion 

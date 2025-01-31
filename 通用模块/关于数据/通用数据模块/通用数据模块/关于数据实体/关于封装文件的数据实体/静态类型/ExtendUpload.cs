@@ -26,7 +26,7 @@ public static partial class ExtendData
     /// <returns></returns>
     public static IEnumerable<Obj> WhereEnableAndNotUpload<Obj>(this IEnumerable<Obj?> objs)
         where Obj : IHasReadOnlyPreviewFile
-        => objs.Where(x => x is { IsEnable: true } and not IHasUploadFileClient { IsUploadCompleted: true })!;
+        => objs.Where(x => x is { IsEnable: true } and (not IHasUploadFileClient { IsUploadCompleted: true }))!;
     #endregion
     #region 筛选未保存的对象
     /// <summary>
@@ -49,6 +49,24 @@ public static partial class ExtendData
     {
         if (files.Any(x => x is IHasUploadFileServer { SaveState: not UploadFileSaveState.HasUploadFileName }))
             throw new NotSupportedException($"可预览文件集合之中存在应该上传，但是不可上传的对象");
+    }
+    #endregion
+    #region 更新所有用于上传的文件名
+    /// <summary>
+    /// 筛选一个集合中的所有<see cref="IHasUploadFileServer"/>，
+    /// 并批量调用它们的<see cref="IHasUploadFileServer.UpdateUploadFileName(string?, string?)"/>方法，
+    /// 这样，它们就可以开始上传文件，这个方法比较适合OSS的模式
+    /// </summary>
+    /// <param name="files">要更新的文件集合</param>
+    /// <param name="prefix">指定要更新的上传文件名的前缀，
+    /// 如果为<see langword="null"/>，表示没有前缀</param>
+    public static void UpdateUploadFileNameOSS(this IEnumerable<IHasReadOnlyPreviewFile> files, string? prefix = null)
+    {
+        foreach (var hasUpload in files.OfType<IHasUploadFileServer>())
+        {
+            var fileName = prefix is null ? null : prefix + Guid.CreateVersion7();
+            hasUpload.UpdateUploadFileName(fileName);
+        }
     }
     #endregion
 }

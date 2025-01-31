@@ -44,5 +44,15 @@ public sealed partial class BootstrapFileViewer : ComponentBase
     [Parameter]
     public RenderFragment<RenderFilePreviewInfo>? RenderFilePreview { get; set; }
     #endregion
+    #region 是否填满剩余空间
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则最后一个子元素会填满这一行的所有剩余空间，
+    /// 在这种情况下，不能使用gap属性，只能使用padding属性，否则会出现问题，
+    /// 默认为<see langword="true"/>
+    /// </summary>
+    [Parameter]
+    public bool FillRemainingSpace { get; set; } = true;
+    #endregion
     #endregion
 }

@@ -1,6 +1,6 @@
 ﻿using System.Data;
+using System.NetFrancis;
 using System.NetFrancis.Api;
-using System.NetFrancis.Http;
 
 namespace System.AI;
 

@@ -17,6 +17,44 @@ sealed class JSDocument(IJSRuntime jsRuntime) : IJSDocument
     public IAsyncProperty<string> Title { get; }
         = jsRuntime.PackProperty<string>("document.title");
     #endregion
+    #region 向任意元素注册事件
+    public async Task<IAsyncDisposable> RegisterEvent(string elementSelector, string eventName, Func<Task> func)
+    {
+        var jsMethodPack = new JSMethodPackAsync(func);
+        var signalName = CreateASP.JSObjectName();
+        await jsRuntime.InvokeVoidAsync("RegisterEvent", elementSelector, eventName, jsMethodPack.DotNetObjectReference, nameof(JSMethodPackAsync.Invoke), signalName);
+        return FastRealize.AsyncDisposable(async () =>
+        {
+            try
+            {
+                await jsRuntime.InvokeVoidAsync(signalName);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            jsMethodPack.Dispose();
+        });
+    }
+    #endregion
+    #region 注册VisibilityChange事件
+    public async Task<IAsyncDisposable> RegisterVisibilityChange(Func<VisibilityState, Task> onVisibilityChange)
+    {
+        var jsMethodPack = new JSMethodPackAsync<int>(visibilityChange => onVisibilityChange((VisibilityState)visibilityChange));
+        var signalName = CreateASP.JSObjectName();
+        await jsRuntime.InvokeVoidAsync("RegisterVisibilityChange", jsMethodPack.DotNetObjectReference, nameof(JSMethodPackAsync<int>.Invoke), signalName);
+        return FastRealize.AsyncDisposable(async () =>
+        {
+            try
+            {
+                await jsRuntime.InvokeVoidAsync(signalName);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            jsMethodPack.Dispose();
+        });
+    }
+    #endregion
     #region 返回页面的可见状态
     public Task<VisibilityState> VisibilityState
     {

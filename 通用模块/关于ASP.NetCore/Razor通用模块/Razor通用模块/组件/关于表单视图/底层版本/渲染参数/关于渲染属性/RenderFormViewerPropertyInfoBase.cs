@@ -28,7 +28,7 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// 如果它没有封装可预览文件，
     /// 则返回<see langword="null"/>
     /// </summary>
-    public required PreviewFilePropertyDescribe? PreviewFilePropertyDescribe { get; init; }
+    public required IHasPreviewFilePropertyInfo? HasPreviewFilePropertyInfo { get; init; }
     #endregion
     #region 是否正在上传
     /// <summary>

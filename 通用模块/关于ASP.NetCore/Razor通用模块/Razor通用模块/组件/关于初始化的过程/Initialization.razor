@@ -3,7 +3,7 @@
 @typeparam Interface where Interface : class, IServerFind<Parameter, Content>
 @typeparam Parameter
 @typeparam Content where Content : class
-@inject IHttpClient HttpClient
+@inject IStrongTypeInvokeFactory StrongTypeInvokeFactory
 
 @switch ((InitializationComplete, Obj, NotFind))
 {

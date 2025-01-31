@@ -18,12 +18,13 @@ public sealed record RenderVirtualizationElementInfo<Element>
     /// </summary>
     public required int Index { get; init; }
     #endregion
-    #region 元素ID
+    #region 组件ID
     /// <summary>
-    /// 获取为这个元素分配的ID，
+    /// 获取为这个元素所对应的组件分配的ID，
     /// 将它分配到Web标签的id属性，
-    /// 可以让其他上下文能够找到这个元素
+    /// 可以让其他上下文能够找到这个元素，注意：
+    /// 它不是实体的ID
     /// </summary>
-    public required string? ID { get; init; }
+    public required string? ComponentID { get; init; }
     #endregion
 }

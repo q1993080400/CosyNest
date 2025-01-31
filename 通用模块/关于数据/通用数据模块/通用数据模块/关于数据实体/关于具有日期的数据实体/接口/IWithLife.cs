@@ -11,7 +11,7 @@ namespace System.DataFrancis;
 public interface IWithLife<Entity>
     where Entity : class, IWithLife<Entity>
 {
-    #region 静态成员：获取筛选过期或未过期的实体的表达式
+    #region 获取筛选过期或未过期的实体的表达式
     /// <summary>
     /// 获取一个表达式，它可以用来筛选过期或未过期的实体
     /// </summary>

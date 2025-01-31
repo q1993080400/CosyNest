@@ -57,6 +57,7 @@ public static partial class ExtendTool
     }
     #endregion
     #endregion
+    #region 关于格式化
     #region 使用常用格式序列化数字
     /// <summary>
     /// 将数字序列化为常用格式
@@ -64,7 +65,40 @@ public static partial class ExtendTool
     /// <param name="num">待序列化的数字</param>
     /// <returns></returns>
     public static string FormatCommon(this decimal num)
-        => num.ToString(Tool.FormattedNumCommon);
+        => num.ToString(Format.FormattedNumCommon);
+    #endregion
+    #region 格式化日期
+    /// <summary>
+    /// 将日期格式化为中国习惯的形式
+    /// </summary>
+    /// <param name="date">要格式化的日期</param>
+    /// <param name="retentionTime">如果这个值为<see langword="true"/>，
+    /// 则保留时间部分，否则放弃时间部分</param>
+    /// <returns></returns>
+    public static string FormatChinese(this DateTimeOffset date, bool retentionTime = true)
+        => date.ToString(retentionTime ? Format.FormatChineseWithTimeText : "yyyy年M月d日");
+    #endregion
+    #region 将日期格式化为友好格式
+    /// <summary>
+    /// 将日期格式化为友好格式，类似昨天23点
+    /// </summary>
+    /// <param name="date">要格式化的日期</param>
+    /// <returns></returns>
+    public static string FormatFriendly(this DateTimeOffset date)
+    {
+        const string format = /*language=DateTimeFormat*/"yyyy/M/d HH:MM";
+        var now = DateTimeOffset.Now;
+        if (date > now)
+            return date.ToString(format);
+        var toDay = now.Today();
+        if (date >= toDay)
+            return date.ToString("HH:mm");
+        if (date >= toDay.AddDays(-1))
+            return date.ToString("昨天HH:mm");
+        return date >= toDay.AddDays(-2) ?
+            date.ToString("前天HH:mm") : date.ToString(format);
+    }
+    #endregion
     #endregion
     #region 如果一个对象为null，则引发异常
     /// <summary>

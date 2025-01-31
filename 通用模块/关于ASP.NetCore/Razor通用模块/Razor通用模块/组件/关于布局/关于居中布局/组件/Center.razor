@@ -3,13 +3,14 @@
 
 @if (@ChildContent is { })
 {
-    var css = CenterMod switch
+    var centerMod = CenterMod switch
     {
         CenterMod.FillFatherElement => "centerMiddRelativelyFill",
         CenterMod.FillElement => "centerMiddRelatively",
         CenterMod.Screen => "centerMiddAbsolute",
         var mod => throw new NotSupportedException($"无法识别{mod}模式")
     };
+    var css = $"{centerMod} centerCommon";
     <div class="@css" @attributes="ContainerAttributes">
         <div>
             @ChildContent

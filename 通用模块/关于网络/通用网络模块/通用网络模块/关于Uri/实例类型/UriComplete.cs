@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace System.NetFrancis.Http;
+namespace System.NetFrancis;
 
 /// <summary>
 /// 这个类型表示一个完整的Uri

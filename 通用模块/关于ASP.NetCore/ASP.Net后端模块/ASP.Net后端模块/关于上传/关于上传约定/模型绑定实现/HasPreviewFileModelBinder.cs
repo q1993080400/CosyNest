@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.NetFrancis;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -27,45 +29,26 @@ sealed class HasPreviewFileModelBinder : IModelBinder
             return;
         }
         var modelType = bindingContext.ModelMetadata.ModelType;
-        var bindingModel = JsonSerializer.Deserialize(jsonText, modelType, JsonSerializerOptions.Web);
+        var uploadFileDictionary = form.Files.ToDictionary(x => x.Name, x => new UploadFile(x));
+        var readFile = CreateNet.UploadFileResolverModifiersRead(uploadFileMiddle =>
+        {
+            var file = uploadFileDictionary[uploadFileMiddle.FileID.ToString()];
+            return CreateDataObj.UploadFileServer(uploadFileMiddle.CoverUri, uploadFileMiddle.Uri, file, uploadFileMiddle.ID);
+        });
+#pragma warning disable
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            {
+                Modifiers = { readFile }
+            }
+        };
+#pragma warning restore
+        var bindingModel = JsonSerializer.Deserialize(jsonText, modelType, options);
         if (bindingModel is null)
         {
             await bindingContext.BindingFailed();
             return;
-        }
-        var uploadFileDictionary = form.Files.ToDictionary(x => x.Name, x => new UploadFile(x));
-        var previewFileProperty = HasPreviewFilePropertyNatureState.Get(modelType).PreviewFilePropertyDescribe;
-        foreach (var property in previewFileProperty.Values.Where(x => x.IsStrict).Select(x => x.Property))
-        {
-            #region 替换值的本地函数
-            object? ReplaceValue()
-            {
-                var value = property.GetValue(bindingModel);
-                #region 转换值的本地函数
-                IHasPreviewFile? ConvertValue(IHasPreviewFile previewFile, int index)
-                {
-                    if (!previewFile.IsEnable)
-                        return null;
-                    var key = $"{property.Name}-{index}";
-                    var id = previewFile.ID;
-                    var coverUri = previewFile.CoverUri;
-                    var uri = previewFile.Uri;
-                    return uploadFileDictionary.TryGetValue(key, out var uploadFile) ?
-                      CreateDataObj.UploadFileServer(coverUri, uri, uploadFile, id) :
-                      CreateDataObj.PreviewFile(coverUri, uri, previewFile.FileName, id);
-                }
-                #endregion
-                return value switch
-                {
-                    IHasPreviewFile previewFile => ConvertValue(previewFile, 0),
-                    IEnumerable<IHasPreviewFile> previewFiles => previewFiles.Select(ConvertValue).WhereNotNull().ToArray(),
-                    null => null,
-                    _ => throw new NotSupportedException($"无法将{value.GetType()}类型的数据绑定为包含可预览文件的对象")
-                };
-            }
-            #endregion
-            var replaceValue = ReplaceValue();
-            property.SetValue(bindingModel, replaceValue);
         }
         await bindingContext.BindingSuccess(bindingModel);
     }

@@ -1,4 +1,4 @@
-﻿using System.NetFrancis.Http;
+﻿using System.NetFrancis;
 
 namespace Microsoft.AspNetCore.Components;
 
@@ -31,12 +31,12 @@ public abstract partial class DataProvision<Data> : ComponentBase
     /// </summary>
     protected SearchViewerState SearchViewerState { get; } = new();
     #endregion
-    #region 依赖注入的Http客户端
+    #region 依赖注入的强类型调用工厂
     /// <summary>
-    /// 获取依赖注入的Http客户端
+    /// 获取依赖注入的强类型调用工厂
     /// </summary>
     [Inject]
-    protected IHttpClient HttpClient { get; set; }
+    protected IStrongTypeInvokeFactory StrongTypeInvokeFactory { get; set; }
     #endregion
     #region 提交搜索
     /// <summary>

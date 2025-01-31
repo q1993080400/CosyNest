@@ -139,63 +139,36 @@ public static partial class ExtendEnumerable
     }
     #endregion
     #endregion
-    #region 返回首位元素
+    #region 按条件寻找索引
     /// <summary>
-    /// 传入一个集合，然后返回一个元组，
-    /// 它的项分别是集合的第一个元素，剩下的元素（该枚举器只能枚举一次），以及集合中是否存在元素
+    /// 寻找集合中第一个符合条件的元素，
+    /// 并返回它的索引，如果集合中不存在符合条件的元素，则返回-1
     /// </summary>
     /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <param name="collections">待返回元素的集合</param>
-    /// <param name="check">在集合没有任何元素的情况下，
-    /// 如果这个值为<see langword="true"/>，则引发异常，否则返回默认值</param>
+    /// <param name="objs">元素的集合</param>
+    /// <param name="test">用来测试集合中的元素是否符合要求的委托</param>
     /// <returns></returns>
-    public static (Obj First, IEnumerable<Obj> Other, bool HasElements) First<Obj>(this IEnumerable<Obj> collections, bool check)
+    public static int IndexOf<Obj>(this IEnumerable<Obj> objs, Func<Obj, bool> test)
     {
-        var enumerator = collections.GetEnumerator();
-        var hasElements = enumerator.MoveNext();
-        var first = hasElements ? enumerator.Current :
-            check ? throw new Exception("该集合没有任何元素") : default!;
-        var isUsed = false;
-        #region 本地函数
-        IEnumerable<Obj> Fun()
+        foreach (var (index, obj) in objs.Index())
         {
-            if (isUsed)
-                throw new NotSupportedException(@"不允许遍历该集合两次");
-#pragma warning disable IDE0059                 //这个赋值仍然有用，该警告是分析器的疏忽
-            isUsed = true;
-#pragma warning restore
-            while (enumerator.MoveNext())
-            {
-                yield return enumerator.Current;
-            }
-            enumerator.Dispose();
+            if (test(obj))
+                return index;
         }
-        #endregion
-        return (first, Fun(), hasElements);
+        return -1;
     }
     #endregion
-    #endregion
-    #region 关于累加
-    #region 聚合函数
+    #region 按元素寻找索引
     /// <summary>
-    /// 将集合中所有相邻的元素聚合起来，并返回一个新集合，
-    /// 如果集合的元素小于2，则返回一个空集合
+    /// 按照元素寻找索引，
+    /// 如果集合中有多个相同的元素，则返回第一个元素的索引，
+    /// 如果没有这个元素，则返回-1
     /// </summary>
-    /// <typeparam name="Obj">集合的元素类型</typeparam>
-    /// <typeparam name="Ret">返回值类型</typeparam>
-    /// <param name="collections">要聚合的集合</param>
-    /// <param name="delegate">这个委托的第一个参数是两个相邻元素的左边，
-    /// 第二个元素是相邻元素的右边，返回值是聚合后的新元素</param>
+    /// <param name="element">要寻找索引的元素</param>
     /// <returns></returns>
-    public static IEnumerable<Ret> Polymerization<Obj, Ret>(this IEnumerable<Obj> collections, Func<Obj, Obj, Ret> @delegate)
-    {
-        var (left, other, _) = collections.First(false);
-        foreach (var right in other)
-        {
-            yield return @delegate(left, right);
-            left = right;
-        }
-    }
+    /// <inheritdoc cref="IndexOf{Obj}(IEnumerable{Obj}, Func{Obj, bool})"/>
+    public static int IndexOf<Obj>(this IEnumerable<Obj> objs, Obj element)
+        => objs.IndexOf(x => Equals(x, element));
     #endregion
     #endregion
     #region 关于重复元素
@@ -266,7 +239,7 @@ public static partial class ExtendEnumerable
     #region 无测试条件
     /// <summary>
     /// 返回集合中唯一的元素，
-    /// 如果集合为空，则返回默认值
+    /// 如果集合为空，或者存在多个元素，则返回默认值
     /// </summary>
     /// <typeparam name="Obj">集合的元素类型</typeparam>
     /// <param name="objs">要返回唯一元素的集合</param>

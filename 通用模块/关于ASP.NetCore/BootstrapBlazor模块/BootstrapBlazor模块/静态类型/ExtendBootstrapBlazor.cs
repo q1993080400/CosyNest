@@ -2,6 +2,9 @@
 
 using BootstrapBlazor.Components;
 
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace System;
 
 /// <summary>
@@ -9,7 +12,7 @@ namespace System;
 /// </summary>
 public static class ExtendBootstrapBlazor
 {
-    #region 有关MessageService
+    #region 关于MessageService
     #region 直接显示消息
     /// <summary>
     /// 直接显示一条消息，在几秒钟后会消失
@@ -24,7 +27,7 @@ public static class ExtendBootstrapBlazor
         });
     #endregion
     #endregion
-    #region 有关SwalService 
+    #region 关于SwalService 
     #region 直接显示消息
     /// <summary>
     /// 直接显示一条消息框
@@ -72,6 +75,29 @@ public static class ExtendBootstrapBlazor
             category: isSuccess ? SwalCategory.Success : SwalCategory.Error);
         return isSuccess;
     }
+    #endregion
+    #endregion
+    #region 关于依赖注入
+    #region 注入IFileUploadNavigationContext
+    /// <summary>
+    /// 以范围模式注入一个<see cref="IFileUploadNavigationContext"/>，
+    /// 并将其作为级联参数传递给所有组件，
+    /// 当正在上传文件，且用户试图离开的时候，
+    /// 会给予一个Bootstrap弹窗提示，询问用户是否离开
+    /// </summary>
+    /// <param name="services">待注入服务的容器</param>
+    /// <returns></returns>
+    public static IServiceCollection AddFileUploadNavigationContextPromptBootstrap(this IServiceCollection services)
+        => services.AddCascadingValue(serviceProvider =>
+        {
+            var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
+            return CreateRazor.FileUploadNavigationContext(navigationManager, async uploadFiles =>
+            {
+                var prompt = $"有{uploadFiles.Count}个文件还没有上传完毕，确定离开页面吗？";
+                var swalService = serviceProvider.GetRequiredService<SwalService>();
+                return !await swalService.ShowConfirm(prompt);
+            });
+        });
     #endregion
     #endregion
 }

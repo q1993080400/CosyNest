@@ -1,4 +1,4 @@
-﻿namespace System.NetFrancis.Http;
+﻿namespace System.NetFrancis;
 
 /// <summary>
 /// 这个委托转换Http请求，
@@ -6,4 +6,4 @@
 /// </summary>
 /// <param name="old">要转换的旧请求</param>
 /// <returns></returns>
-public delegate HttpRequestRecording HttpRequestTransform(HttpRequestRecording old);
+public delegate Task<HttpRequestRecording> HttpRequestTransform(HttpRequestRecording old);

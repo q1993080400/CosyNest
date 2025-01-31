@@ -40,6 +40,23 @@ public static partial class CreateDataObj
             ID = id,
         };
     #endregion
+    #region 创建特殊可上传文件
+    /// <summary>
+    /// 创建一个特殊的可上传文件，
+    /// 它只用于在前端和后端之间作为中介
+    /// </summary>
+    /// <param name="previewFile">函数会从这个可预览文件中复制信息到新创建的对象</param>
+    /// <returns></returns>
+    public static IHasUploadFileMiddle UploadFileMiddle(IHasPreviewFile previewFile)
+        => new HasUploadFileMiddle()
+        {
+            CoverUri = previewFile.CoverUri,
+            FileName = previewFile.FileName,
+            ID = previewFile.ID,
+            Uri = previewFile.Uri,
+            FileID = Guid.CreateVersion7()
+        };
+    #endregion
     #region 创建包含客户端上传文件的对象
     /// <summary>
     /// 创建一个包含客户端上传文件的对象
@@ -65,6 +82,23 @@ public static partial class CreateDataObj
     /// <inheritdoc cref="UploadFileClient(string, string, IUploadFile, Guid)"/>
     public static IHasUploadFileServer UploadFileServer(string coverUri, string uri, IUploadFile uploadFile, Guid id = default)
         => new HasUploadFileServer()
+        {
+            CoverUri = coverUri,
+            Uri = uri,
+            FileName = uploadFile.FileName,
+            ID = id,
+            UploadFile = uploadFile
+        };
+    #endregion
+    #region 创建共享上传文件对象
+    /// <summary>
+    /// 创建一个可以同时在服务端和客户端使用的可预览文件，
+    /// 它只在某些特殊的情况下有用
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="UploadFileClient(string, string, IUploadFile, Guid)"/>
+    public static IHasUploadFileFusion UploadFileFusion(string coverUri, string uri, IUploadFile uploadFile, Guid id = default)
+        => new HasUploadFileFusion()
         {
             CoverUri = coverUri,
             Uri = uri,

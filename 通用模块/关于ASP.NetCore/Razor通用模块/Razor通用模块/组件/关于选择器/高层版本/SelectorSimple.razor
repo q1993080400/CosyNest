@@ -1,0 +1,14 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+@typeparam Candidate where Candidate : IWithID
+@typeparam BusinessInterface where BusinessInterface : class, IGetCandidates<Candidate>
+@inject IStrongTypeInvokeFactory StrongTypeInvokeFactory
+
+@if (Candidates is { })
+{
+    var candidates = FilterCandidate is null ?
+    Candidates : Candidates.Where(FilterCandidate).ToHashSet();
+    <Selector Candidates="candidates" InitializationSelect="InitializationSelect"
+              RenderComponent="RenderComponent" Submit="Submit"
+              MinSelectCount="MinSelectCount" MaxSelectCount="MaxSelectCount" />
+}

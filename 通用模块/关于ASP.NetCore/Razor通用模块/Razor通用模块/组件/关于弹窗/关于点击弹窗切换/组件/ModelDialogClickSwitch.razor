@@ -1,0 +1,9 @@
+﻿@namespace Microsoft.AspNetCore.Components
+@inherits ComponentBase
+
+@{
+    var renderInfo = GetRenderInfo();
+}
+<CascadingValue Value="renderInfo">
+    @RenderComponent(renderInfo)
+</CascadingValue>

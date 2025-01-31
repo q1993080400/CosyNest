@@ -34,7 +34,7 @@
                 </div>
                 @if (files.Count > 0)
                 {
-                    <BootstrapFileViewer Files="files">
+                    <BootstrapFileViewer Files="files" FillRemainingSpace="false">
                         <RenderFile Context="renderSingleFile">
                             <BootstrapSingleFile RenderFileInfo="renderSingleFile" @onclick=renderSingleFile.CancelFile />
                         </RenderFile>

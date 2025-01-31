@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Net.Http.Headers;
 
-namespace System.NetFrancis.Http.Realize;
+namespace System.NetFrancis;
 
 /// <summary>
 /// 这个记录是Http标头的可选基类

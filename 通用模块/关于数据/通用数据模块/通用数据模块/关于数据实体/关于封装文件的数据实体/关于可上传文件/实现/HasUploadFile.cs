@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace System.DataFrancis;
+﻿namespace System.DataFrancis;
 
 /// <summary>
 /// 这个记录是<see cref="IHasUploadFile"/>的实现，
@@ -9,9 +7,6 @@ namespace System.DataFrancis;
 abstract record HasUploadFile : HasPreviewFile, IHasUploadFile
 {
     #region 要上传的文件
-#pragma warning disable CS8618
-    [JsonIgnore]
-    public IUploadFile UploadFile { get; init; }
-#pragma warning restore
+    public required IUploadFile UploadFile { get; init; }
     #endregion
 }

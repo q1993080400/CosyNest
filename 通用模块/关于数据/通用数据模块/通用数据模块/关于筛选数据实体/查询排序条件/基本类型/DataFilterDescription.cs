@@ -20,13 +20,6 @@ public sealed record DataFilterDescription
     /// </summary>
     public IReadOnlyCollection<SortCondition> SortCondition { get; init; } = [];
     #endregion
-    #region 特殊标记
-    /// <summary>
-    /// 获取一个特殊的标记，
-    /// 它可以用作指示某些特殊用途
-    /// </summary>
-    public IReadOnlyCollection<string> Sign { get; init; } = [];
-    #endregion
     #region 重构对象
     /// <summary>
     /// 重构这个对象的查询和排序条件，

@@ -2,8 +2,8 @@
 using System.Design.Direct;
 using System.Net;
 using System.Net.Http.Json;
+using System.NetFrancis;
 using System.NetFrancis.Api;
-using System.NetFrancis.Http;
 using System.Text.Json;
 
 namespace System.AI;

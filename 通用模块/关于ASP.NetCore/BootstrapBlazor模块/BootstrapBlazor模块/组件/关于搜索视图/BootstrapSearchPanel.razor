@@ -1,16 +1,16 @@
 ﻿@namespace BootstrapBlazor.Components
 @inherits ComponentBase
 @typeparam BusinessInterface where BusinessInterface : class, IGetRenderAllFilterCondition
-@inject IHttpClient HttpClient
+@inject IStrongTypeInvokeFactory StrongTypeInvokeFactory
 
-<SearchPanel GetRenderCondition="@(GetRenderCondition??ToolServerInterface.GetConditionFunction<BusinessInterface>(HttpClient))"
+<SearchPanel GetRenderCondition="@(GetRenderCondition??ToolServerInterface.GetConditionFunction<BusinessInterface>(StrongTypeInvokeFactory))"
              SearchViewerState="SearchViewerState" Submit="Submit"
              ElementNumber=ElementNumber OnClear=OnClear!>
     <RenderComponent>
         @if (RenderComponent is null)
         {
             <div class="commonContainers">
-                <div class="perfectContainer bisectContainers">
+                <div class="perfectContainer">
                     @foreach (var item in context.RenderCondition)
                     {
                         @item

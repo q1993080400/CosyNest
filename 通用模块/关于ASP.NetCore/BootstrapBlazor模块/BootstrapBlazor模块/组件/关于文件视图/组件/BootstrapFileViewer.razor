@@ -5,7 +5,7 @@
     <RenderComponent Context="renderFileViewer">
         @if (RenderComponent is null)
         {
-            <Arrange Context="renderArrange" Particle="ArrangeParticle.EspeciallyMany">
+            <Arrange Context="renderArrange" FillRemainingSpace="FillRemainingSpace" Particle="ArrangeParticle.EspeciallyMany">
                 <div class="@renderArrange.CSS">
                     @renderFileViewer.RenderAllFile
                 </div>

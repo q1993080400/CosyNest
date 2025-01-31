@@ -64,8 +64,8 @@ public sealed partial class AuthenticationViewDingDing : ComponentBase
         #region 用于更新组件的本地函数
         async Task Update(AuthenticationDingDingRequest request)
         {
-            var state = (await HttpClient.StrongType<IGetAuthenticationDingDingState>().
-                Request(x => x.GetAuthenticationDingDingState(request))).AuthenticationState;
+            var state = (await StrongTypeInvokeFactory.StrongType<IGetAuthenticationDingDingState>().
+                Invoke(x => x.GetAuthenticationDingDingState(request))).AuthenticationState;
             await AuthenticationStateChange(state);
         }
         #endregion
@@ -89,8 +89,8 @@ public sealed partial class AuthenticationViewDingDing : ComponentBase
                 NavigationManager.NavigateTo(loginPageUri);
                 break;
             case (null, null, null):
-                AppInfo = await HttpClient.StrongType<IGetAuthenticationDingDingState>().
-                    Request(x => x.GetAppInfo());
+                AppInfo = await StrongTypeInvokeFactory.StrongType<IGetAuthenticationDingDingState>().
+                    Invoke(x => x.GetAppInfo());
                 StateHasChanged();
                 break;
             case ({ }, _, _):

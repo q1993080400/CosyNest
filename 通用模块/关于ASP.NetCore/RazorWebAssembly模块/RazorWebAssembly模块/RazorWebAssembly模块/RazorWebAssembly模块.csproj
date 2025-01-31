@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AssemblyName>ToolRazorWebAssembly</AssemblyName>
+		<RootNamespace>Microsoft.AspNetCore.Components</RootNamespace>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+		<StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+		<NoWarn>1701;1702;CS8618;IDE0130</NoWarn>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="9.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于编译和表达式树\编译和表达式树模块\编译和表达式树模块\编译和表达式树模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于网络\通用网络模块\通用网络模块\通用网络模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+		<ProjectReference Include="..\..\..\ASP.Net中台模块\ASP.Net中台模块\ASP.Net中台模块.csproj" />
+		<ProjectReference Include="..\..\..\Razor通用模块\Razor通用模块\Razor通用模块.csproj" />
+	</ItemGroup>
+
+</Project>

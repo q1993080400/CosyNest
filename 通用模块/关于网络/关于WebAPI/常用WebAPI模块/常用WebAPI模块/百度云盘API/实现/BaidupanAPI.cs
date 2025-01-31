@@ -1,5 +1,4 @@
 ﻿using System.Design.Direct;
-using System.NetFrancis.Http;
 
 namespace System.NetFrancis.Api;
 

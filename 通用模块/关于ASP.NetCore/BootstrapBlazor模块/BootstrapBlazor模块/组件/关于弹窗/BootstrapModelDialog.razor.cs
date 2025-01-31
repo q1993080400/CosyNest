@@ -30,6 +30,10 @@ public sealed partial class BootstrapModelDialog : ComponentBase, IContentCompon
     #endregion
     #region 内部成员
     #region 缓存的是否打开参数
+    /// <summary>
+    /// 这个属性是对<see cref="IsOpen"/>的缓存，
+    /// 它控制弹窗是否被打开
+    /// </summary>
     private bool IsOpenCache { get; set; }
     #endregion
     #region 捕获的弹窗组件

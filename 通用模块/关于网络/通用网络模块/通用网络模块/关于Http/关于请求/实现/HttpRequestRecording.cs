@@ -1,4 +1,4 @@
-﻿namespace System.NetFrancis.Http;
+﻿namespace System.NetFrancis;
 
 /// <summary>
 /// 这个记录封装了提交Http请求所需要的信息

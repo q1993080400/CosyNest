@@ -5,9 +5,6 @@ namespace System.NetFrancis.Browser;
 /// <summary>
 /// 本类型是底层使用Selenium实现的浏览器标签
 /// </summary>
-/// <remarks>
-/// 使用指定的Edge测试用例初始化对象
-/// </remarks>
 /// <param name="browser">本标签所隶属的浏览器对象</param>
 /// <param name="windowHandle">窗口句柄，它可以用来标识窗口</param>
 sealed class TabWebDriver(BrowserWebDriver browser, string windowHandle) : ITab

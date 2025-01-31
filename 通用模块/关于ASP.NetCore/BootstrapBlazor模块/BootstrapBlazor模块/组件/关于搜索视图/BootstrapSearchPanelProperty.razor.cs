@@ -34,10 +34,10 @@ public sealed partial class BootstrapSearchPanelProperty : ComponentBase
     /// </summary>
     /// <param name="bind">要绑定的对象</param>
     /// <returns></returns>
-    private Func<IReadOnlyCollection<EnumItem>, Task> SubmitEnumItem(IBindProperty<string> bind)
-        => async x =>
+    private Func<SelectElementInfo<EnumItem>, Task> SubmitEnumItem(IBindProperty<string> bind)
+        => async info =>
         {
-            bind.Value = x.Single().Value;
+            bind.Value = info.Select.Single().Value;
             await RenderPropertyInfo.Submit();
             IsShow = false;
         };

@@ -6,7 +6,48 @@ function InvokeCode(code) {
 
 //调用net实例方法
 async function InvokeNetInstanceMethod(netObjectInstance, netMethodName, ...arguments) {
-    return await netObjectInstance.invokeMethodAsync(netMethodName, arguments)
+    return await netObjectInstance.invokeMethodAsync(netMethodName, ...arguments)
+}
+
+//向JS事件注册Net方法，然后返回一个可以用来取消注册的对象名称
+function RegisterNetMethod(element, type, listener, signalName) {
+    const controller = new AbortController();
+    element.addEventListener(type, listener,
+        {
+            signal: controller.signal
+        });
+    window[signalName] = function () {
+        controller.abort();
+    };
+    return signalName;
+}
+
+//向任意JS事件注册Net方法，然后返回一个可以用来取消注册的对象名称
+function RegisterEvent(elementSelector, type, netObjectInstance, netMethodName, signalName) {
+    const element = document.querySelector(elementSelector);
+    return RegisterNetMethod(element, type, async function (...arguments) {
+        return await InvokeNetInstanceMethod(netObjectInstance, netMethodName, ...arguments);
+    }, signalName);
+}
+
+//将net实例方法注册到Document的VisibilityChange事件中，然后返回一个可以用来取消注册的对象名称
+function RegisterVisibilityChange(netObjectInstance, netMethodName, signalName) {
+    return RegisterNetMethod(document, "visibilitychange", async () => {
+        const visibilityState = function () {
+            if (document.visibilityState == "prerender")
+                return;
+            const visibilityState = document.visibilityState;
+            switch (visibilityState) {
+                case "visible":
+                    return 0;
+                case "hidden":
+                    return 1;
+                default:
+                    return 2;
+            }
+        }();
+        setTimeout(async () => await InvokeNetInstanceMethod(netObjectInstance, netMethodName, visibilityState), 250);
+    }, signalName);
 }
 
 //获取复制文本
@@ -233,7 +274,7 @@ function GetPlayerProgress(player) {
         0 : player.currentTime / duration;
 }
 
-//获取某一元素是否被用户看到
+//判断具有某一ID的元素是否被用户看到
 function CheckIntersecting(id) {
     const element = document.getElementById(id);
     if (!element)
@@ -243,6 +284,14 @@ function CheckIntersecting(id) {
         elementRect.bottom > 0 &&
         elementRect.left < window.innerWidth &&
         elementRect.right > 0;
+}
+
+//滚动至某一元素的末尾
+function ScrollIntoViewToEnd(id) {
+    document.getElementById(id)?.scrollIntoView({
+        behavior: "auto",
+        block: "start"
+    });
 }
 
 //观察虚拟化容器
@@ -362,9 +411,32 @@ function GetUploadFileURL(inputElementID, maxAllowedSize) {
     return urls;
 }
 
+//注册软键盘发送收尾事件，它允许在按下回车键的时候阻止默认操作，并使文本框失去焦点
+function RegisterSoftKeyboardSend(id, blur) {
+    const input = document.querySelector(`#${id}:is(textarea,input)`);
+    input?.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            if (blur)
+                this.blur();
+        }
+    });
+}
+
+//当一个textarea标签的值更改时，自动调整它的高度
+function AutoGrow(id) {
+    const textarea = document.querySelector(`textarea#${id}`);
+    if (!textarea)
+        return;
+    textarea.style.height = 'unset';
+    if (textarea.scrollHeight > textarea.clientHeight) {
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+}
+
 //这是一个读写cookie的小框架
 
-const docCookies = {
+this.docCookies = {
     getItem: function (sKey) {
         return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[-.+*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
     },
@@ -396,7 +468,7 @@ const docCookies = {
         return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(sKey).replace(/[-.+*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
     },
     count: function () {
-        return keys().length;
+        return this.keys().length;
     },
     keys: /* optional method: you can safely remove it! */ function () {
         const aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
@@ -406,24 +478,24 @@ const docCookies = {
         return aKeys;
     },
     clear: function (sPath, sDomain) {
-        const allKey = docCookies.keys();
+        const allKey = this.keys();
         for (let i = 0; i < allKey.length; i++) {
-            docCookies.removeItem(allKey[i], sPath, sDomain);
+            this.removeItem(allKey[i], sPath, sDomain);
         }
     },
     keyAndValue: function () {
-        const allKey = docCookies.keys();
-        const allKeyValue = Array.from(allKey.map(x => {
+        const allKey = this.keys();
+        const allKeyValue = Array.from(allKey.map(key => {
             return {
-                Key: x,
-                Value: docCookies.getItem(key)
+                Key: key,
+                Value: this.getItem(key)
             }
         }));
         return allKeyValue;
     },
     tryGetValue: function (key) {
         if (this.hasItem(key)) {
-            const value = getItem(key);
+            const value = this.getItem(key);
             return {
                 Exist: true,
                 Value: value

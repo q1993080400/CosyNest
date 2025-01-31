@@ -37,7 +37,7 @@ public abstract record WebDriverOptions
     public bool IsHeadLess { get; init; }
     #endregion
     #endregion
-    #region 生成浏览器配置
+    #region 内部抽象成员：生成浏览器配置
     /// <summary>
     /// 生成一个浏览器配置
     /// </summary>
