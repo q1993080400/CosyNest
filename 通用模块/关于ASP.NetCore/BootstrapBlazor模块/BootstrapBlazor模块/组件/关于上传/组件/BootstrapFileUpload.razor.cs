@@ -21,11 +21,6 @@ public sealed partial class BootstrapFileUpload : ComponentBase
     [EditorRequired]
     public Func<UploadTaskInfo, IReadOnlyList<IHasReadOnlyPreviewFile>, Task> OnUpload { get; set; }
     #endregion
-    #region 用来进行上传的参数
-    /// <inheritdoc cref="FileUpload.UploadFileOptions"/>
-    [Parameter]
-    public UploadFileOptions UploadFileOptions { get; set; } = new();
-    #endregion
     #region 可接受文件类型
     /// <summary>
     /// 获取上传组件可接受的文件类型，
@@ -75,6 +70,13 @@ public sealed partial class BootstrapFileUpload : ComponentBase
     [EditorRequired]
     public bool InUpload { get; set; }
     #endregion
+    #region 级联参数：用来进行上传的参数
+    /// <summary>
+    /// 获取用来进行上传的参数
+    /// </summary>
+    [CascadingParameter]
+    private UploadFileOptions UploadFileOptions { get; set; } = new();
+    #endregion
     #endregion
     #region 内部成员
     #region 后来上传的文件
@@ -112,6 +114,59 @@ public sealed partial class BootstrapFileUpload : ComponentBase
         this.StateHasChanged();
     }
     #endregion
+    #region 从剪切板上传的方法
+    /// <summary>
+    /// 通过读取剪切板的内容上传文件
+    /// </summary>
+    /// <returns></returns>
+    private async Task OnUploadFromClipboard()
+    {
+        var copyContent = await JSWindow.Navigator.Clipboard.ReadObject(true);
+        if (copyContent is null)
+        {
+            await MessageService.Show("未能获取复制粘贴权限，或者复制了不支持的内容");
+            return;
+        }
+        var clipboardItems = copyContent.ClipboardItems;
+        if (clipboardItems.Count is 0)
+        {
+            await MessageService.Show("没有复制任何内容");
+            return;
+        }
+        var binaryItems = clipboardItems.OfType<IClipboardItemBinary>().ToArray();
+        if (binaryItems.Length is 0)
+        {
+            await MessageService.Show("你复制的是文字，不能用来上传");
+            return;
+        }
+        var files = binaryItems.Select(x =>
+        {
+            var uri = x.ObjectURL!;
+            var file = x.ToUploadFile();
+            return CreateDataObj.UploadFileClient(uri, uri, file);
+        }).ToArray();
+        var maxAllowedSize = UploadFileOptions.MaxAllowedSize;
+        var (uploadFiles, uugeFiles) = files.Split(x => x.UploadFile.Length <= maxAllowedSize);
+        var hugeBrowserFiles = uugeFiles.Select(x =>
+        {
+            var file = x.UploadFile;
+            return new HugeBrowserFile()
+            {
+                ContentType = file.ContentType,
+                LastModified = DateTimeOffset.Now,
+                Name = file.FileName,
+                Size = file.Length
+            };
+        }).ToArray();
+        var uploadTaskInfo = new UploadTaskInfo()
+        {
+            UploadFiles = uploadFiles,
+            HugeFiles = hugeBrowserFiles,
+            UploadFileOptions = UploadFileOptions
+        };
+        await OnUploadFile(uploadTaskInfo);
+    }
+    #endregion
     #region 返回渲染参数
     /// <summary>
     /// 返回本组件的渲染参数
@@ -124,6 +179,7 @@ public sealed partial class BootstrapFileUpload : ComponentBase
             Files = ShowFiles,
             Multiple = Multiple,
             OnUpload = OnUploadFile,
+            OnUploadFromClipboard = OnUploadFromClipboard,
             UploadFileOptions = UploadFileOptions,
             UploadButtonText = UploadButtonText ?? "上传文件",
             InUpload = InUpload

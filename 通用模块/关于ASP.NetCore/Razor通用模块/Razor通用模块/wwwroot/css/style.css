@@ -18,11 +18,7 @@
         /*更矮的弹窗高度*/
         --popUpHeightSmall: 40dvh;
     }
-}
 
-/*超大容器，一般出现在超大屏PC平台*/
-@container (min-width : 1836px)
-{
     /*依次排列元素的变量定义样式*/
     .arrangeDefinition
     {
@@ -36,6 +32,13 @@
         --arrangeParticleEspeciallyMany: 9;
         /*列表容器元素的建议高度*/
         --arrangeElementSuggestedHeight: 14ic;
+    }
+
+    /*弹窗宽度样式*/
+    .popUpWidth
+    {
+        min-width: calc(var(--popUpWidthMedium) / 2.5);
+        max-width: var(--popUpWidthMedium);
     }
 }
 
@@ -58,11 +61,7 @@
         /*更矮的弹窗高度*/
         --popUpHeightSmall: 50dvh;
     }
-}
 
-/*大容器，一般出现在普通屏PC平台*/
-@container (min-width : 1224px) and (max-width : 1836px)
-{
     /*依次排列元素的变量定义样式*/
     .arrangeDefinition
     {
@@ -76,6 +75,13 @@
         --arrangeParticleEspeciallyMany: 6;
         /*列表容器元素的建议高度*/
         --arrangeElementSuggestedHeight: 12ic;
+    }
+
+    /*弹窗宽度样式*/
+    .popUpWidth
+    {
+        min-width: calc(var(--popUpWidthMedium) / 2);
+        max-width: var(--popUpWidthMedium);
     }
 }
 
@@ -98,11 +104,7 @@
         /*更矮的弹窗高度*/
         --popUpHeightSmall: 60dvh;
     }
-}
 
-/*中容器，一般出现在平板平台*/
-@container (min-width : 667px) and (max-width : 1224px)
-{
     /*依次排列元素的变量定义样式*/
     .arrangeDefinition
     {
@@ -116,6 +118,13 @@
         --arrangeParticleEspeciallyMany: 4;
         /*列表容器元素的建议高度*/
         --arrangeElementSuggestedHeight: 10ic;
+    }
+
+    /*弹窗宽度样式*/
+    .popUpWidth
+    {
+        min-width: calc(var(--popUpWidthMedium) / 1.5);
+        max-width: var(--popUpWidthMedium);
     }
 }
 
@@ -138,11 +147,7 @@
         /*更矮的弹窗高度*/
         --popUpHeightSmall: 60dvh;
     }
-}
 
-/*小容器，一般出现在手机平台*/
-@container (max-width : 667px)
-{
     /*依次排列元素的变量定义样式*/
     .arrangeDefinition
     {
@@ -157,6 +162,12 @@
         /*列表容器元素的建议高度*/
         --arrangeElementSuggestedHeight: 8ic;
     }
+
+    /*弹窗宽度样式*/
+    .popUpWidth
+    {
+        width: var(--popUpWidthMedium);
+    }
 }
 
 /*横向屏幕，即宽大于高，一般用于电脑*/
@@ -167,6 +178,12 @@
     {
         min-width: 100dvw;
         min-height: 100dvh;
+    }
+
+    :root
+    {
+        /*横纵比*/
+        --aspectRatio: 16 / 9;
     }
 }
 
@@ -180,6 +197,12 @@
         min-height: 100dvw;
         transform-origin: left top;
         transform: translateX(100dvw) rotate(90deg);
+    }
+
+    :root
+    {
+        /*横纵比*/
+        --aspectRatio: 9 / 16;
     }
 }
 
@@ -220,6 +243,8 @@
     --radiusExtremeSmall: calc(var(--radiusMedium) * 0.25);
     /*最顶层组件的上边和下边大小*/
     --topLayoutPaddingVertical: 5dvmin;
+    /*强调的颜色*/
+    --emphasizeColor: red;
     /*屏蔽深色模式，因为作者认为这个需要由开发者自己适配，否则会产生很多意想不到的结果*/
     color-scheme: only light;
 }
@@ -401,6 +426,7 @@ input[type=file]
 {
     height: 100dvh;
     overflow: auto;
+    overscroll-behavior: none;
 }
 
 /*通用居中模式*/
@@ -443,7 +469,8 @@ input[type=file]
 .compactCentered
 {
     display: flex;
-    place-content: center;
+    flex-wrap: wrap;
+    place-content: space-evenly;
     gap: var(--gapBig);
 }
 
@@ -574,18 +601,6 @@ input[type=file]
         padding: var(--paddingSmall);
     }
 
-/*依次排列元素的父容器样式*/
-:has(> :where(.arrange,.arrangeFill))
-{
-    container-type: inline-size;
-}
-
-/*弹窗宽度样式*/
-.popUpWidth
-{
-    max-width: var(--popUpWidthMedium);
-}
-
 /*横宽竖高型固定弹窗样式*/
 .fixedModalGiant
 {
@@ -605,4 +620,10 @@ input[type=file]
 {
     border-radius: 50%;
     text-align: center;
+}
+
+/*强调文本的样式*/
+.emphasizeText
+{
+    color: var(--emphasizeColor);
 }

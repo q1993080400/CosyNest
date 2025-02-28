@@ -1,4 +1,6 @@
-﻿namespace System.IOFrancis.FileSystem;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace System.IOFrancis.FileSystem;
 
 /// <summary>
 /// 这个记录封装了文件的简称，扩展名和全名
@@ -6,7 +8,8 @@
 public sealed record FileNameInfo
 {
     #region 公开成员
-    #region 静态成员：生成文件名
+    #region 静态成员
+    #region 生成文件名
     /// <summary>
     /// 生成一个文件名，
     /// 如果不显式指定名称，则生成一个随机且不重复的文件名
@@ -19,15 +22,54 @@ public sealed record FileNameInfo
     public static FileNameInfo Create(string? simpleName = null, string? extensionName = null)
     {
         var newSimpleName = simpleName.IsVoid() ? Guid.CreateVersion7().ToString() : simpleName;
-        return new FileNameInfo(newSimpleName, extensionName);
+        return new FileNameInfo()
+        {
+            Simple = newSimpleName,
+            Extended = extensionName
+        };
     }
+    #endregion
+    #region 解析文件或路径
+    /// <summary>
+    /// 解析路径或文件的全名，
+    /// 然后返回文件信息
+    /// </summary>
+    /// <param name="pathOrFullName">要解析的文件路径或全名</param>
+    /// <returns></returns>
+    [return: NotNullIfNotNull(nameof(pathOrFullName))]
+    public static FileNameInfo? FromPath(string? pathOrFullName)
+    {
+        #region 用来分析的本地函数
+        static (string Simple, string? Extended) Analysis(string path)
+        {
+            var fullName = Path.GetFileName(path);
+            if (fullName.IsVoid())
+                return ("", null);
+            var index = fullName.LastIndexOf('.');
+            if (index < 0)
+                return (fullName, null);
+            var simple = fullName[..index];
+            var extended = fullName[(index + 1)..].ToLower();
+            return (simple, extended);
+        }
+        #endregion
+        if (pathOrFullName is null)
+            return null;
+        var (simple, extended) = Analysis(pathOrFullName);
+        return new()
+        {
+            Simple = simple,
+            Extended = extended
+        };
+    }
+    #endregion
     #endregion
     #region 简称
     /// <summary>
     /// 获取文件的简称，
     /// 它表示不包含扩展名的部分
     /// </summary>
-    public string Simple { get; }
+    public required string Simple { get; init; }
     #endregion
     #region 扩展名
     /// <summary>
@@ -35,7 +77,11 @@ public sealed record FileNameInfo
     /// 如果为<see langword="null"/>，
     /// 表示没有扩展名
     /// </summary>
-    public string? Extended { get; }
+    public required string? Extended
+    {
+        get => field;
+        init => field = value?.TrimStart('.').ToLower();
+    }
     #endregion
     #region 全名
     /// <summary>
@@ -64,48 +110,6 @@ public sealed record FileNameInfo
         simple = this.Simple;
         extended = this.Extended;
         fullName = this.FullName;
-    }
-    #endregion
-    #endregion
-    #region 构造函数
-    #region 指定简称和扩展名
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="simple">文件的简称，
-    /// 它表示不包含扩展名的部分</param>
-    /// <param name="extended">文件的扩展名，
-    /// 如果为<see langword="null"/>，表示没有扩展名</param>
-    public FileNameInfo(string simple, string? extended)
-    {
-        Simple = simple;
-        Extended = extended.IsVoid() ?
-            null :
-            extended.TrimStart('.').ToLower();
-    }
-    #endregion 
-    #region 指定全名
-    /// <summary>
-    /// 使用指定的参数初始化对象
-    /// </summary>
-    /// <param name="pathOrFullName">文件的路径或全名</param>
-    public FileNameInfo(string pathOrFullName)
-    {
-        #region 用来初始化的本地函数
-        static (string Simple, string? Extended) Initialization(string path)
-        {
-            var fullName = Path.GetFileName(path);
-            if (fullName.IsVoid())
-                return ("", null);
-            var index = fullName.LastIndexOf('.');
-            if (index < 0)
-                return (fullName, null);
-            var simple = fullName[..index];
-            var extended = fullName[(index + 1)..].ToLower();
-            return (simple, extended);
-        }
-        #endregion
-        (Simple, Extended) = Initialization(pathOrFullName);
     }
     #endregion
     #endregion

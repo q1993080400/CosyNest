@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace BootstrapBlazor.Components;
 
@@ -19,6 +17,11 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     [Parameter]
     public RenderFragment<RenderFormViewerPropertyInfoBase<Model>>? RenderProperty { get; set; }
     #endregion
+    #region 用来进行递归渲染的委托
+    /// <inheritdoc cref="FormViewer{Model}.RenderRecursion"/>
+    [Parameter]
+    public RenderFragment<RenderFormViewerPropertyInfoRecursion>? RenderRecursion { get; set; }
+    #endregion
     #region 用来渲染整个组件的委托
     /// <inheritdoc cref="FormViewer{Model}.RenderComponent"/>
     [Parameter]
@@ -33,6 +36,11 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     /// <inheritdoc cref="FormViewer{Model}.RenderSubmit"/>
     [Parameter]
     public RenderFragment<RenderSubmitInfo<Model>>? RenderSubmit { get; set; }
+    #endregion
+    #region 是否强制所有属性只读
+    /// <inheritdoc cref="FormViewer{Model}.ForceReadOnly"/>
+    [Parameter]
+    public bool ForceReadOnly { get; set; }
     #endregion
     #region 是否只读
     /// <inheritdoc cref="FormViewer{Model}.IsReadOnlyProperty"/>
@@ -58,11 +66,16 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     [EditorRequired]
     public Model InitializationModel { get; set; }
     #endregion
-    #region 用来判断是否为现有表单的委托
-    /// <inheritdoc cref="FormViewer{Model}.ExistingForms"/>
+    #region 是否引用传递
+    /// <inheritdoc cref="FormViewer{Model}.IsReference"/>
     [Parameter]
-    public Func<Model, bool> ExistingForms { get; set; }
-        = FormViewer<Model>.ExistingFormsDefault;
+    public bool IsReference { get; set; }
+    #endregion
+    #region 用来判断是否为现有表单的委托
+    /// <inheritdoc cref="FormViewer{Model}.ExistingForm"/>
+    [Parameter]
+    public Func<Model, bool> ExistingForm { get; set; }
+        = FormViewer<Model>.ExistingFormDefault;
     #endregion
     #region 值转换函数
     /// <inheritdoc cref="FormViewer{Model}.PropertyValueConvert"/>

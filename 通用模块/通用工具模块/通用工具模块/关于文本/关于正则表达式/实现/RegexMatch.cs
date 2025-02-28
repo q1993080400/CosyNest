@@ -61,13 +61,13 @@ sealed partial class RegexMatch : IMatch
         Name = (match as Group)?.Name;
         Index = match.Index;
         Length = match.Length;
-        Groups = (match switch
+        Groups = [.. (match switch
         {
             Match m => m.Groups.OfType<Group>().Skip(1).Where(x => x.Success),
             Group m => (IEnumerable<Capture>)m.Captures,
             _ => []
         }).
-        Select(x => x == match ? new RegexMatch(x.Value, x.Index, x.Length) : (IMatch)new RegexMatch(x, regular)).ToArray();
+        Select(x => x == match ? new RegexMatch(x.Value, x.Index, x.Length) : (IMatch)new RegexMatch(x, regular))];
         var names = MatchGroupName().Matches(regular).Select(x => x.Value[3..^1]).ToHashSet();
         GroupsNamed = Groups.Where(x => x.Name != null && names.Contains(x.Name)).ToDictionary(x => x.Name!, x => x);
     }

@@ -1,6 +1,8 @@
 ﻿@namespace BootstrapBlazor.Components
 @using System.Media
 @inherits ComponentBase
+@inject MessageService MessageService
+@inject IJSWindow JSWindow
 
 @{
     #region 用来渲染上传文件的委托
@@ -26,20 +28,45 @@
 <div class="bootstrapFormViewerPropertyContainer">
     <div class="bootstrapFormViewerPropertyItem">
         <div class="bootstrapFormViewerPropertyContainer">
-            <div class="bootstrapFormViewerPropertyLabel">@Title</div>
-            @switch (Value)
+            @if (Title is { })
             {
-                case IHasReadOnlyPreviewFile file:
-                    RenderFileViewer([file]);
-                    break;
-                case IEnumerable<IHasReadOnlyPreviewFile> files:
-                    RenderFileViewer(files);
-                    break;
-                case var value:
-                    <pre class="bootstrapFormViewerPropertyText">
-                        <TextRenderingSimple Value="FormatValue()" />
-                    </pre>
-                    break;
+                <div class="bootstrapFormViewerPropertyLabel">@Title</div>
+            }
+            @if (RecursionInfo is { } recursionInfo)
+            {
+                @if (RenderRecursion is { })
+                {
+                    @RenderRecursion(recursionInfo)
+                }
+                else
+                {
+                    @BootstrapFormViewerPropertyRecursion.DynamicRender(recursionInfo)
+                }
+            }
+            else
+            {
+                @switch (Value)
+                {
+                    case IHasReadOnlyPreviewFile file:
+                        RenderFileViewer([file]);
+                        break;
+                    case IEnumerable<IHasReadOnlyPreviewFile> files:
+                        RenderFileViewer(files);
+                        break;
+                    case var value:
+                        <div class="commonContainers">
+                            <pre class="bootstrapFormViewerPropertyText">
+                            <TextRenderingSimple Value="FormatValue()" />
+                            </pre>
+                            @if ((Value, RenderPreference) is (string, RenderPreferenceText { ShowCopyText: true }))
+                            {
+                                <div class="compactCentered">
+                                    <Button Text="复制文字" OnClickWithoutRender="CopyText" />
+                                </div>
+                            }
+                        </div>
+                        break;
+                }
             }
         </div>
     </div>

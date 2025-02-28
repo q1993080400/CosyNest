@@ -90,7 +90,7 @@ public abstract record HttpHeader : IHttpHeader
     public HttpHeader(IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
     {
         var h = headers.Select(static x => new KeyValuePair<string, IEnumerable<string>>
-        (x.Key, x.Value.Where(static x => !x.IsVoid()).ToArray())).
+        (x.Key, [.. x.Value.Where(static x => !x.IsVoid())])).
             Where(static x => (x.Key.IsVoid(), x.Value.Count()) is (false, > 0)).ToArray();
         HeadersImmutable = ImmutableDictionary<string, IEnumerable<string>>.Empty.AddRange(h);
     }

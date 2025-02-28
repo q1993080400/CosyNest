@@ -51,7 +51,7 @@ public interface IFromIO : IInstruct, IAsyncDisposable
     /// </summary>
     FileNameInfo PathInfo
         => Path is { } path ?
-        new FileNameInfo(path) :
+         FileNameInfo.FromPath(path) :
         throw new NotSupportedException($"文件还尚未保存到硬盘中，不知道它的路径");
     #endregion
     #region 是否存在于硬盘

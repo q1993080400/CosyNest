@@ -5,16 +5,24 @@
 @{
     var file = RenderFileInfo.File;
     var disableDownload = DisableDownload ?? Attributes?.ContainsKey("onclick") ?? false;
+    var coverUri = file.CoverUri;
 }
 @switch (file.MediumFileType)
 {
-    case MediumFileType.NotMediumFile or MediumFileType.Audio or MediumFileType.Video:
-        <FileRendering FileName="@file.FileName" Uri="@file.Uri" DisableDownload="disableDownload" Attributes="Attributes" />
-        break;
     case MediumFileType.Image:
-        <div>
-            <img src="@file.CoverUri" class="bootstrapSingleFileImage bootstrapMediaElement" alt="@file.FileName" loading="lazy" @attributes=Attributes />
+        <div @key=file>
+            <img src="@coverUri" class="bootstrapSingleFileImage bootstrapMediaElement" alt="@file.FileName" @attributes=Attributes />
         </div>
+        break;
+    case MediumFileType.Video:
+        <TransferVideo Uri="@coverUri" @key=file>
+            <RenderComponent Context="trueUri">
+                <video src="@trueUri" autoplay muted playsinline loop class="bootstrapSingleFileImage bootstrapMediaElement" @attributes=Attributes />
+            </RenderComponent>
+        </TransferVideo>
+        break;
+    case MediumFileType.NotMediumFile or MediumFileType.Audio:
+        <FileRendering FileName="@file.FileName" Uri="@file.Uri" DisableDownload="disableDownload" @key=file Attributes="Attributes" />
         break;
     case var mediumFileType:
         throw mediumFileType.Unrecognized();

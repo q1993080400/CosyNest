@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.DataFrancis;
 using System.DataFrancis.DB;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
 
@@ -24,13 +25,12 @@ public static partial class ExtendEFCoreDB
     public static Type[] GetAllEntityType(this Assembly entityAssembly)
     {
         var entityType = typeof(IEntity);
-        return entityAssembly.GetTypes().
+        return [.. entityAssembly.GetTypes().
             Where(x => x is { IsClass: true, IsPublic: true } &&
             entityType.IsAssignableFrom(x) &&
-            !x.IsDefined<NotMappedAttribute>(false)).ToArray();
+            !x.IsDefined<NotMappedAttribute>(false))];
     }
     #endregion
-    #region 添加模型映射
     #region 添加所有模型
     /// <summary>
     /// 添加一个程序集中的所有模型
@@ -49,51 +49,21 @@ public static partial class ExtendEFCoreDB
         {
             var makeEntityMethod = entityMethod.MakeGenericMethod(type);
             var builder = makeEntityMethod.Invoke(modelBuilder, []);
-            if (!type.GetInterfaces().Any(x => x.IsGenericRealize(interfaceType)))
+            var realize = type.GetInterfaces().Any(x =>
+            {
+                var (isRealize, _, genericParameter) = x.IsRealizeGeneric(interfaceType);
+                return isRealize && genericParameter.Single() == type;
+            });
+            if (!realize)
                 continue;
             var entityTypeBuilder = typeof(EntityTypeBuilder<>).MakeGenericType(type);
-            var method = type.GetMethod(nameof(IConfigureEntity<ConfigureEntityName>.Configure),
+            var method = type.GetMethod(nameof(IConfigureEntity<>.Configure),
                 BindingFlags.Static | BindingFlags.Public,
                 [entityTypeBuilder]) ??
                 throw new NotSupportedException($"在类型{type}中没有找到符合接口定义的模型配置方法");
             method.Invoke(null, [builder]);
         }
     }
-    #endregion
-    #region 添加所有TPH表映射
-    /// <summary>
-    /// 添加模型中的所有TPH表映射关系
-    /// </summary>
-    /// <param name="modelBuilder">模型创建者对象，
-    /// 函数会通过它找到所有的模型</param>
-    /// <param name="getDiscriminator">这个委托传入抽象实体类的类型，
-    /// 然后返回实体类鉴别器的列名</param>
-    /// <param name="getDiscriminatorValue">这个委托传入具体实体类的类型，
-    /// 然后返回实体类鉴别器的值，它用来在TPH表映射中区分该实体类的具体类型</param>
-    public static void AddAllTPHMap(this ModelBuilder modelBuilder,
-        Func<Type, string>? getDiscriminator = null,
-        Func<Type, string>? getDiscriminatorValue = null)
-    {
-        getDiscriminator ??= x => $"{x.Name}Discriminator";
-        getDiscriminatorValue ??= x => x.FullName ??
-        throw new NotSupportedException($"实体类{x.Name}类型的{nameof(Type)}.{nameof(Type.FullName)}属性返回null，无法确认鉴别器的值");
-        var entityTypes = modelBuilder.Model.GetEntityTypes().Select(x => x.ClrType).ToArray();
-        var abstractEntityTypes = entityTypes.Where(x => x.IsAbstract && x.BaseType == typeof(Entity)).ToArray();
-        foreach (var abstractEntityType in abstractEntityTypes)
-        {
-            var realizeEntityTypes = entityTypes.
-                Where(x => abstractEntityType.IsAssignableFrom(x) && x != abstractEntityType).ToArray();
-            if (realizeEntityTypes.Length is 0)
-                continue;
-            var builder = modelBuilder.Entity(abstractEntityType).
-                HasDiscriminator<string>(getDiscriminator(abstractEntityType));
-            foreach (var realizeEntityType in realizeEntityTypes)
-            {
-                builder = builder.HasValue(realizeEntityType, getDiscriminatorValue(realizeEntityType));
-            }
-        }
-    }
-    #endregion
     #endregion
     #region 统一配置浮点数的精度
     /// <summary>
@@ -111,6 +81,20 @@ public static partial class ExtendEFCoreDB
         configurationBuilder.Properties<FloatingPointNum?>().HavePrecision(precision, scale);
     }
     #endregion
+    #region 将一个列配置为自增列
+    /// <summary>
+    /// 将一个列配置为自增列
+    /// </summary>
+    /// <typeparam name="Entity">实体的类型</typeparam>
+    /// <param name="entityTypeBuilder">用于配置实体的选项</param>
+    /// <param name="getProperty">用于选择自增列的表达式</param>
+    public static void HasAutoIncrement<Entity>(this EntityTypeBuilder<Entity> entityTypeBuilder, Expression<Func<Entity, object?>> getProperty)
+        where Entity : class
+    {
+        entityTypeBuilder.Property(getProperty).UseIdentityColumn();
+        entityTypeBuilder.HasAlternateKey(getProperty);
+    }
+    #endregion
     #endregion
     #region 内部成员
     #region 获取一个DbContext的所有实体类型
@@ -125,17 +109,3 @@ public static partial class ExtendEFCoreDB
     #endregion
     #endregion
 }
-
-#region 用来获取名字的类型
-/// <summary>
-/// 这个类型仅用来通过nameof表达式获取泛型接口的名字，
-/// 无其他任何用途
-/// </summary>
-file sealed class ConfigureEntityName : IConfigureEntity<ConfigureEntityName>
-{
-    public static void Configure(EntityTypeBuilder<ConfigureEntityName> configureEntity)
-    {
-        throw new NotImplementedException();
-    }
-}
-#endregion

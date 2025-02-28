@@ -14,46 +14,101 @@ sealed class HasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyDirectInf
     #region 是否为可预览文件的集合
     public required bool Multiple { get; init; }
     #endregion
+    #region 是否直接映射
+    public bool IsDirect
+        => CreateDataObj.GetPreviewFileTypeInfo(Property.PropertyType).IsDirect;
+    #endregion
     #region 是否是否可写入
     public required bool IsInitOnly { get; init; }
     #endregion
     #region 递归获取所有可预览文件
-    public IEnumerable<PreviewFileInfo> AllPreviewFile(object? obj)
+    public IEnumerable<PreviewFileInfo> AllPreviewFile(object? obj, bool isStrict)
     {
         if (obj is null)
             yield break;
-        #region 本地函数
-        PreviewFileInfo Convert(IEnumerable<IHasReadOnlyPreviewFile?> file)
-            => new()
-            {
-                Files = file.WhereNotNull().ToArray(),
-                Property = Property,
-                Target = obj,
-                Multiple = Multiple,
-                IsStrict = IsStrict
-            };
-        #endregion
+        var propertyType = Property.PropertyType;
+        var previewFilePropertyInfos = CreateDataObj.GetPreviewFileTypeInfo(propertyType).
+            HasPreviewFilePropertyInfo.Values.OfType<IHasPreviewFilePropertyDirectInfo>().
+            Where(x => x.IsStrict || !isStrict).ToArray();
+        if (previewFilePropertyInfos.Length is 0)
+            yield break;
         var value = Property.GetValue(obj);
-        var list = Multiple ?
-            (value.To<IEnumerable<IHasReadOnlyPreviewFile?>>() ?? []) :
-            [value.To<IHasReadOnlyPreviewFile>()];
-        yield return Convert(list);
+        foreach (var previewFilePropertyInfo in previewFilePropertyInfos)
+        {
+            var previewFileProperty = previewFilePropertyInfo.Property;
+            var previewFilePropertyValue = previewFileProperty.GetValue(value);
+            if (previewFilePropertyValue is null)
+                continue;
+            var previewFileInfo = new PreviewFileInfo()
+            {
+                PreviewFilePropertyInfo = previewFilePropertyInfo,
+                Target = previewFilePropertyValue
+            };
+            yield return previewFileInfo;
+        }
     }
     #endregion
-    #region 获取直接封装的可预览文件
-    public IReadOnlyCollection<IHasReadOnlyPreviewFile> AllPreviewFileDirect(object? obj)
+    #region 读取直接封装的可预览文件
+    public IReadOnlyCollection<IHasReadOnlyPreviewFile> GetPreviewFile(object? obj)
     {
+        if (obj is null)
+            return [];
         var value = Property.GetValue(obj);
-        return (Multiple ?
-            (value.To<IEnumerable<IHasReadOnlyPreviewFile?>>() ?? []) :
-            [value.To<IHasReadOnlyPreviewFile>()]).WhereEnable().ToArray();
+        if (value is null)
+            return [];
+        object[] files = Multiple ? [.. value.To<IEnumerable<object>>()] : [value];
+        #region 返回用来转换的本地函数
+        Func<object, IHasReadOnlyPreviewFile?> Convert()
+        {
+            if (IsDirect)
+                return x => (IHasReadOnlyPreviewFile)x;
+            var projectionType = typeof(IProjection<>).MakeGenericType(typeof(IHasReadOnlyPreviewFile));
+            var method = projectionType.GetMethod(nameof(IProjection<>.Projection))!;
+            return x => x is null ? null : method.Invoke<IHasReadOnlyPreviewFile>(x);
+        }
+        #endregion
+        var convert = Convert();
+        return [.. files.Select(convert).WhereNotNull().WhereEnable()];
+    }
+    #endregion
+    #region 写入直接封装的可预览文件
+    public void SetPreviewFile(object obj, IEnumerable<IHasReadOnlyPreviewFile> files)
+    {
+        var fileArray = files.WhereEnable().ToArray();
+        if ((Multiple, fileArray) is (false, { Length: > 1 }))
+            throw new NotSupportedException($"{Property}只接受单个可预览文件，但是写入了可预览文件的集合");
+        var propertyType = Property.PropertyType;
+        #region 返回用来转换的本地函数
+        Func<IHasReadOnlyPreviewFile, object> Convert()
+        {
+            if (IsDirect)
+                return x => x;
+            var previewFileType = propertyType.GetCollectionElementType() ?? propertyType;
+            var method = previewFileType.GetMethods(BindingFlags.Static | BindingFlags.Public).
+                Where(x =>
+                {
+                    if (x.Name is not nameof(ICreate<,>.Create))
+                        return false;
+                    var parameterTypes = x.GetParameterTypes();
+                    return parameterTypes.Length is 1 &&
+                    typeof(IHasReadOnlyPreviewFile).IsAssignableFrom(parameterTypes[0]) &&
+                    previewFileType.IsAssignableFrom(x.ReturnType);
+                }).Single();
+            return x => method.Invoke(null, [x])!;
+        }
+        #endregion
+        var convert = Convert();
+        var convertFiles = files.Select(convert).ToArray();
+        var setValue = Multiple ?
+            propertyType.CreateCollection(convertFiles) :
+            convertFiles.SingleOrDefault();
+        Property.SetValue(obj, setValue);
     }
     #endregion
     #region 是否为严格模式
     public required bool IsStrict { get; init; }
     #endregion
     #region 封装可预览文件的状态
-    public HasPreviewFileState HasPreviewFileState
-        => HasPreviewFileState.Direct;
+    public required HasPreviewFileState HasPreviewFileState { get; init; }
     #endregion
 }

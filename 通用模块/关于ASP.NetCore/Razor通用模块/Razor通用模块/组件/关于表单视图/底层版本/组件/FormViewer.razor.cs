@@ -28,6 +28,16 @@ public sealed partial class FormViewer<Model> : ComponentBase
     [EditorRequired]
     public RenderFragment<RenderFormViewerPropertyInfoBase<Model>> RenderProperty { get; set; }
     #endregion
+    #region 用来进行递归渲染的委托
+    /// <summary>
+    /// 获取用来递归渲染属性的委托，
+    /// 如果为<see langword="null"/>，
+    /// 则使用一个默认方法，
+    /// 它同时会作为一个级联参数传递给子组件
+    /// </summary>
+    [Parameter]
+    public RenderFragment<RenderFormViewerPropertyInfoRecursion>? RenderRecursion { get; set; }
+    #endregion
     #region 用来渲染主体部分的委托
     /// <summary>
     /// 获取用来渲染主体部分的委托，
@@ -55,6 +65,25 @@ public sealed partial class FormViewer<Model> : ComponentBase
     [Parameter]
     [EditorRequired]
     public RenderFragment<RenderFormViewerRegionInfo<Model>> RenderRegion { get; set; }
+    #endregion
+    #region 用来渲染上传遮罩的委托
+    /// <summary>
+    /// 当本组件正在执行提交逻辑时，
+    /// 如果这个逻辑包含一个正在进行的上传操作，
+    /// 则渲染本委托，遮罩屏幕提醒用户正在上传，
+    /// 如果为<see langword="null"/>，则不进行渲染
+    /// </summary>
+    [Parameter]
+    public RenderFragment? RenderUploadMask { get; set; }
+    #endregion
+    #region 是否强制所有属性只读
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则强制所有属性只读，不会考虑<see cref="IsReadOnlyProperty"/>，
+    /// 注意：如果<see cref="ExistingForm"/>返回<see langword="false"/>，它不会生效
+    /// </summary>
+    [Parameter]
+    public bool ForceReadOnly { get; set; }
     #endregion
     #region 是否只读
     #region 正式属性
@@ -84,15 +113,6 @@ public sealed partial class FormViewer<Model> : ComponentBase
             { } canEditMod => throw canEditMod.Unrecognized()
         };
     #endregion
-    #region 直接将所有属性设置为只读
-    /// <summary>
-    /// 这个高阶函数返回一个函数，
-    /// 它直接将所有属性设置为只读
-    /// </summary>
-    /// <returns></returns>
-    public static Func<PropertyInfo, Model, bool> PropertyAllReadOnly()
-        => static (_, _) => true;
-    #endregion
     #region 返回过滤指定属性的高阶函数
     /// <summary>
     /// 返回一个高阶函数，
@@ -102,7 +122,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// 表示将名称存在于<paramref name="propertyName"/>的属性设置为只读，否则设置为可写</param>
     /// <param name="propertyName">枚举要筛选的属性的名称</param>
     /// <returns></returns>
-    public static Func<PropertyInfo, Model, bool> PropertyStateFilter(bool isReadOnly, params string[] propertyName)
+    public static Func<PropertyInfo, Model, bool> IsReadOnlyFilter(bool isReadOnly, params string[] propertyName)
     {
         var filterPropertyName = propertyName.ToHashSet();
         return (property, model) =>
@@ -121,31 +141,40 @@ public sealed partial class FormViewer<Model> : ComponentBase
     #region 初始模型
     /// <summary>
     /// 获取初始的模型，
-    /// 注意：<see cref="FormModel"/>只是它的副本，不是同一个引用，
+    /// 注意：除非指定引用传递，否则<see cref="FormModel"/>只是它的副本，不是同一个引用，
     /// 并且它只会在调用<see cref="OnInitialized"/>时初始化一次，重复传入无效
     /// </summary>
     [Parameter]
     [EditorRequired]
     public Model InitializationModel { get; set; }
     #endregion
+    #region 是否引用传递
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则表单模型使用引用传递，而不是创建它的副本
+    /// </summary>
+    [Parameter]
+    public bool IsReference { get; set; }
+    #endregion
     #region 用来判断是否为现有表单的委托
     #region 正式属性
     /// <summary>
     /// 这个委托传入模型，
     /// 返回当前表单是否为现有表单，
-    /// 现有表单支持修改和删除，不支持新增
+    /// 现有表单指的是已经保存到数据库中的表单，
+    /// 它在某些业务逻辑上和没有保存，只是草稿的表单有区别
     /// </summary>
     [Parameter]
-    public Func<Model, bool> ExistingForms { get; set; } = ExistingFormsDefault;
+    public Func<Model, bool> ExistingForm { get; set; } = ExistingFormDefault;
     #endregion
     #region 默认方法
     /// <summary>
-    /// 这个方法是<see cref="ExistingForms"/>的默认方法，
+    /// 这个方法是<see cref="ExistingForm"/>的默认方法，
     /// 它返回当前表单是否为现有表单
     /// </summary>
     /// <param name="model">待判断的模型</param>
     /// <returns></returns>
-    public static bool ExistingFormsDefault(Model model)
+    public static bool ExistingFormDefault(Model model)
         => model is IWithID { } entity && !entity.IsNew();
     #endregion
     #endregion
@@ -188,7 +217,10 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// <returns></returns>
     public static IEnumerable<RenderFormViewerPropertyInfoBase<Model>> GetRenderPropertyInfoDefault(FormViewer<Model> formViewer)
     {
-        var propertys = typeof(Model).GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(x =>
+        var model = formViewer.FormModel;
+        var forceReadOnly = formViewer.IsForceReadOnly(model);
+        var modelType = model.GetType();
+        var propertys = modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(x =>
         {
             var renderData = x.GetCustomAttribute<RenderDataBaseAttribute>();
             return new
@@ -199,16 +231,16 @@ public sealed partial class FormViewer<Model> : ComponentBase
         }).
         Where(x => x.Attribute is { }).ToArray().
         OrderBy(x => x.Attribute.Order).ToArray();
-        var model = formViewer.FormModel;
-        return propertys.Select(x =>
+        return [.. propertys.Select(x =>
         {
             var property = x.Item;
             var attribute = x.Attribute;
             var groupName = attribute.GroupName;
-            var isReadOnly = !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model);
+            var isReadOnly = forceReadOnly || !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model);
             var readOnlyConvert = isReadOnly ? formViewer.PropertyValueConvert : null;
-            var previewFileTypeInfo = CreateDataObj.GetPreviewFileTypeInfo(typeof(Model)).HasPreviewFilePropertyInfo.GetValueOrDefault(property.Name);
+            var previewFileTypeInfo = CreateDataObj.GetPreviewFileTypeInfo(modelType).HasPreviewFilePropertyInfo.GetValueOrDefault(property.Name);
             var inUpload = formViewer.InUpload && (previewFileTypeInfo?.IsStrict ?? false);
+            var renderPreference = property.GetCustomAttribute<RenderPreferenceAttribute>()?.GetRenderPreference();
             var renderInfo = attribute switch
             {
                 RenderDataAttribute renderDataAttribute => (RenderFormViewerPropertyInfoBase<Model>)new RenderFormViewerPropertyInfo<Model>()
@@ -222,12 +254,9 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     InUpload = inUpload,
                     OnPropertyChange = null,
                     HasPreviewFilePropertyInfo = previewFileTypeInfo,
-                    RenderPreference = new()
-                    {
-                        Format = renderDataAttribute.Format,
-                        RenderLongTextRows = renderDataAttribute.RenderLongTextRows,
-                        RenderEnum = renderDataAttribute.RenderEnum,
-                    }
+                    RenderPreference = renderPreference,
+                    IsRecursion = renderDataAttribute.IsRecursion,
+                    Describe = renderDataAttribute.Describe
                 },
                 RenderDataCustomAttribute => new RenderFormViewerPropertyInfoCustom<Model>()
                 {
@@ -238,7 +267,8 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     PropertyValueConvert = readOnlyConvert,
                     OnPropertyChange = null,
                     HasPreviewFilePropertyInfo = previewFileTypeInfo,
-                    InUpload = inUpload
+                    InUpload = inUpload,
+                    RenderPreference = renderPreference
                 },
                 _ => throw new NotSupportedException("无法识别这个渲染数据特性")
             };
@@ -249,7 +279,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
                 OnPropertyChange = createPropertyChangeEvent(renderInfo)
             } :
             renderInfo;
-        }).ToArray();
+        })];
     }
     #endregion
     #region 外部方法
@@ -288,16 +318,6 @@ public sealed partial class FormViewer<Model> : ComponentBase
     [Parameter]
     public bool ResetAfterSubmission { get; set; }
     #endregion
-    #region 用来渲染上传遮罩的委托
-    /// <summary>
-    /// 当本组件正在执行提交逻辑时，
-    /// 如果这个逻辑包含一个正在进行的上传操作，
-    /// 则渲染本委托，遮罩屏幕提醒用户正在上传，
-    /// 如果为<see langword="null"/>，则不进行渲染
-    /// </summary>
-    [Parameter]
-    public RenderFragment? RenderUploadMask { get; set; }
-    #endregion
     #region 用来重置表单的业务逻辑
     /// <summary>
     /// 获取或设置用于重置表单的业务逻辑，
@@ -325,7 +345,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     #endregion
     #region 刷新目标
     /// <summary>
-    /// 获取提交和删除成功后应该刷新的组件，
+    /// 获取提交，删除成功或取消后应该刷新的组件，
     /// 它可以在子组件提交成功后刷新父组件，
     /// 如果为<see langword="null"/>，则刷新这个组件自己
     /// </summary>
@@ -365,28 +385,39 @@ public sealed partial class FormViewer<Model> : ComponentBase
     public bool InUpload
         => InUploadField;
     #endregion
-    #region 初始化表单模型
+    #region 初始化表单模型（外部版本）
     /// <summary>
     /// 初始化并写入<see cref="FormModel"/>属性
     /// </summary>
     /// <returns></returns>
     public void InitializationFormModel()
     {
-        FormModelField = CopyModel.MemberwiseClone();
-        var previewFileTypeInfo = CreateDataObj.GetPreviewFileTypeInfo(typeof(Model));
-        if (!previewFileTypeInfo.HasPreviewFile)
-            return;
-        var allPreviewFile = previewFileTypeInfo.AllPreviewFile(FormModelField).
-            Where(x => x.IsStrict).ToArray();
-        foreach (var previewFile in allPreviewFile)
-        {
-            var value = previewFile.Files.Select(x => x.MemberwiseClone()).ToArray();
-            previewFile.SetFile(value);
-        }
+        CopyModel = InitializationModel;
+        InitializationFormModelInternal();
     }
     #endregion
     #endregion
     #region 内部成员
+    #region 是否强制所有属性只读
+    /// <summary>
+    /// 返回是否强制所有属性只读
+    /// </summary>
+    /// <param name="model">要判断的模型</param>
+    /// <returns></returns>
+    private bool IsForceReadOnly(Model model)
+        => ForceReadOnly && ExistingForm(model);
+    #endregion
+    #region 初始化表单模型（内部版本）
+    /// <summary>
+    /// 初始化并写入<see cref="FormModel"/>属性，
+    /// 它仅供内部调用
+    /// </summary>
+    /// <returns></returns>
+    private void InitializationFormModelInternal()
+    {
+        FormModelField = IsReference || IsForceReadOnly(CopyModel) ? CopyModel : CopyModel.MemberwiseClone();
+    }
+    #endregion
     #region 待复制模型
     /// <summary>
     /// 这个模型专门用于复制
@@ -423,7 +454,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
             RenderNotGroup = notGroup is null ? _ => { } : RenderGroup(notGroup),
             FormModel = formModel
         };
-        var existingForms = ExistingForms(formModel);
+        var isExistingForm = ExistingForm(formModel);
         #region 用来刷新组件的本地函数
         void RefreshComponent()
         {
@@ -436,7 +467,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
         #region 用来重置的本地函数
         async Task Resetting()
         {
-            InitializationFormModel();
+            InitializationFormModelInternal();
             await this.Resetting();
         }
         #endregion
@@ -446,22 +477,15 @@ public sealed partial class FormViewer<Model> : ComponentBase
             #region 提交逻辑主体
             async Task OnSubmitMain()
             {
-                var previewFileTypeInfo = CreateDataObj.GetPreviewFileTypeInfo(typeof(Model));
+                var previewFileTypeInfo = CreateDataObj.GetPreviewFileTypeInfo(formModel.GetType());
                 if (!previewFileTypeInfo.HasPreviewFile)
                 {
                     await NotUploadFile();
                     return;
                 }
-                var allPreviewFile = previewFileTypeInfo.AllPreviewFile(formModel).
-                    Where(x => x.IsStrict).ToArray();
-                foreach (var previewFile in allPreviewFile)
-                {
-                    var setFiles = previewFile.Files.WhereEnable().ToArray();
-                    previewFile.SetFile(setFiles);
-                }
-                var uploadFiles = allPreviewFile.SelectMany(x => x.Files).
-                    OfType<IHasUploadFileClient>().
-                    WhereEnableAndNotUpload().ToArray();
+                var allPreviewFile = previewFileTypeInfo.AllPreviewFile(formModel, true).ToArray();
+                var uploadFiles = allPreviewFile.SelectMany(x => x.PreviewFilePropertyInfo.GetPreviewFile(x.Target)).
+                    OfType<IHasUploadFileClient>().WhereEnableAndNotUpload().ToArray();
                 if (uploadFiles.Length > 0)
                     await HasUploadFile();
                 else
@@ -535,11 +559,11 @@ public sealed partial class FormViewer<Model> : ComponentBase
         var renderSubmit = new RenderSubmitInfo<Model>()
         {
             Resetting = Resetting,
-            ExistingForms = existingForms,
+            IsExistingForm = isExistingForm,
             FormModel = formModel,
             InUpload = InUpload,
             CanEdit = renderFormViewerPropertyInfo.Any(x => !x.IsReadOnly),
-            Delete = (existingForms, Delete) is ({ }, { }) ? OnDelete : null,
+            Delete = (isExistingForm, Delete) is ({ }, { }) ? OnDelete : null,
             Submit = OnSubmit,
             RenderUploadMask = (InUpload, RenderUploadMask) is (true, { }) ?
             RenderUploadMask : static _ => { },
@@ -556,7 +580,6 @@ public sealed partial class FormViewer<Model> : ComponentBase
     #region 重写OnInitialized
     protected override void OnInitialized()
     {
-        CopyModel = InitializationModel;
         InitializationFormModel();
     }
     #endregion

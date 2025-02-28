@@ -66,7 +66,7 @@ public sealed record RenderPlayerState
         };
         return newMediaName is null ?
             null :
-            new FileNameInfo(WebUtility.UrlDecode(newMediaName)).Simple;
+            FileNameInfo.FromPath(WebUtility.UrlDecode(newMediaName)).Simple;
     }
     #endregion
     #endregion

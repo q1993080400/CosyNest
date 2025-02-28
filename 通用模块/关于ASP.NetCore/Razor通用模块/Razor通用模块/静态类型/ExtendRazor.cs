@@ -37,6 +37,16 @@ public static partial class ExtendRazor
         return parameters.Where(x => x.Item2 is { }).ToDictionary()!;
     }
     #endregion
+    #region 是否为可路由组件
+    /// <summary>
+    /// 返回某个类型，是否为可路由的Blazor组件
+    /// </summary>
+    /// <param name="type">要判断的组件类型</param>
+    /// <returns></returns>
+    public static bool IsRouteComponent(this Type type)
+        => typeof(IComponent).IsAssignableFrom(type) &&
+        type.IsDefined<RouteAttribute>();
+    #endregion
     #region 公开StateHasChanged方法
     /// <summary>
     /// 公开组件的StateHasChanged方法，并调用它

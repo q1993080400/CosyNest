@@ -10,7 +10,7 @@ sealed record HasUploadFileFusion : HasUploadFileServer, IHasUploadFileFusion
     #region 是否上传完毕
     private bool IsUploadCompletedField;
 
-    public bool IsUploadCompleted => IsUploadCompletedField;
+    public bool IsUploadCompleted => IsUploadCompletedField || SavePosition is { };
     #endregion
     #region 指示上传完毕
     public void UploadCompleted()

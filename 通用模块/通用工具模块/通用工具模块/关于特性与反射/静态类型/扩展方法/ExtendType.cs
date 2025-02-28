@@ -80,7 +80,7 @@ public static partial class ExtendReflection
           TypeCode.Empty or TypeCode.DateTime or
           TypeCode.Char or TypeCode.String or TypeCode.Boolean);
     #endregion
-    #region 判断一个类型是否为通用类型
+    #region 判断类型是否为通用类型
     /// <summary>
     /// 判断一个类型是否为通用类型，
     /// 通用类型包括数字，布尔，时间，枚举，Guid类型，以及它们的可空版本，
@@ -102,7 +102,16 @@ public static partial class ExtendReflection
             }
         };
     #endregion
-    #region 判断一个类型是否可作为异步返回值
+    #region 判断类型是否为集合
+    /// <summary>
+    /// 判断一个类型是否为集合类型
+    /// </summary>
+    /// <param name="type">待判断的类型</param>
+    /// <returns></returns>
+    public static bool IsCollection(this Type type)
+        => typeof(Collections.IEnumerable).IsAssignableFrom(type);
+    #endregion
+    #region 判断类型是否可作为异步返回值
     /// <summary>
     /// 判断一个类型是否可以作为异步方法的返回值
     /// </summary>
@@ -134,9 +143,18 @@ public static partial class ExtendReflection
     /// <param name="definition">要检查的泛型类型定义</param>
     /// <returns></returns>
     public static bool IsGenericRealize(this Type type, Type definition)
-       => type.IsConstructedGenericType &&
-        definition.IsGenericTypeDefinition &&
-        type.GetGenericTypeDefinition() == definition;
+    {
+        if (!definition.IsGenericTypeDefinition)
+            return false;
+        if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == definition)
+            return true;
+        if (definition.IsInterface)
+        {
+            var interfaces = type.GetInterfaces();
+            return interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == definition);
+        }
+        return false;
+    }
     #endregion
     #region 判断是否实现泛型类型，接受开放式泛型
     /// <summary>
@@ -146,23 +164,23 @@ public static partial class ExtendReflection
     /// <param name="type">要检查的类型</param>
     /// <param name="generic">要检查是否继承或实现的泛型类型</param>
     /// <returns>一个元组，它的项分别是是否继承或实现泛型类型，
-    /// 以及如果继承或实现了，则返回该泛型类型的泛型参数</returns>
-    public static (bool IsRealize, Type[] GenericParameter) IsRealizeGeneric(this Type type, Type generic)
+    /// 以及如果继承或实现了，则返回该封闭泛型类型和它的泛型参数</returns>
+    public static (bool IsRealize, Type? GenericType, Type[] GenericParameter) IsRealizeGeneric(this Type type, Type generic)
     {
         #region 本地函数
-        (bool IsRealize, Type[] GenericParameter) Fun(IEnumerable<Type> types)
+        (bool IsRealize, Type? GenericType, Type[] GenericParameter) Fun(IEnumerable<Type> types)
         {
             var realize = types.Prepend(type).FirstOrDefault(x => x == generic || x.IsGenericRealize(generic));
             return realize is null ?
-                (false, []) :
-                (true, realize.GetGenericArguments());
+                (false, null, []) :
+                (true, realize, realize.GetGenericArguments());
         }
         #endregion
         return generic switch
         {
             { IsGenericType: true } => Fun(type.BaseTypeAll()) switch
             {
-                (true, { } parameter) => (true, parameter),
+                (true, { } genericType, { } parameter) => (true, genericType, parameter),
                 _ => Fun(type.GetInterfaces())
             },
             _ => throw new ArgumentException($"{generic}不是泛型类型")
@@ -180,7 +198,7 @@ public static partial class ExtendReflection
     {
         if (type.IsArray)
             return type.GetElementType();
-        if (type.IsRealizeGeneric(typeof(IEnumerable<>)) is (true, { } elementType))
+        if (type.IsRealizeGeneric(typeof(IEnumerable<>)) is (true, _, { } elementType))
             return elementType.Single();
         if (typeof(Collections.IEnumerable).IsAssignableFrom(type))
             return typeof(object);
@@ -229,8 +247,10 @@ public static partial class ExtendReflection
             Array.Copy(array, copyArray, length);
             return (IEnumerable<Element>)copyArray;
         }
-        var addMethod = collectionType.GetMethod(nameof(ICollection<int>.Add), BindingFlags.Public | BindingFlags.Instance, [elementType])!;
-        var list = type.ConstructorsInvoke<IEnumerable<Element>>();
+        var addMethod = varCollectionType.GetMethod(nameof(ICollection<>.Add), BindingFlags.Public | BindingFlags.Instance, [elementType])!;
+        var createCollectionType = type.IsInterface ?
+            typeof(List<>).MakeGenericType(elementType) : type;
+        var list = createCollectionType.ConstructorsInvoke<IEnumerable<Element>>();
         foreach (var element in elements)
         {
             addMethod.Invoke(list, [element]);

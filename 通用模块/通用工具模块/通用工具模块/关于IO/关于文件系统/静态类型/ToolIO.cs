@@ -34,4 +34,22 @@ public static class ToolIO
             Directory.CreateDirectory(father);
     }
     #endregion
+    #region 安全删除文件
+    /// <summary>
+    /// 安全删除一个文件，
+    /// 它可以避免一些不必要的异常
+    /// </summary>
+    /// <param name="paths">要删除的文件的路径，可指定多个路径</param>
+    public static void FileDeleteSecure(params string?[] paths)
+    {
+        foreach (var path in paths)
+        {
+            if (path.IsVoid())
+                continue;
+            if (!File.Exists(path))
+                continue;
+            File.Delete(path);
+        }
+    }
+    #endregion
 }

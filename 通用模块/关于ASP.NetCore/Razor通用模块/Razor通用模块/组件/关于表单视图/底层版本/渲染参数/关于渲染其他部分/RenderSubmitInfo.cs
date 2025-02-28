@@ -26,10 +26,11 @@ public sealed record RenderSubmitInfo<Model>
     #endregion
     #region 是否为现有表单
     /// <summary>
-    /// 返回这个表单是否为现有表单，
-    /// 现有表单支持修改和删除，不支持新增
+    /// 返回当前表单是否为现有表单，
+    /// 现有表单指的是已经保存到数据库中的表单，
+    /// 它在某些业务逻辑上和没有保存，只是草稿的表单有区别
     /// </summary>
-    public required bool ExistingForms { get; init; }
+    public required bool IsExistingForm { get; init; }
     #endregion
     #region 用来提交表单的业务逻辑
     /// <summary>

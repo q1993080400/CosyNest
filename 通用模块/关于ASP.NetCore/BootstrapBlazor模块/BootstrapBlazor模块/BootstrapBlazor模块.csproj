@@ -4,6 +4,7 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>preview</LangVersion>
 		<RootNamespace>BootstrapBlazor.Components</RootNamespace>
 		<AssemblyName>ToolBootstrapBlazor</AssemblyName>
 		<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
@@ -16,7 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BootstrapBlazor" Version="9.3.0" />
+		<PackageReference Include="BootstrapBlazor" Version="9.4.2" />
 		<PackageReference Include="BootstrapBlazor.FontAwesome" Version="9.0.2" />
 	</ItemGroup>
 

@@ -17,10 +17,6 @@ abstract record HasPreviewFileBase : IHasReadOnlyPreviewFile
     #region 文件的名称
     public required string FileName { get; init; }
     #endregion
-    #region 存储层文件名称
-    public virtual string FileNameStorage
-        => Uri.Op().GetEndPoint();
-    #endregion
     #region 是否启用该文件
     public bool IsEnable { get; set; } = true;
     #endregion

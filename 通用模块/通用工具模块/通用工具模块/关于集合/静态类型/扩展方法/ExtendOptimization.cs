@@ -13,7 +13,7 @@ public static partial class ExtendEnumerable
     /// <param name="array">要返回所有维度长度的数组</param>
     /// <returns></returns>
     public static int[] GetLength(this Array array)
-        => Enumerable.Range(0, array.Rank).Select(array.GetLength).ToArray();
+        => [.. Enumerable.Range(0, array.Rank).Select(array.GetLength)];
     #endregion
     #endregion
     #region 为Queue<T>优化

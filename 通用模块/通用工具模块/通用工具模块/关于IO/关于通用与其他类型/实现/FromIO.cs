@@ -13,7 +13,7 @@ public abstract class FromIO : ReleaseAsync, IFromIO
     #region 返回文件的格式
     public string Format
         => Path is { } p ?
-        new FileNameInfo(p).Extended ?? "" : DefaultFormat;
+         FileNameInfo.FromPath(p).Extended ?? "" : DefaultFormat;
     #endregion
     #region 文件的默认格式
     /// <summary>
@@ -47,7 +47,7 @@ public abstract class FromIO : ReleaseAsync, IFromIO
         #region 
         async Task Fun(string path, bool isSitu)
         {
-            var extension = new FileNameInfo(path).Extended ??
+            var extension = FileNameInfo.FromPath(path).Extended ??
                 throw new NotSupportedException($"{path}是一个目录，不能将本对象保存在这个路径");
             if (!CheckExtensionName(extension))
                 throw new NotSupportedException($"{path}的扩展名是{extension}，它不受支持，不能将本对象保存到这个路径");
@@ -122,7 +122,7 @@ public abstract class FromIO : ReleaseAsync, IFromIO
         Path = path;
         if (path is { })
         {
-            var extension = new FileNameInfo(path).Extended ??
+            var extension = FileNameInfo.FromPath(path).Extended ??
                 throw new NotSupportedException($"{path}是一个目录，不能通过这个路径加载本对象");
             if (!CheckExtensionName(extension))
                 throw new NotSupportedException($"{path}的扩展名是{extension}，它不受支持，不能通过这个路径加载本对象");

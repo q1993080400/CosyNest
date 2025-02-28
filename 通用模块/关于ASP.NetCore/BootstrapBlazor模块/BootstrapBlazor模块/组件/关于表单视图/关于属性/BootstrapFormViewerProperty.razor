@@ -1,230 +1,285 @@
 ﻿@namespace BootstrapBlazor.Components
 @inherits ComponentBase
 @typeparam Model
-@using System.Media
-@using System.Reflection
-@using System.DataFrancis
-@using System.ComponentModel.DataAnnotations;
-@using System.ComponentModel.DataAnnotations.Schema;
 
 @{
     var model = RenderPropertyInfo.FormModel;
-    var name = RenderPropertyInfo.NameWithPoint;
+    var showName = RenderPropertyInfo.ShowName;
+    var name = showName ? RenderPropertyInfo.NameWithPoint : null;
     var property = RenderPropertyInfo.Property;
     var propertyType = property.PropertyType;
     var renderPreference = RenderPropertyInfo.RenderPreference;
-    var format = renderPreference.Format;
+    var format = (renderPreference as IRenderHasFormat)?.Format;
     var isReadOnly = RenderPropertyInfo.IsReadOnly;
-    var previewFilePropertyDirectInfo = RenderPropertyInfo.HasPreviewFilePropertyInfo as IHasPreviewFilePropertyDirectInfo;
+    var recursionInfo = RenderPropertyInfo.ToRecursion();
+    var hasPreviewFilePropertyDirectInfo = RenderPropertyInfo.HasPreviewFilePropertyInfo
+    is IHasPreviewFilePropertyDirectInfo { HasPreviewFileState: HasPreviewFileState.PreviewFile } previewFile ?
+    previewFile : null;
     #region 抛出异常
     NotSupportedException Throw(Enum renderMode)
     => new($"无法识别属性{name}的类型{propertyType}的渲染模式{renderMode}");
     #endregion
+    #region 用来渲染标签的本地函数
+    RenderFragment RenderLabel()
+    => builder =>
+    {
+        @if (name is { })
+        {
+            <div class="form-label bootstrapFormViewerPropertyLabel">@name</div>
+        }
+    };
+    #endregion
 }
+
 @if (isReadOnly)
 {
-    @if (previewFilePropertyDirectInfo is { })
+    @if (hasPreviewFilePropertyDirectInfo is { })
     {
-        <BootstrapFormViewerPropertyReadOnly Title="@name" Value="previewFilePropertyDirectInfo.AllPreviewFileDirect(model)" />
+        <BootstrapFormViewerPropertyReadOnly Title="@name" Value="hasPreviewFilePropertyDirectInfo.GetPreviewFile(model)" />
     }
     else
     {
-        <BootstrapFormViewerPropertyReadOnly Title="@name" Value="RenderPropertyInfo.Value" Format="@format" />
+        <BootstrapFormViewerPropertyReadOnly Title="@name" Value="RenderPropertyInfo.Value"
+                                             RenderPreference="renderPreference" RecursionInfo="recursionInfo" />
     }
 }
 else
 {
     <div class="bootstrapFormViewerPropertyContainer">
         <div class="bootstrapFormViewerPropertyItem">
-            @if (previewFilePropertyDirectInfo is { })
+            @if (hasPreviewFilePropertyDirectInfo is { })
             {
-                var files = previewFilePropertyDirectInfo.AllPreviewFileDirect(model);
+                var files = hasPreviewFilePropertyDirectInfo.GetPreviewFile(model);
+                var multiple = hasPreviewFilePropertyDirectInfo.Multiple;
                 var renderUpload = property.GetCustomAttribute<RenderUploadAttribute>();
-                var uploadFileOptions = renderUpload is null ?
-                new UploadFileOptions() :
+                var uploadFileOptions = renderUpload is { } ?
                 new()
                     {
-                        MaxAllowedSize = renderUpload.MaxAllowedSize
-                    };
+                        MaxAllowedSize = renderUpload.MaxAllowedSize,
+                        EnableClipboardUpload = renderUpload.EnableClipboardUpload
+                    } : UploadFileOptions;
                 <div class="bootstrapFormViewerPropertyContainer">
-                    <div class="bootstrapFormViewerPropertyLabel">@name</div>
-                    <BootstrapFileUpload Accept="@renderUpload?.Accept" OnUpload="OnUpload" InUpload="RenderPropertyInfo.InUpload"
-                                         Multiple="previewFilePropertyDirectInfo.Multiple" InitialFiles="files" @key=model
-                                         UploadButtonText="@renderUpload?.UploadButtonText" UploadFileOptions="uploadFileOptions" />
+                    @RenderLabel()
+                    <CascadingValue Value="uploadFileOptions">
+                        <BootstrapFileUpload Accept="@renderUpload?.Accept" OnUpload="OnUpload" InUpload="RenderPropertyInfo.InUpload"
+                                             Multiple="multiple" InitialFiles="files" @key=model
+                                             UploadButtonText="@renderUpload?.UploadButtonText" />
+                    </CascadingValue>
                 </div>
             }
             else
             {
-                var trueType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
-                @switch ((trueType, trueType != propertyType))
+                @if (recursionInfo is { })
                 {
-                    case (var t, _) when t == typeof(string):
-                        var valueText = RenderPropertyInfo.BindValue<string>();
-                        var stringRender = renderPreference.RenderString;
-                        @switch (stringRender)
+                    <div class="bootstrapFormViewerPropertyContainer">
+                        @RenderLabel()
+                        @if (RenderRecursion is { })
                         {
-                            case FormStringRender.Default or FormStringRender.SingleLineText:
-                                <BootstrapInput TValue="string" ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value />
-                                break;
-                            case FormStringRender.LongText:
-                                <Textarea ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value rows="@(renderPreference.RenderLongTextRows)" />
-                                break;
-                            case FormStringRender.Password:
-                                <BootstrapInput ShowLabel="true" DisplayText="@name" @bind-Value=valueText.Value type="password" />
-                                break;
-                            case var r:
-                                throw Throw(r);
+                            @RenderRecursion(recursionInfo)
                         }
-                        break;
-                    case (var t, _) when t.IsNum():
-                        var numRender = renderPreference.RenderNum;
-                        #region 渲染字段
-                        void Render<T>()
-                        where T : struct, IParsable<T>
+                        else
                         {
-                            @switch (numRender)
+                            @BootstrapFormViewerPropertyRecursion.DynamicRender(recursionInfo)
+                        }
+                    </div>
+                }
+                else
+                {
+                    var trueType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+                    @switch ((trueType, trueType != propertyType))
+                    {
+                        case (var t, _) when t == typeof(string):
+                            var valueText = RenderPropertyInfo.BindValue<string>();
+                            var renderPreferenceText = RenderPreference.ConvertOrCreate<RenderPreferenceText>(renderPreference);
+                            var stringRender = renderPreferenceText.RenderText;
+                            @switch (stringRender)
                             {
-                                case FormNumRender.Default or FormNumRender.Num:
-                                    var value = RenderPropertyInfo.BindValue<T>();
-                                    <BootstrapInputNumber TValue="T" ShowLabel="true"
-                                                          DisplayText="@name" @bind-Value=value.Value
-                                                          FormatString="@(format??Format.FormattedNumCommon)" />
+                                case FormTextRender.Default or FormTextRender.SingleLineText:
+                                    <BootstrapInput TValue="string" ShowLabel="showName" DisplayText="@name" @bind-Value=valueText.Value />
                                     break;
-                                case FormNumRender.Grade when typeof(T) == typeof(double):
-                                    var v = RenderPropertyInfo.BindValue<double>();
-                                    <div>
-                                        <div class="form-label bootstrapFormViewerPropertyLabel">@name</div>
-                                        <Rate @bind-Value=v.Value />
-                                    </div>
+                                case FormTextRender.LongText:
+                                    <Textarea ShowLabel="showName" DisplayText="@name" @bind-Value=valueText.Value rows="@(renderPreferenceText.RenderLongTextRows)" />
+                                    break;
+                                case FormTextRender.Password:
+                                    <BootstrapInput ShowLabel="showName" DisplayText="@name" @bind-Value=valueText.Value type="password" />
                                     break;
                                 case var r:
                                     throw Throw(r);
                             }
-                        }
-                        #endregion
-                        switch (t)
-                        {
-                            case var type when type == typeof(int):
-                                Render<int>();
-                                break;
-                            case var type when type == typeof(long):
-                                Render<long>();
-                                break;
-                            case var type when type == typeof(double):
-                                Render<double>();
-                                break;
-                            case var type when type == typeof(decimal):
-                                Render<decimal>();
-                                break;
-                            case var _:
-                                throw Throw(numRender);
-                        }
-                        break;
-                    case (var t, _) when t == typeof(bool):
-                        var boolRender = renderPreference.RenderBool;
-                        var trueDescribe = "打开";
-                        var flaseDescribe = "关闭";
-                        var valueBool = RenderPropertyInfo.BindValue<bool>();
-                        switch (boolRender)
-                        {
-                            case FormBoolRender.Default or FormBoolRender.Radio:
-                                var boolSelect = new SelectedItem[]
+                            break;
+                        case (var t, _) when t.IsNum():
+                            var renderPreferenceNum = RenderPreference.ConvertOrCreate<RenderPreferenceNum>(renderPreference);
+                            var numRender = renderPreferenceNum.RenderNum;
+                            #region 渲染字段
+                            void Render<T>()
+                            where T : struct, IParsable<T>
+                            {
+                                @switch (numRender)
                                 {
+                                    case FormNumRender.Default or FormNumRender.Num:
+                                        var value = RenderPropertyInfo.BindValue<T>();
+                                        <BootstrapInputNumber TValue="T" ShowLabel="showName"
+                                                              DisplayText="@name" @bind-Value=value.Value
+                                                              FormatString="@(format??Format.FormattedNumCommon)" />
+                                        break;
+                                    case FormNumRender.Grade when typeof(T) == typeof(double):
+                                        var v = RenderPropertyInfo.BindValue<double>();
+                                        <div>
+                                            @if (name is { })
+                                            {
+                                                <div class="form-label bootstrapFormViewerPropertyLabel">@name</div>
+                                            }
+                                            <Rate @bind-Value=v.Value />
+                                        </div>
+                                        break;
+                                    case var r:
+                                        throw Throw(r);
+                                }
+                            }
+                            #endregion
+                            switch (t)
+                            {
+                                case var type when type == typeof(int):
+                                    Render<int>();
+                                    break;
+                                case var type when type == typeof(long):
+                                    Render<long>();
+                                    break;
+                                case var type when type == typeof(double):
+                                    Render<double>();
+                                    break;
+                                case var type when type == typeof(decimal):
+                                    Render<decimal>();
+                                    break;
+                                case var _:
+                                    throw Throw(numRender);
+                            }
+                            break;
+                        case (var t, _) when t == typeof(bool):
+                            var renderPreferenceBool = RenderPreference.ConvertOrCreate<RenderPreferenceBool>(renderPreference);
+                            var boolRender = renderPreferenceBool.RenderBool;
+                            var describeTrue = renderPreferenceBool.DescribeTrue;
+                            var describeFlase = renderPreferenceBool.DescribeFlase;
+                            var valueBool = RenderPropertyInfo.BindValue<bool>();
+                            switch (boolRender)
+                            {
+                                case FormBoolRender.Default or FormBoolRender.Switch:
+                                    <Switch ShowLabel="showName" DisplayText="@name" OnText="@describeTrue" OffText="@describeFlase" @bind-Value=valueBool.Value />
+                                    break;
+                                case FormBoolRender.Radio:
+                                    var boolSelect = new SelectedItem[]
+                                    {
         new ()
         {
-        Text=trueDescribe,
+        Text=describeTrue,
         Value=bool.TrueString,
         },
         new()
         {
-        Text=flaseDescribe,
+        Text=describeFlase,
         Value=bool.FalseString,
         }
-                                };
-                                <RadioList Items="boolSelect" TValue="bool" ShowLabel="true" DisplayText="@name" @bind-Value=valueBool.Value />
-                                break;
-                            case FormBoolRender.Switch:
-                                <Switch ShowLabel="true" DisplayText="@name" OnText="@trueDescribe" OffText="@flaseDescribe" @bind-Value=valueBool.Value />
-                                break;
-                            case var r:
-                                throw Throw(r);
-                        }
-                        break;
-                    case ({ IsEnum: true } t, var isNullStruct):
-                        var enumRender = renderPreference.RenderEnum;
-                        #region 渲染枚举
-                        void RenderEnum<T>()
-                        {
-                            Func<T, Task>? onEnumChange =
-                            RenderPropertyInfo.OnPropertyChange is null ?
-                            null :
-                            async value =>
-                            {
-                                var enumValue = value.To(RenderPropertyInfo.ValueType);
-                                await RenderPropertyInfo.OnPropertyChange(enumValue);
-                            };
-                            var enumSelect = Enum.GetNames(t).
-                            Select(x => t.GetField(x)!).
-                            Where(x => !x.IsDefined<NotMappedAttribute>()).
-                            Select(x =>
-                            {
-                                var attribute = x.GetCustomAttribute<RenderDataAttribute>();
-                                return (x.GetValue<T>(), attribute?.Name ?? x.Name, attribute?.Order ?? 0);
-                            }).
-                            OrderBy(x => x.Item3).
-                            Select(x => new SelectedItem()
-                                {
-                                    Text = x.Item2,
-                                    Value = x.Item1?.ToString()!
-                                }).ToArray();
-                            enumSelect = isNullStruct ?
-                            enumSelect.Prepend(new() { Text = "无", Value = null! }).ToArray() :
-                            enumSelect;
-                            var valueEnum = RenderPropertyInfo.BindValue<T>();
-                            @switch (enumRender)
-                            {
-                                case FormEnumRender.Default or FormEnumRender.Radio:
-                                    <RadioList Items="enumSelect" TValue="T" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value OnValueChanged="onEnumChange!" />
-                                    break;
-                                case FormEnumRender.Select:
-                                    <Select Items="enumSelect" TValue="T" ShowLabel="true" DisplayText="@name" @bind-Value=valueEnum.Value OnValueChanged="onEnumChange!" />
+                                    };
+                                    <RadioList Items="boolSelect" TValue="bool" ShowLabel="showName" DisplayText="@name" @bind-Value=valueBool.Value />
                                     break;
                                 case var r:
                                     throw Throw(r);
                             }
-                        }
-                        #endregion
-                        if (isNullStruct)
-                        {
-                            RenderEnum<int?>();
-                        }
-                        else
-                        {
-                            RenderEnum<int>();
-                        }
-                        break;
-                    case (var t, var isNullStruct) when t == typeof(DateTimeOffset):
-                        var formatDate = format.IsVoid() ? "d" : format;
-                        #region 渲染日期
-                        void RenderDateTime<T>()
-                        {
-                            var valueDate = RenderPropertyInfo.BindValue<T>();
-                            <DateTimePicker @bind-Value=valueDate.Value ShowLabel="true"
-                                            DisplayText="@name" DateFormat="@formatDate" />
-                        }
-                        #endregion
-                        if (isNullStruct)
-                        {
-                            RenderDateTime<DateTimeOffset?>();
-                        }
-                        else
-                        {
-                            RenderDateTime<DateTimeOffset>();
-                        }
-                        break;
-                    case var t:
-                        throw new NotSupportedException($"无法识别属性{name}的类型{t}，不能生成表单");
+                            break;
+                        case ({ IsEnum: true } t, var isNullStruct):
+                            var renderPreferenceEnum = RenderPreference.ConvertOrCreate<RenderPreferenceEnum>(renderPreference);
+                            var enumRender = renderPreferenceEnum.RenderEnum;
+                            #region 渲染枚举
+                            void RenderEnum<T>()
+                            {
+                                Func<T, Task>? onEnumChange =
+                                RenderPropertyInfo.OnPropertyChange is null ?
+                                null :
+                                async value =>
+                                {
+                                    var enumValue = value.To(RenderPropertyInfo.ValueType);
+                                    await RenderPropertyInfo.OnPropertyChange(enumValue);
+                                };
+                                var enumSelect = Enum.GetNames(t).
+                                Select(x =>
+                                {
+                                    var item = t.GetField(x)!;
+                                    var attribute = item.GetCustomAttribute<EnumDescribeAttribute>();
+                                    return (item.GetValue<T>(), attribute?.Describe ?? item.Name, attribute?.Order ?? 0);
+                                }).
+                                OrderBy(x => x.Item3).
+                                Select(x => new SelectedItem()
+                                    {
+                                        Text = x.Item2,
+                                        Value = x.Item1?.ToString()!
+                                    }).ToArray();
+                                enumSelect = isNullStruct ?
+                                enumSelect.Prepend(new() { Text = "无", Value = null! }).ToArray() :
+                                enumSelect;
+                                var valueEnum = RenderPropertyInfo.BindValue<T>();
+                                @switch (enumRender)
+                                {
+                                    case FormEnumRender.Default or FormEnumRender.Radio:
+                                        <RadioList Items="enumSelect" TValue="T" ShowLabel="showName" DisplayText="@name" @bind-Value=valueEnum.Value OnValueChanged="onEnumChange!" />
+                                        break;
+                                    case FormEnumRender.Select:
+                                        <Select Items="enumSelect" TValue="T" ShowLabel="showName" DisplayText="@name" @bind-Value=valueEnum.Value OnValueChanged="onEnumChange!" />
+                                        break;
+                                    case var r:
+                                        throw Throw(r);
+                                }
+                            }
+                            #endregion
+                            if (isNullStruct)
+                            {
+                                RenderEnum<int?>();
+                            }
+                            else
+                            {
+                                RenderEnum<int>();
+                            }
+                            break;
+                        case (var t, var isNullStruct) when t == typeof(DateTimeOffset):
+                            var formatDate = format.IsVoid() ? "d" : format;
+                            #region 渲染日期
+                            void RenderDateTime<T>()
+                            {
+                                var valueDate = RenderPropertyInfo.BindValue<T>();
+                                <DateTimePicker @bind-Value=valueDate.Value ShowLabel="showName"
+                                                DisplayText="@name" DateFormat="@formatDate" />
+                            }
+                            #endregion
+                            if (isNullStruct)
+                            {
+                                RenderDateTime<DateTimeOffset?>();
+                            }
+                            else
+                            {
+                                RenderDateTime<DateTimeOffset>();
+                            }
+                            break;
+                        case (var t, false) when t == typeof(TimeOnly):
+                            @RenderLabel()
+                            var valueHour = RenderPropertyInfo.BindValueAdapter<int, TimeOnly>(x => x.Hour, x => new(Math.Clamp(x, 0, 23), RenderPropertyInfo.GetValue<TimeOnly>().Minute));
+                            var valueMinute = RenderPropertyInfo.BindValueAdapter<int, TimeOnly>(x => x.Minute, x => new(RenderPropertyInfo.GetValue<TimeOnly>().Hour, Math.Clamp(x, 0, 59)));
+                            <div class="commonContainers">
+                                <BootstrapInputGroup>
+                                    <BootstrapInputNumber @bind-Value=valueHour.Value Min="0" Max="23" />
+                                    <BootstrapInputGroupLabel DisplayText="时" />
+                                    <BootstrapInputNumber @bind-Value=valueMinute.Value Min="0" Max="59" />
+                                    <BootstrapInputGroupLabel DisplayText="分" />
+                                </BootstrapInputGroup>
+                                <div>提示：小时按24小时制计算</div>
+                            </div>
+                            break;
+                        case var t:
+                            throw new NotSupportedException($"无法识别属性{name}的类型{t}，不能生成表单");
+                    }
                 }
+            }
+            @if (RenderPropertyInfo.Describe is { } describe)
+            {
+                <p class="bootstrapFormViewerPropertyDescription">@describe</p>
             }
         </div>
     </div>

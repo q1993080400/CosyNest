@@ -35,7 +35,7 @@ public static class FastRealize
         getKey.AnyCheck("用来获取键的委托");
         return EqualityComparer<Obj>(
             (x, y) => getKey.All(del => Equals(del(x), del(y))),
-            x => ToolEqual.CreateHash(getKey.Select(del => del(x) ?? 0).ToArray()));
+            x => ToolEqual.CreateHash([.. getKey.Select(del => del(x) ?? 0)]));
     }
     #endregion
     #endregion

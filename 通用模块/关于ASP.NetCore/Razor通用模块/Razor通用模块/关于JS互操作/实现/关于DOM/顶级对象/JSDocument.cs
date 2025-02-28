@@ -41,7 +41,7 @@ sealed class JSDocument(IJSRuntime jsRuntime) : IJSDocument
     {
         var jsMethodPack = new JSMethodPackAsync<int>(visibilityChange => onVisibilityChange((VisibilityState)visibilityChange));
         var signalName = CreateASP.JSObjectName();
-        await jsRuntime.InvokeVoidAsync("RegisterVisibilityChange", jsMethodPack.DotNetObjectReference, nameof(JSMethodPackAsync<int>.Invoke), signalName);
+        await jsRuntime.InvokeVoidAsync("RegisterVisibilityChange", jsMethodPack.DotNetObjectReference, nameof(JSMethodPackAsync<>.Invoke), signalName);
         return FastRealize.AsyncDisposable(async () =>
         {
             try

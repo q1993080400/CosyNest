@@ -23,12 +23,12 @@ sealed class HardwareInfoPC : IHardwareInfo
     public HardwareInfoPC()
     {
         using var cpuInfo = new ManagementClass("Win32_Processor");
-        CPUInfo = cpuInfo.GetInstances().Cast<ManagementObject>().
+        CPUInfo = [.. cpuInfo.GetInstances().Cast<ManagementObject>().
             Select(static x => new CPUInfo()
             {
                 Model = (x["Name"].ToString() ?? "").Split("@")[0].Trim(),
                 Number = x["ProcessorId"]?.ToString() ?? ""
-            }).ToArray();
+            })];
         using var motherboardInfo = new ManagementClass("Win32_BaseBoard");
         MotherboardInfo = motherboardInfo.GetInstances().OfType<ManagementObject>().
             Select(static x => new MotherboardInfo()
@@ -41,12 +41,12 @@ sealed class HardwareInfoPC : IHardwareInfo
                 Number = ""
             };
         using var hardDiskInfo = new ManagementClass("Win32_DiskDrive");
-        HardDiskInfo = hardDiskInfo.GetInstances().OfType<ManagementObject>().
+        HardDiskInfo = [.. hardDiskInfo.GetInstances().OfType<ManagementObject>().
             Select(static x => new HardDiskInfo()
             {
                 Number = x["SerialNumber"].ToString() ?? "",
                 Model = x["Model"].ToString() ?? ""
-            }).ToArray();
+            })];
         var hash = CPUInfo.Join(static x => x.Number, ";") + MotherboardInfo.Number + HardDiskInfo.Join(static x => x.Number, ";");
     }
     #endregion

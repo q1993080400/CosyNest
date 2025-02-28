@@ -61,8 +61,12 @@ sealed class JSWindow(IJSRuntime jsRuntime) : IJSWindow
            => jsRuntime.InvokeVoidAsync("alert", cancellation, message);
     #endregion
     #region 弹出输入框
-    public ValueTask<string?> Prompt(string? text = null, string? value = null, CancellationToken cancellation = default)
-        => jsRuntime.InvokeAsync<string?>("prompt", cancellation, text, value);
+    public async ValueTask<(bool IsConfirm, string? Input)> Prompt(string? text = null, string? value = null, CancellationToken cancellation = default)
+    {
+        var input = await jsRuntime.InvokeAsync<string?>("prompt", cancellation, text, value);
+        var isConfirm = input is { };
+        return (isConfirm, input.IsVoid() ? null : input);
+    }
     #endregion
     #region 打印窗口
     public ValueTask Print(CancellationToken cancellation = default)
@@ -88,12 +92,13 @@ sealed class JSWindow(IJSRuntime jsRuntime) : IJSWindow
     #endregion
     #region 关于通知
     #region 请求通知权限
-    public Task<bool> RequestNotifications()
-        => throw new NotImplementedException();
+    public async Task<bool> RequestNotifications(CancellationToken cancellationToken = default)
+        => await jsRuntime.InvokeAsync<bool>("RequestNotificationPermission", cancellationToken);
     #endregion
     #region 返回通知对象
-    public Task<INotifications?> Notifications(bool requestNotifications)
-        => throw new NotImplementedException();
+    public async Task<INotifications<WebNotificationsOptions>?> Notifications(CancellationToken cancellationToken = default)
+        => await RequestNotifications(cancellationToken) ?
+        new NotificationsWeb(jsRuntime) : null;
     #endregion
     #endregion
 }

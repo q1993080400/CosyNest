@@ -6,8 +6,7 @@ namespace System;
 
 public static partial class ExtendTool
 {
-
-    //本部分类专门用于储存与对象转换有关的扩展方法
+    //这个部分类专门用于储存与对象转换有关的扩展方法
 
     #region 转换任意对象
     #region 非泛型方法
@@ -158,16 +157,5 @@ public static partial class ExtendTool
         where NewDel : Delegate
         => (NewDel)oldDelegate.To(typeof(NewDel));
     #endregion
-    #endregion
-    #region 将一个枚举转换为和它等效的另一个枚举
-    /// <summary>
-    /// 将一个枚举转换为和它等效的另一个枚举
-    /// </summary>
-    /// <typeparam name="To">返回值类型，必须是一个枚举</typeparam>
-    /// <param name="fromEnum">要转换的枚举</param>
-    /// <returns></returns>
-    public static To To<To>(this Enum fromEnum)
-        where To : Enum
-        => (To)Enum.ToObject(typeof(To), fromEnum);
     #endregion
 }

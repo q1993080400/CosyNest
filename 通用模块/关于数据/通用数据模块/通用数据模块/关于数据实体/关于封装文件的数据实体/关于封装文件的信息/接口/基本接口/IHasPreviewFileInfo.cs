@@ -12,8 +12,10 @@ public interface IHasPreviewFileInfo
     /// </summary>
     /// <param name="obj">属性依附的对象实例，
     /// 如果它为<see langword="null"/>，则返回一个空集合</param>
+    /// <param name="isStrict">如果这个值为<see langword="true"/>，
+    /// 表示只筛选严格模式的可预览文件</param>
     /// <returns></returns>
-    IEnumerable<PreviewFileInfo> AllPreviewFile(object? obj);
+    IEnumerable<PreviewFileInfo> AllPreviewFile(object? obj, bool isStrict);
     #endregion
     #region 是否为严格模式
     /// <summary>

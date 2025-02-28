@@ -18,13 +18,14 @@ sealed class HasPreviewFilePropertyRecursionInfo : IHasPreviewFilePropertyRecurs
     public required bool IsInitOnly { get; init; }
     #endregion
     #region 递归获取所有可预览文件
-    public IEnumerable<PreviewFileInfo> AllPreviewFile(object? obj)
+    public IEnumerable<PreviewFileInfo> AllPreviewFile(object? obj, bool isStrict)
     {
         var typeInfo = PropertyTypeInfo;
-        foreach (var propertyInfo in typeInfo.HasPreviewFilePropertyInfo.Values)
+        var previewFilePropertyInfos = typeInfo.HasPreviewFilePropertyInfo.Values.Where(x => x.IsStrict || !isStrict);
+        foreach (var propertyInfo in previewFilePropertyInfos)
         {
             var value = propertyInfo.Property.GetValue(obj);
-            foreach (var previewFileInfo in propertyInfo.AllPreviewFile(value))
+            foreach (var previewFileInfo in propertyInfo.AllPreviewFile(value, isStrict))
             {
                 yield return previewFileInfo;
             }

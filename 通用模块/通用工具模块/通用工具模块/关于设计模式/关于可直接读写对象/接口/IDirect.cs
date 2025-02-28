@@ -82,7 +82,7 @@ public interface IDirect : IReadOnlyDictionary<string, object?>
                     var index = matchText.To<int>();
                     return list.Cast<object>().ElementAt(index);
                 default:
-                    throw new ArgumentException($"递归读取属性只支持{nameof(IDirect)}和{nameof(IEnumerable<object>)}");
+                    throw new ArgumentException($"递归读取属性只支持{nameof(IDirect)}和{nameof(IEnumerable<>)}");
             }
         }).To<Ret>(check);
     }

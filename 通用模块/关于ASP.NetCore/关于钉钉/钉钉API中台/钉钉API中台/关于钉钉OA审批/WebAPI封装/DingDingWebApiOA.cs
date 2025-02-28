@@ -157,10 +157,8 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
             CCUserID = Fun<string[]>("ccUserIds") ?? [],
             IsAgree = Fun<string>("result") is "agree",
             BusinessID = Fun<string>("businessId"),
-            OperationRecords = Fun<object[]>("operationRecords").Cast<IDirect>().
-                Select(ConvertOperationRecord).ToArray(),
-            Tasks = Fun<object[]>("tasks").Cast<IDirect>().
-                Select(ConvertTask).ToArray(),
+            OperationRecords = [.. Fun<object[]>("operationRecords").Cast<IDirect>().Select(ConvertOperationRecord)],
+            Tasks = [.. Fun<object[]>("tasks").Cast<IDirect>().Select(ConvertTask)],
             BizAction = Fun<string>("bizAction") switch
             {
                 "MODIFY" => DingDingOABizAction.Modify,
@@ -171,8 +169,7 @@ public sealed class DingDingWebApiOA(IServiceProvider serviceProvider) : DingDin
             BizData = Fun<string>("bizData"),
             AttachedInstanceID = Fun<string[]>("attachedProcessInstanceIds"),
             MainProcessInstanceID = Fun<string>("mainProcessInstanceId"),
-            FormComponentValues = Fun<object[]>("formComponentValues").Cast<IDirect>().
-                Select(ConvertComponentValue).ToArray(),
+            FormComponentValues = [.. Fun<object[]>("formComponentValues").Cast<IDirect>().Select(ConvertComponentValue)],
             CreateTime = ConvertDate(Fun<DateTimeOffset>("createTime"))
         };
     }

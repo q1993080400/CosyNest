@@ -38,7 +38,7 @@ public static partial class ExtendEnumerable
     {
         var keys = listA.Select(getListAKey).ToHashSet();
         var intersect = listB.Select(getListBKey).Intersect(keys).ToArray();
-        return listA.ExceptBy(intersect, getListAKey).ToArray();
+        return [.. listA.ExceptBy(intersect, getListAKey)];
     }
     #endregion
 }

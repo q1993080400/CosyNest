@@ -16,7 +16,7 @@ public interface IBind<Contain>
     IBindProperty<Contain> ToBindProperty()
         => this is IBindProperty<Contain> bindProperty ?
         bindProperty :
-        throw new NotImplementedException($"这个{nameof(IBind<Contain>)}不是{nameof(IBindProperty<Contain>)}");
+        throw new NotImplementedException($"这个{nameof(IBind<>)}不是{nameof(IBindProperty<>)}");
     #endregion
     #region 强行转为绑定范围
     /// <summary>
@@ -27,6 +27,6 @@ public interface IBind<Contain>
     IBindRange<Contain> ToBindRange()
         => this is IBindRange<Contain> bindRange ?
         bindRange :
-        throw new NotImplementedException($"这个{nameof(IBind<Contain>)}不是{nameof(IBindRange<Contain>)}");
+        throw new NotImplementedException($"这个{nameof(IBind<>)}不是{nameof(IBindRange<>)}");
     #endregion
 }

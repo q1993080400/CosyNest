@@ -35,6 +35,8 @@ public sealed partial class ModelDialogClickSwitch : ComponentBase
             IsOpen = IsOpen,
             Close = () =>
             {
+                if (!IsOpen)
+                    return;
                 IsOpen = false;
                 this.StateHasChanged();
             },

@@ -10,27 +10,21 @@ public sealed class RenderDataAttribute : RenderDataBaseAttribute
     /// <summary>
     /// 要在UI上显示的名称
     /// </summary>
-    public required string Name { get; init; }
+    public string Name { get; init; } = "";
     #endregion
-    #region 格式化字符串
+    #region 说明
     /// <summary>
-    /// 这个属性指示格式化字符串，
-    /// 只对部分数据类型有效
+    /// 获取对这个字段的说明，
+    /// 它被放在这个字段的下方
     /// </summary>
-    public string? Format { get; init; }
+    public string? Describe { get; init; }
     #endregion
-    #region 渲染长文本时的行数
+    #region 是否递归渲染
     /// <summary>
-    /// 指示在渲染长文本时，
-    /// 最多应该渲染的行数
+    /// 如果这个值为<see langword="true"/>，
+    /// 则指示这个属性的类型是一个复杂的对象，
+    /// 应该进行递归渲染，它把这个属性视为一个新的表单
     /// </summary>
-    public int RenderLongTextRows { get; init; } = 4;
-    #endregion
-    #region 渲染枚举时的偏好
-    /// <summary>
-    /// 如果这个特性是枚举，
-    /// 指定在渲染枚举时的偏好
-    /// </summary>
-    public FormEnumRender RenderEnum { get; init; }
+    public bool IsRecursion { get; init; }
     #endregion
 }

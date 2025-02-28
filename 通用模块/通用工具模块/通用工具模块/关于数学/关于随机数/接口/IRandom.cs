@@ -123,7 +123,7 @@ public interface IRandom
             index.OrderDescending().ForEach(list.RemoveAt);
             return list;
         }
-        return index.Select(x => list[x]).ToArray();
+        return [.. index.Select(x => list[x])];
     }
 
     /*说明文档

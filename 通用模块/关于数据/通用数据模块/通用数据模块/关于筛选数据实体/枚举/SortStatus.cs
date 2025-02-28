@@ -10,19 +10,19 @@ public enum SortStatus
     /// <summary>
     /// 未排序
     /// </summary>
-    [RenderData(Name = "未排序")]
+    [EnumDescribe(Describe = "未排序")]
     [Display(Name = "未排序")]
     None,
     /// <summary>
     /// 升序
     /// </summary>
-    [RenderData(Name = "升序")]
+    [EnumDescribe(Describe = "升序")]
     [Display(Name = "升序")]
     Ascending,
     /// <summary>
     /// 降序
     /// </summary>
-    [RenderData(Name = "降序")]
+    [EnumDescribe(Describe = "降序")]
     [Display(Name = "降序")]
     Descending,
 }

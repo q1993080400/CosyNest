@@ -69,6 +69,6 @@ public static class ExtendLocalization
             ThenBy(x=>x.PinYin).
             ThenBy(x=>x.Key).
             GroupBy(x =>x.PinYin).
-            Select(x=>new GroupInitial<Obj>(x.Key,x.Select(x=>x.Value).ToArray()))];
+            Select(x=>new GroupInitial<Obj>(x.Key,[.. x.Select(x=>x.Value)]))];
     #endregion
 }

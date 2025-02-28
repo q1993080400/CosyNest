@@ -38,6 +38,8 @@ public static class ExtendSafety
                 $"无法转换为{nameof(ClaimsIdentity)}")
         };
     #endregion
+    #endregion
+    #region 关于ClaimsIdentity
     #region 关于标识Json对象
     #region 获取ClaimsIdentity中储存的对象
     /// <summary>
@@ -70,6 +72,16 @@ public static class ExtendSafety
         identity.ReplaceClaim(claim);
     }
     #endregion
+    #endregion
+    #region 获取所有角色
+    /// <summary>
+    /// 获取这个用户的所有角色
+    /// </summary>
+    /// <param name="identity">要获取角色的用户</param>
+    /// <returns></returns>
+    public static IEnumerable<string> Roles(this ClaimsIdentity identity)
+        => identity.FindAll(x => x.Type is ClaimsIdentity.DefaultRoleClaimType).
+        Select(x => x.Value);
     #endregion
     #region 替换Claim
     /// <summary>

@@ -1,5 +1,4 @@
 ﻿using System.IOFrancis.FileSystem;
-using System.Media;
 using System.Text.Json.Serialization;
 
 namespace System.DataFrancis;
@@ -9,6 +8,7 @@ namespace System.DataFrancis;
 /// 都可以作为一个封装了只读可预览文件的API数据实体
 /// </summary>
 [JsonDerivedType(typeof(HasReadOnlyPreviewFile), nameof(HasReadOnlyPreviewFile))]
+[JsonDerivedType(typeof(HasPreviewFile), nameof(HasPreviewFile))]
 public interface IHasReadOnlyPreviewFile : IWithID
 {
     #region 封面Uri
@@ -31,19 +31,12 @@ public interface IHasReadOnlyPreviewFile : IWithID
     /// </summary>
     string FileName { get; }
     #endregion
-    #region 存储层文件名称
-    /// <summary>
-    /// 获取存储层文件名称，
-    /// 它是文件位于存储介质的实际名称
-    /// </summary>
-    string FileNameStorage { get; }
-    #endregion
     #region 文件路径信息
     /// <summary>
     /// 这个属性返回该文件路径的信息
     /// </summary>
     FileNameInfo FilePathInfo
-        => new(FileName);
+        => FileNameInfo.FromPath(FileName);
     #endregion
     #region 媒体类型
     /// <summary>

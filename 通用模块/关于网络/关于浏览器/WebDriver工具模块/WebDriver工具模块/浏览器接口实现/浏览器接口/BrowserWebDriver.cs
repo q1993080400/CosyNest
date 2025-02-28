@@ -40,8 +40,7 @@ sealed class BrowserWebDriver : Release, IBrowser
     #endregion
     #region 选项卡的集合
     public IReadOnlyList<ITab> Tabs
-        => WebDriver.WindowHandles.
-        Select(x => new TabWebDriver(this, x)).ToArray();
+        => [.. WebDriver.WindowHandles.Select(x => new TabWebDriver(this, x))];
     #endregion
     #region 当前选项卡
     public ITab CurrentTab

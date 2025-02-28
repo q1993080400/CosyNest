@@ -9,6 +9,63 @@ async function InvokeNetInstanceMethod(netObjectInstance, netMethodName, ...argu
     return await netObjectInstance.invokeMethodAsync(netMethodName, ...arguments)
 }
 
+//竞争刷新，它可以避免两个对象同时执行刷新
+function RreloadCompetition() {
+    const key = "4BFD8EA6007C3260F37B07F6281D814F";
+    if (window[key])
+        return;
+    window[key] = true;
+    try {
+        location.reload();
+    } catch (e) {
+        window[key] = false;
+    }
+}
+
+//请求通知权限
+async function RequestNotificationPermission() {
+    switch (Notification.permission) {
+        case "granted":
+            return true;
+        case "denied":
+            return false;
+        case "default":
+            try {
+                const result = await Notification.requestPermission();
+                return result === "granted";
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
+        default:
+            return false;
+    }
+}
+
+//显示通知
+function ShowNotification(webNotificationsOptions) {
+    if (Notification.permission != "granted")
+        return;
+    if (webNotificationsOptions.onlyBackend && !document.hidden)
+        return;
+    const options = {
+        body: webNotificationsOptions.body,
+        tag: webNotificationsOptions.tag,
+        icon: webNotificationsOptions.icon,
+        requireInteraction: webNotificationsOptions.requireInteraction,
+        renotify: webNotificationsOptions.renotify
+    };
+    const notification = new Notification(webNotificationsOptions.title, options);
+    notification.onclick = () => {
+        notification.close();
+        const uri = webNotificationsOptions.uri;
+        if (uri) {
+            window.focus();
+            location.href = uri;
+        }
+    };
+}
+
 //向JS事件注册Net方法，然后返回一个可以用来取消注册的对象名称
 function RegisterNetMethod(element, type, listener, signalName) {
     const controller = new AbortController();
@@ -34,7 +91,7 @@ function RegisterEvent(elementSelector, type, netObjectInstance, netMethodName, 
 function RegisterVisibilityChange(netObjectInstance, netMethodName, signalName) {
     return RegisterNetMethod(document, "visibilitychange", async () => {
         const visibilityState = function () {
-            if (document.visibilityState == "prerender")
+            if (document.visibilityState === "prerender")
                 return;
             const visibilityState = document.visibilityState;
             switch (visibilityState) {
@@ -50,8 +107,8 @@ function RegisterVisibilityChange(netObjectInstance, netMethodName, signalName) 
     }, signalName);
 }
 
-//获取复制文本
-async function ReadCopyText() {
+//获取剪切板文本
+async function ReadClipboardText() {
     try {
         const text = await navigator.clipboard.readText();
         return {
@@ -67,8 +124,43 @@ async function ReadCopyText() {
     }
 }
 
-//写入复制文本
-async function WriteCopyText(text) {
+//获取剪切板对象
+async function ReadClipboardObject(withObjectURL) {
+    try {
+        const clipboardItems = await navigator.clipboard.read();
+        const array = [];
+        for (const clipboardItem of clipboardItems) {
+            const types = clipboardItem.types;
+            const type = types.length === 0 ?
+                null :
+                types.find(type => !type.startsWith('application') && !type.startsWith('text')) ?? types[0];
+            if (!type)
+                return null;
+            const clipboardItemObject = await clipboardItem.getType(type);
+            const isText = types.includes('text/plain');
+            const text = isText ? await clipboardItemObject.text() : null;
+            const arrayBuffer = isText ? null : await clipboardItemObject.arrayBuffer();
+            const data = new Uint8Array(arrayBuffer);
+            const objectURL = !isText && withObjectURL ?
+                URL.createObjectURL(clipboardItemObject) : null;
+            const arrayItem = {
+                type: type,
+                size: clipboardItemObject.size,
+                data: data,
+                text: text,
+                objectURL: objectURL
+            };
+            array.push(arrayItem);
+        }
+        return array;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
+//写入剪切板文本
+async function WriteClipboardText(text) {
     try {
         await navigator.clipboard.writeText(text);
         return true;
@@ -79,7 +171,7 @@ async function WriteCopyText(text) {
 }
 
 //跳转到指定的元素
-function JumpTo(elementID, smooth, scrollingContextCSS) {
+function JumpTo(elementID, smooth, jumpToEnd, scrollingContextCSS) {
     const behavior = smooth ? "smooth" : "instant";
     if (scrollingContextCSS) {
         document.querySelector(scrollingContextCSS)?.scrollIntoView(
@@ -91,15 +183,15 @@ function JumpTo(elementID, smooth, scrollingContextCSS) {
     document.getElementById(elementID)?.scrollIntoView(
         {
             behavior: behavior,
-            block: "end"
+            block: jumpToEnd ? "end" : "start"
         });
 }
 
 //动态加载css文件
 function LoadCSS(uri) {
     const head = document.head;
-    for (let i in head.childNodes) {
-        if (i.href == uri)
+    for (const i of head.childNodes) {
+        if (i.href === uri)
             return;
     }
     const link = document.createElement("link");
@@ -109,7 +201,7 @@ function LoadCSS(uri) {
     head.insertBefore(link, head.firstChild);
 }
 
-//下载文件
+//下载文件，可指定文件名
 function Download(uri, fileName) {
     const downloadDom = document.createElement('a');
     downloadDom.href = uri;
@@ -160,10 +252,10 @@ async function ReleaseWakeLock(key) {
 
 const volumeKey = "TotalPlayVolume";
 
-//初始化播放器音量
-function InitializationPlayVolume() {
+//从缓存中提取播放器音量
+function GetPlayVolume() {
     const volume = localStorage.getItem(volumeKey);
-    return parseFloat(volume ?? 0.5);
+    return parseFloat(volume);
 }
 
 //记录播放器音量
@@ -184,7 +276,7 @@ function GetPlayer(playerID) {
 //获取播放器的状态
 function GetPlayerState(playerID) {
     const player = GetPlayer(playerID);
-    return player == null ? null : {
+    return player === null ? null : {
         PlayerID: playerID,
         Length: player.duration,
         InPlay: !player.paused,
@@ -195,7 +287,7 @@ function GetPlayerState(playerID) {
             Played: player.currentTime,
             Volume: player.volume,
             AutoPlay: player.autoplay,
-            MediumSource: player.childNodes.length == 0 ?
+            MediumSource: player.childNodes.length === 0 ?
                 [player.src] :
                 Array.prototype.map.call(player.childNodes, source => source.src)
         }
@@ -205,7 +297,7 @@ function GetPlayerState(playerID) {
 //切换播放器的播放/暂停状态，然后返回播放器的状态
 async function SwitchPlayerStatus(playerID) {
     const player = GetPlayer(playerID);
-    if (player == null)
+    if (player === null)
         return null;
     if (player.paused) {
         try {
@@ -223,7 +315,7 @@ async function SwitchPlayerStatus(playerID) {
 //写入播放器的状态，并返回是否成功写入
 async function SetPlayerState(playerID, stateOperational) {
     const player = GetPlayer(playerID);
-    if (player == null)
+    if (player === null)
         return false;
     player.autoplay = stateOperational.autoPlay;
     const source = Array.prototype.map.call(player.childNodes, source => source.src);
@@ -232,8 +324,8 @@ async function SetPlayerState(playerID, stateOperational) {
         while (player.firstChild) {
             player.removeChild(player.firstChild);
         }
-        for (let i of mediumSource) {
-            let newSource = document.createElement("source");
+        for (const i of mediumSource) {
+            const newSource = document.createElement("source");
             newSource.src = i;
             player.appendChild(newSource);
         }
@@ -270,13 +362,18 @@ function UpdatePlayerTime(player, currentTimeElementID, totalTimeElementID) {
 //获取播放器的播放进度，并返回一个double
 function GetPlayerProgress(player) {
     const duration = player.duration;
-    return duration == 0 || Number.isNaN(duration) ?
+    return duration === 0 || Number.isNaN(duration) ?
         0 : player.currentTime / duration;
 }
 
 //判断具有某一ID的元素是否被用户看到
 function CheckIntersecting(id) {
     const element = document.getElementById(id);
+    return CheckIntersectingElement(element);
+}
+
+//判断某一元素是否被用户看到
+function CheckIntersectingElement(element) {
     if (!element)
         return false;
     const elementRect = element.getBoundingClientRect();
@@ -288,17 +385,29 @@ function CheckIntersecting(id) {
 
 //滚动至某一元素的末尾
 function ScrollIntoViewToEnd(id) {
-    document.getElementById(id)?.scrollIntoView({
-        behavior: "auto",
-        block: "start"
-    });
+    function ScrollIntoView() {
+        document.getElementById(id)?.scrollIntoView({
+            behavior: "auto",
+            block: "start"
+        });
+    }
+    const element = document.getElementById(id);
+    if (!element)
+        return;
+    ScrollIntoView();
+    const parentElement = element.parentElement;
+    if (!parentElement)
+        return;
+    const observer = new ResizeObserver(ScrollIntoView);
+    observer.observe(parentElement);
+    setTimeout(() => observer.disconnect(), 2000);
 }
 
 //观察虚拟化容器
 function ObservingVirtualizationContainers(netObjectInstance, netMethodName, endID) {
     const observer = CacheObservation(endID,
         () => new IntersectionObserver(async (entries, observer) => {
-            for (let i of entries) {
+            for (const i of entries) {
                 if (i.isIntersecting) {
                     try {
                         await InvokeNetInstanceMethod(netObjectInstance, netMethodName);
@@ -325,45 +434,115 @@ function CacheObservation(key, createObserve) {
     return observe;
 }
 
-//注册观察媒体事件，它检测媒体的可见性，并自动播放暂停媒体
-function ObserveVisiblePlay(id) {
-    const element = document.querySelectorAll(`#${id} :is(video,audio)`);
-    const observe = CacheObservation(id,
-        () => new IntersectionObserver(array => {
-            for (let i of array) {
-                const medium = i.target;
+//注册观察媒体事件，它为媒体元素附加某些功能
+function ObserveVisibleMediaElement(id, options) {
+    const container = document.getElementById(id);
+    if (!container)
+        return;
+
+    //判断是否为媒体元素的方法
+    function IsMediaElement(element) {
+        return element.tagName === "VIDEO" || element.tagName === "AUDIO";
+    }
+
+    const visiblePlay = options.visiblePlay;
+    const onlyVolume = options.onlyVolume;
+    const onlyVolumeAttribute = "onlyvolume";
+    const onlyVisibleVolumeAttribute = "onlyvisiblevolume";
+
+
+    //设置唯一音量的方法
+    function OnlyVolume() {
+        if (!onlyVolume)
+            return;
+        const elements = Array.from(container.querySelectorAll("video,audio"));
+        let canPlaySound = true;
+        for (const element of elements) {
+            if (element.hasAttribute(onlyVolumeAttribute) && canPlaySound &&
+                (element.tagName === "AUDIO" || !element.hasAttribute(onlyVisibleVolumeAttribute) || CheckIntersectingElement(element))) {
+                element.muted = false;
+                canPlaySound = false;
+            }
+            else {
+                element.muted = true;
+            }
+        }
+    }
+
+    const intersectionObserver = new IntersectionObserver(async array => {
+        OnlyVolume();
+        for (const i of array) {
+            const medium = i.target;
+            if (visiblePlay) {
                 if (i.isIntersecting) {
-                    medium.play();
+                    try {
+                        await medium.play();
+                    } catch (e) {
+                    }
                 }
                 else {
                     medium.pause();
                 }
             }
-        }));
-    for (let i of element) {
-        observe.observe(i);
-    }
-    function Callback(mutationList, observer) {
-        for (let i of mutationList) {
-            if (i.type != "childList")
+        }
+    });
+
+    //用于注册功能的方法
+    function RegistrationFunction(elements) {
+        OnlyVolume();
+        for (const element of elements) {
+            if (!IsMediaElement(element))
                 continue;
-            for (let add of i.addedNodes) {
-                if (add.tagName == "VIDEO" || add.tagName == "AUDIO") {
-                    observe.observe(add);
+            intersectionObserver.observe(element);
+            if (options.globalVolume) {
+                //用来保存音量的方法
+                function SaveVolume() {
+                    RecordPlayVolume(element.volume)
                 }
-            }
-            for (let removed of i.removedNodes) {
-                if (removed.tagName == "VIDEO" || removed.tagName == "AUDIO") {
-                    observe.unobserve(removed);
+                //用来调整音量的方法
+                function ChangeVolume() {
+                    const volume = GetPlayVolume();
+                    if (!isNaN(volume))
+                        element.volume = volume;
                 }
+                element.addEventListener("click", () => {
+                    element.addEventListener("volumechange", SaveVolume)
+                    element.addEventListener("timeupdate", ChangeVolume);
+                });
+                element.addEventListener("focusout", () => {
+                    element.removeEventListener("volumechange", SaveVolume);
+                    element.removeEventListener("timeupdate", ChangeVolume)
+                });
             }
         }
     }
-    const observerDOM = CacheObservation(id + 'ObserveDOM', () => new MutationObserver(Callback));
-    observerDOM.observe(document.getElementById(id),
+
+    const elements = container.querySelectorAll("video,audio");
+    RegistrationFunction(elements);
+
+    function Callback(mutationList, observer) {
+        let canOnlyVolume = true;
+        for (const i of mutationList) {
+            switch (i.type) {
+                case "childList":
+                    RegistrationFunction(i.addedNodes);
+                    break;
+                case "attributes":
+                    if (canOnlyVolume) {
+                        canOnlyVolume = false;
+                        OnlyVolume();
+                    }
+                    break;
+            }
+        }
+    }
+
+    const mutationObserver = new MutationObserver(Callback);
+    mutationObserver.observe(container,
         {
             subtree: true,
-            childList: true
+            childList: true,
+            attributeFilter: onlyVolume ? [onlyVolumeAttribute, onlyVisibleVolumeAttribute] : undefined
         });
 }
 
@@ -392,9 +571,18 @@ function CreateSVGUri(svgID) {
 
 //批量释放对象Url
 function DisposableObjectURL(objectURLs) {
-    for (let url of objectURLs) {
+    for (const url of objectURLs) {
         URL.revokeObjectURL(url)
     }
+}
+
+//将普通Uri转换为BlobUri
+async function ToBlobUri(uri) {
+    const response = await fetch(uri);
+    if (!response.ok)
+        return null;
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
 }
 
 //返回待上传文件的的ObjectURL

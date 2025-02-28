@@ -20,6 +20,20 @@ public sealed partial class BootstrapFormViewerProperty<Model> : ComponentBase
     [EditorRequired]
     public RenderFormViewerPropertyInfo<Model> RenderPropertyInfo { get; set; }
     #endregion
+    #region 级联参数：用来进行递归渲染的委托
+    /// <summary>
+    /// 获取用来递归渲染属性的委托
+    /// </summary>
+    [CascadingParameter]
+    private RenderFragment<RenderFormViewerPropertyInfoRecursion>? RenderRecursion { get; set; }
+    #endregion
+    #region 级联参数：上传文件选项
+    /// <summary>
+    /// 这个级联参数是用来上传文件的选项
+    /// </summary>
+    [CascadingParameter]
+    private UploadFileOptions UploadFileOptions { get; set; }
+    #endregion
     #endregion
     #region 内部成员
     #region 当上传时触发的事件
@@ -31,15 +45,9 @@ public sealed partial class BootstrapFormViewerProperty<Model> : ComponentBase
     /// <returns></returns>
     private Task OnUpload(UploadTaskInfo info, IReadOnlyList<IHasReadOnlyPreviewFile> files)
     {
-        var filterFiles = files.WhereEnable().ToArray();
-        var previewFilePropertyInfo = RenderPropertyInfo.HasPreviewFilePropertyInfo;
-        if (previewFilePropertyInfo is not IHasPreviewFilePropertyDirectInfo { IsStrict: true } previewFilePropertyDirectInfo)
-            return Task.CompletedTask;
-        var property = RenderPropertyInfo.Property;
-        object? value = previewFilePropertyDirectInfo.Multiple ?
-            property.PropertyType.CreateCollection(filterFiles) :
-            filterFiles.SingleOrDefault();
-        property.SetValue(RenderPropertyInfo.FormModel, value);
+        var target = RenderPropertyInfo.FormModel!;
+        var hasPreviewFilePropertyDirectInfo = RenderPropertyInfo.HasPreviewFilePropertyInfo.To<IHasPreviewFilePropertyDirectInfo>()!;
+        hasPreviewFilePropertyDirectInfo.SetPreviewFile(target, files);
         return Task.CompletedTask;
     }
     #endregion

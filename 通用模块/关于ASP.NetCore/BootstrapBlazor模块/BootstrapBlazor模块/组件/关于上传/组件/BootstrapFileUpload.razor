@@ -1,5 +1,7 @@
 ﻿@namespace BootstrapBlazor.Components
 @inherits ComponentBase
+@inject IJSWindow JSWindow
+@inject MessageService MessageService
 
 @{
     var renderInfo = GetRenderInfo();
@@ -7,34 +9,37 @@
 @if (RenderComponent is null)
 {
     var files = renderInfo.Files;
-    <FileUpload OnUpload="renderInfo.OnUpload" UploadFileOptions="renderInfo.UploadFileOptions">
+    <FileUpload OnUpload="renderInfo.OnUpload">
         <RenderComponent Context="renderFileUpload">
             @{
                 var uploadTaskInfo = renderFileUpload.UploadTaskInfo;
                 var hugeFileCount = uploadTaskInfo.HugeFiles.Count;
             }
             <div class="commonContainers">
-                <label>
-                    <InputFile OnChange="renderFileUpload.OnChange" id="@renderFileUpload.ID" @key=@renderFileUpload.ID
-                               accept="@renderInfo.Accept" multiple="@renderInfo.Multiple" />
-                    <span class="uploadButtonContainer">
-                        <Button Text="@renderInfo.UploadButtonText" />
-                        @if (renderInfo.InUpload)
-                        {
-                            <Spinner Color="Color.Primary" />
-                        }
-                    </span>
-                </label>
+                <div class="compactCentered">
+                    <label>
+                        <InputFile OnChange="renderFileUpload.OnChange" id="@renderFileUpload.ID" @key=@renderFileUpload.ID
+                                   accept="@renderInfo.Accept" multiple="@renderInfo.Multiple" />
+                        <span class="uploadButtonContainer">
+                            <Button Text="@renderInfo.UploadButtonText" />
+                            @if (renderInfo.InUpload)
+                            {
+                                <Spinner Color="Color.Primary" />
+                            }
+                        </span>
+                    </label>
+                    <Button Text="粘贴图片" OnClick="@renderInfo.OnUploadFromClipboard" />
+                </div>
                 <div>
-                    <span>提示：点击即可删除文件，上传文件的最大大小为@(uploadTaskInfo.UploadFileOptions.MaxAllowedSizeFormat)</span>
+                    <div>提示：点击即可删除文件，上传文件的最大大小为@(uploadTaskInfo.UploadFileOptions.MaxAllowedSizeFormat)</div>
                     @if (hugeFileCount > 0)
                     {
-                        <span>，有@(hugeFileCount)个文件因为大小超过限制，未能上传</span>
+                        <div class="emphasizeText">有@(hugeFileCount)个文件因为大小超过限制，未能上传</div>
                     }
                 </div>
                 @if (files.Count > 0)
                 {
-                    <BootstrapFileViewer Files="files" FillRemainingSpace="false">
+                    <BootstrapFileViewer Files="files">
                         <RenderFile Context="renderSingleFile">
                             <BootstrapSingleFile RenderFileInfo="renderSingleFile" @onclick=renderSingleFile.CancelFile />
                         </RenderFile>

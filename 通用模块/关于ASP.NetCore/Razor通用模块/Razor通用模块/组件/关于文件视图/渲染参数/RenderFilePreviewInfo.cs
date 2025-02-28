@@ -10,7 +10,7 @@ public sealed record RenderFilePreviewInfo
     /// 假设从本文件开始预览文件，
     /// 则依次返回应该预览的文件列表
     /// </summary>
-    public required IEnumerable<IHasReadOnlyPreviewFile> PreviewFile { get; init; }
+    public required IReadOnlyCollection<IHasReadOnlyPreviewFile> PreviewFile { get; init; }
     #endregion
     #region 用于关闭预览的委托
     /// <summary>

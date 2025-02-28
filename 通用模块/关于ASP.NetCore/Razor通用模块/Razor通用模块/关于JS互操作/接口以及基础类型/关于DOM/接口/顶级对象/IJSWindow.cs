@@ -82,9 +82,9 @@ public interface IJSWindow : IJSRuntime
     /// <param name="text">用来提示用户输入文字的字符串</param>
     /// <param name="value">文本输入框中的默认值</param>
     /// <param name="cancellation">用来取消异步任务的令牌</param>
-    /// <returns>用户输入的字符串，如果尚未输入，
-    /// 则为<see langword="null"/></returns>
-    ValueTask<string?> Prompt(string? text = null, string? value = "", CancellationToken cancellation = default);
+    /// <returns>一个元组，它的第一个项是用户是否点击了确定按钮，
+    /// 第二个项是输入的内容，如果直接点确定，没有输入，则为<see langword="null"/></returns>
+    ValueTask<(bool IsConfirm, string? Input)> Prompt(string? text = null, string? value = "", CancellationToken cancellation = default);
     #endregion
     #endregion
     #region 关于打开与关闭窗口
@@ -140,17 +140,18 @@ public interface IJSWindow : IJSRuntime
     /// 一定要在手势事件中调用本方法，
     /// 否则可能会被直接拒绝
     /// </summary>
+    /// <param name="cancellationToken">一个用来取消异步操作的令牌</param>
     /// <returns></returns>
-    Task<bool> RequestNotifications();
+    Task<bool> RequestNotifications(CancellationToken cancellationToken = default);
     #endregion
     #region 返回通知对象
     /// <summary>
     /// 返回一个可用于执行浏览器通知的对象，
     /// 如果不支持此功能，返回<see langword="null"/>
     /// </summary>
-    /// <param name="requestNotifications">如果这个值为<see langword="true"/>，
-    /// 则会自动请求通知权限</param>
-    Task<INotifications?> Notifications(bool requestNotifications);
+    /// <param name="cancellationToken">一个用来取消异步操作的令牌</param>
+    /// <returns></returns>
+    Task<INotifications<WebNotificationsOptions>?> Notifications(CancellationToken cancellationToken = default);
     #endregion
     #endregion
 }

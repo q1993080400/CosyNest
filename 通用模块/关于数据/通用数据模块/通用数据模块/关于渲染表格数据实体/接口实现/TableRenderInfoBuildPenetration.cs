@@ -23,7 +23,7 @@ sealed class TableRenderInfoBuildPenetration<OuterModel, TrueModel>
     #region 获取表身渲染参数
     public IReadOnlyCollection<RenderBodyColumnsInfoBase<OuterModel>> GetRenderBodyColumnsInfo
         (OuterModel model, int rowIndex)
-        => build.GetRenderBodyColumnsInfo(penetration(model), rowIndex).
+        => [.. build.GetRenderBodyColumnsInfo(penetration(model), rowIndex).
         Select(x => x switch
         {
             RenderTableBodyColumnsInfo<TrueModel> info =>
@@ -44,7 +44,7 @@ sealed class TableRenderInfoBuildPenetration<OuterModel, TrueModel>
                 IsLong = info.IsLong,
             },
             var info => throw new NotSupportedException($"无法识别{info.GetType()}类型的渲染参数")
-        }).ToArray();
+        })];
     #endregion
     #endregion
 }

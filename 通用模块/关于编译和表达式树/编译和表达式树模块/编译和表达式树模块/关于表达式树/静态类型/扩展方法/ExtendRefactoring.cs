@@ -24,7 +24,7 @@ public static partial class ExtendExpressions
             NotExpression => expression switch
             {
                 MethodCallExpression e => Call(e.Object.Refactoring(c), e.Method, e.Arguments.Select(x => x.Refactoring(c))),
-                LambdaExpression e => Lambda(e.Type, e.Body.Refactoring(c), e.Parameters.Select(x => (ParameterExpression)x.Refactoring(c)).ToArray()),
+                LambdaExpression e => Lambda(e.Type, e.Body.Refactoring(c), [.. e.Parameters.Select(x => (ParameterExpression)x.Refactoring(c)!)]),
                 UnaryExpression e => MakeUnary(e.NodeType, e.Operand.Refactoring(c), e.Type, e.Method),
                 BinaryExpression e => MakeBinary(e.NodeType, e.Left.Refactoring(c), e.Right.Refactoring(c), e.IsLiftedToNull, e.Method),
                 var e => e

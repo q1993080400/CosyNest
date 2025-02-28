@@ -80,7 +80,7 @@ public sealed partial class Selector<Candidate> : ComponentBase
     /// </summary>
     private void InitializedSelectElement()
     {
-        SelectElement = Candidates.Where(InitializationSelect).ToImmutableHashSet();
+        SelectElement = [.. Candidates.Where(InitializationSelect)];
     }
     #endregion
     #region 获取渲染参数

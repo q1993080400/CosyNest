@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace System.DataFrancis;
+﻿namespace System.DataFrancis;
 
 /// <summary>
 /// 这个记录表示验证数据的结果
@@ -15,12 +13,10 @@ public sealed record VerificationResults
     #endregion
     #region 验证失败的原因
     /// <summary>
-    /// 这个集合的元素是一个元组，
-    /// 它的第一个项是验证失败的属性，
-    /// 第二个项是验证失败的原因，
+    /// 枚举验证失败的原因，
     /// 如果为空集合，表示验证成功
     /// </summary>
-    public required IReadOnlyList<(PropertyInfo Property, string Prompt)> FailureReason { get; init; }
+    public required IReadOnlyCollection<FailureReason> FailureReason { get; init; }
     #endregion
     #region 验证失败的消息
     /// <summary>

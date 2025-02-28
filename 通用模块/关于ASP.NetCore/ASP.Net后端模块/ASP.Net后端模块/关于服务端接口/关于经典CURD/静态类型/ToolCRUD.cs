@@ -9,6 +9,23 @@ namespace Microsoft.AspNetCore;
 /// </summary>
 public static class ToolCRUD
 {
+    #region 直接返回所有对象
+    /// <summary>
+    /// 直接返回数据库中的所有对象，
+    /// 务必谨慎使用这个接口
+    /// </summary>
+    /// <typeparam name="DBEntity">数据库实体类的类型</typeparam>
+    /// <typeparam name="Info">API实体的类型</typeparam>
+    /// <param name="serviceProvider">一个用来请求服务的对象</param>
+    /// <returns></returns>
+    public static async Task<Info[]> GetAll<DBEntity, Info>(IServiceProvider serviceProvider)
+        where DBEntity : class, IProjection<Info>
+        where Info : class
+    {
+        await using var pipe = serviceProvider.RequiredDataPipe();
+        return [.. pipe.Query<DBEntity>().ToArray().Projection()];
+    }
+    #endregion
     #region 返回添加或更新时，被改变的实体
     /// <summary>
     /// 执行典型的添加或更新操作，
@@ -98,7 +115,7 @@ public static class ToolCRUD
     #region 执行删除操作
     /// <summary>
     /// 执行典型的删除操作，
-    /// 如果实体类实现了<see cref="IClean{Entity}"/>，
+    /// 如果实体类实现了<see cref="IHasDeleteSideEffect{Entity}"/>，
     /// 还会清理它
     /// </summary>
     /// <typeparam name="DBEntity">数据库实体类的类型</typeparam>

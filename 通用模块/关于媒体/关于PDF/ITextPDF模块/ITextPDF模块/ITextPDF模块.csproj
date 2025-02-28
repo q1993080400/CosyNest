@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="itext" Version="9.0.0" PrivateAssets="compile" />
+		<PackageReference Include="itext" Version="9.1.0" PrivateAssets="compile" />
 	</ItemGroup>
 
 	<ItemGroup>

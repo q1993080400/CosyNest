@@ -16,7 +16,7 @@ static class MicrosoftOfficeRealize
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     public static string GetPrinterName(string filePath)
-        => new FileNameInfo(filePath).Extended switch
+        => FileNameInfo.FromPath(filePath).Extended switch
         {
             "pdf" => "Microsoft Print to PDF",
             "xps" or "oxps" => "Microsoft XPS Document Writer",

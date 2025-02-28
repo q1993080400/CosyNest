@@ -16,13 +16,29 @@ public interface IHasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyInfo
     /// </summary>
     bool Multiple { get; }
     #endregion
-    #region 获取直接封装的可预览文件
+    #region 是否直接映射
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示它直接映射到<see cref="IHasReadOnlyPreviewFile"/>或它的集合，
+    /// 否则表示它是通过<see cref="MapToPreviewFileAttribute"/>特性间接映射的
+    /// </summary>
+    bool IsDirect { get; }
+    #endregion
+    #region 读取直接封装的可预览文件
     /// <summary>
     /// 获取这个属性所直接封装的可预览文件
     /// </summary>
     /// <param name="obj">属性依附的对象实例，
     /// 如果它为<see langword="null"/>，则返回一个空集合</param>
     /// <returns></returns>
-    IReadOnlyCollection<IHasReadOnlyPreviewFile> AllPreviewFileDirect(object? obj);
+    IReadOnlyCollection<IHasReadOnlyPreviewFile> GetPreviewFile(object? obj);
+    #endregion
+    #region 写入直接封装的可预览文件
+    /// <summary>
+    /// 写入这个属性所直接封装的可预览文件
+    /// </summary>
+    /// <param name="obj">属性依附的对象实例</param>
+    /// <param name="files">待写入的可预览文件</param>
+    void SetPreviewFile(object obj, IEnumerable<IHasReadOnlyPreviewFile> files);
     #endregion
 }

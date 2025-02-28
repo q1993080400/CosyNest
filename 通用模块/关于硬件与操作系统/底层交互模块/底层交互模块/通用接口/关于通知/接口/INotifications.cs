@@ -4,23 +4,16 @@
 /// 凡是实现这个接口的类型，
 /// 都可以用来发送通知
 /// </summary>
-public interface INotifications
+/// <typeparam name="Parameter">用来发送通知的参数的类型</typeparam>
+public interface INotifications<in Parameter>
 {
     #region 发送通知
     /// <summary>
     /// 发送一条通知
     /// </summary>
-    /// <param name="options">这个对象描述通知的内容以及配置</param>
+    /// <param name="parameter">用来发送通知的参数</param>
+    /// <param name="cancellationToken">一个用来取消异步操作的对象</param>
     /// <returns></returns>
-    Task Send(INotificationsOptions options);
-    #endregion
-    #region 关闭通知
-    /// <summary>
-    /// 关闭指定或全部通知
-    /// </summary>
-    /// <param name="tags">枚举要关闭的通知ID，
-    /// 如果为<see langword="null"/>，则关闭所有通知</param>
-    /// <returns></returns>
-    Task Close(IEnumerable<string>? tags = null);
+    Task Send(Parameter parameter, CancellationToken cancellationToken = default);
     #endregion
 }

@@ -25,6 +25,6 @@ public sealed record RenderVirtualizationElementInfo<Element>
     /// 可以让其他上下文能够找到这个元素，注意：
     /// 它不是实体的ID
     /// </summary>
-    public required string? ComponentID { get; init; }
+    public required string ComponentID { get; init; }
     #endregion
 }

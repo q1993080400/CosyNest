@@ -1,5 +1,4 @@
-﻿using System.IOFrancis.FileSystem;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace System.DataFrancis;
 
@@ -9,36 +8,20 @@ namespace System.DataFrancis;
 /// </summary>
 record HasUploadFileServer : HasUploadFile, IHasUploadFileServer
 {
-    #region 保存状态
+    #region 文件实际存储位置
     [JsonIgnore]
-    public UploadFileSaveState SaveState { get; set; }
+    public IFilePosition? SavePosition { get; private set; }
     #endregion
-    #region 存储层文件名称
-    private string? FileNameStorageField;
-
-    public override string FileNameStorage
-        => FileNameStorageField ??
-        base.FileNameStorage;
-    #endregion
-    #region 更新上传文件名
-    public void UpdateUploadFileName(string? fileName = null, string? extendName = null)
-    {
-        if (SaveState is not UploadFileSaveState.NotSave)
-            throw new NotSupportedException($"{nameof(SaveState)}的状态不是{nameof(UploadFileSaveState.NotSave)}，不能调用这个方法");
-        var extended = Path.GetExtension(FileName);
-        FileNameStorageField = FileNameInfo.Create(fileName, extendName ?? extended).FullName;
-        SaveState = UploadFileSaveState.HasUploadFileName;
-    }
+    #region 建议用来保存的名称
+    [JsonIgnore]
+    public string? SuggestionSaveName { get; set; }
     #endregion
     #region 指示保存已经完毕
-    public void SaveCompleted(string coverUri, string uri)
+    public void SaveCompleted(string coverUri, string uri, IFilePosition savePosition)
     {
-        if (SaveState is UploadFileSaveState.NotSave)
-            throw new NotSupportedException($"{nameof(SaveState)}的状态是{nameof(UploadFileSaveState.NotSave)}，不能调用这个方法" +
-                $"请先调用{nameof(UpdateUploadFileName)}");
         CoverUri = coverUri;
         Uri = uri;
-        SaveState = UploadFileSaveState.SaveCompleted;
+        SavePosition = savePosition;
     }
     #endregion
 }

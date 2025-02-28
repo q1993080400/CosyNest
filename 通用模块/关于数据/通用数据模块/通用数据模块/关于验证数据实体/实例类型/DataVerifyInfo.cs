@@ -32,7 +32,7 @@ public sealed record DataVerifyInfo
     /// </summary>
     private static ICache<Type, IEnumerable<PropertyInfo>> GetVerifyPropertysCache { get; }
     = CreatePerformance.MemoryCache<Type, IEnumerable<PropertyInfo>>(
-        type => type.GetPropertyInfoAlmighty(true).Where(x => x.IsDefined<RenderDataAttribute>()).ToArray());
+        type => [.. type.GetPropertyInfoAlmighty(true).Where(x => x.IsDefined<RenderDataAttribute>())]);
     #endregion
     #endregion
 }

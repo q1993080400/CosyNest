@@ -33,7 +33,7 @@ sealed class BindMultipleQueryCondition<Property> :
                 Fun(filterTargetMultiple.PropertyAccessStart.Name,Range.Start,true),
                 Fun(filterTargetMultiple.PropertyAccessEnd.Name,Range.End,false)
             ];
-        return array.WhereNotNull().ToArray();
+        return [.. array.WhereNotNull()];
     }
     #endregion
     #region 构造函数

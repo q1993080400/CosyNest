@@ -37,7 +37,7 @@ public static partial class ExtendReflection
     /// <param name="method">要获取参数类型的方法或构造函数</param>
     /// <returns></returns>
     public static Type[] GetParameterTypes(this MethodBase method)
-        => method.GetParameters().Select(static p => p.ParameterType).ToArray();
+        => [.. method.GetParameters().Select(static p => p.ParameterType)];
     #endregion
     #region 判断方法是否与指定的签名兼容
     #region 仅指定方法参数

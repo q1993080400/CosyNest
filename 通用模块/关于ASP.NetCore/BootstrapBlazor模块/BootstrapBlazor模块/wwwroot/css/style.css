@@ -15,7 +15,7 @@
     /*表示媒体的元素样式样式*/
     .bootstrapMediaElement
     {
-        --mediaContainerHeight: 16em;
+        --mediaContainerHeight: 28em;
     }
 }
 
@@ -35,7 +35,7 @@
     /*表示媒体的元素样式样式*/
     .bootstrapMediaElement
     {
-        --mediaContainerHeight: 14em;
+        --mediaContainerHeight: 24em;
     }
 }
 
@@ -50,7 +50,7 @@
     /*表示媒体的元素样式样式*/
     .bootstrapMediaElement
     {
-        --mediaContainerHeight: 12em;
+        --mediaContainerHeight: 22em;
     }
 }
 
@@ -65,7 +65,7 @@
     /*表示媒体的元素样式样式*/
     .bootstrapMediaElement
     {
-        --mediaContainerHeight: 10em;
+        --mediaContainerHeight: 18em;
     }
 }
 
@@ -129,6 +129,9 @@ label button
 /*属性渲染容器元素样式*/
 .bootstrapFormViewerPropertyItem
 {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gapMedium);
 }
 
 /*属性渲染容器属性标签样式*/
@@ -208,13 +211,18 @@ dialog .card-footer
     z-index: 1000;
 }
 
-/*文件视图渲染单个图片样式*/
-.bootstrapSingleFileImage
+/*文件渲染图片共享样式*/
+.bootstrapSingleFileImage, .bootstrapFileViewerPreviewItemImage
 {
     object-position: center;
     object-fit: cover;
     width: 100%;
-    height: var(--mediaContainerHeight);
+}
+
+/*文件视图渲染单个图片样式*/
+.bootstrapSingleFileImage
+{
+    max-height: var(--mediaContainerHeight);
 }
 
 /*文件视图预览容器样式*/
@@ -231,8 +239,6 @@ dialog .card-footer
 /*文件视图预览项下面的图片样式*/
 .bootstrapFileViewerPreviewItemImage
 {
-    object-fit: cover;
-    width: 100%;
 }
 
 /*避免模态框被遮盖，这是因为Bootstrap的模态框实现有问题*/

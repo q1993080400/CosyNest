@@ -13,7 +13,7 @@ public interface IClipboard
     /// <param name="text">要写入的文本</param>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
-    Task<bool> Write(string? text, CancellationToken cancellationToken = default);
+    Task<bool> WriteText(string? text, CancellationToken cancellationToken = default);
     #endregion
     #region 读取剪切板文本
     /// <summary>
@@ -22,6 +22,6 @@ public interface IClipboard
     /// </summary>
     /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
     /// <returns></returns>
-    Task<(bool IsSuccess, string? Text)> Read(CancellationToken cancellationToken = default);
+    Task<(bool IsSuccess, string? Text)> ReadText(CancellationToken cancellationToken = default);
     #endregion
 }

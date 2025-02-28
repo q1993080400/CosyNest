@@ -4,5 +4,15 @@
 
 @if (FormModel is { })
 {
-    @RenderComponent(GetRenderInfo())
+    var renderInfo = GetRenderInfo();
+    @if (RenderRecursion is { } renderRecursion)
+    {
+        <CascadingValue Value="renderRecursion">
+            @RenderComponent(renderInfo)
+        </CascadingValue>
+    }
+    else
+    {
+        @RenderComponent(renderInfo)
+    }
 }

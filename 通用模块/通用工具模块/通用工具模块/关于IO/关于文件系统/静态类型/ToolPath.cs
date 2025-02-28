@@ -41,12 +41,16 @@ public static class ToolPath
         var father = Path.GetDirectoryName(path);
         var fatherRefactoring = refactoringDirectory is null ?
             father : refactoringDirectory(father);
-        var (simplee, extended, _) = new FileNameInfo(path);
+        var (simplee, extended, _) = FileNameInfo.FromPath(path);
         var simpleeRefactoring = refactoringSimplee is null ?
             simplee : refactoringSimplee(simplee);
         var extendedRefactoring = refactoringExtended is null ?
             extended : refactoringExtended(extended);
-        var fileFullName = new FileNameInfo(simpleeRefactoring, extendedRefactoring).FullName;
+        var fileFullName = new FileNameInfo()
+        {
+            Simple = simpleeRefactoring,
+            Extended = extendedRefactoring
+        }.FullName;
         return fatherRefactoring switch
         {
             null or "" => fileFullName,

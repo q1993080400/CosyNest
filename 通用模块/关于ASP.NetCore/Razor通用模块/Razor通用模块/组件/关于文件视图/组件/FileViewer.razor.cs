@@ -82,7 +82,7 @@ public sealed partial class FileViewer : ComponentBase
                 #endregion
                 RenderFilePreviewInfo = new()
                 {
-                    PreviewFile = PreviewFile(),
+                    PreviewFile = [.. PreviewFile()],
                     ClosePreview = new(this, ClosePreview)
                 };
             }

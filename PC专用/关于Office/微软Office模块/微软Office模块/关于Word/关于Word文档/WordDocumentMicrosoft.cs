@@ -51,7 +51,7 @@ sealed class WordDocumentMicrosoft : WordDocument, IOfficeUpdate
             }
         }
         #endregion
-        return FindRange().ToArray();
+        return [.. FindRange()];
     }
     #endregion
     #region 升级Office文件

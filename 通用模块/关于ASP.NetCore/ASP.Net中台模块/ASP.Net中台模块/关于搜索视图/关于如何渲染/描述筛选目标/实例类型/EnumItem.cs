@@ -13,11 +13,11 @@ public sealed record EnumItem
     /// <param name="type">要获取枚举描述和值的类型</param>
     /// <returns></returns>
     public static EnumItem[] Create(Type type)
-       => type.GetEnumDescription().Select(static x => new EnumItem()
+       => [.. type.GetEnumDescription().Select(static x => new EnumItem()
        {
            Describe = x.Describe,
            Value = x.Value.ToString()
-       }).ToArray();
+       })];
     #endregion
     #region 枚举的值
     /// <summary>

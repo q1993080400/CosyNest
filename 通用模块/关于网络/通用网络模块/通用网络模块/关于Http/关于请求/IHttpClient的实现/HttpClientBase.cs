@@ -37,8 +37,7 @@ abstract class HttpClientBase(HttpRequestTransform defaultTransform) : IHttpClie
             return response;
         }
         #endregion
-        var response = await Fun(request);
-        return response.EnsureSuccessStatusCode();
+        return await Fun(request);
     }
     #endregion
     #region 返回Stream

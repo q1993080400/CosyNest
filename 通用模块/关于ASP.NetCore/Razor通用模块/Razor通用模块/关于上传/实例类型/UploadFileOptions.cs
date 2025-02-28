@@ -32,4 +32,11 @@ public sealed record UploadFileOptions
         }
     }
     #endregion
+    #region 是否启用从剪切板上传功能
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则启用从剪切板上传的功能
+    /// </summary>
+    public bool EnableClipboardUpload { get; init; }
+    #endregion
 }

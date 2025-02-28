@@ -68,7 +68,7 @@ public abstract record DingDingOAComponentInfo
                     static DingDingOAFormComponentValue[] Fun(IDirect json)
                     {
                         var rowValue = json.GetValue<object[]>("rowValue")!.Cast<IDirect>().ToArray();
-                        return rowValue.Select(static x =>
+                        return [.. rowValue.Select(static x =>
                         {
                             var componentType = x.GetValue<string>("key")!.Split('-', '_')[0];
                             return new DingDingOAFormComponentValue()
@@ -78,7 +78,7 @@ public abstract record DingDingOAComponentInfo
                                 ExtValue = x.GetValue<string>("extendValue", false),
                                 ComponentType = componentType.To<DingDingOAComponentType>()
                             };
-                        }).ToArray();
+                        })];
                     }
                     #endregion
                     var table = JsonSerializer.Deserialize<IDirect[]>(valueJson, options)!;

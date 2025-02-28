@@ -35,7 +35,7 @@ public static class ToolBit
             }
         }
         #endregion
-        return Fun().Reverse().ToArray();
+        return [.. Fun().Reverse()];
     }
     #endregion
     #region 从其他进制转换为十进制

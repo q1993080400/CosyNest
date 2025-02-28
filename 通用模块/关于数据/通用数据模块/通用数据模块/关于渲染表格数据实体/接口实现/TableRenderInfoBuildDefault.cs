@@ -24,7 +24,7 @@ sealed class TableRenderInfoBuildDefault<Model> : ITableRenderInfoBuild<Model>
     #endregion
     #region 获取表身渲染参数
     public IReadOnlyCollection<RenderBodyColumnsInfoBase<Model>> GetRenderBodyColumnsInfo(Model model, int rowIndex)
-        => CacheRenderInfo.Select(x => x.Attribute.GetRenderBodyColumnsInfo(x.MemberInfo, model, rowIndex)).ToArray();
+        => [.. CacheRenderInfo.Select(x => x.Attribute.GetRenderBodyColumnsInfo(x.MemberInfo, model, rowIndex))];
     #endregion
     #endregion
     #region 内部成员
@@ -50,8 +50,7 @@ sealed class TableRenderInfoBuildDefault<Model> : ITableRenderInfoBuild<Model>
             Select(static x =>  (x,x.GetCustomAttribute<RenderTableBaseAttribute>()!)).
             Where(static x => x.Item2 is { }).ToArray().
             OrderBy(static x => x.Item2.Order)];
-        RenderHeaderColumnsInfoCache = CacheRenderInfo.
-            Select(static x => x.Attribute.GetTableHeaderColumnsInfo(x.MemberInfo)).ToArray();
+        RenderHeaderColumnsInfoCache = [.. CacheRenderInfo.Select(static x => x.Attribute.GetTableHeaderColumnsInfo(x.MemberInfo))];
     }
     #endregion
 }

@@ -1,19 +1,45 @@
 ﻿@namespace BootstrapBlazor.Components
 @inherits ComponentBase
+@inject IJSWindow JSWindow
 
 <BootstrapPopUp Cancellation="RenderFilePreviewInfo.ClosePreview">
     <RenderBody>
-        <div class="bootstrapFileViewerPreviewContainer">
-            <Carousel PlayMode="CarouselPlayMode.Manually" ShowIndicators="false">
-                @foreach (var file in RenderFilePreviewInfo.PreviewFile)
+        <div class="bootstrapFileViewerPreviewContainer" id="@ID">
+            @{
+                var previewFiles = RenderFilePreviewInfo.PreviewFile;
+            }
+            <Carousel PlayMode="CarouselPlayMode.Manually" ShowIndicators="false" ShowControls="@(previewFiles.Count>1)">
+                @foreach (var file in previewFiles)
                 {
-                    <CarouselItem @key=file.Uri>
+                    var uri = file.Uri;
+                    var fileName = file.FileName;
+                    <CarouselItem @key=uri>
                         <div class="bootstrapFileViewerPreviewItem">
-                            <img src="@file.Uri" alt="@file.FileName" class="bootstrapFileViewerPreviewItemImage" loading="lazy" />
+                            @switch (file.MediumFileType)
+                            {
+                                case MediumFileType.Image:
+                                    <img src="@uri" alt="@fileName" fileName="@fileName" class="bootstrapFileViewerPreviewItemImage bootstrapMediaElement" />
+                                    break;
+                                case MediumFileType.Video:
+                                    <TransferVideo Uri="@uri">
+                                        <RenderComponent Context="trueUri">
+                                            <video src="@trueUri" fileName="@fileName" onlyVolume onlyVisibleVolume playsinline loop controls class="bootstrapFileViewerPreviewItemImage bootstrapMediaElement" />
+                                        </RenderComponent>
+                                    </TransferVideo>
+                                    break;
+                                case var mediumFileType:
+                                    throw mediumFileType.Unrecognized();
+                            }
                         </div>
                     </CarouselItem>
                 }
             </Carousel>
         </div>
     </RenderBody>
+    <RenderFooter Context="cancellation">
+        <div class="compactCentered">
+            <Button Text="下载" OnClickWithoutRender="OnDownload" />
+            <Button Text="关闭" OnClick="@cancellation" />
+        </div>
+    </RenderFooter>
 </BootstrapPopUp>

@@ -46,7 +46,7 @@ public sealed partial class BootstrapPopUp : ComponentBase
     /// 获取弹窗dialog组件的CSS类名
     /// </summary>
     [Parameter]
-    public string? DialogCSS { get; set; }
+    public string? DialogCSS { get; set; } = "popUpWidth";
     #endregion
     #endregion
 }

@@ -20,5 +20,11 @@ public enum UploadFileState
     /// <summary>
     /// 表示上传发生错误
     /// </summary>
-    Error
+    Error,
+    /// <summary>
+    /// 表示上传已成功，
+    /// 但是这个文件后来被删除了，
+    /// 无法再次找回
+    /// </summary>
+    FileNotExist
 }

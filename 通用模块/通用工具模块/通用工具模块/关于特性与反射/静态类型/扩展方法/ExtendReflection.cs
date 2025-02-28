@@ -162,8 +162,7 @@ public static partial class ExtendReflection
     /// 则包括Init属性，否则排除Init属性</param>
     /// <returns></returns>
     public static PropertyInfo[] GetPropertyInfoAlmighty(this Type type, bool includeInit = false)
-        => type.GetPropertyInfoRecursion(BindingFlags.Public | BindingFlags.Instance).
-        Where(x => x.CanRead && x.CanWrite && (includeInit || !x.IsInitOnly()) && !x.IsIndexing()).ToArray();
+        => [.. type.GetPropertyInfoRecursion(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanRead && x.CanWrite && (includeInit || !x.IsInitOnly()) && !x.IsIndexing())];
     #endregion
     #endregion
     #region 关于成员

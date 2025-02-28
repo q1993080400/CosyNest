@@ -17,7 +17,7 @@ public static class ToolMediaType
     {
         var extended = pathOrExtended is null ?
             null :
-            new FileNameInfo(pathOrExtended).Extended ?? pathOrExtended.TrimStart('.');
+            FileNameInfo.FromPath(pathOrExtended).Extended ?? pathOrExtended.TrimStart('.');
         var mime = extended switch
         {
             "svg" => "image/svg+xml",
@@ -32,6 +32,7 @@ public static class ToolMediaType
             "webp" => "image/webp",
             "avi" => "video/x-msvideo",
             "mp4" => "video/mp4",
+            "mov" => "video/quicktime",
             "mpeg" => "video/mpeg",
             "ogv" => "video/ogg",
             "ts" => "video/mp2t",
@@ -47,6 +48,10 @@ public static class ToolMediaType
             "txt" => "text/plain",
             "pdf" => "application/pdf",
             "json" => "application/json",
+            "doc" => "application/msword",
+            "docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "xls" => "application/vnd.ms-excel",
+            "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             _ => "application/octet-stream"
         };
         var mediumFileType = mime.Split('/')[0] switch
@@ -65,5 +70,51 @@ public static class ToolMediaType
         };
         return (mediumFileType, mime, canPreview);
     }
+    #endregion
+    #region 根据媒体类型，返回建议的文件扩展名
+    /// <summary>
+    /// 根据媒体类型，返回建议的文件扩展名，
+    /// 如果无扩展名，或者不知道扩展名，
+    /// 则返回<see langword="null"/>
+    /// </summary>
+    /// <param name="mediumType">要检查的媒体类型</param>
+    /// <returns></returns>
+    public static string? Extensions(string mediumType)
+        => mediumType switch
+        {
+            "image/svg+xml" => "svg",
+            "image/tiff" => "tiff",
+            "image/apng" => "apng",
+            "image/avif" => "avif",
+            "image/bmp" => "bmp",
+            "image/gif" => "gif",
+            "image/vnd.microsoft.icon" => "ico",
+            "image/jpeg" => "jpg",
+            "image/png" => "png",
+            "image/webp" => "webp",
+            "video/x-msvideo" => "avi",
+            "video/mp4" => "mp4",
+            "video/quicktime" => "mov",
+            "video/mpeg" => "mpeg",
+            "video/ogg" => "ogg",
+            "video/mp2t" => "ts",
+            "video/webm" => "webm",
+            "audio/aac" => "aac",
+            "audio/midi" => "mid",
+            "audio/x-midi" => "midi",
+            "audio/mpeg" => "mp3",
+            "audio/ogg" => "oga",
+            "audio/opus" => "opus",
+            "audio/wav" => "wav",
+            "audio/webm" => "weba",
+            "text/plain" => "txt",
+            "application/pdf" => "pdf",
+            "application/json" => "json",
+            "application/msword" => "doc",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "docx",
+            "application/vnd.ms-excel" => "xls",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "xlsx",
+            _ => null
+        };
     #endregion
 }

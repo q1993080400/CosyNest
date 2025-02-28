@@ -3,12 +3,12 @@
 @typeparam Model
 
 <FormViewer GetRenderPropertyInfo=GetRenderPropertyInfo
-            InitializationModel="InitializationModel"
-            ExistingForms=ExistingForms IsReadOnlyProperty=IsReadOnlyProperty
-            Delete="Delete" Cancellation="Cancellation" RenderUploadMask="RenderUploadMask"
+            InitializationModel="InitializationModel" ForceReadOnly=ForceReadOnly
+            ExistingForm=ExistingForm IsReadOnlyProperty=IsReadOnlyProperty
+            Delete="Delete" Cancellation="Cancellation" RenderRecursion=RenderRecursion
             ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
             PropertyValueConvert="PropertyValueConvert" CreatePropertyChangeEvent="CreatePropertyChangeEvent"
-            Submit="Submit" RefreshTarget="RefreshTarget">
+            Submit="Submit" RefreshTarget="RefreshTarget" IsReference=IsReference>
     <RenderComponent>
         @if (RenderComponent is null)
         {
@@ -63,7 +63,7 @@
             @if (renderInfo.CanEdit)
             {
                 <div class="compactCentered">
-                    <Button Text="@(renderInfo.ExistingForms?"修改":"提交")" OnClick="renderInfo.Submit"></Button>
+                    <Button Text="@(renderInfo.IsExistingForm?"修改":"提交")" OnClick="renderInfo.Submit"></Button>
                     <Button Text="重置" OnClick="renderInfo.Resetting"></Button>
                     @if (renderInfo.Delete is { } deleteValue)
                     {
@@ -82,4 +82,14 @@
             @RenderSubmit(renderInfo)
         }
     </RenderSubmit>
+    <RenderUploadMask>
+        @if (RenderUploadMask is null)
+        {
+            <BootstrapUploadMask />
+        }
+        else
+        {
+            @RenderUploadMask
+        }
+    </RenderUploadMask>
 </FormViewer>

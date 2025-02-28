@@ -1,34 +1,34 @@
 ﻿
 //在BlazorWebApp中，如果丢失连接，则自动刷新页面
 
-let connection = false;
+let lostConnection = false;
+
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && lostConnection) {
+        RreloadCompetition();
+    }
+});
+
+document.querySelector("body").addEventListener("click", () => {
+    if (lostConnection) {
+        RreloadCompetition();
+    }
+});
 
 Blazor.start({
     circuit: {
         reconnectionHandler: {
-            onConnectionDown: () => {
-                connection = true;
-                const controller = new AbortController();
-                document.addEventListener("visibilitychange", () => {
-                    if (!connection) {
-                        controller.abort();
-                        return;
-                    }
-                    if (!document.hidden) {
-                        controller.abort();
-                        location.reload();
-                    }
-                }, {
-                    signal: controller.signal
-                });
-                document.querySelector("body").addEventListener("click", () => {
-                    if (connection)
-                        location.reload();
-                }, {
-                    once: true
-                });
+            onConnectionDown: async () => {
+                try {
+                    lostConnection = !await Blazor.reconnect();
+                } catch (e) {
+                    lostConnection = true;
+                }
+                if (lostConnection) {
+                    RreloadCompetition();
+                }
             },
-            onConnectionUp: () => connection = false
+            onConnectionUp: () => lostConnection = false
         }
     }
 });

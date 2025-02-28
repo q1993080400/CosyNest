@@ -43,18 +43,20 @@ public static partial class ExtendTool
     #endregion
     #region 正式方法
     /// <summary>
-    /// 通过反射浅拷贝对象，并返回它的副本
+    /// 通过反射浅拷贝对象，并返回它的副本，
+    /// 如果它实现了<see cref="ICloneable{Obj}"/>，会执行深拷贝
     /// </summary>
     /// <typeparam name="Ret">拷贝的返回值类型</typeparam>
     /// <param name="obj">被拷贝的对象</param>
     /// <returns></returns>
     [return: NotNullIfNotNull(nameof(obj))]
     public static Ret? MemberwiseClone<Ret>(this Ret? obj)
-    {
-        if (obj is null)
-            return default;
-        return MemberwiseCloneCache.Invoke<Ret>(obj)!;
-    }
+        => obj switch
+        {
+            null => default,
+            ICloneable<Ret> cloneable => cloneable.Cloneable(),
+            _ => MemberwiseCloneCache.Invoke<Ret>(obj)!
+        };
     #endregion
     #endregion
     #region 关于格式化

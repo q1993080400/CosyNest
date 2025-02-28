@@ -74,7 +74,9 @@ public static partial class CreateNet
                             (true, { }) => delegateParameterMethodReturnParameter == typeof(Task<>).MakeGenericType(genericArguments[^1])
                         };
                     });
-                    var makeMethod = invokeMethod.MakeGenericMethod(genericParameters);
+                    var makeMethod = genericParameters.Length is 0 ?
+                        invokeMethod :
+                        invokeMethod.MakeGenericMethod(genericParameters);
                     var delegateType = makeMethod.GetParameterTypes()[^1];
                     return (makeMethod, delegateType);
                 }
@@ -86,7 +88,7 @@ public static partial class CreateNet
             }
         }
         #endregion
-        return Register().ToArray();
+        return [.. Register()];
     }
     #endregion
     #region 返回用来注册客户端的高阶函数

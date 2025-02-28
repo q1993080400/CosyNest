@@ -27,6 +27,14 @@ public sealed record UploadTaskInfo
     public bool HasHugeFile
         => HugeFiles.Count > 0;
     #endregion
+    #region 是否选择了文件
+    /// <summary>
+    /// 获取是否选择了任何文件，
+    /// 包括选择了大小超出限制的文件
+    /// </summary>
+    public bool HasFile
+        => UploadFiles.Count > 0 || HasHugeFile;
+    #endregion
     #region 上传文件的选项
     /// <summary>
     /// 获取上传文件的选项

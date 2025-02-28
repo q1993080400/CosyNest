@@ -7,12 +7,6 @@
 public sealed record RenderFormViewerPropertyInfo<Model> : RenderFormViewerPropertyInfoBase<Model>, ITitleData
     where Model : class
 {
-    #region 渲染偏好
-    /// <summary>
-    /// 获取进行渲染时的偏好
-    /// </summary>
-    public required RenderPreference RenderPreference { get; init; }
-    #endregion
     #region 属性名称
     public required string Name { get; init; }
     #endregion
@@ -22,10 +16,47 @@ public sealed record RenderFormViewerPropertyInfo<Model> : RenderFormViewerPrope
     /// 在某些情况下，它是建议的属性名称
     /// </summary>
     public string NameWithPoint
-        => Name.EndsWith(':') ? Name : Name + ":";
+        => (Name.IsVoid() || Name.EndsWith(':')) ? Name : Name + ":";
+    #endregion
+    #region 是否显示名称
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示应该显示名称
+    /// </summary>
+    public bool ShowName
+        => !Name.IsVoid();
     #endregion
     #region 获取属性的值的类型
     public Type ValueType
          => Property.PropertyType;
+    #endregion
+    #region 是否递归渲染
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则指示这个属性的类型是一个复杂的对象，
+    /// 应该进行递归渲染，它把这个属性视为一个新的表单
+    /// </summary>
+    public required bool IsRecursion { get; init; }
+    #endregion
+    #region 说明
+    /// <summary>
+    /// 获取对这个字段的说明，
+    /// 它被放在这个字段的下方
+    /// </summary>
+    public required string? Describe { get; init; }
+    #endregion
+    #region 转换为渲染递归属性的参数
+    /// <summary>
+    /// 将本记录转换为渲染递归属性的参数，
+    /// 如果不是递归渲染，则为<see langword="null"/>
+    /// </summary>
+    /// <returns></returns>
+    public RenderFormViewerPropertyInfoRecursion? ToRecursion()
+        => IsRecursion ? new()
+        {
+            IsReadOnly = IsReadOnly,
+            Value = Value,
+            PropertyType = Property.PropertyType
+        } : null;
     #endregion
 }

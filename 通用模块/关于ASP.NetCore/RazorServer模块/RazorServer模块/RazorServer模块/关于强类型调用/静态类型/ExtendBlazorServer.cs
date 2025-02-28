@@ -37,9 +37,9 @@ public static partial class ExtendBlazorServer
     /// <inheritdoc cref="AddStrongTypeInvokeFactoryServer(IServiceCollection, IEnumerable{Assembly}, IEnumerable{Assembly})"/>
     private static IServiceCollection AddAllInlineInvokeServiceFactory(this IServiceCollection services, IEnumerable<Assembly> interfaceAssembly, IEnumerable<Assembly> realizeAssembly)
     {
-        var interfaceTypes = interfaceAssembly.Select(x => x.GetExportedTypes()).SelectMany().
+        var interfaceTypes = interfaceAssembly.SelectMany(x => x.ExportedTypes).
             Where(x => x is { IsInterface: true } && x.IsDefined<ServerAPIAttribute>()).ToArray();
-        var realizeTypes = realizeAssembly.Select(x => x.GetExportedTypes()).SelectMany().
+        var realizeTypes = realizeAssembly.SelectMany(x => x.ExportedTypes).
             Where(x => x is { IsAbstract: false } && typeof(ControllerBase).IsAssignableFrom(x)).ToArray();
         var method = typeof(ExtendBlazorServer).GetMethod(nameof(AddSingleInlineInvokeServiceFactory),
             BindingFlags.Static | BindingFlags.NonPublic, [typeof(IServiceCollection)]).ThrowIfNull();

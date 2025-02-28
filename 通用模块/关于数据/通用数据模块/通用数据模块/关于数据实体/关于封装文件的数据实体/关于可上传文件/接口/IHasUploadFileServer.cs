@@ -1,4 +1,6 @@
-﻿namespace System.DataFrancis;
+﻿using System.IOFrancis.FileSystem;
+
+namespace System.DataFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -7,22 +9,42 @@
 /// </summary>
 public interface IHasUploadFileServer : IHasUploadFile
 {
-    #region 保存状态
+    #region 保存是否成功
     /// <summary>
-    /// 指示这个文件被保存到服务器中的状态
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示保存已经完成
     /// </summary>
-    UploadFileSaveState SaveState { get; }
+    bool SaveComplete
+        => SavePosition is { };
     #endregion
-    #region 更新上传文件名
+    #region 建议用来保存的名称
     /// <summary>
-    /// 更新用于上传的文件名，在执行这个方法以后，
-    /// 就可以开始保存文件
+    /// 获取用来进行保存的建议名称，
+    /// 它不包括扩展名
     /// </summary>
-    /// <param name="fileName">用于上传的文件名，
-    /// 如果为<see langword="null"/>，则随机生成一个不重复的文件名</param>
-    /// <param name="extendName">用于上传的扩展名，不要带上点号，
-    /// 如果为<see langword="null"/>，则与<see cref="IHasReadOnlyPreviewFile.FileName"/>的扩展名相同</param>
-    void UpdateUploadFileName(string? fileName = null, string? extendName = null);
+    string? SuggestionSaveName { get; set; }
+    #endregion
+    #region 建议用来保存的文件信息
+    /// <summary>
+    /// 获取建议用来保存的文件信息，
+    /// 如果尚未设置建议用来保存的名称，
+    /// 则为<see langword="null"/>
+    /// </summary>
+    FileNameInfo? SuggestionSaveFilePathInfo
+        => SuggestionSaveName is null ?
+        null :
+        FilePathInfo with
+        {
+            Simple = SuggestionSaveName
+        };
+    #endregion
+    #region 文件实际存储位置
+    /// <summary>
+    /// 在保存后，返回这个文件的存储位置，
+    /// 如果尚未保存完成，则返回<see langword="null"/>
+    /// </summary>
+    /// <returns></returns>
+    IFilePosition? SavePosition { get; }
     #endregion
     #region 指示保存已经完毕
     /// <summary>
@@ -30,6 +52,7 @@ public interface IHasUploadFileServer : IHasUploadFile
     /// </summary>
     /// <param name="coverUri">保存后的封面Uri</param>
     /// <param name="uri">保存后的本体Uri</param>
-    void SaveCompleted(string coverUri, string uri);
+    /// <param name="savePosition">指示保存完成后文件的存储位置</param>
+    void SaveCompleted(string coverUri, string uri, IFilePosition savePosition);
     #endregion
 }

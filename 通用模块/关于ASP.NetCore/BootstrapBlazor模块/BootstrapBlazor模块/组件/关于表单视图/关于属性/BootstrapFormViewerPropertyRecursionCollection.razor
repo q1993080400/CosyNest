@@ -1,0 +1,40 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+@typeparam ElementType
+
+@{
+    var canUpdateCollection = !IsReadOnly && CanUpdateCollection();
+}
+<div class="commonContainers">
+    <div class="commonContainers">
+        @{
+            var collection = RenderCollection is IEnumerable<IHasSort> ?
+            RenderCollection.OrderBy(x => x.To<IHasSort>().Sort).ToArray() :
+            RenderCollection;
+        }
+        @foreach (var (_, item, isLast) in collection.PackIndex())
+        {
+            <div class="commonContainers" @key=item>
+                <BootstrapFormViewer InitializationModel="item" IsReference=true
+                                     ForceReadOnly=IsReadOnly RenderRecursion="RenderRecursion">
+                    <RenderSubmit>
+
+                    </RenderSubmit>
+                </BootstrapFormViewer>
+                @if (canUpdateCollection)
+                {
+                    <div class="compactCentered">
+                        <Button Text="删除本项" OnClick="@(()=>OnDelete(item))" />
+                    </div>
+                }
+            </div>
+            <Divider />
+        }
+    </div>
+    @if (canUpdateCollection)
+    {
+        <div class="compactCentered">
+            <Button Text="添加新项" OnClick="OnAdd" />
+        </div>
+    }
+</div>

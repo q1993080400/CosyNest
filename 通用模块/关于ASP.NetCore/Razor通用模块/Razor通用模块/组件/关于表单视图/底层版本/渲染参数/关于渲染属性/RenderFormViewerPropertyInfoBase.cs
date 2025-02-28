@@ -22,21 +22,12 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// </summary>
     public required PropertyInfo Property { get; init; }
     #endregion
-    #region 对封装可预览文件的描述
+    #region 是否为集合
     /// <summary>
-    /// 获取对这个属性封装可预览文件的性质的描述，
-    /// 如果它没有封装可预览文件，
-    /// 则返回<see langword="null"/>
+    /// 获取这个属性是否为集合类型
     /// </summary>
-    public required IHasPreviewFilePropertyInfo? HasPreviewFilePropertyInfo { get; init; }
-    #endregion
-    #region 是否正在上传
-    /// <summary>
-    /// 指示这个属性是否是一个可上传文件的属性，
-    /// 且正在执行上传操作，你可以给予用户一些提示，
-    /// 告诉它们正在上传
-    /// </summary>
-    public required bool InUpload { get; init; }
+    public bool IsCollection
+        => Property.PropertyType.IsCollection();
     #endregion
     #region 分组的名字
     /// <summary>
@@ -88,6 +79,7 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     public required Func<object?, Task>? OnPropertyChange { get; init; }
     #endregion
     #region 创建属性绑定对象
+    #region 直接绑定
     /// <summary>
     /// 创建一个属性绑定对象，
     /// 它允许绑定表单属性
@@ -98,6 +90,20 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
         => IsReadOnly ?
         new BindPropertyInfoStatic<Value>((Value)this.Value!) :
         new BindPropertyInfo<Value>(FormModel, Property);
+    #endregion 
+    #region 通过桥接绑定
+    /// <summary>
+    /// 创建一个属性绑定对象，
+    /// 它允许通过桥接的方式绑定表单属性，
+    /// 能够进行复杂的类型转换
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="BindPropertyInfoAdapter{Adapter, Bottom}"/>
+    /// <inheritdoc cref="BindPropertyInfoAdapter{Adapter, Bottom}.BindPropertyInfoAdapter(object, PropertyInfo, Func{Bottom?, Adapter?}, Func{Adapter?, Bottom?})"/>
+    public IBindProperty<Adapter> BindValueAdapter<Adapter, Bottom>
+        (Func<Bottom?, Adapter?> convert, Func<Adapter?, Bottom?> convertReverse)
+        => new BindPropertyInfoAdapter<Adapter, Bottom>(FormModel, Property, convert, convertReverse);
+    #endregion
     #endregion
     #region 是否只读
     /// <summary>
@@ -105,5 +111,38 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// 表示仅提供数据显示功能，不提供数据编辑功能
     /// </summary>
     public required bool IsReadOnly { get; init; }
+    #endregion
+    #region 渲染偏好
+    /// <summary>
+    /// 获取进行渲染时的偏好，
+    /// 如果未指定任何偏好，则为<see langword="null"/>
+    /// </summary>
+    public required RenderPreference? RenderPreference { get; init; }
+    #endregion
+    #region 关于可预览文件
+    #region 对封装可预览文件的描述
+    /// <summary>
+    /// 获取对这个属性封装可预览文件的性质的描述，
+    /// 如果它没有封装可预览文件，
+    /// 则返回<see langword="null"/>
+    /// </summary>
+    public required IHasPreviewFilePropertyInfo? HasPreviewFilePropertyInfo { get; init; }
+    #endregion
+    #region 是否正在上传
+    /// <summary>
+    /// 指示这个属性是否是一个可上传文件的属性，
+    /// 且正在执行上传操作，你可以给予用户一些提示，
+    /// 告诉它们正在上传
+    /// </summary>
+    public required bool InUpload { get; init; }
+    #endregion
+    #region 是否含有可预览文件
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示它直接或间接含有可预览文件
+    /// </summary>
+    public bool HasPreviewFile
+        => HasPreviewFilePropertyInfo is { };
+    #endregion
     #endregion
 }

@@ -15,13 +15,6 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
     [EditorRequired]
     public Func<UploadTaskInfo, Task> OnUpload { get; set; }
     #endregion
-    #region 用来进行上传的参数
-    /// <summary>
-    /// 获取用来进行上传的参数
-    /// </summary>
-    [Parameter]
-    public UploadFileOptions UploadFileOptions { get; set; }
-    #endregion
     #region 用来渲染整个组件的委托
     /// <summary>
     /// 获取用来渲染整个组件的委托
@@ -39,6 +32,13 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
     /// </summary>
     [CascadingParameter]
     private IFileUploadNavigationContext? FileUploadNavigationContext { get; set; }
+    #endregion
+    #region 级联参数：用来进行上传的参数
+    /// <summary>
+    /// 获取用来进行上传的参数
+    /// </summary>
+    [CascadingParameter]
+    private UploadFileOptions UploadFileOptions { get; set; } = new();
     #endregion
     #endregion
     #region 公开成员
@@ -124,6 +124,17 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
         return (upload, hugeFiles);
     }
     #endregion
+    #region 重写OnInitialized方法
+    protected override void OnInitialized()
+    {
+        UploadTaskInfo = new()
+        {
+            UploadFiles = [],
+            HugeFiles = [],
+            UploadFileOptions = UploadFileOptions
+        };
+    }
+    #endregion
     #region 返回渲染参数
     /// <summary>
     /// 返回本组件的渲染参数
@@ -137,17 +148,5 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
             ID = ID
         };
     #endregion
-    #endregion
-    #region 构造函数
-    public FileUpload()
-    {
-        UploadFileOptions = new();
-        UploadTaskInfo = new()
-        {
-            UploadFiles = [],
-            HugeFiles = [],
-            UploadFileOptions = UploadFileOptions
-        };
-    }
     #endregion
 }

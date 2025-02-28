@@ -1,4 +1,6 @@
-﻿namespace System.DataFrancis;
+﻿using System.IOFrancis.FileSystem;
+
+namespace System.DataFrancis;
 
 public static partial class CreateDataObj
 {
@@ -105,6 +107,39 @@ public static partial class CreateDataObj
             FileName = uploadFile.FileName,
             ID = id,
             UploadFile = uploadFile
+        };
+    #endregion
+    #region 创建文件物理位置
+    /// <summary>
+    /// 创建一个文件物理位置，
+    /// 它指示某文件实际存储的地方
+    /// </summary>
+    /// <param name="coverPath">文件的封面路径</param>
+    /// <param name="path">文件的本体路径</param>
+    /// <returns></returns>
+    public static IFilePosition FilePosition(FilePathInfo? coverPath, FilePathInfo path)
+        => new FilePosition()
+        {
+            CoverPath = coverPath,
+            Path = path
+        };
+    #endregion
+    #region 创建具有ID的文件物理位置
+    /// <summary>
+    /// 创建一个文件物理位置，
+    /// 它指示某文件实际存储的地方，
+    /// 并且它还具有一个ID，
+    /// 可以和其他存储文件位置的对象关联起来
+    /// </summary>
+    /// <param name="id">文件的ID，它通常被映射到数据库等对象的ID</param>
+    /// <returns></returns>
+    /// <inheritdoc cref="FilePosition(FilePathInfo?, FilePathInfo)"/>
+    public static IFileObjectPosition FileObjectPosition(FilePathInfo? coverPath, FilePathInfo path, Guid id)
+        => new FileObjectPosition()
+        {
+            CoverPath = coverPath,
+            ID = id,
+            Path = path
         };
     #endregion
 }

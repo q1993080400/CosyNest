@@ -150,7 +150,7 @@ public sealed partial class SearchPanel : ComponentBase
                 Submit = SubmitFunction,
                 GoToTop = JumpToTop
             }),
-            RenderCondition = CacheRenderCondition.Select(x =>
+            RenderCondition = [.. CacheRenderCondition.Select(x =>
             {
                 var renderProperty = new RenderSearchPanelPropertyInfo()
                 {
@@ -160,7 +160,7 @@ public sealed partial class SearchPanel : ComponentBase
                     Clear = Clear
                 };
                 return RenderProperty(renderProperty);
-            }).ToArray()
+            })]
         };
     }
     #endregion

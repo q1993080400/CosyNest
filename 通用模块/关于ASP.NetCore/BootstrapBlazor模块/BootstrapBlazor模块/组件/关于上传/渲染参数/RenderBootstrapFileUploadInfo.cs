@@ -16,6 +16,12 @@ public sealed record RenderBootstrapFileUploadInfo
     /// </summary>
     public required Func<UploadTaskInfo, Task> OnUpload { get; init; }
     #endregion
+    #region 通过剪切板进行上传的委托
+    /// <summary>
+    /// 通过剪切板进行上传的委托
+    /// </summary>
+    public required Func<Task> OnUploadFromClipboard { get; init; }
+    #endregion
     #region 用来进行上传的参数
     /// <summary>
     /// 获取用来进行上传的参数

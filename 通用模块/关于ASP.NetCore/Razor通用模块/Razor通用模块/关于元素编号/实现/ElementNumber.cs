@@ -15,10 +15,10 @@ sealed class ElementNumber(IJSRuntime js, string prefix, string? scrollingContex
         => prefix + index;
     #endregion
     #region 跳转到指定元素
-    public async Task JumpToElement(int index, bool smooth = true)
+    public async Task JumpToElement(int index, bool smooth = true, bool jumpToEnd = true)
     {
         var id = GetElementID(index);
-        await js.InvokeVoidAsync("JumpTo", id, smooth, scrollingContextCSS);
+        await js.InvokeVoidAsync("JumpTo", id, smooth, jumpToEnd, scrollingContextCSS);
     }
     #endregion 
 }

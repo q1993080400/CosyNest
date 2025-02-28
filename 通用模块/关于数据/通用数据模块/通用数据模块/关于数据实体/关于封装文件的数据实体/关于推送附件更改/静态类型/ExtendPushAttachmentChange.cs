@@ -1,5 +1,4 @@
 ﻿using System.DataFrancis;
-using System.Design;
 
 namespace System;
 
@@ -8,7 +7,7 @@ public static partial class ExtendData
     //这个部分类被用来声明有关推送附件更改有关的API
 
     #region 获取对附件的更改
-    #region 传入IHasPreviewFile
+    #region 传入IHasPreviewFile的集合
     /// <summary>
     /// 获取对附件所做的更改
     /// </summary>
@@ -17,21 +16,38 @@ public static partial class ExtendData
     /// <param name="replaceFiles">要替换的新附件，在它当中存在，
     /// 但是在<paramref name="oldFiles"/>中不存在的附件会被判定为应该保存</param>
     /// <returns></returns>
-    public static PushAttachmentChangeInfo GetChangeInfo(this IEnumerable<IHasPreviewFile> oldFiles, IEnumerable<IHasPreviewFile> replaceFiles)
+    /// <inheritdoc cref="IPushAttachmentChange{Obj}"/>
+    public static PushAttachmentChangeInfo<Obj> GetChangeInfo<Obj>(this IEnumerable<Obj> oldFiles, IEnumerable<IHasPreviewFile?> replaceFiles)
+        where Obj : class, IWithID, IProjection<IFileObjectPosition>, ICreate<Obj>, IPushAttachmentChange<Obj>
     {
         replaceFiles.CheckCannotUpload();
-        var delete = oldFiles.ExceptBy(replaceFiles.Select(x => x.ID), x => x.ID).ToArray();
+        var replaceFilesIds = replaceFiles.WhereEnable().Select(x => x.ID).ToHashSet();
+        var (notChange, change) = oldFiles.Split(x => replaceFilesIds.Contains(x.ID));
+        var delete = change.Select(x => new AttachmentDeleteInfo<Obj>()
+        {
+            Depend = x,
+            FilePosition = x.Projection()
+        }).ToArray();
+        var oldFileDictionary = oldFiles.ToDictionary();
+        var add = replaceFiles.OfType<IHasUploadFileServer>().
+            Select(x => new AttachmentAddInfo<Obj>()
+            {
+                Depend = Obj.Create(),
+                UploadFile = x
+            }).ToArray();
         return new()
         {
             Delete = delete,
-            Add = replaceFiles.OfType<IHasUploadFileServer>().ToArray()
+            Add = add,
+            AfterChange = [.. notChange, .. add.Select(x => x.Depend)]
         };
     }
-    #endregion
-    #region 传入IProjection
-    /// <inheritdoc cref="GetChangeInfo(IEnumerable{IHasPreviewFile}, IEnumerable{IHasPreviewFile})"/>
-    public static PushAttachmentChangeInfo GetChangeInfo(this IEnumerable<IProjection<IHasPreviewFile>> oldFiles, IEnumerable<IHasPreviewFile> replaceFiles)
-        => oldFiles.Projection().ToArray().GetChangeInfo(replaceFiles);
+    #endregion 
+    #region 传入可转换为IHasPreviewFile的对象
+    /// <inheritdoc cref="GetChangeInfo{Obj}(IEnumerable{Obj}, IEnumerable{IHasPreviewFile?})"/>
+    public static PushAttachmentChangeInfo<Obj> GetChangeInfo<Obj>(this IEnumerable<Obj> oldFiles, IEnumerable<IProjection<IHasPreviewFile?>> replaceFiles)
+        where Obj : class, IWithID, IProjection<IFileObjectPosition>, ICreate<Obj>, IPushAttachmentChange<Obj>
+        => oldFiles.GetChangeInfo(replaceFiles.Projection().ToArray());
     #endregion
     #endregion
 }

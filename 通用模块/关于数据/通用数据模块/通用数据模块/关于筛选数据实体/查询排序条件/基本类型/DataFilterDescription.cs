@@ -30,8 +30,8 @@ public sealed record DataFilterDescription
     public DataFilterDescription Reconfiguration(Func<DataCondition, DataCondition> reconfigurationQuery)
         => this with
         {
-            QueryCondition = QueryCondition.Select(reconfigurationQuery).Cast<QueryCondition>().ToArray(),
-            SortCondition = SortCondition.Select(reconfigurationQuery).Cast<SortCondition>().ToArray()
+            QueryCondition = [.. QueryCondition.Select(reconfigurationQuery).Cast<QueryCondition>()],
+            SortCondition = [.. SortCondition.Select(reconfigurationQuery).Cast<SortCondition>()]
         };
     #endregion
     #region 高亮文本

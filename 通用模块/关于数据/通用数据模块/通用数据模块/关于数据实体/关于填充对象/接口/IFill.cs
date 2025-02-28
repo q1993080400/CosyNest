@@ -1,6 +1,4 @@
-﻿using System.Design;
-
-namespace System.DataFrancis;
+﻿namespace System.DataFrancis;
 
 /// <summary>
 /// 凡是实现这个接口的类型，
@@ -9,7 +7,7 @@ namespace System.DataFrancis;
 /// </summary>
 /// <typeparam name="Source">被填充对象的类型</typeparam>
 /// <typeparam name="Fill">要填充的对象类型</typeparam>
-public interface IFill<Source, in Fill> : ICreate<Source>
+public interface IFill<Source, in Fill> : IHasDeleteSideEffect<Source>
     where Source : class
 {
     #region 创建或填充

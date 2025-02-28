@@ -20,7 +20,11 @@ public interface IFile : IIO, IFileBase
     {
         if ((newSimple, newExtension) is (null, null))
             return (IFile)Copy(target, null, rename);
-        var fullName = new FileNameInfo(newSimple ?? NameSimple, newExtension ?? NameExtension).FullName;
+        var fullName = new FileNameInfo()
+        {
+            Simple = newSimple ?? NameSimple,
+            Extended = newExtension ?? NameExtension
+        }.FullName;
         return (IFile)Copy(target, fullName, rename);
     }
     #endregion

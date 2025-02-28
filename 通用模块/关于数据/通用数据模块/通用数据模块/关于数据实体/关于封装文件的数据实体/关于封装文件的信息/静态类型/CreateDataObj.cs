@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Performance;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace System.DataFrancis;
 
@@ -49,25 +50,99 @@ public static partial class CreateDataObj
             if (type.IsValueType || type.IsCommonType() || type.IsDelegate() || type.IsStatic())
                 return new HasPreviewFileTypeInfo()
                 {
+                    KnownDerivedTypes = ImmutableDictionary<Type, IHasPreviewFileTypeInfo>.Empty,
                     HasPreviewFilePropertyInfo = ImmutableDictionary<string, IHasPreviewFilePropertyInfo>.Empty,
-                    HasPreviewFileState = HasPreviewFileState.None,
+                    ElementPreviewFileTypeInfo = null,
                     IsStrict = false,
+                    HasPreviewFileState = HasPreviewFileState.None,
                     Type = type,
+                    IsDirect = false
                 };
+            var elementType = type.GetCollectionElementType();
+            var mapToPreviewFileType = elementType ?? type;
+            if (typeof(IHasReadOnlyPreviewFile).IsAssignableFrom(mapToPreviewFileType))
+                return new HasPreviewFileTypeInfo()
+                {
+                    ElementPreviewFileTypeInfo = null,
+                    HasPreviewFilePropertyInfo = ImmutableDictionary<string, IHasPreviewFilePropertyInfo>.Empty,
+                    KnownDerivedTypes = ImmutableDictionary<Type, IHasPreviewFileTypeInfo>.Empty,
+                    HasPreviewFileState = HasPreviewFileState.PreviewFile,
+                    IsDirect = true,
+                    IsStrict = typeof(IHasPreviewFile).IsAssignableFrom(mapToPreviewFileType),
+                    Type = type
+                };
+            var knownDerivedTypes = type.IsSealed ?
+                ImmutableDictionary<Type, IHasPreviewFileTypeInfo>.Empty :
+                type.GetCustomAttributes<JsonDerivedTypeAttribute>().ToImmutableDictionary(x => x.DerivedType, x => GetTypeInfo(x.DerivedType, filter));
+            var elementPreviewFileTypeInfo = elementType is null ? null : GetTypeInfo(elementType, filter);
+            var elementPreviewFileTypeInfoIsStrict = (elementPreviewFileTypeInfo?.IsStrict ?? false) || knownDerivedTypes.Values.Any(x => x.IsStrict);
+            if (mapToPreviewFileType.IsDefined<MapToPreviewFileAttribute>())
+            {
+                #region 获取映射可预览文件信息
+                IHasPreviewFileTypeInfo GetMapToPreviewFileInfo()
+                {
+                    var previewFileType = typeof(IHasPreviewFile);
+                    var createDefinitionType = typeof(ICreate<,>).MakeGenericType(mapToPreviewFileType, previewFileType);
+                    var projectionDefinitionType = typeof(IProjection<>).MakeGenericType(previewFileType);
+                    var hasCreateType = false;
+                    var hasProjectionType = false;
+                    var isStrict = false || elementPreviewFileTypeInfoIsStrict;
+                    foreach (var interfaceType in mapToPreviewFileType.GetInterfaces())
+                    {
+                        if (!interfaceType.IsGenericType)
+                            continue;
+                        if (createDefinitionType.IsAssignableFrom(interfaceType))
+                        {
+                            hasCreateType = true;
+                            continue;
+                        }
+                        if (projectionDefinitionType.IsAssignableFrom(interfaceType))
+                        {
+                            hasProjectionType = true;
+                            isStrict = typeof(IHasPreviewFile).IsAssignableFrom(interfaceType.GetGenericArguments()[0]);
+                        }
+                    }
+                    if (!(hasCreateType && hasProjectionType))
+                        throw new NotSupportedException($"{type}被{nameof(MapToPreviewFileAttribute)}特性修饰，但是它没有实现{nameof(ICreate<,>)}和{nameof(IProjection<>)}接口，或泛型参数不正确");
+                    return new HasPreviewFileTypeInfo()
+                    {
+                        HasPreviewFilePropertyInfo = ImmutableDictionary<string, IHasPreviewFilePropertyInfo>.Empty,
+                        Type = type,
+                        IsDirect = false,
+                        IsStrict = isStrict,
+                        HasPreviewFileState = HasPreviewFileState.PreviewFile,
+                        ElementPreviewFileTypeInfo = elementPreviewFileTypeInfo,
+                        KnownDerivedTypes = ImmutableDictionary<Type, IHasPreviewFileTypeInfo>.Empty
+                    };
+
+                }
+                #endregion
+                return GetMapToPreviewFileInfo();
+            }
             var propertyInfoAlmighty = type.GetPropertyInfoAlmighty(true);
             var propertyInfo = propertyInfoAlmighty.Select(x => GetPropertyInfo(x, filter)).
                 WhereNotNull().ToArray();
-            var states = propertyInfo.Select(x => x.HasPreviewFileState).ToHashSet();
-            var hasPreviewFileState = states.Contains(HasPreviewFileState.Direct) ?
-                HasPreviewFileState.Direct :
-                states.Contains(HasPreviewFileState.Recursion) ? HasPreviewFileState.Recursion : HasPreviewFileState.None;
-            var isStrict = propertyInfo.Any(x => x.IsStrict);
+            var hasPreviewFileState = propertyInfo.Select(x => x.HasPreviewFileState).ToHashSet();
+            var processPreviewFileState = hasPreviewFileState.Contains(HasPreviewFileState.PreviewFile) ?
+                 HasPreviewFileState.Direct :
+                 hasPreviewFileState.Any(x => x is HasPreviewFileState.Direct or HasPreviewFileState.Recursion or HasPreviewFileState.Collections) ?
+                 HasPreviewFileState.Recursion : HasPreviewFileState.None;
+            var finalasPreviewFileState = processPreviewFileState is not HasPreviewFileState.None ?
+                processPreviewFileState :
+                knownDerivedTypes.Values.Any(x => x.HasPreviewFileState is not HasPreviewFileState.None) ?
+                HasPreviewFileState.Offspring :
+                elementPreviewFileTypeInfo is { HasPreviewFileState: HasPreviewFileState.Direct or HasPreviewFileState.Recursion } ?
+                HasPreviewFileState.Collections : HasPreviewFileState.None;
+            var isStrict = elementPreviewFileTypeInfoIsStrict || propertyInfo.Any(x => x.IsStrict);
             return new HasPreviewFileTypeInfo()
             {
                 HasPreviewFilePropertyInfo = propertyInfo.ToImmutableDictionary(x => x.Property.Name),
-                HasPreviewFileState = hasPreviewFileState,
+                ElementPreviewFileTypeInfo = elementPreviewFileTypeInfo,
                 IsStrict = isStrict,
+                HasPreviewFileState = finalasPreviewFileState,
                 Type = type,
+                IsDirect = true,
+                KnownDerivedTypes = knownDerivedTypes
             };
         }
         #endregion
@@ -88,28 +163,26 @@ public static partial class CreateDataObj
     {
         var isInitOnly = property.IsInitOnly();
         var propertyType = property.PropertyType;
-        #region 用于判断类型的本地函数
-        bool Judge<T>()
-            where T : IHasReadOnlyPreviewFile
-            => typeof(T).IsAssignableFrom(propertyType) || typeof(IEnumerable<T>).IsAssignableFrom(propertyType);
-        #endregion
-        if (Judge<IHasReadOnlyPreviewFile>())
-            return new HasPreviewFilePropertyDirectInfo()
-            {
-                IsInitOnly = isInitOnly,
-                Property = property,
-                IsStrict = Judge<IHasPreviewFile>(),
-                Multiple = typeof(IEnumerable<IHasReadOnlyPreviewFile>).IsAssignableFrom(propertyType)
-            };
         var typeInfo = GetTypeInfo(propertyType, filter);
-        return typeInfo.HasPreviewFileState is HasPreviewFileState.None ?
-            null :
-            new HasPreviewFilePropertyRecursionInfo()
+        var hasPreviewFileState = typeInfo.HasPreviewFileState;
+        return hasPreviewFileState switch
+        {
+            HasPreviewFileState.PreviewFile or HasPreviewFileState.Direct or HasPreviewFileState.Collections => new HasPreviewFilePropertyDirectInfo()
+            {
+                IsInitOnly = isInitOnly,
+                IsStrict = typeInfo.IsStrict,
+                Multiple = typeInfo.Multiple,
+                Property = property,
+                HasPreviewFileState = hasPreviewFileState
+            },
+            HasPreviewFileState.Recursion => new HasPreviewFilePropertyRecursionInfo()
             {
                 IsInitOnly = isInitOnly,
                 Property = property,
-                PropertyTypeInfo = typeInfo,
-            };
+                PropertyTypeInfo = typeInfo
+            },
+            _ => null,
+        };
     }
     #endregion
     #endregion

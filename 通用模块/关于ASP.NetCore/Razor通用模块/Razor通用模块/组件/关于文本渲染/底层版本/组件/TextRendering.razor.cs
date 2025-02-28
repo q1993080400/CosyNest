@@ -169,7 +169,7 @@ public sealed partial class TextRendering : ComponentBase, IContentComponent<Ren
     private RenderTextRenderingInfo GetRenderInfo()
         => new()
         {
-            RenderText = Identify().ToArray()
+            RenderText = [.. Identify()]
         };
     #endregion
     #endregion

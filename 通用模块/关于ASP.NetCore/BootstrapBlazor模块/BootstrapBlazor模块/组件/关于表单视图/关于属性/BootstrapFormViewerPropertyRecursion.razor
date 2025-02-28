@@ -1,0 +1,30 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+@typeparam PropertyType
+@using System.Reflection
+
+@{
+    var value = RenderPropertyInfo.GetValue<PropertyType>()!;
+    var isReadOnly = RenderPropertyInfo.IsReadOnly;
+    var propertyType = RenderPropertyInfo.PropertyType;
+    var elementType = propertyType.GetCollectionElementType();
+}
+@if (elementType is { })
+{
+    var componentType = typeof(BootstrapFormViewerPropertyRecursionCollection<>).MakeGenericType(elementType);
+    var parameters = new Dictionary<string, object>()
+                {
+                    [nameof(BootstrapFormViewerPropertyRecursionCollection<>.IsReadOnly)] = isReadOnly,
+                    [nameof(BootstrapFormViewerPropertyRecursionCollection<>.RenderCollection)] = value,
+                };
+    <DynamicComponent Type="componentType" Parameters="parameters" />
+}
+else
+{
+    <BootstrapFormViewer InitializationModel="value" ForceReadOnly=isReadOnly
+                         IsReference=true RenderRecursion="RenderRecursion">
+        <RenderSubmit>
+
+        </RenderSubmit>
+    </BootstrapFormViewer>
+}

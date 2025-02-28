@@ -45,7 +45,8 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// 则不进行这个操作
     /// </summary>
     [Parameter]
-    public IElementNumber? ElementNumber { get; set; }
+    [EditorRequired]
+    public IElementNumber ElementNumber { get; set; }
     #endregion
     #region 每次渲染增加的数量
     /// <summary>
@@ -134,6 +135,21 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     /// </summary>
     private ImmutableList<Element> ElementList { get; set; } = [];
     #endregion
+    #region 是否需要跳跃到最后元素
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示需要跳跃到上一次渲染元素的末尾位置，
+    /// 它只在倒序渲染中需要
+    /// </summary>
+    private bool NeedJumpLastElement { get; set; }
+    #endregion
+    #region 上一次渲染的元素数量
+    /// <summary>
+    /// 获取上一次渲染的元素数量，
+    /// 它只在倒序渲染中需要
+    /// </summary>
+    private int LastElementListCount { get; set; }
+    #endregion
     #region 异步迭代器
     /// <summary>
     /// 获取用来枚举元素的异步迭代器
@@ -184,10 +200,16 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             var newElement = element.ToArray();
             if (newElement.Length is 0)
             {
+                LastElementListCount = 0;
+                NeedJumpLastElement = false;
                 await RenderElements.DisposeAsync();
                 return false;
             }
-            ElementList = ElementList.AddRange(newElement);
+            if (IsReverse)
+                LastElementListCount = ElementList.Count;
+            ElementList = IsReverse ?
+                ElementList.InsertRange(0, newElement) :
+                ElementList.AddRange(newElement);
             return true;
         }
         #endregion
@@ -220,8 +242,13 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             var needRedner = await NeedRender();
             if (!needRedner)
                 return;
-            if (IsReverse && await JSWindow.InvokeAsync<bool>("CheckIntersecting", PairingID))
-                AnchoringReverse = true;
+            if (IsReverse)
+            {
+                if (await JSWindow.InvokeAsync<bool>("CheckIntersecting", PairingID))
+                    AnchoringReverse = true;
+                else
+                    NeedJumpLastElement = true;
+            }
             StateHasChanged();
         });
     #endregion
@@ -250,6 +277,8 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
             ElementList = [];
             OldElements = Elements;
             AnchoringReverse = IsReverse;
+            LastElementListCount = 0;
+            NeedJumpLastElement = false;
             await TryAddElement();
         }
         finally
@@ -261,6 +290,8 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
     #region 重写OnAfterRenderAsync
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (IsDispose)
+            return;
         if (firstRender)
         {
             await JSWindow.InvokeVoidAsync("ObservingVirtualizationContainers", DotNetObject, nameof(AddElementAndRender), EndID);
@@ -269,18 +300,27 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
         #region 用来跳转到末尾的扩展方法
         async Task ScrollIntoViewToEnd()
         {
-            if (IsDispose || !AnchoringReverse || ElementList.Count is 0)
+            if (!IsReverse || ElementList.Count is 0)
                 return;
-            await JSWindow.InvokeVoidAsync("ScrollIntoViewToEnd", PairingID);
-            AnchoringReverse = false;
+            if (AnchoringReverse)
+            {
+                AnchoringReverse = false;
+                await JSWindow.InvokeVoidAsync("ScrollIntoViewToEnd", PairingID);
+                return;
+            }
+            if (NeedJumpLastElement)
+            {
+                var lastElementListCountCache = LastElementListCount;
+                LastElementListCount = 0;
+                NeedJumpLastElement = false;
+                await ElementNumber.JumpToElement(ElementList.Count - lastElementListCountCache, false, false);
+            }
         }
         #endregion
         await ScrollIntoViewToEnd();
-        await Task.Delay(1000);
-        if (IsDispose || IsComplete)
+        if (IsComplete)
             return;
-        var intersecting = await JSWindow.InvokeAsync<bool>("CheckIntersecting", EndID);
-        if (intersecting && await NeedRender())
+        if (await JSWindow.InvokeAsync<bool>("CheckIntersecting", EndID) && await NeedRender())
             StateHasChanged();
     }
     #endregion
@@ -318,13 +358,13 @@ public sealed partial class Virtualization<Element> : ComponentBase, IAsyncDispo
         : RenderEnd(renderEndInfo);
         #region 转换渲染参数的方法
         IReadOnlyCollection<RenderVirtualizationElementInfo<Element>> GenerateRenderElementInfo(IEnumerable<Element> elements)
-            => elements.Select
+            => [.. elements.Select
             ((element, index) => new RenderVirtualizationElementInfo<Element>()
             {
-                ComponentID = ElementNumber?.GetElementID(index),
+                ComponentID = ElementNumber.GetElementID(index),
                 Index = index,
                 RenderElement = element
-            }).ToArray();
+            })];
         #endregion
         return new()
         {

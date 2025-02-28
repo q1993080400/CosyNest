@@ -47,7 +47,7 @@ public sealed record RenderFormViewerMainInfo<Model>
                     }
                 }
             ];
-        var renderFragments = firstRenderNotGroup ? fragments : fragments.Reverse().ToArray();
+        var renderFragments = firstRenderNotGroup ? fragments : [.. fragments.Cast<RenderFragment>().Reverse()];
         return x =>
         {
             foreach (var fragment in renderFragments)
