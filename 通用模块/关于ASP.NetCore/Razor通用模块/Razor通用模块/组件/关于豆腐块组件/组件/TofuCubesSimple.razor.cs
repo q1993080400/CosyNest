@@ -13,11 +13,6 @@ public sealed partial class TofuCubesSimple : ComponentBase
     [Parameter]
     public string Text { get; set; }
     #endregion
-    #region 可显示的最大字数
-    /// <inheritdoc cref="TofuCubes.MaxTextLength"/>
-    [Parameter]
-    public int MaxTextLength { get; set; } = 6;
-    #endregion
     #region 渲染图标部分的委托
     /// <summary>
     /// 获取用来渲染图标部分的委托，

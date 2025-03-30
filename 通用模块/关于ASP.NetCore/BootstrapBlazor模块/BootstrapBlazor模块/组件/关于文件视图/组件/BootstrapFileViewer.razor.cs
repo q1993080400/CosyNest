@@ -12,12 +12,15 @@ public sealed partial class BootstrapFileViewer : ComponentBase
 {
     #region 组件参数
     #region 要预览的文件
-    /// <summary>
-    /// 获取要预览的所有文件
-    /// </summary>
+    /// <inheritdoc cref="FileViewer.Files"/>
     [Parameter]
     [EditorRequired]
     public IEnumerable<IHasReadOnlyPreviewFile> Files { get; set; }
+    #endregion
+    #region 点击文件所附加的事件
+    /// <inheritdoc cref="FileViewer.OnClickEventPreference"/>
+    [Parameter]
+    public RenderSingleFileEventPreference OnClickEventPreference { get; set; }
     #endregion
     #region 用来渲染整个组件的委托
     /// <summary>

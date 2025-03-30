@@ -245,6 +245,10 @@
     --topLayoutPaddingVertical: 5dvmin;
     /*强调的颜色*/
     --emphasizeColor: red;
+    /*遮罩的颜色*/
+    --backdropColor: rgb(0 0 0 / 45%);
+    /*默认的均分容器子元素宽度*/
+    --sharingContainerElementWidth: calc(6ic + 2ch);
     /*屏蔽深色模式，因为作者认为这个需要由开发者自己适配，否则会产生很多意想不到的结果*/
     color-scheme: only light;
 }
@@ -308,6 +312,14 @@ input[type=file]
         flex-grow: 99;
     }
 
+/*均分容器样式，它指定子元素的宽度，然后自动排列元素*/
+.sharingContainer
+{
+    display: grid;
+    grid-template: 1fr / repeat(auto-fill,minmax(var(--sharingContainerElementWidth),1fr));
+    gap: var(--gapMedium);
+}
+
 /*占满屏幕，并且在横屏时自动旋转*/
 .horizontalScreen
 {
@@ -361,18 +373,6 @@ input[type=file]
     z-index: 1;
 }
 
-/*粘性定位父容器样式*/
-:has(> .sticky)
-{
-    isolation: isolate;
-}
-
-    /*粘性定位父容器的每一个子元素样式，它保证粘性定位不会被遮盖*/
-    :has(> .sticky) > *
-    {
-        isolation: isolate;
-    }
-
 /*粘在顶部的粘性定位样式*/
 .stickyTop
 {
@@ -391,11 +391,13 @@ input[type=file]
     display: flex;
     flex-direction: column;
     row-gap: var(--paddingSmall);
+    width: var(--sharingContainerElementWidth);
 }
 
 /*豆腐块组件图标的CSS样式*/
 .tofuCubesIcon
 {
+    width: var(--sharingContainerElementWidth);
 }
 
 /*豆腐块组件文本的CSS样式*/
@@ -405,6 +407,7 @@ input[type=file]
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    width: var(--sharingContainerElementWidth);
 }
 
 /*表示一个换行样式*/
@@ -606,6 +609,7 @@ input[type=file]
 {
     width: var(--popUpWidthMedium);
     height: var(--popUpHeightMedium);
+    overflow: auto;
 }
 
 /*横窄竖高型固定弹窗样式*/
@@ -613,6 +617,7 @@ input[type=file]
 {
     width: var(--popUpWidthSmall);
     height: var(--popUpHeightMedium);
+    overflow: auto;
 }
 
 /*圆形圆角样式*/
@@ -626,4 +631,10 @@ input[type=file]
 .emphasizeText
 {
     color: var(--emphasizeColor);
+}
+
+/*背景遮罩样式*/
+dialog::backdrop
+{
+    background: var(--backdropColor);
 }

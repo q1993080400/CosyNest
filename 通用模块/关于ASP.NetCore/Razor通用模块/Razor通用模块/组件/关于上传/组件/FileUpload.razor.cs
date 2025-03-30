@@ -51,6 +51,14 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
     #endregion
     #endregion
     #region 内部成员
+    #region 是否正在执行选择文件事件
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示正在执行选择文件事件，
+    /// 注意：上传可能在后续才触发，它不等于触发上传事件
+    /// </summary>
+    private bool InInvokeOnChange { get; set; }
+    #endregion
     #region 上传组件的ID
     /// <summary>
     /// 获取这个上传组件的ID，
@@ -82,6 +90,29 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
         }
     }
     #endregion
+    #region 从剪切板上传的方法
+    /// <summary>
+    /// 通过读取剪切板的内容上传文件
+    /// </summary>
+    /// <returns>中途出现的错误提示，
+    /// 如果未出现任何错误，则返回<see langword="null"/></returns>
+    private async Task<string?> OnUploadFromClipboard()
+    {
+        var copyContent = await JSWindow.Navigator.Clipboard.ReadObject(true);
+        if (copyContent is null)
+            return "未能获取复制粘贴权限，或者复制了不支持的内容";
+        var clipboardItems = copyContent.ClipboardItems;
+        if (clipboardItems.Count is 0)
+            return "没有复制任何内容";
+        var binaryItems = clipboardItems.OfType<IClipboardItemBinary>().ToArray();
+        if (binaryItems.Length is 0)
+            return "你复制的是文字，不能用来上传";
+        var files = binaryItems.Select(x => x.ToBrowserFile()).ToArray();
+        var inputFileChangeEventArgs = new InputFileChangeEventArgs(files);
+        await OnChange(inputFileChangeEventArgs);
+        return null;
+    }
+    #endregion
     #region 当选择文件时触发的事件
     /// <summary>
     /// 当选择文件时，触发这个事件
@@ -90,17 +121,26 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
     /// <returns></returns>
     private async Task OnChange(InputFileChangeEventArgs args)
     {
-        await DisposableObjectURL();
-        var uploadFile = args.GetMultipleFiles(args.FileCount);
-        var (uploadFileInfos, hugeFiles) = await GetUploadFiles(uploadFile);
-        UploadTaskInfo = new()
+        InInvokeOnChange = true;
+        this.StateHasChanged();
+        try
         {
-            UploadFiles = uploadFileInfos,
-            HugeFiles = hugeFiles,
-            UploadFileOptions = UploadFileOptions
-        };
-        FileUploadNavigationContext?.RegisterUploadTaskInfo(ID, uploadFileInfos);
-        await OnUpload(UploadTaskInfo);
+            await DisposableObjectURL();
+            var uploadFile = args.GetMultipleFiles(args.FileCount);
+            var (uploadFileInfos, hugeFiles) = await GetUploadFiles(uploadFile);
+            UploadTaskInfo = new()
+            {
+                UploadFiles = uploadFileInfos,
+                HugeFiles = hugeFiles,
+                UploadFileOptions = UploadFileOptions
+            };
+            FileUploadNavigationContext?.RegisterUploadTaskInfo(ID, uploadFileInfos);
+            await OnUpload(UploadTaskInfo);
+        }
+        finally
+        {
+            InInvokeOnChange = false;
+        }
     }
     #endregion
     #region 返回待上传的文件
@@ -145,6 +185,9 @@ public sealed partial class FileUpload : ComponentBase, IAsyncDisposable
         {
             OnChange = new(this, OnChange),
             UploadTaskInfo = UploadTaskInfo,
+            OnUploadFromClipboard = OnUploadFromClipboard,
+            InInvokeOnChange = InInvokeOnChange,
+            UploadFileOptions = UploadFileOptions,
             ID = ID
         };
     #endregion

@@ -35,9 +35,7 @@ sealed class EFDataPipe(DbContext dbContext) : IDataPipe
         => dbContext.EntityTypes();
     #endregion
     #region 释放对象
-    public async ValueTask DisposeAsync()
-    {
-        await dbContext.DisposeAsync();
-    }
+    public ValueTask DisposeAsync()
+        => dbContext.DisposeAsync();
     #endregion
 }

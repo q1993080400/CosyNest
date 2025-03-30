@@ -14,8 +14,11 @@ sealed class HasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyDirectInf
     #region 是否为可预览文件的集合
     public required bool Multiple { get; init; }
     #endregion
+    #region 是否允许空集合
+    public required bool AllowEmptyCollection { get; init; }
+    #endregion
     #region 是否直接映射
-    public bool IsDirect
+    public bool IsDirectMap
         => CreateDataObj.GetPreviewFileTypeInfo(Property.PropertyType).IsDirect;
     #endregion
     #region 是否是否可写入
@@ -27,7 +30,17 @@ sealed class HasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyDirectInf
         if (obj is null)
             yield break;
         var propertyType = Property.PropertyType;
-        var previewFilePropertyInfos = CreateDataObj.GetPreviewFileTypeInfo(propertyType).
+        var previewFileTypeInfo = CreateDataObj.GetPreviewFileTypeInfo(propertyType);
+        if (previewFileTypeInfo.HasPreviewFileState is HasPreviewFileState.PreviewFile)
+        {
+            yield return new()
+            {
+                PreviewFilePropertyInfo = this,
+                Target = obj
+            };
+            yield break;
+        }
+        var previewFilePropertyInfos = previewFileTypeInfo.
             HasPreviewFilePropertyInfo.Values.OfType<IHasPreviewFilePropertyDirectInfo>().
             Where(x => x.IsStrict || !isStrict).ToArray();
         if (previewFilePropertyInfos.Length is 0)
@@ -60,7 +73,7 @@ sealed class HasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyDirectInf
         #region 返回用来转换的本地函数
         Func<object, IHasReadOnlyPreviewFile?> Convert()
         {
-            if (IsDirect)
+            if (IsDirectMap)
                 return x => (IHasReadOnlyPreviewFile)x;
             var projectionType = typeof(IProjection<>).MakeGenericType(typeof(IHasReadOnlyPreviewFile));
             var method = projectionType.GetMethod(nameof(IProjection<>.Projection))!;
@@ -81,7 +94,7 @@ sealed class HasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyDirectInf
         #region 返回用来转换的本地函数
         Func<IHasReadOnlyPreviewFile, object> Convert()
         {
-            if (IsDirect)
+            if (IsDirectMap)
                 return x => x;
             var previewFileType = propertyType.GetCollectionElementType() ?? propertyType;
             var method = previewFileType.GetMethods(BindingFlags.Static | BindingFlags.Public).

@@ -1,1 +1,7 @@
 ﻿
+/*弹窗样式*/
+.bootstrapPopUpDialog
+{
+    height: auto;
+    align-content: center;
+}

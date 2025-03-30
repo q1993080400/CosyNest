@@ -39,7 +39,7 @@ public static partial class CreateNet
             {
                 var type = typeof(Interface);
                 return type.ContainsGenericParameters ?
-                    instance.GetType().GetInterfaces().Single(x => x.IsGenericRealize(type)) :
+                    instance.GetType().IsGenericRealize(type).RealizeType! :
                     type;
             }
             #endregion

@@ -19,6 +19,13 @@ public sealed partial class FileViewer : ComponentBase
     [EditorRequired]
     public IEnumerable<IHasReadOnlyPreviewFile> Files { get; set; }
     #endregion
+    #region 点击文件所附加的事件
+    /// <summary>
+    /// 获取点击文件时，附加的事件
+    /// </summary>
+    [Parameter]
+    public RenderSingleFileEventPreference OnClickEventPreference { get; set; }
+    #endregion
     #region 用来渲染整个组件的委托
     /// <summary>
     /// 用来渲染整个组件的委托
@@ -96,6 +103,7 @@ public sealed partial class FileViewer : ComponentBase
             {
                 File = file,
                 Index = index,
+                OnClickEventPreference = OnClickEventPreference,
                 CanPreview = canPreview,
                 OpenPreview = canPreview ?
                 new(this, OpenPreview) :

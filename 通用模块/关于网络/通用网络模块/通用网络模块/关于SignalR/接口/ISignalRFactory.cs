@@ -40,7 +40,7 @@ public interface ISignalRFactory : IAsyncDisposable
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="Create{BusinessInterface}(Func{HubConnection, Task}?, bool)"/>
-    Task<IStrongTypeStreamInvoke<BusinessInterface>> StrongType<BusinessInterface>
+    Task<IStrongTypeSignalRInvoke<BusinessInterface>> StrongType<BusinessInterface>
        (Func<HubConnection, Task>? configuration = null, bool cacheConnection = true)
        where BusinessInterface : class;
     #endregion
@@ -51,7 +51,7 @@ public interface ISignalRFactory : IAsyncDisposable
     /// </summary>
     /// <returns></returns>
     /// <inheritdoc cref="Create{BusinessInterface}(Func{HubConnection, Task}?, bool)"/>
-    IStrongTypeStreamInvoke<BusinessInterface> StrongTypeLazy<BusinessInterface>
+    IStrongTypeSignalRInvoke<BusinessInterface> StrongTypeLazy<BusinessInterface>
        (Func<HubConnection, Task>? configuration = null, bool cacheConnection = true)
        where BusinessInterface : class;
     #endregion

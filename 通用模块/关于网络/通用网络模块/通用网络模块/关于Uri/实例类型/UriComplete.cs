@@ -12,6 +12,13 @@ public sealed record UriComplete : UriBase
         => new(uri);
     #endregion
     #region 公开成员
+    #region 静态成员：用于匹配Uri的正则表达式
+    /// <summary>
+    /// 获取用于匹配Uri的正则表达式
+    /// </summary>
+    public static IRegex Regex { get; } =/*language=regex*/@"^(?<host>([a-z0-9]+://)?[^/]+)?(/?(?<extend>[^#\?]+)(\?(?<parameter>[^#]+))?)?(#(?<anchor>\S+))?$".
+        Op().Regex(RegexOptions.IgnoreCase);
+    #endregion
     #region 主机部分
     /// <summary>
     /// 获取Uri的主机部分，
@@ -71,14 +78,6 @@ public sealed record UriComplete : UriBase
     #endregion
     #region 构造函数
     #region 指定Uri的文本形式
-    #region 正则表达式
-    /// <summary>
-    /// 获取用于匹配Uri的正则表达式
-    /// </summary>
-    private static IRegex Regex { get; } =/*language=regex*/@"^(?<host>([a-z0-9]+://)?[^/]+)?(/?(?<extend>[^#\?]+)(\?(?<parameter>[^#]+))?)?(#(?<anchor>\S+))?$".
-        Op().Regex(RegexOptions.IgnoreCase);
-    #endregion
-    #region 指定Uri和参数
     /// <summary>
     /// 使用指定的Uri初始化对象
     /// </summary>
@@ -107,7 +106,6 @@ public sealed record UriComplete : UriBase
         if (match.GroupsNamed.TryGetValue("anchor", out var anchor))
             UriAnchor = anchor.Match;
     }
-    #endregion
     #endregion 
     #region 无参数构造函数
     /// <summary>

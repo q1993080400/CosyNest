@@ -20,7 +20,7 @@ sealed class ComparableStringChinese : IComparer<string>
             case (null, { }):
                 return -1;
             default:
-                #region 获取拼音的本地函数
+                #region 获取拼音首字母的本地函数
                 static string GetPinYin(char c)
                     => PinyinUtil.IsHanzi(c) ?
                     Pinyin4Net.GetFirstPinyin(c)[0].ToString() :        //只取拼音首字母

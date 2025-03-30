@@ -1,5 +1,7 @@
 ﻿using System.Underlying;
 
+using Microsoft.AspNetCore;
+
 namespace Microsoft.JSInterop;
 
 /// <summary>
@@ -31,7 +33,7 @@ public interface IJSWindow : IJSRuntime
     /// 返回一个字典，它可以用来索引浏览器本地存储，
     /// 本地存储不会过期
     /// </summary>
-    IAsyncDictionary<string, string> LocalStorage { get; }
+    IBrowserStorage LocalStorage { get; }
     #endregion
     #region 会话存储
     /// <summary>
@@ -39,7 +41,7 @@ public interface IJSWindow : IJSRuntime
     /// 它可以用来索引浏览器会话存储，
     /// 在关闭页面的时候，会话存储会被清除
     /// </summary>
-    IAsyncDictionary<string, string> SessionStorage { get; }
+    IBrowserStorage SessionStorage { get; }
     #endregion
     #endregion
     #region 返回Document对象

@@ -3,7 +3,7 @@
 /// <summary>
 /// 这个对象可以用来管理Cookie
 /// </summary>
-public interface ICookie : IAsyncDictionary<string, string>
+public interface ICookie : IBrowserStorage
 {
     #region 读取原始Cookie
     /// <summary>

@@ -16,5 +16,9 @@ public enum FormEnumRender
     /// <summary>
     /// 使用选择器进行渲染
     /// </summary>
-    Select
+    Select,
+    /// <summary>
+    /// 使用弹窗进行渲染，它自带一个搜索功能
+    /// </summary>
+    ModelDialog
 }

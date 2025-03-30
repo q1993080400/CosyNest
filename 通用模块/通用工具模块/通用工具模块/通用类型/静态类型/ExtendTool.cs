@@ -78,7 +78,7 @@ public static partial class ExtendTool
     /// 则保留时间部分，否则放弃时间部分</param>
     /// <returns></returns>
     public static string FormatChinese(this DateTimeOffset date, bool retentionTime = true)
-        => date.ToString(retentionTime ? Format.FormatChineseWithTimeText : "yyyy年M月d日");
+        => date.ToString(retentionTime ? Format.FormatChineseWithTimeText : Format.FormatChineseText);
     #endregion
     #region 将日期格式化为友好格式
     /// <summary>
@@ -100,6 +100,15 @@ public static partial class ExtendTool
         return date >= toDay.AddDays(-2) ?
             date.ToString("前天HH:mm") : date.ToString(format);
     }
+    #endregion
+    #region 格式化时间
+    /// <summary>
+    /// 将时间格式化为中国习惯的格式
+    /// </summary>
+    /// <param name="timeOnly">要格式化的时间</param>
+    /// <returns></returns>
+    public static string FormatChinese(this TimeOnly timeOnly)
+        => timeOnly.ToString("H时m分");
     #endregion
     #endregion
     #region 如果一个对象为null，则引发异常

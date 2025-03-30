@@ -25,8 +25,10 @@ public static partial class ExtendData
     /// <param name="id">要筛选的实体的ID</param>
     /// <returns></returns>
     public static Entity Find<Entity>(this IQueryable<Entity> data, Guid id)
-        where Entity : IWithID
-        => data.First(x => x.ID == id);
+        where Entity : class, IWithID
+        => id == default ?
+        throw new NotSupportedException("对象的ID为空，它在数据库中必然不存在") :
+        data.First(x => x.ID == id);
     #endregion
     #region 可能为null
     /// <summary>
@@ -37,8 +39,8 @@ public static partial class ExtendData
     /// <returns></returns>
     /// <inheritdoc cref="Find{Entity}(IQueryable{Entity}, Guid)"/>
     public static Entity? FindOrDefault<Entity>(this IQueryable<Entity> data, Guid id)
-        where Entity : IWithID
-        => data.FirstOrDefault(x => x.ID == id);
+        where Entity : class, IWithID
+        => id == default ? null : data.FirstOrDefault(x => x.ID == id);
     #endregion
     #endregion
     #region 判断是否存在具有指定ID的实体

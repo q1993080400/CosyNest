@@ -7,7 +7,7 @@
 /// </summary>
 /// <typeparam name="Source">被填充对象的类型</typeparam>
 /// <typeparam name="Fill">要填充的对象类型</typeparam>
-public interface IFill<Source, in Fill> : IHasDeleteSideEffect<Source>
+public interface IFill<Source, in Fill>
     where Source : class
 {
     #region 创建或填充

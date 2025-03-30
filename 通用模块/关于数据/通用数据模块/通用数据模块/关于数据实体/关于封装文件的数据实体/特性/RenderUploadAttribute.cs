@@ -20,18 +20,4 @@ public sealed class RenderUploadAttribute : Attribute
     /// </summary>
     public string UploadButtonText { get; init; } = "上传文件";
     #endregion
-    #region 可上传文件的最大大小
-    /// <summary>
-    /// 获取可上传文件的最大大小，
-    /// 以字节为单位，默认为50M
-    /// </summary>
-    public long MaxAllowedSize { get; init; } = 1024 * 1024 * 50;
-    #endregion
-    #region 是否启用从剪切板上传功能
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 则启用从剪切板上传的功能
-    /// </summary>
-    public bool EnableClipboardUpload { get; init; }
-    #endregion
 }

@@ -13,26 +13,25 @@ public static partial class ExtendNet
     #region 公开成员
     #region 关于依赖注入
     #region 注入IHttpClient
-    #region 可指定生存期
+    #region 直接注入
     /// <summary>
-    /// 以指定的生存期注入一个<see cref="IHttpClient"/>，
+    /// 以范围模式注入一个<see cref="IHttpClient"/>，
     /// 它可以用来发起Http请求，
     /// 如果服务容器中注册了<see cref="HttpRequestTransform"/>，
     /// 那么还会将它作为<see cref="IHttpClient"/>的默认请求转换函数
     /// </summary>
     /// <param name="services">要注入的服务集合</param>
-    /// <param name="lifetime">服务的生存期</param>
     /// <returns></returns>
-    public static IServiceCollection AddIHttpClient(this IServiceCollection services, ServiceLifetime lifetime)
-        => services.AddService(lifetime, serviceProvider =>
+    public static IServiceCollection AddIHttpClient(this IServiceCollection services)
+        => services.AddScoped(serviceProvider =>
         {
             var requestTransform = serviceProvider.GetService<HttpRequestTransform>();
             return serviceProvider.GetRequiredService<IHttpClientFactory>().ToHttpClient(requestTransform);
         });
     #endregion
-    #region 单例生存期，适用于非浏览器应用
+    #region 适用于非浏览器应用
     /// <summary>
-    /// 以单例模式注入一个<see cref="IHttpClient"/>，
+    /// 以范围模式注入一个<see cref="IHttpClient"/>，
     /// 它可以用来发起Http请求，
     /// 这个方法不会携带Cookie，它不适合浏览器应用
     /// </summary>
@@ -41,21 +40,21 @@ public static partial class ExtendNet
     public static IServiceCollection AddIHttpClientCommon(this IServiceCollection services)
     {
         services.AddHttpClient(CreateNet.HttpClientName);
-        services.AddIHttpClient(ServiceLifetime.Singleton);
+        services.AddIHttpClient();
         return services;
     }
     #endregion
     #endregion
     #region 注入HttpRequestTransform
     /// <summary>
-    /// 以单例模式注入一个<see cref="HttpRequestTransform"/>，
+    /// 以范围模式注入一个<see cref="HttpRequestTransform"/>，
     /// 它可以自动处理相对请求路径，将其视为请求本站，
     /// 本服务依赖于<see cref="IHostProvide"/>
     /// </summary>
     /// <param name="services">要注入的服务集合</param>
     /// <returns></returns>
     public static IServiceCollection AddHttpRequestTransformUri(this IServiceCollection services)
-        => services.AddSingleton(static x =>
+        => services.AddScoped(static x =>
         {
             var hostProvide = x.GetRequiredService<IHostProvide>();
             return CreateNet.TransformBaseUri(hostProvide.Host);

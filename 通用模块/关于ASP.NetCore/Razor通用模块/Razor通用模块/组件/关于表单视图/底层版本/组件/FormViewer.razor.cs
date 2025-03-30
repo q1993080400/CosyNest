@@ -178,17 +178,6 @@ public sealed partial class FormViewer<Model> : ComponentBase
         => model is IWithID { } entity && !entity.IsNew();
     #endregion
     #endregion
-    #region 值转换函数
-    /// <summary>
-    /// 这个函数的第一个参数是属性，
-    /// 第二个参数是属性的值，
-    /// 返回值是渲染的时候应该渲染的值，
-    /// 通过它可以实现某些特殊操作，
-    /// 例如把空字符串渲染成不明
-    /// </summary>
-    [Parameter]
-    public Func<PropertyInfo, object?, object?>? PropertyValueConvert { get; set; }
-    #endregion
     #region 创建值改变时的函数的高阶函数
     /// <summary>
     /// 这个高阶函数传入属性渲染对象，
@@ -197,6 +186,50 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// </summary>
     [Parameter]
     public Func<RenderFormViewerPropertyInfoBase<Model>, Func<object?, Task>?>? CreatePropertyChangeEvent { get; set; }
+    #endregion
+    #region 用来筛选要渲染的属性的委托
+    #region 正式方法
+    /// <summary>
+    /// 这个委托传入模型的类型，
+    /// 返回它的哪些属性应该被渲染
+    /// </summary>
+    [Parameter]
+    public Func<Type, IEnumerable<PropertyInfo>> FilterRenderPropertyInfo { get; set; } = FilterRenderPropertyInfoDefault;
+    #endregion
+    #region 默认方法
+    /// <summary>
+    /// 这个方法是<see cref="FilterRenderPropertyInfo"/>的默认方法，
+    /// 它通过<see cref="RenderDataBaseAttribute"/>特性来确定是否渲染
+    /// </summary>
+    /// <param name="modelType">模型的类型</param>
+    /// <returns></returns>
+    public static IEnumerable<PropertyInfo> FilterRenderPropertyInfoDefault(Type modelType)
+        => FilterRenderPropertyInfoBase(modelType).
+        Where(x => !x.IsDefined<RenderDataConditionAttribute>());
+    #endregion
+    #region 仅渲染拥有某些条件的属性
+    /// <summary>
+    /// 返回一个高阶函数，
+    /// 它仅渲染具有某些条件的属性
+    /// </summary>
+    /// <param name="conditions">拥有这些条件其中任意一项的属性会被认为是可渲染</param>
+    /// <returns></returns>
+    public static Func<Type, IEnumerable<PropertyInfo>> FilterRenderPropertyInfoOnly(params string[] conditions)
+        => modelType =>
+        FilterRenderPropertyInfoBase(modelType).
+        Where(x => x.GetCustomAttributes<RenderDataConditionAttribute>().Any(x => conditions.Contains(x.RenderCondition)));
+    #endregion
+    #region 内部方法
+    /// <summary>
+    /// 这个方法是<see cref="FilterRenderPropertyInfo"/>的辅助方法，
+    /// 它筛选所有公开，实例，不是索引器，且拥有<see cref="RenderDataBaseAttribute"/>的属性
+    /// </summary>
+    /// <param name="modelType">模型的类型</param>
+    /// <returns></returns>
+    private static IEnumerable<PropertyInfo> FilterRenderPropertyInfoBase(Type modelType)
+        => modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance).
+        Where(x => x.IsDefined<RenderDataBaseAttribute>() && !x.IsIndexing());
+    #endregion
     #endregion
     #region 用来获取属性渲染参数的委托
     #region 正式属性
@@ -218,45 +251,44 @@ public sealed partial class FormViewer<Model> : ComponentBase
     public static IEnumerable<RenderFormViewerPropertyInfoBase<Model>> GetRenderPropertyInfoDefault(FormViewer<Model> formViewer)
     {
         var model = formViewer.FormModel;
-        var forceReadOnly = formViewer.IsForceReadOnly(model);
         var modelType = model.GetType();
-        var propertys = modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(x =>
-        {
-            var renderData = x.GetCustomAttribute<RenderDataBaseAttribute>();
-            return new
+        var propertys = formViewer.FilterRenderPropertyInfo(modelType).
+            Select(x => new
             {
                 Item = x,
-                Attribute = renderData!,
-            };
-        }).
+                Attribute = x.GetCustomAttribute<RenderDataBaseAttribute>()!,
+            }).
         Where(x => x.Attribute is { }).ToArray().
         OrderBy(x => x.Attribute.Order).ToArray();
-        return [.. propertys.Select(x =>
+        var renderPropertyCount = propertys.Length;
+        var forceReadOnly = formViewer.IsForceReadOnly(model);
+        return [..propertys.Select((x, index) =>
         {
             var property = x.Item;
             var attribute = x.Attribute;
             var groupName = attribute.GroupName;
             var isReadOnly = forceReadOnly || !property.IsAlmighty() || formViewer.IsReadOnlyProperty(property, model);
-            var readOnlyConvert = isReadOnly ? formViewer.PropertyValueConvert : null;
             var previewFileTypeInfo = CreateDataObj.GetPreviewFileTypeInfo(modelType).HasPreviewFilePropertyInfo.GetValueOrDefault(property.Name);
             var inUpload = formViewer.InUpload && (previewFileTypeInfo?.IsStrict ?? false);
             var renderPreference = property.GetCustomAttribute<RenderPreferenceAttribute>()?.GetRenderPreference();
-            var renderInfo = attribute switch
+            RenderFormViewerPropertyInfoBase<Model> renderInfo = attribute switch
             {
-                RenderDataAttribute renderDataAttribute => (RenderFormViewerPropertyInfoBase<Model>)new RenderFormViewerPropertyInfo<Model>()
+                RenderDataAttribute renderDataAttribute => new RenderFormViewerPropertyInfo<Model>()
                 {
                     FormModel = model,
                     GroupName = groupName,
                     IsReadOnly = isReadOnly,
                     Property = property,
                     Name = renderDataAttribute.Name,
-                    PropertyValueConvert = readOnlyConvert,
+                    ValueIfNullText = renderDataAttribute.ValueIfNullText,
                     InUpload = inUpload,
                     OnPropertyChange = null,
                     HasPreviewFilePropertyInfo = previewFileTypeInfo,
                     RenderPreference = renderPreference,
                     IsRecursion = renderDataAttribute.IsRecursion,
-                    Describe = renderDataAttribute.Describe
+                    Order = index,
+                    RenderPropertyCount = renderPropertyCount,
+                    Describe = (renderDataAttribute.ShowDescribeInReadOnly || !isReadOnly) ? renderDataAttribute.Describe : null
                 },
                 RenderDataCustomAttribute => new RenderFormViewerPropertyInfoCustom<Model>()
                 {
@@ -264,10 +296,11 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     GroupName = groupName,
                     IsReadOnly = isReadOnly,
                     Property = property,
-                    PropertyValueConvert = readOnlyConvert,
                     OnPropertyChange = null,
                     HasPreviewFilePropertyInfo = previewFileTypeInfo,
                     InUpload = inUpload,
+                    Order = index,
+                    RenderPropertyCount = renderPropertyCount,
                     RenderPreference = renderPreference
                 },
                 _ => throw new NotSupportedException("无法识别这个渲染数据特性")
@@ -415,7 +448,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
     /// <returns></returns>
     private void InitializationFormModelInternal()
     {
-        FormModelField = IsReference || IsForceReadOnly(CopyModel) ? CopyModel : CopyModel.MemberwiseClone();
+        FormModelField = IsReference ? CopyModel : CopyModel?.MemberwiseClone()!;
     }
     #endregion
     #region 待复制模型
@@ -471,6 +504,13 @@ public sealed partial class FormViewer<Model> : ComponentBase
             await this.Resetting();
         }
         #endregion
+        #region 如果刷新目标实现了IRefresh，则刷新它
+        async Task Refresh()
+        {
+            if (RefreshTarget is IRefresh refresh)
+                await refresh.Refresh();
+        }
+        #endregion
         #region 用来提交的本地函数
         async Task OnSubmit()
         {
@@ -520,6 +560,7 @@ public sealed partial class FormViewer<Model> : ComponentBase
                     if (!isSuccess)
                         return false;
                     CopyModel = formModel.MemberwiseClone();
+                    await Refresh();
                     if (Cancellation is { } cancellation)
                     {
                         await cancellation();
@@ -553,7 +594,10 @@ public sealed partial class FormViewer<Model> : ComponentBase
         {
             var isSuccess = await Delete(formModel);
             if (isSuccess)
+            {
+                await Refresh();
                 await OnCancellation();
+            }
         }
         #endregion
         var renderSubmit = new RenderSubmitInfo<Model>()

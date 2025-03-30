@@ -119,7 +119,7 @@
             var bindSortText = BindSort();
             <BootstrapInputGroup>
                 <BootstrapInputGroupLabel DisplayText="@describe" />
-                <BootstrapInput @bind-Value=@(bindQueryText.Value) OnEnterAsync="@(OnEnter<string?>())" />
+                <BootstrapInput @bind-Value=@(bindQueryText.Value) OnEnterAsync="@(OnEnter<string?>())" IsSelectAllTextOnFocus=true />
                 @if (bindSortText is { })
                 {
                     <Select @bind-Value=@(bindSortText.Value) OnValueChanged="OnSubmit" />
@@ -136,12 +136,12 @@
                 @switch (bindQueryNum)
                 {
                     case IBindProperty<double?> bindQueryNumSingle:
-                        <BootstrapInputNumber @bind-Value=@(bindQueryNumSingle.Value) OnEnterAsync="@(OnEnter<double?>())" />
+                        <BootstrapInputNumber @bind-Value=@(bindQueryNumSingle.Value) OnEnterAsync="@(OnEnter<double?>())" IsSelectAllTextOnFocus=true />
                         break;
                     case IBindRange<double?> { Range: { } bindQueryNumRange }:
-                        <BootstrapInputNumber @bind-Value=@(bindQueryNumRange.Start) OnEnterAsync="@(OnEnter<double?>())" />
+                        <BootstrapInputNumber @bind-Value=@(bindQueryNumRange.Start) OnEnterAsync="@(OnEnter<double?>())" IsSelectAllTextOnFocus=true />
                         <BootstrapInputGroupLabel DisplayText="至" />
-                        <BootstrapInputNumber @bind-Value=@(bindQueryNumRange.End) OnEnterAsync="@(OnEnter<double?>())" />
+                        <BootstrapInputNumber @bind-Value=@(bindQueryNumRange.End) OnEnterAsync="@(OnEnter<double?>())" IsSelectAllTextOnFocus=true />
                         break;
                 }
                 @if (bindSortNum is { })

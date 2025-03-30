@@ -17,6 +17,9 @@ sealed class HasPreviewFilePropertyRecursionInfo : IHasPreviewFilePropertyRecurs
     #region 是否可写入
     public required bool IsInitOnly { get; init; }
     #endregion
+    #region 是否直接所有
+    public required bool IsDirectOwne { get; init; }
+    #endregion
     #region 递归获取所有可预览文件
     public IEnumerable<PreviewFileInfo> AllPreviewFile(object? obj, bool isStrict)
     {

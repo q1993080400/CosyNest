@@ -11,10 +11,7 @@
         {
             <div class="commonContainers">
                 <div class="perfectContainer">
-                    @foreach (var item in context.RenderCondition)
-                    {
-                        @item
-                    }
+                    @context.RenderConditionAll
                 </div>
                 @context.RenderSubmit
             </div>

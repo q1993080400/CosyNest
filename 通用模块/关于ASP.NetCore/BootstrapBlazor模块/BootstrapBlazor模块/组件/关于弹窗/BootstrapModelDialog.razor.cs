@@ -7,52 +7,48 @@ namespace BootstrapBlazor.Components;
 /// 它不使用Web原生的dialog标签，
 /// 在特殊情况下，可以避免某些弹出组件被遮盖的问题
 /// </summary>
-public sealed partial class BootstrapModelDialog : ComponentBase, IContentComponent<RenderFragment>
+public sealed partial class BootstrapModelDialog : ComponentBase
 {
     #region 组件参数
-    #region 子内容
-    [Parameter]
-    [EditorRequired]
-    public RenderFragment ChildContent { get; set; }
-    #endregion
-    #region 是否打开
+    #region 标题
     /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示弹窗打开，否则表示关闭，
-    /// 请始终保留本组件，并通过这个参数来控制是否打开，
-    /// 而不是关闭弹窗时就销毁本组件，
-    /// 这是因为Bootstrap弹窗的实现缺陷造成的
+    /// 获取弹窗的标题
     /// </summary>
     [Parameter]
     [EditorRequired]
-    public bool IsOpen { get; set; }
+    public string Title { get; set; }
     #endregion
-    #endregion
-    #region 内部成员
-    #region 缓存的是否打开参数
+    #region 弹窗大小
     /// <summary>
-    /// 这个属性是对<see cref="IsOpen"/>的缓存，
-    /// 它控制弹窗是否被打开
+    /// 这个参数允许显式控制弹窗的大小
     /// </summary>
-    private bool IsOpenCache { get; set; }
+    [Parameter]
+    public Size Size { get; set; } = Size.ExtraExtraLarge;
     #endregion
-    #region 捕获的弹窗组件
+    #region 是否滚动
     /// <summary>
-    /// 获取捕获的弹窗组件
+    /// 获取在长度超出限制的时候，弹窗主体是否滚动，
+    /// 如果弹窗会因为增加元素而扩张，
+    /// 请务必将这个属性设置为<see langword="true"/>
     /// </summary>
-    private Modal? Modal { get; set; }
+    [Parameter]
+    public bool IsScrolling { get; set; } = true;
     #endregion
-    #region 重写OnParametersSetAsync方法
-    protected async override Task OnParametersSetAsync()
-    {
-        if (Modal is null || IsOpen == IsOpenCache)
-            return;
-        if (IsOpen)
-            await Modal.Show();
-        else
-            await Modal.Close();
-        IsOpenCache = IsOpen;
-    }
+    #region 渲染弹窗主体的方法
+    /// <summary>
+    /// 获取渲染弹窗主体的方法
+    /// </summary>
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment RenderBody { get; set; }
+    #endregion
+    #region 渲染弹窗页脚的方法
+    /// <summary>
+    /// 获取渲染弹窗页脚的方法
+    /// </summary>
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment RenderFooter { get; set; }
     #endregion
     #endregion
 }

@@ -4,7 +4,9 @@
 /// 凡是实现这个接口的类型，
 /// 都可以作为一个针对属性的，
 /// 封装可预览文件的信息，
-/// 它指示该属性直接封装了可预览文件
+/// 它指示该属性直接封装了可预览文件，
+/// 直接封装的意思是：
+/// 这个类型或属性就是可预览文件，或它的集合自身
 /// </summary>
 public interface IHasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyInfo
 {
@@ -16,13 +18,21 @@ public interface IHasPreviewFilePropertyDirectInfo : IHasPreviewFilePropertyInfo
     /// </summary>
     bool Multiple { get; }
     #endregion
+    #region 是否允许空集合
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 表示该属性是可预览文件的集合，而且它允许空集合，
+    /// 不要求集合中至少有一个文件
+    /// </summary>
+    bool AllowEmptyCollection { get; }
+    #endregion
     #region 是否直接映射
     /// <summary>
     /// 如果这个值为<see langword="true"/>，
     /// 表示它直接映射到<see cref="IHasReadOnlyPreviewFile"/>或它的集合，
     /// 否则表示它是通过<see cref="MapToPreviewFileAttribute"/>特性间接映射的
     /// </summary>
-    bool IsDirect { get; }
+    bool IsDirectMap { get; }
     #endregion
     #region 读取直接封装的可预览文件
     /// <summary>

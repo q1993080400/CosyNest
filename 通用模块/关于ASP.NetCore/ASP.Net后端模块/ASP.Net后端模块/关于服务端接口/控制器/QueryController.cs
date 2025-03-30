@@ -14,9 +14,6 @@ public abstract class QueryController<BusinessInterface, DBEntity> : ApiControll
 {
     #region 获取搜索条件
     public virtual Task<RenderFilterGroup[]> GetRenderAllFilterCondition()
-    {
-        var renderCondition = ToolSearchViewer.GetRenderCondition<DBEntity, BusinessInterface>();
-        return Task.FromResult(renderCondition);
-    }
+        => ToolSearchViewer.GetRenderCondition<DBEntity, BusinessInterface>().ToTask();
     #endregion
 }

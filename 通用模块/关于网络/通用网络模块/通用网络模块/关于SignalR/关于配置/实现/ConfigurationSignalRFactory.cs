@@ -22,11 +22,9 @@ public class ConfigurationSignalRFactory(IServiceProvider serviceProvider) : ICo
         var builder = new HubConnectionBuilder();
         builder.WithUrl(absoluteUri, op =>
         {
-            op.UseStatefulReconnect = true;
             if (cookie is { })
                 op.Cookies = cookie;
-        }).
-        WithAutomaticReconnect();
+        }).WithStatefulReconnect();
         return builder;
     }
     #endregion

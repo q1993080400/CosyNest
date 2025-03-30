@@ -56,7 +56,7 @@ public static partial class ExtendData
         {
             if (type.IsAbstract || !type.IsClass)
                 return (Type[]?)null;
-            var (isRealize, _, genericParameter) = type.IsRealizeGeneric(typeof(IWithLife<>));
+            var (isRealize, _, genericParameter) = type.IsGenericRealize(typeof(IWithLife<>));
             return isRealize ? [genericParameter[0], type] : null;
         }).WhereNotNull().ToArray();
         var methodInfo = typeof(ExtendData).GetMethod(nameof(DeleteAllExpireRealize),

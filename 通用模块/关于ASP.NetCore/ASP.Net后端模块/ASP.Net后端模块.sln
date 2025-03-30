@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "通用工具模块", "..\..\通用工具模块\通用工具模块\通用工具模块.csproj", "{AE7E578F-B2F1-4C4E-9122-EC9CF7E3F263}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASP.Net中台模块", "..\ASP.Net中台模块\ASP.Net中台模块\ASP.Net中台模块.csproj", "{16747A5F-90A8-405F-A702-94E56325835B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASP.Net后端模块", "ASP.Net后端模块\ASP.Net后端模块.csproj", "{E19F201C-D405-45A5-9C30-B9C2BD1CB1AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "通用本地化模块", "..\..\关于本地化\通用本地化模块\通用本地化模块\通用本地化模块.csproj", "{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{E19F201C-D405-45A5-9C30-B9C2BD1CB1AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E19F201C-D405-45A5-9C30-B9C2BD1CB1AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E19F201C-D405-45A5-9C30-B9C2BD1CB1AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

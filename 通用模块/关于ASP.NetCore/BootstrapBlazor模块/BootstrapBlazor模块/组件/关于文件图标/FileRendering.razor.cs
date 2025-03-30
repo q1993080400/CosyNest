@@ -40,7 +40,7 @@ public sealed partial class FileRendering : ComponentBase
     /// 获取最外层a标签的参数展开
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
-    public Dictionary<string, object>? Attributes { get; set; }
+    public IDictionary<string, object>? Attributes { get; set; }
     #endregion
     #endregion
 }

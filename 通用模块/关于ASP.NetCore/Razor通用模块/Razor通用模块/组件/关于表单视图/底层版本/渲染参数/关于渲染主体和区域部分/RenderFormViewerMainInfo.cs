@@ -26,35 +26,29 @@ public sealed record RenderFormViewerMainInfo<Model>
     /// </summary>
     public required RenderFragment RenderNotGroup { get; init; }
     #endregion
+    #region 获取所有渲染组
+    /// <summary>
+    /// 获取所有的渲染组
+    /// </summary>
+    /// <param name="firstRenderNotGroup">如果这个值为<see langword="true"/>，
+    /// 则将无分组排在前面，否则排在后面</param>
+    /// <returns></returns>
+    public IEnumerable<RenderFragment> AllGroup(bool firstRenderNotGroup)
+    {
+        var group = RenderGroup.OrderBy(x => x.Key).Select(x => x.Value);
+        return firstRenderNotGroup ?
+        [RenderNotGroup, .. group] :
+        [.. group, RenderNotGroup];
+    }
+    #endregion
     #region 渲染全部
     /// <summary>
     /// 返回一个<see cref="RenderFragment"/>，
     /// 它可以用来直接渲染全部分组的属性
     /// </summary>
-    /// <param name="firstRenderNotGroup">如果这个值为<see langword="true"/>，
-    /// 则先渲染无分组的属性，否则先渲染各个分组</param>
     /// <returns></returns>
+    /// <inheritdoc cref="AllGroup(bool)"/>
     public RenderFragment RenderAllGroup(bool firstRenderNotGroup)
-    {
-        RenderFragment[] fragments =
-            [
-               RenderNotGroup,
-                x=>
-                {
-                    foreach (var (_,renderGroup) in RenderGroup.OrderBy(x=>x.Key))
-                    {
-                        renderGroup(x);
-                    }
-                }
-            ];
-        var renderFragments = firstRenderNotGroup ? fragments : [.. fragments.Cast<RenderFragment>().Reverse()];
-        return x =>
-        {
-            foreach (var fragment in renderFragments)
-            {
-                fragment(x);
-            }
-        };
-    }
+        => AllGroup(firstRenderNotGroup).MergeRender();
     #endregion
 }

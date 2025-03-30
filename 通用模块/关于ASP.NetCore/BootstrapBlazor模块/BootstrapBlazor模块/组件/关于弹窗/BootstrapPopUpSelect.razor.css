@@ -1,0 +1,23 @@
+﻿
+/*选择器分组样式*/
+.bootstrapPopUpSelectGroup
+{
+    font-size: 125%;
+}
+
+/*选择器子容器样式*/
+.bootstrapPopUpSelectSonContainer
+{
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--gapBig);
+    row-gap: var(--gapMedium);
+    white-space: nowrap;
+}
+
+/*选择器项样式*/
+.bootstrapPopUpSelectItem
+{
+    max-width: max-content;
+    align-content: center;
+}

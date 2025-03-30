@@ -125,13 +125,13 @@ public static partial class CreateDataObj
             var hasPreviewFileState = propertyInfo.Select(x => x.HasPreviewFileState).ToHashSet();
             var processPreviewFileState = hasPreviewFileState.Contains(HasPreviewFileState.PreviewFile) ?
                  HasPreviewFileState.Direct :
-                 hasPreviewFileState.Any(x => x is HasPreviewFileState.Direct or HasPreviewFileState.Recursion or HasPreviewFileState.Collections) ?
+                 hasPreviewFileState.Any(x => x is HasPreviewFileState.Direct or HasPreviewFileState.Recursion or HasPreviewFileState.Collections or HasPreviewFileState.Offspring) ?
                  HasPreviewFileState.Recursion : HasPreviewFileState.None;
             var finalasPreviewFileState = processPreviewFileState is not HasPreviewFileState.None ?
                 processPreviewFileState :
                 knownDerivedTypes.Values.Any(x => x.HasPreviewFileState is not HasPreviewFileState.None) ?
                 HasPreviewFileState.Offspring :
-                elementPreviewFileTypeInfo is { HasPreviewFileState: HasPreviewFileState.Direct or HasPreviewFileState.Recursion } ?
+                elementPreviewFileTypeInfo is { HasPreviewFileState: HasPreviewFileState.Direct or HasPreviewFileState.Recursion or HasPreviewFileState.Offspring } ?
                 HasPreviewFileState.Collections : HasPreviewFileState.None;
             var isStrict = elementPreviewFileTypeInfoIsStrict || propertyInfo.Any(x => x.IsStrict);
             return new HasPreviewFileTypeInfo()
@@ -164,14 +164,17 @@ public static partial class CreateDataObj
         var isInitOnly = property.IsInitOnly();
         var propertyType = property.PropertyType;
         var typeInfo = GetTypeInfo(propertyType, filter);
+        var multiple = typeInfo.Multiple;
         var hasPreviewFileState = typeInfo.HasPreviewFileState;
         return hasPreviewFileState switch
         {
-            HasPreviewFileState.PreviewFile or HasPreviewFileState.Direct or HasPreviewFileState.Collections => new HasPreviewFilePropertyDirectInfo()
+            HasPreviewFileState.PreviewFile or HasPreviewFileState.Direct or HasPreviewFileState.Collections or HasPreviewFileState.Offspring
+            => new HasPreviewFilePropertyDirectInfo()
             {
                 IsInitOnly = isInitOnly,
                 IsStrict = typeInfo.IsStrict,
-                Multiple = typeInfo.Multiple,
+                Multiple = multiple,
+                AllowEmptyCollection = multiple && !property.IsDefined<EnrichFileCollectionAttribute>(),
                 Property = property,
                 HasPreviewFileState = hasPreviewFileState
             },
@@ -179,7 +182,8 @@ public static partial class CreateDataObj
             {
                 IsInitOnly = isInitOnly,
                 Property = property,
-                PropertyTypeInfo = typeInfo
+                PropertyTypeInfo = typeInfo,
+                IsDirectOwne = hasPreviewFileState is HasPreviewFileState.Offspring
             },
             _ => null,
         };

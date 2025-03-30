@@ -1,8 +1,1 @@
 ﻿
-/*上传按钮容器样式*/
-.uploadButtonContainer
-{
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--gapMedium);
-}

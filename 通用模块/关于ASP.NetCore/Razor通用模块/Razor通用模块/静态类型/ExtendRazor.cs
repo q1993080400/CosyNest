@@ -1,6 +1,8 @@
 ﻿using System.NetFrancis;
 using System.Reflection;
 
+using Microsoft.AspNetCore.Components.Authorization;
+
 namespace System;
 
 /// <summary>
@@ -58,6 +60,23 @@ public static partial class ExtendRazor
         stateHasChanged.Invoke(component, null);
     }
     #endregion
+    #region 刷新组件
+    /// <summary>
+    /// 调用组件的StateHasChanged方法，
+    /// 如果它实现了<see cref="IRefresh"/>，还会刷新它
+    /// </summary>
+    /// <param name="component">要刷新的组件，
+    /// 如果它为<see langword="null"/>，不会执行任何操作</param>
+    /// <returns></returns>
+    public static async Task StateHasChangedRefresh(this ComponentBase? component)
+    {
+        if (component is null)
+            return;
+        if (component is IRefresh refresh)
+            await refresh.Refresh();
+        component.StateHasChanged();
+    }
+    #endregion
     #region 合并渲染RenderFragment
     /// <summary>
     /// 返回一个新的<see cref="RenderFragment"/>，
@@ -105,4 +124,20 @@ public static partial class ExtendRazor
     #endregion
     #endregion
     #endregion 
+    #region 公开NotifyAuthenticationStateChanged方法
+    /// <summary>
+    /// 公开NotifyAuthenticationStateChanged方法，
+    /// 它通知用户登录状态发生改变
+    /// </summary>
+    /// <param name="authenticationStateProvider">要调用方法的<see cref="AuthenticationStateProvider"/>对象</param>
+    /// <param name="task">新传入的用户登录状态</param>
+    public static void NotifyAuthenticationStateChanged(this AuthenticationStateProvider authenticationStateProvider, Task<AuthenticationState> task)
+    {
+        if (authenticationStateProvider is IHostEnvironmentAuthenticationStateProvider hostAuthenticationStateProvider)
+            hostAuthenticationStateProvider.SetAuthenticationState(task);
+        var method = typeof(AuthenticationStateProvider).
+            GetMethod("NotifyAuthenticationStateChanged", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        method.Invoke(authenticationStateProvider, [task]);
+    }
+    #endregion
 }

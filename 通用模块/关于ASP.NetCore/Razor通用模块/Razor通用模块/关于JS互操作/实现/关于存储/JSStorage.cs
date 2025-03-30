@@ -1,11 +1,13 @@
-﻿namespace Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore;
+
+namespace Microsoft.JSInterop;
 
 /// <summary>
 /// 这个类型可以通过JS互操作来索引和修改存储
 /// </summary>
 /// <param name="jsRuntime">封装的JS运行时对象，本对象的功能就是通过它实现的</param>
 /// <param name="isLocal">如果这个值为<see langword="true"/>，表示本地存储，否则表示会话存储</param>
-sealed class JSStorage(IJSRuntime jsRuntime, bool isLocal) : IAsyncDictionary<string, string>
+sealed class JSStorage(IJSRuntime jsRuntime, bool isLocal) : IBrowserStorage
 {
     #region 公开成员
     #region 关于根据键读写值
@@ -20,10 +22,10 @@ sealed class JSStorage(IJSRuntime jsRuntime, bool isLocal) : IAsyncDictionary<st
            (key, value, cancellation) => jsRuntime.InvokeVoidAsync($"{Prefix}.setItem", cancellation, key, value).AsTask());
     #endregion
     #region 根据键读取值（不会引发异常）
-    public async Task<(bool Exist, string? Value)> TryGetValueAsync(string key, CancellationToken cancellation = default)
+    public async Task<TryGetObject<string>> TryGetValueAsync(string key, CancellationToken cancellation = default)
     {
         var value = await jsRuntime.InvokeAsync<string?>($"{Prefix}.getItem", cancellation, key);
-        return (value is { }, value);
+        return new(value is { }, value);
     }
     #endregion
     #endregion

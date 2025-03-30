@@ -39,7 +39,15 @@ public sealed partial class Selector<Candidate> : ComponentBase
     /// 它传入元素，返回元素是否被选择
     /// </summary>
     [Parameter]
-    public Func<Candidate, bool> InitializationSelect { get; set; } = static x => false;
+    public Func<Candidate, bool> InitializationSelect { get; set; } = static _ => false;
+    #endregion
+    #region 用于分组的委托
+    /// <summary>
+    /// 获取用于分组的委托，
+    /// 它的参数是元素，返回值是分组的名称
+    /// </summary>
+    [Parameter]
+    public Func<Candidate, string?> Group { get; set; } = static _ => null;
     #endregion
     #region 最大可选数量
     /// <summary>
@@ -117,9 +125,11 @@ public sealed partial class Selector<Candidate> : ComponentBase
                 SelectElementInfo = selectElementInfo
             };
         }).ToArray();
+        var candidatesInfoGrouping = renderSelectElementInfo.GroupBy(x => Group(x.Element)).ToArray();
         return new()
         {
             CandidatesInfo = renderSelectElementInfo,
+            CandidatesInfoGrouping = candidatesInfoGrouping,
             SelectElementInfo = selectElementInfo,
             Submit = () => Submit(selectElementInfo),
             Reset = () =>

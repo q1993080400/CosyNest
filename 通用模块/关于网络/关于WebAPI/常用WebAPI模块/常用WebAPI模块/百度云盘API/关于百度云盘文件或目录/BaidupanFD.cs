@@ -21,7 +21,7 @@ public abstract record BaidupanFD
     /// 获取这个文件的信息
     /// </summary>
     public FileNameInfo Info
-        => new(Path);
+        => FileNameInfo.FromPath(Path);
     #endregion
     #region 文件ID
     /// <summary>

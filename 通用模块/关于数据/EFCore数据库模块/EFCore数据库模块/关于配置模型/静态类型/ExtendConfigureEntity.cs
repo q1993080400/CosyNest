@@ -51,7 +51,7 @@ public static partial class ExtendEFCoreDB
             var builder = makeEntityMethod.Invoke(modelBuilder, []);
             var realize = type.GetInterfaces().Any(x =>
             {
-                var (isRealize, _, genericParameter) = x.IsRealizeGeneric(interfaceType);
+                var (isRealize, _, genericParameter) = x.IsGenericRealize(interfaceType);
                 return isRealize && genericParameter.Single() == type;
             });
             if (!realize)

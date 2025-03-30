@@ -10,7 +10,7 @@ namespace System;
 /// <summary>
 /// 这个类型是有关BootstrapBlazor的扩展方法
 /// </summary>
-public static class ExtendBootstrapBlazor
+public static partial class ExtendBootstrapBlazor
 {
     #region 关于MessageService
     #region 直接显示消息
@@ -67,13 +67,17 @@ public static class ExtendBootstrapBlazor
     /// </summary>
     /// <param name="swalService">消息确认框服务</param>
     /// <param name="apiPack">API响应对象</param>
+    /// <param name="successMessage">在操作成功时显示的弹窗消息，
+    /// 如果为<see langword="null"/>，则使用一个默认消息</param>
     /// <returns>API是否响应成功</returns>
-    public static async Task<bool> ShowIfFailure(this SwalService swalService, APIPack apiPack)
+    public static async Task<bool> ShowIfFailure(this SwalService swalService, APIPack apiPack, string? successMessage = null)
     {
-        var isSuccess = apiPack.IsSuccess;
-        await swalService.Show(isSuccess ? "操作成功" : apiPack.FailureReason!,
-            category: isSuccess ? SwalCategory.Success : SwalCategory.Error);
-        return isSuccess;
+        var failureReason = apiPack.FailureReason;
+        var (message, category) = failureReason is null ?
+            (successMessage ?? "操作成功", SwalCategory.Success) :
+            (failureReason, SwalCategory.Error);
+        await swalService.Show(message, category: category);
+        return apiPack.Success;
     }
     #endregion
     #endregion

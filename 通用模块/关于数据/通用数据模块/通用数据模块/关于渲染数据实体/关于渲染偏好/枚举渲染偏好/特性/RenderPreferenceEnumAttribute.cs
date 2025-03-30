@@ -12,11 +12,19 @@ public sealed class RenderPreferenceEnumAttribute : RenderPreferenceAttribute
     /// </summary>
     public FormEnumRender RenderEnum { get; init; }
     #endregion
+    #region 是否按拼音排序
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则在渲染枚举时，还会按拼音排序
+    /// </summary>
+    public bool SortByPinyin { get; init; }
+    #endregion
     #region 抽象成员实现：返回渲染偏好
     public override RenderPreferenceEnum GetRenderPreference()
         => new()
         {
-            RenderEnum = RenderEnum
+            RenderEnum = RenderEnum,
+            SortByPinyin = SortByPinyin
         };
     #endregion
 }

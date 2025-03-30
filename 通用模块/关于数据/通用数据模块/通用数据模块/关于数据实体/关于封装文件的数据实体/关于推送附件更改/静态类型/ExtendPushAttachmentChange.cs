@@ -21,6 +21,7 @@ public static partial class ExtendData
         where Obj : class, IWithID, IProjection<IFileObjectPosition>, ICreate<Obj>, IPushAttachmentChange<Obj>
     {
         replaceFiles.CheckCannotUpload();
+        oldFiles = [.. oldFiles.WhereNotNull()];
         var replaceFilesIds = replaceFiles.WhereEnable().Select(x => x.ID).ToHashSet();
         var (notChange, change) = oldFiles.Split(x => replaceFilesIds.Contains(x.ID));
         var delete = change.Select(x => new AttachmentDeleteInfo<Obj>()
@@ -49,5 +50,25 @@ public static partial class ExtendData
         where Obj : class, IWithID, IProjection<IFileObjectPosition>, ICreate<Obj>, IPushAttachmentChange<Obj>
         => oldFiles.GetChangeInfo(replaceFiles.Projection().ToArray());
     #endregion
+    #endregion
+    #region 合并副作用
+    /// <summary>
+    /// 合并两个副作用的委托
+    /// </summary>
+    /// <param name="self">第一个副作用委托</param>
+    /// <param name="other">第二个副作用委托</param>
+    /// <returns></returns>
+    public static Func<IServiceProvider, Task>? SideEffect(this Func<IServiceProvider, Task>? self, Func<IServiceProvider, Task>? other)
+    {
+        if (self is null)
+            return other;
+        if (other is null)
+            return self;
+        return async serviceProvider =>
+        {
+            await self(serviceProvider);
+            await other(serviceProvider);
+        };
+    }
     #endregion
 }

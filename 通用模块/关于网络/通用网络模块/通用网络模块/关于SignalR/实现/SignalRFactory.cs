@@ -57,19 +57,19 @@ sealed class SignalRFactory(IConfigurationSignalRFactory configurationSignalRFac
     #endregion
     #region 通过业务接口自动获取Uri，且返回它的强类型封装
     #region 立即连接
-    public async Task<IStrongTypeStreamInvoke<BusinessInterface>> StrongType<BusinessInterface>
+    public async Task<IStrongTypeSignalRInvoke<BusinessInterface>> StrongType<BusinessInterface>
         (Func<HubConnection, Task>? configuration = null, bool cacheConnection = true)
         where BusinessInterface : class
     {
         var connection = await Create<BusinessInterface>(configuration, cacheConnection);
-        return new SignalRStrongTypeInvoke<BusinessInterface>(() => connection.StartSecureAsync());
+        return new StrongTypeSignalRInvoke<BusinessInterface>(() => connection.StartSecureAsync());
     }
     #endregion
     #region 延迟连接
-    public IStrongTypeStreamInvoke<BusinessInterface> StrongTypeLazy<BusinessInterface>
+    public IStrongTypeSignalRInvoke<BusinessInterface> StrongTypeLazy<BusinessInterface>
         (Func<HubConnection, Task>? configuration = null, bool cacheConnection = true)
         where BusinessInterface : class
-        => new SignalRStrongTypeInvoke<BusinessInterface>(() => Create<BusinessInterface>(configuration, cacheConnection));
+        => new StrongTypeSignalRInvoke<BusinessInterface>(() => Create<BusinessInterface>(configuration, cacheConnection));
     #endregion 
     #endregion
     #region 释放对象

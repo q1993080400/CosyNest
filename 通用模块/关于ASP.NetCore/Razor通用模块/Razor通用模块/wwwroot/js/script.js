@@ -258,6 +258,12 @@ function GetPlayVolume() {
     return parseFloat(volume);
 }
 
+//从缓存中提取播放器音量，如果没有，则返回默认值
+function GetPlayVolumeOrDefault() {
+    const volume = GetPlayVolume();
+    return isNaN(volume) ? 50 : volume;
+}
+
 //记录播放器音量
 function RecordPlayVolume(volume) {
     localStorage.setItem(volumeKey, volume);

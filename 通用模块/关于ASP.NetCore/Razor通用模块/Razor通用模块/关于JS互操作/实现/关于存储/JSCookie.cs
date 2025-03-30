@@ -17,10 +17,10 @@ sealed class JSCookie : ICookie
     public IAsyncIndex<string, string> IndexAsync { get; }
     #endregion
     #region 读取Cookie且不引发异常
-    public async Task<(bool Exist, string? Value)> TryGetValueAsync(string key, CancellationToken cancellation = default)
+    public async Task<TryGetObject<string>> TryGetValueAsync(string key, CancellationToken cancellation = default)
     {
         var result = await JSRuntime.InvokeAsync<ExistAndValue>("docCookies.tryGetValue", cancellation, key);
-        return (result.Exist, result.Value);
+        return new(result.Exist, result.Value);
     }
     #endregion
     #endregion

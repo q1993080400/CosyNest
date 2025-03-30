@@ -2,6 +2,8 @@
 using System.MathFrancis;
 using System.Underlying;
 
+using Microsoft.AspNetCore;
+
 namespace Microsoft.JSInterop;
 
 /// <summary>
@@ -39,11 +41,11 @@ sealed class JSWindow(IJSRuntime jsRuntime) : IJSWindow
     #endregion
     #region 关于存储
     #region 本地存储
-    public IAsyncDictionary<string, string> LocalStorage { get; }
+    public IBrowserStorage LocalStorage { get; }
         = new JSStorage(jsRuntime, true);
     #endregion
     #region 会话存储
-    public IAsyncDictionary<string, string> SessionStorage { get; }
+    public IBrowserStorage SessionStorage { get; }
         = new JSStorage(jsRuntime, false);
     #endregion
     #endregion

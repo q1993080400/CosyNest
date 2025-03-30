@@ -58,6 +58,14 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     [Parameter]
     public RenderFragment? RenderUploadMask { get; set; }
     #endregion
+    #region 是否自动渲染遮罩区域
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则自动渲染遮罩区域，否则你需要手动渲染它
+    /// </summary>
+    [Parameter]
+    public bool AutoRenderUploadMask { get; set; } = true;
+    #endregion
     #endregion
     #region 关于模型
     #region 初始模型
@@ -77,15 +85,15 @@ public sealed partial class BootstrapFormViewer<Model> : ComponentBase
     public Func<Model, bool> ExistingForm { get; set; }
         = FormViewer<Model>.ExistingFormDefault;
     #endregion
-    #region 值转换函数
-    /// <inheritdoc cref="FormViewer{Model}.PropertyValueConvert"/>
-    [Parameter]
-    public Func<PropertyInfo, object?, object?>? PropertyValueConvert { get; set; }
-    #endregion
     #region 创建值改变时的函数的高阶函数
     /// <inheritdoc cref="FormViewer{Model}.CreatePropertyChangeEvent"/>
     [Parameter]
     public Func<RenderFormViewerPropertyInfoBase<Model>, Func<object?, Task>?>? CreatePropertyChangeEvent { get; set; }
+    #endregion
+    #region 用来筛选要渲染的属性的委托
+    /// <inheritdoc cref="FormViewer{Model}.FilterRenderPropertyInfo"/>
+    [Parameter]
+    public Func<Type, IEnumerable<PropertyInfo>> FilterRenderPropertyInfo { get; set; } = FormViewer<Model>.FilterRenderPropertyInfoDefault;
     #endregion
     #region 用来获取属性渲染参数的委托
     /// <inheritdoc cref="FormViewer{Model}.GetRenderPropertyInfo"/>

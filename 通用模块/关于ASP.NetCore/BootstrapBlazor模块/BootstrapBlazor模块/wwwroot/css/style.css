@@ -69,10 +69,21 @@
     }
 }
 
+:root
+{
+    /*强调文本的颜色*/
+    --emphasizeColor: rgb(241, 65, 108);
+}
+
 pre
 {
     margin: 0;
     font-size: unset;
+}
+
+p
+{
+    margin-bottom: 0;
 }
 
 /*高亮样式*/
@@ -81,7 +92,9 @@ mark
     padding: 0;
 }
 
-/*禁止label内部的button元素进行交互，使label可以正确触发input的事件*/
+/*禁止label内部的button元素进行交互，使label可以正确触发input的事件，注意：
+  在这种情况下，input标签必须放在button标签的前面
+*/
 label button
 {
     pointer-events: none;
@@ -199,10 +212,10 @@ dialog .card-footer
     bottom: 0px;
 }
 
-/*递归地设置弹出窗的父容器的z-index，确保弹出窗不会被遮盖*/
-:has( .dropdown-menu.show)
+/*确认弹窗的样式，它避免该弹窗被其他弹窗遮盖*/
+.modal.fade.swal.show
 {
-    z-index: 999;
+    z-index: 1056;
 }
 
 /*粘性定位样式*/
@@ -241,8 +254,14 @@ dialog .card-footer
 {
 }
 
-/*避免模态框被遮盖，这是因为Bootstrap的模态框实现有问题*/
-body:has(.show[role='dialog']) *
+/*当存在打开的弹窗时，防止它被遮盖*/
+.sticky:has(.modal.show)
 {
-    isolation: unset;
+    position: unset;
+    z-index: unset;
+}
+
+/*卡片标头文字样式*/
+.bootstrapCardHeaderText
+{
 }

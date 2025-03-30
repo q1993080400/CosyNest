@@ -141,15 +141,17 @@ public sealed partial class SearchPanel : ComponentBase
             await SubmitFunction();
         }
         #endregion
+        var renderSubmitInfo = new RenderSearchPanelSubmitInfo()
+        {
+            Clear = Clear,
+            Submit = SubmitFunction,
+            GoToTop = JumpToTop
+        };
         return new()
         {
             SearchViewerState = SearchViewerState,
-            RenderSubmit = RenderSubmit(new()
-            {
-                Clear = Clear,
-                Submit = SubmitFunction,
-                GoToTop = JumpToTop
-            }),
+            RenderSubmit = RenderSubmit(renderSubmitInfo),
+            RenderSubmitInfo = renderSubmitInfo,
             RenderCondition = [.. CacheRenderCondition.Select(x =>
             {
                 var renderProperty = new RenderSearchPanelPropertyInfo()

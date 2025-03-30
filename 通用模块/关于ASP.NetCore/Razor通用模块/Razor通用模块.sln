@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "底层交互模块", "..\..
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "媒体工具模块", "..\..\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj", "{8A101050-C3CD-4F10-94EB-B4F3450AF133}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "通用本地化模块", "..\..\关于本地化\通用本地化模块\通用本地化模块\通用本地化模块.csproj", "{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{8A101050-C3CD-4F10-94EB-B4F3450AF133}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A101050-C3CD-4F10-94EB-B4F3450AF133}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A101050-C3CD-4F10-94EB-B4F3450AF133}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C50B65ED-7D1C-C1B0-0C12-87C4C649E2E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

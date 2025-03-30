@@ -59,4 +59,28 @@ public sealed record RenderFormViewerPropertyInfo<Model> : RenderFormViewerPrope
             PropertyType = Property.PropertyType
         } : null;
     #endregion
+    #region 值为null的时候显示的文本
+    /// <summary>
+    /// 获取值为<see langword="null"/>的时候显示的文本，
+    /// 只在只读状态下生效
+    /// </summary>
+    public required string? ValueIfNullText { get; init; }
+    #endregion
+    #region 将值格式化为文本
+    /// <summary>
+    /// 将属性的值格式化为文本，
+    /// 它会被作为最终显示的文本
+    /// </summary>
+    /// <returns></returns>
+    public string? FormatValue()
+        => (Value, RenderPreference) switch
+        {
+            (null, _) => ValueIfNullText,
+            (var value, { } renderPreference) => renderPreference.RenderToText(value),
+            (true, _) => "是",
+            (false, _) => "否",
+            (Enum @enum, _) => @enum.GetDescription(),
+            (var value, _) => value.ToString()
+        };
+    #endregion
 }

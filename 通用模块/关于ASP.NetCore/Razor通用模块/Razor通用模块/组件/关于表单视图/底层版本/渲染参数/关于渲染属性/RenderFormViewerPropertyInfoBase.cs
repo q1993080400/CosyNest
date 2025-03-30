@@ -41,15 +41,7 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// 获取属性的值
     /// </summary>
     public object? Value
-    {
-        get
-        {
-            var value = Property.GetValue(FormModel);
-            return PropertyValueConvert is null ?
-                value :
-                PropertyValueConvert(Property, value);
-        }
-    }
+        => Property.GetValue(FormModel);
     #endregion
     #region 获取属性的值
     /// <summary>
@@ -60,16 +52,6 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// <returns></returns>
     public Obj? GetValue<Obj>()
         => Value.To<Obj>();
-    #endregion
-    #region 值转换函数
-    /// <summary>
-    /// 这个函数的第一个参数是属性，
-    /// 第二个参数是属性的值，
-    /// 返回值是渲染的时候应该渲染的值，
-    /// 通过它可以实现某些特殊操作，
-    /// 例如把空字符串渲染成不明
-    /// </summary>
-    public required Func<PropertyInfo, object?, object?>? PropertyValueConvert { get; init; }
     #endregion
     #region 值改变时的函数
     /// <summary>
@@ -119,6 +101,25 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// </summary>
     public required RenderPreference? RenderPreference { get; init; }
     #endregion
+    #region 渲染顺序
+    /// <summary>
+    /// 获取渲染的实际顺序
+    /// </summary>
+    public required int Order { get; init; }
+    #endregion
+    #region 要渲染的属性数量
+    /// <summary>
+    /// 获取所有要渲染的属性数量
+    /// </summary>
+    public required int RenderPropertyCount { get; init; }
+    #endregion
+    #region 是否为最后一个渲染的属性
+    /// <summary>
+    /// 指示这个属性是否为最后一个渲染的属性
+    /// </summary>
+    public bool IsLast
+        => Order == RenderPropertyCount - 1;
+    #endregion
     #region 关于可预览文件
     #region 对封装可预览文件的描述
     /// <summary>
@@ -128,6 +129,16 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// </summary>
     public required IHasPreviewFilePropertyInfo? HasPreviewFilePropertyInfo { get; init; }
     #endregion
+    #region 是否直接包含可预览文件
+    /// <summary>
+    /// 如果这个属性直接包含可预览文件，
+    /// 则返回它，否则返回<see langword="null"/>
+    /// </summary>
+    public IHasPreviewFilePropertyDirectInfo? HasPreviewFilePropertyDirectInfo
+        => HasPreviewFilePropertyInfo is
+        IHasPreviewFilePropertyDirectInfo { HasPreviewFileState: HasPreviewFileState.PreviewFile } previewFile ?
+        previewFile : null;
+    #endregion
     #region 是否正在上传
     /// <summary>
     /// 指示这个属性是否是一个可上传文件的属性，
@@ -135,14 +146,6 @@ public abstract record RenderFormViewerPropertyInfoBase<Model>
     /// 告诉它们正在上传
     /// </summary>
     public required bool InUpload { get; init; }
-    #endregion
-    #region 是否含有可预览文件
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 表示它直接或间接含有可预览文件
-    /// </summary>
-    public bool HasPreviewFile
-        => HasPreviewFilePropertyInfo is { };
     #endregion
     #endregion
 }

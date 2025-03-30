@@ -9,7 +9,8 @@ public sealed record RenderPreferenceEnum : RenderPreference, ICreate<RenderPref
     public static RenderPreferenceEnum Create()
         => new()
         {
-            RenderEnum = default
+            RenderEnum = default,
+            SortByPinyin = false
         };
     #endregion
     #region 渲染枚举时的偏好
@@ -17,6 +18,13 @@ public sealed record RenderPreferenceEnum : RenderPreference, ICreate<RenderPref
     /// 在渲染枚举时的偏好
     /// </summary>
     public required FormEnumRender RenderEnum { get; init; }
+    #endregion
+    #region 是否按拼音排序
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 则在渲染枚举时，还会按拼音排序
+    /// </summary>
+    public required bool SortByPinyin { get; init; }
     #endregion
     #region 抽象实现：返回值的文本
     public override string? RenderToText(object value)

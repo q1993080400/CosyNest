@@ -38,13 +38,6 @@ public sealed record DataFilterAnalysisInfo<Obj>
     /// </summary>
     public Func<SortCondition, IOrderedQueryable<Obj>, IOrderedQueryable<Obj>>? GenerateVirtuallySort { get; init; }
     #endregion
-    #region 是否跳过虚拟化
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 则跳过所有虚拟化条件，由用户自行处理它们
-    /// </summary>
-    public bool SkipVirtualization { get; init; }
-    #endregion
     #region 高优先级排序函数
     /// <summary>
     /// 这个函数允许在执行筛选之后，

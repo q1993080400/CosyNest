@@ -1,6 +1,17 @@
 ﻿@namespace BootstrapBlazor.Components
 @inherits ComponentBase
 
-<Modal @ref="Modal" IsFade=false>
-    @ChildContent
+<Modal FirstAfterRenderCallbackAsync="@(x=>x.Show())">
+    <ModalDialog Size=Size ShowHeaderCloseButton=false ShowCloseButton=false IsScrolling=IsScrolling BodyTemplate=RenderBody>
+        <HeaderTemplate>
+            <Center>
+                <div class="bootstrapCardHeaderText">@Title</div>
+            </Center>
+        </HeaderTemplate>
+        <FooterTemplate>
+            <Center>
+                @RenderFooter
+            </Center>
+        </FooterTemplate>
+    </ModalDialog>
 </Modal>

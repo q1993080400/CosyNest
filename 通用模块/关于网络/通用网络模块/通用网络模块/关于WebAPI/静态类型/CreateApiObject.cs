@@ -7,6 +7,33 @@ public static partial class CreateNet
 
     //这个部分类专门用来声明用来创建有关WebApi的对象的方法
 
+    #region 创建API封包
+    /// <summary>
+    /// 创建一个API封包，如果在创建的过程中出现了错误，
+    /// 自动返回一个包含错误的API封包
+    /// </summary>
+    /// <typeparam name="Pack">API封包的类型</typeparam>
+    /// <param name="serviceProvider">一个用于请求服务的对象</param>
+    /// <param name="createPack">用来创建API封包的委托</param>
+    /// <returns></returns>
+    public static async Task<Pack> APIPack<Pack>
+        (IServiceProvider serviceProvider, Func<IServiceProvider, Task<Pack>> createPack)
+        where Pack : APIPack, new()
+    {
+        try
+        {
+            return await createPack(serviceProvider);
+        }
+        catch (Exception ex)
+        {
+            ex.Log(serviceProvider);
+            return new()
+            {
+                FailureReason = ex.Message
+            };
+        }
+    }
+    #endregion
     #region 创建API返回值封包
     #region 可指定任何API封包类型
     /// <summary>
@@ -22,19 +49,12 @@ public static partial class CreateNet
         (IServiceProvider serviceProvider, Func<IServiceProvider, Task<Context>> createContext)
         where Pack : APIReturnPack<Context>, new()
     {
-#if DEBUG
-        var context = await createContext(serviceProvider);
-        return new()
-        {
-            Content = context
-        };
-#else
         try
         {
             var context = await createContext(serviceProvider);
             return new()
             {
-                Content = context
+                Value = context
             };
         }
         catch (Exception ex)
@@ -45,7 +65,6 @@ public static partial class CreateNet
                 FailureReason = ex.Message
             };
         }
-#endif
     }
     #endregion
     #region 直接使用APIReturnPack

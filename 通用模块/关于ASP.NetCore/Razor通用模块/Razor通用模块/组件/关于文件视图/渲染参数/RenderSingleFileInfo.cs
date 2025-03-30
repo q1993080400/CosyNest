@@ -37,4 +37,37 @@ public sealed record RenderSingleFileInfo
     /// </summary>
     public required EventCallback OpenPreview { get; init; }
     #endregion
+    #region 点击文件所附加的事件
+    /// <summary>
+    /// 获取点击文件时，附加的事件
+    /// </summary>
+    public required RenderSingleFileEventPreference OnClickEventPreference { get; init; }
+    #endregion
+    #region 更改参数展开
+    /// <summary>
+    /// 根据<see cref="OnClickEventPreference"/>的值，
+    /// 设置参数展开中的onclick事件
+    /// </summary>
+    /// <param name="captureUnmatchedValues">要设置的参数展开</param>
+    /// <returns></returns>
+    public IDictionary<string, object>? ChangeParameterExpansion(IDictionary<string, object>? captureUnmatchedValues)
+    {
+        #region 获取更改后参数展开的本地函数
+        IDictionary<string, object> Change(EventCallback onClick)
+        {
+            var dictionary = captureUnmatchedValues is { } ?
+                new Dictionary<string, object>(captureUnmatchedValues) : [];
+            dictionary["onclick"] = onClick;
+            return dictionary;
+        }
+        #endregion
+        return OnClickEventPreference switch
+        {
+            RenderSingleFileEventPreference.None => captureUnmatchedValues,
+            RenderSingleFileEventPreference.Cancel => Change(CancelFile),
+            RenderSingleFileEventPreference.Preview => Change(OpenPreview),
+            var eventPreference => throw eventPreference.Unrecognized()
+        };
+    }
+    #endregion
 }

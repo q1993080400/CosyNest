@@ -45,15 +45,4 @@ public static partial class ExtendNet
         return connection;
     }
     #endregion
-    #region 返回强类型调用封装
-    /// <summary>
-    /// 返回一个<see cref="HubConnection"/>的强类型封装
-    /// </summary>
-    /// <param name="cancellationToken">一个用于取消异步操作的令牌</param>
-    /// <returns></returns>
-    /// <inheritdoc cref="SignalRStrongTypeInvoke{API}.SignalRStrongTypeInvoke(Func{Task{HubConnection}})"/>
-    public static IStrongTypeStreamInvoke<API> StrongType<API>(this HubConnection connection, CancellationToken cancellationToken = default)
-        where API : class
-        => new SignalRStrongTypeInvoke<API>(() => connection.StartSecureAsync(cancellationToken));
-    #endregion
 }

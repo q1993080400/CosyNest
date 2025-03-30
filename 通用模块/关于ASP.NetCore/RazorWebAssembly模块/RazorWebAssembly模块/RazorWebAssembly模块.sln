@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorWebAssembly模块", "RazorWebAssembly模块\RazorWebAssembly模块.csproj", "{D8F52C65-064E-4DF2-9169-7C0A6DD34E75}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "通用数据模块", "..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj", "{DA07B12B-48D1-405E-BFBD-D946A0260324}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "通用网络模块", "..\..\..\关于网络\通用网络模块\通用网络模块\通用网络模块.csproj", "{B997BEA2-2224-4CDE-88D0-9CFBC09D7530}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "通用本地化模块", "..\..\..\关于本地化\通用本地化模块\通用本地化模块\通用本地化模块.csproj", "{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{B997BEA2-2224-4CDE-88D0-9CFBC09D7530}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B997BEA2-2224-4CDE-88D0-9CFBC09D7530}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B997BEA2-2224-4CDE-88D0-9CFBC09D7530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,58 @@
+﻿@namespace BootstrapBlazor.Components
+@using System.Localization
+@inherits ComponentBase
+@typeparam Candidate
+
+<Selector Candidates="RenderCandidates()" InitializationSelect="InitializationSelect"
+          MaxSelectCount="MaxSelectCount" MinSelectCount="MinSelectCount"
+          Group=Group Submit="Submit">
+    <RenderComponent Context="renderSelector">
+        <BootstrapPopUp Title="@Title" Cancellation="Cancellation">
+            <RenderBody>
+                <div class="commonContainers">
+                    <BootstrapInputGroup>
+                        <BootstrapInputGroupLabel DisplayText="搜索" />
+                        <BootstrapInput IsTrim=true UseInputEvent=true IsAutoFocus=false @bind-Value="@SearchCriteria" />
+                        <Button Text="清除" OnClick="@(()=>SearchCriteria=null)" />
+                    </BootstrapInputGroup>
+                    <div class="commonContainers">
+                        @{
+                            var renderFormTemplate = renderSelector.CandidatesInfoGrouping.
+                            OrderBy(x => x.Key ?? "", CreateLocalization.ComparableStringChinese);
+                        }
+                        @foreach (var group in renderFormTemplate)
+                        {
+                            <div class="bootstrapPopUpSelectGroup">@group.Key</div>
+                            <div class="bootstrapPopUpSelectSonContainer">
+                                @foreach (var info in group)
+                                {
+                                    var element = info.Element;
+                                    var name = ConvertToString(element);
+                                    <div @onclick=@info.ChangeSelect
+                                         class="@(info.IsSelect?"selectElement":"") bootstrapPopUpSelectItem">
+                                        @name
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </RenderBody>
+            <RenderFooter Context="cancellation">
+                @{
+                    #region 用于提交的方法
+                    async Task Submit()
+                    {
+                        await renderSelector.Submit();
+                        await cancellation.InvokeAsync();
+                    }
+                    #endregion
+                }
+                <div class="compactCentered">
+                    <Button Text="关闭" OnClick="@cancellation" />
+                    <Button Text="确定" OnClick="Submit" IsDisabled="@(renderSelector.SelectElementInfo.IsInvalid)" />
+                </div>
+            </RenderFooter>
+        </BootstrapPopUp>
+    </RenderComponent>
+</Selector>

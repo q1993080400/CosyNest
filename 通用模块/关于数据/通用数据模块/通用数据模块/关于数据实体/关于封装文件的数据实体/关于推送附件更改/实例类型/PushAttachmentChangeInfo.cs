@@ -46,4 +46,18 @@ public sealed record PushAttachmentChangeInfo<Obj>
         serviceProvider => Obj.PushAttachmentChange(this, basePath, serviceProvider) :
         null;
     #endregion
+    #region 批量获取副作用
+    /// <summary>
+    /// 批量获取本对象和其他<see cref="IPushAttachmentChange{Obj}"/>的副作用，
+    /// 它们会被作为一个管道组合到一起
+    /// </summary>
+    /// <param name="changeInfos">其他的<see cref="IPushAttachmentChange{Obj}"/></param>
+    /// <returns></returns>
+    /// <inheritdoc cref="SideEffect(string?)"/>
+    public Func<IServiceProvider, Task>? SideEffect(IEnumerable<PushAttachmentChangeInfo<Obj>> changeInfos, string? basePath = null)
+    {
+        var sideEffects = changeInfos.Prepend(this).Select(x => x.SideEffect(basePath)).ToArray();
+        return sideEffects.Aggregate((Func<IServiceProvider, Task>?)null, (seed, sideEffect) => seed.SideEffect(sideEffect));
+    }
+    #endregion
 }

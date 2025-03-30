@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "通用网络模块", "..\..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP.Net后端模块", "..\..\ASP.Net后端模块\ASP.Net后端模块\ASP.Net后端模块.csproj", "{AA6BDF44-69D2-41A1-A539-B236170ECF56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "通用本地化模块", "..\..\..\关于本地化\通用本地化模块\通用本地化模块\通用本地化模块.csproj", "{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{AA6BDF44-69D2-41A1-A539-B236170ECF56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA6BDF44-69D2-41A1-A539-B236170ECF56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA6BDF44-69D2-41A1-A539-B236170ECF56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E329BA8-FAF7-6B36-C8C1-92EFB9BED711}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

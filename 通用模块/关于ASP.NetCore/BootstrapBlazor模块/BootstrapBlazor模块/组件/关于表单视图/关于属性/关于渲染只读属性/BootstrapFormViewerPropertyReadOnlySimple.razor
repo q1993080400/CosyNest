@@ -1,0 +1,25 @@
+﻿@namespace BootstrapBlazor.Components
+@inherits ComponentBase
+@typeparam Model
+
+@{
+    var model = RenderPropertyInfo.FormModel;
+    var showName = RenderPropertyInfo.ShowName;
+    var name = showName ? RenderPropertyInfo.NameWithPoint : null;
+    var hasPreviewFilePropertyDirectInfo = RenderPropertyInfo.HasPreviewFilePropertyDirectInfo;
+    var formatValue = RenderPropertyInfo.FormatValue();
+    var recursionInfo = RenderPropertyInfo.ToRecursion();
+    var renderPreference = RenderPropertyInfo.RenderPreference;
+    var describe = RenderPropertyInfo.Describe;
+}
+@if (hasPreviewFilePropertyDirectInfo is { })
+{
+    <BootstrapFormViewerPropertyReadOnly Title="@name" FormatValue="@formatValue"
+                                         RenderPreference="renderPreference" Value="hasPreviewFilePropertyDirectInfo.GetPreviewFile(model)"
+                                         Describe="@describe" />
+}
+else
+{
+    <BootstrapFormViewerPropertyReadOnly Title="@name" FormatValue="@formatValue" Value="RenderPropertyInfo.Value"
+                                         RenderPreference="renderPreference" RecursionInfo="recursionInfo" Describe="@describe" />
+}

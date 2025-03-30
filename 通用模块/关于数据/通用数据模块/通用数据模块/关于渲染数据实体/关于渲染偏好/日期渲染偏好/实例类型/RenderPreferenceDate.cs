@@ -20,6 +20,8 @@ public sealed record RenderPreferenceDate : RenderPreference, IRenderHasFormat, 
         => value switch
         {
             DateTimeOffset date => date.ToString(Format),
+            DateOnly dateOnly => dateOnly.ToString(Format),
+            TimeOnly timeOnly => timeOnly.ToString(Format),
             var v => throw new NotSupportedException($"无法按照渲染偏好返回{v}的文本，它只支持日期")
         };
     #endregion

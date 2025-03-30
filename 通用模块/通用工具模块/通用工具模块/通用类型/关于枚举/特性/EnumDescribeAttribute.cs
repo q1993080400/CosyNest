@@ -20,4 +20,11 @@ public sealed class EnumDescribeAttribute : Attribute
     /// </summary>
     public int Order { get; init; }
     #endregion
+    #region 枚举的分组
+    /// <summary>
+    /// 获取这个枚举的分组，
+    /// 它仅在弹窗渲染时有效
+    /// </summary>
+    public string? Group { get; init; }
+    #endregion
 }

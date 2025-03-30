@@ -62,4 +62,11 @@ public sealed record RenderVirtualizationInfo<Element>
     public VirtualizationEnumerableState EnumerableState
         => RenderEndInfo.EnumerableState;
     #endregion
+    #region 是否枚举完毕
+    /// <summary>
+    /// 获取集合是否已经枚举完毕（无论集合有没有元素）
+    /// </summary>
+    public bool IsComplete
+        => RenderEndInfo.IsComplete;
+    #endregion
 }

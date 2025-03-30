@@ -11,11 +11,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="9.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="9.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\关于媒体\媒体工具模块\媒体工具模块\媒体工具模块.csproj" />
+		<ProjectReference Include="..\..\..\关于本地化\通用本地化模块\通用本地化模块\通用本地化模块.csproj" />
 		<ProjectReference Include="..\..\..\关于树形文档模型\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
 		<ProjectReference Include="..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
 		<ProjectReference Include="..\..\..\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />

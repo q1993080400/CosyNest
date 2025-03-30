@@ -12,7 +12,7 @@ public static partial class CreateNet
     /// </summary>
     /// <param name="host">本机的Host地址</param>
     /// <returns></returns>
-    public static IHostProvide HostProvide(string host)
+    public static IHostProvide HostProvide(UriHost host)
         => new HostProvide()
         {
             Host = host

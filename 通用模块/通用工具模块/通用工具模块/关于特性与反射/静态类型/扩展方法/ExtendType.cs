@@ -11,17 +11,22 @@ public static partial class ExtendReflection
     /// 按照继承树中从下往上的顺序，枚举一个类型的所有基类
     /// </summary>
     /// <param name="type">要枚举基类的类型</param>
+    /// <param name="includeSelf">如果这个值为<see langword="true"/>，
+    /// 则还会枚举<paramref name="type"/>自身，否则不会枚举</param>
     /// <param name="stop">枚举将在到达这个类型时停止，
     /// 如果为<see langword="null"/>，则默认为到达<see cref="object"/>时停止</param>
     /// <returns></returns>
-    public static IEnumerable<Type> BaseTypeAll(this Type type, Type? stop = null)
+    public static IEnumerable<Type> BaseTypeAll(this Type type, bool includeSelf = false, Type? stop = null)
     {
+        if (includeSelf)
+            yield return type;
+        var recursionType = type;
         while (true)
         {
-            type = type.BaseType!;
-            if (type is null || type == stop)
+            recursionType = recursionType.BaseType;
+            if (recursionType is null || recursionType == stop)
                 yield break;
-            yield return type;
+            yield return recursionType;
         }
     }
     #endregion
@@ -56,15 +61,24 @@ public static partial class ExtendReflection
     public static bool IsAssignableFrom(this Type type, object? obj)
         => obj is null ? type.CanNull() : type.IsAssignableFrom(obj.GetType());
     #endregion
+    #region 判断一个类型是否为可空值类型
+    /// <summary>
+    /// 判断一个类型是否为可空值类型
+    /// </summary>
+    /// <param name="type">要判断的类型</param>
+    /// <returns></returns>
+    public static bool IsNullable(this Type type)
+        => Nullable.GetUnderlyingType(type) is { };
+    #endregion
     #region 判断一个类型是否可赋值为null
     /// <summary>
-    /// 判断一个类型是否可可赋值为null
+    /// 判断一个类型是否可可赋值为null，
+    /// 注意：如果某类型为引用类型，但它是静态类，则仍然认为它不可空
     /// </summary>
     /// <param name="type">待判断的类型</param>
     /// <returns></returns>
     public static bool CanNull(this Type type)
-        => (type.IsClass && !type.IsStatic()) || type.IsInterface ||        //注意：如果某类型为引用类型，但它是静态类，则仍然认为它不可空
-            type.IsGenericRealize(typeof(Nullable<>));
+        => (type.IsClass && !type.IsStatic()) || type.IsInterface || type.IsNullable();
     #endregion
     #region 判断类型是否为数字
     /// <summary>
@@ -140,51 +154,29 @@ public static partial class ExtendReflection
     /// 类似List&lt;int&gt;和<see cref="List{T}"/>的关系
     /// </summary>
     /// <param name="type">泛型类型实现</param>
-    /// <param name="definition">要检查的泛型类型定义</param>
-    /// <returns></returns>
-    public static bool IsGenericRealize(this Type type, Type definition)
+    /// <param name="definition">要检查的泛型类型定义，它可以为开放型泛型，也可以为封闭型泛型</param>
+    /// <returns>一个元组，它的项分别是是否为泛型类型定义的实现，
+    /// 以及如果是泛型类型定义的实现，则返回被实现的泛型类型和泛型参数，
+    /// 例如，传入List&lt;int&gt;和IList&lt;T&gt;，返回(true,IList&lt;int&gt;,[int])</returns>
+    public static (bool IsRealize, Type? RealizeType, Type[] GenericParameter) IsGenericRealize(this Type type, Type definition)
     {
-        if (!definition.IsGenericTypeDefinition)
-            return false;
-        if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == definition)
-            return true;
-        if (definition.IsInterface)
-        {
-            var interfaces = type.GetInterfaces();
-            return interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == definition);
-        }
-        return false;
-    }
-    #endregion
-    #region 判断是否实现泛型类型，接受开放式泛型
-    /// <summary>
-    /// 返回类型<paramref name="type"/>是否继承或实现了另一个泛型类型<paramref name="generic"/>，
-    /// <paramref name="generic"/>可以为开放式泛型
-    /// </summary>
-    /// <param name="type">要检查的类型</param>
-    /// <param name="generic">要检查是否继承或实现的泛型类型</param>
-    /// <returns>一个元组，它的项分别是是否继承或实现泛型类型，
-    /// 以及如果继承或实现了，则返回该封闭泛型类型和它的泛型参数</returns>
-    public static (bool IsRealize, Type? GenericType, Type[] GenericParameter) IsRealizeGeneric(this Type type, Type generic)
-    {
+        if (!definition.IsGenericType)
+            return (false, null, []);
+        var definitionIsConstructed = definition.IsConstructedGenericType;
+        if (definitionIsConstructed && !definition.IsAssignableFrom(type))
+            return (false, null, []);
         #region 本地函数
-        (bool IsRealize, Type? GenericType, Type[] GenericParameter) Fun(IEnumerable<Type> types)
+        (bool IsRealize, Type? RealizeType, Type[] GenericParameter) GetGenericRealize(Func<Type, bool> detection)
         {
-            var realize = types.Prepend(type).FirstOrDefault(x => x == generic || x.IsGenericRealize(generic));
-            return realize is null ?
-                (false, null, []) :
-                (true, realize, realize.GetGenericArguments());
+            var baseTypes = definition.IsInterface ?
+            type.GetInterfaces().Append(type) : type.BaseTypeAll(true).Reverse();
+            var realizeType = baseTypes.FirstOrDefault(detection);
+            return (realizeType is { }, realizeType, realizeType?.GetGenericArguments() ?? []);
         }
         #endregion
-        return generic switch
-        {
-            { IsGenericType: true } => Fun(type.BaseTypeAll()) switch
-            {
-                (true, { } genericType, { } parameter) => (true, genericType, parameter),
-                _ => Fun(type.GetInterfaces())
-            },
-            _ => throw new ArgumentException($"{generic}不是泛型类型")
-        };
+        return GetGenericRealize(definitionIsConstructed ?
+            x => x == definition :
+            x => x.IsGenericType && x.GetGenericTypeDefinition() == definition);
     }
     #endregion
     #region 返回集合的元素类型
@@ -198,7 +190,7 @@ public static partial class ExtendReflection
     {
         if (type.IsArray)
             return type.GetElementType();
-        if (type.IsRealizeGeneric(typeof(IEnumerable<>)) is (true, _, { } elementType))
+        if (type.IsGenericRealize(typeof(IEnumerable<>)) is (true, _, { } elementType))
             return elementType.Single();
         if (typeof(Collections.IEnumerable).IsAssignableFrom(type))
             return typeof(object);

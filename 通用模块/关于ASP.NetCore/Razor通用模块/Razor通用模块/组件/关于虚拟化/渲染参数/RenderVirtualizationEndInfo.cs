@@ -18,4 +18,11 @@ public sealed record RenderVirtualizationEndInfo
     /// </summary>
     public required VirtualizationEnumerableState EnumerableState { get; init; }
     #endregion
+    #region 是否枚举完毕
+    /// <summary>
+    /// 获取集合是否已经枚举完毕（无论集合有没有元素）
+    /// </summary>
+    public bool IsComplete
+        => EnumerableState is VirtualizationEnumerableState.Empty or VirtualizationEnumerableState.Complete;
+    #endregion
 }

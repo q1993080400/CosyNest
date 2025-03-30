@@ -51,11 +51,11 @@ public sealed record RenderFormViewerPropertyInfoRecursion
     {
         get
         {
-            var (isRealize, _, genericParameters) = PropertyType.IsRealizeGeneric(typeof(ICollection<>));
+            var (isRealize, _, genericParameters) = PropertyType.IsGenericRealize(typeof(ICollection<>));
             if (!isRealize)
                 return false;
             var genericParameter = genericParameters[0];
-            return genericParameter.IsGenericRealize(typeof(ICreate<>));
+            return genericParameter.IsGenericRealize(typeof(ICreate<>)).IsRealize;
         }
     }
     #endregion

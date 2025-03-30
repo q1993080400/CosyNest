@@ -13,7 +13,7 @@ public static class ToolPlayer
     /// <param name="runtime">JS运行时</param>
     /// <returns></returns>
     public static async Task<double> GetPlayVolume(IJSRuntime runtime)
-        => await runtime.InvokeAsync<double>("GetPlayVolume");
+        => await runtime.InvokeAsync<double>("GetPlayVolumeOrDefault");
     #endregion
     #region 合理化播放器音量
     /// <summary>

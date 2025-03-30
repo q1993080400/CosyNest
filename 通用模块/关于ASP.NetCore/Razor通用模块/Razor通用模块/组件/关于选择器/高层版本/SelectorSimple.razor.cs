@@ -42,6 +42,11 @@ public sealed partial class SelectorSimple<Candidate, BusinessInterface> : Compo
     [Parameter]
     public Func<Candidate, bool>? FilterCandidate { get; set; }
     #endregion
+    #region 用于分组的委托
+    /// <inheritdoc cref="Selector{Candidate}.Group"/>
+    [Parameter]
+    public Func<Candidate, string?> Group { get; set; } = static _ => null;
+    #endregion
     #region 最大可选数量
     /// <inheritdoc cref="Selector{Candidate}.MaxSelectCount"/>
     [Parameter]

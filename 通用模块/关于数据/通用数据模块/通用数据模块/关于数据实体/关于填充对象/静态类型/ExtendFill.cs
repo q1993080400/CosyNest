@@ -17,7 +17,7 @@ public static partial class ExtendData
     /// <inheritdoc cref="IFill{Source, Fill}.CreateOrFill(Source, Fill, IDataPipeFromContext)"/>
     public static (IEnumerable<Source> Object, Func<IServiceProvider, Task>? SideEffect) CreateOrFill<Source, Fill>
         (this IEnumerable<Source> source, IEnumerable<Fill> fill, IDataPipeFromContext dataPipe)
-        where Source : class, IWithID, IFill<Source, Fill>
+        where Source : class, IWithID, IFill<Source, Fill>, IHasDeleteSideEffect<Source>
         where Fill : IWithID
     {
         var sourceDictionary = source.ToDictionary();

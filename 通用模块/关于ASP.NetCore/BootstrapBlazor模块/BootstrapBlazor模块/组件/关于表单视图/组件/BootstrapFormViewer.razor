@@ -7,8 +7,9 @@
             ExistingForm=ExistingForm IsReadOnlyProperty=IsReadOnlyProperty
             Delete="Delete" Cancellation="Cancellation" RenderRecursion=RenderRecursion
             ResetAfterSubmission=ResetAfterSubmission Resetting="Resetting"
-            PropertyValueConvert="PropertyValueConvert" CreatePropertyChangeEvent="CreatePropertyChangeEvent"
-            Submit="Submit" RefreshTarget="RefreshTarget" IsReference=IsReference>
+            CreatePropertyChangeEvent="CreatePropertyChangeEvent"
+            Submit="Submit" RefreshTarget="RefreshTarget" IsReference=IsReference
+            FilterRenderPropertyInfo=FilterRenderPropertyInfo>
     <RenderComponent>
         @if (RenderComponent is null)
         {
@@ -74,12 +75,15 @@
                         <Button Text="取消" OnClick="cancellationValue"></Button>
                     }
                 </div>
-                @renderInfo.RenderUploadMask
             }
         }
         else
         {
             @RenderSubmit(renderInfo)
+        }
+        @if (AutoRenderUploadMask)
+        {
+            @renderInfo.RenderUploadMask
         }
     </RenderSubmit>
     <RenderUploadMask>

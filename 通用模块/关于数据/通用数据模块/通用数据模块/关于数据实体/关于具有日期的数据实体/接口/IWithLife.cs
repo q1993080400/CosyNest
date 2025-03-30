@@ -67,5 +67,16 @@ public static class IWithLife
         return GetFilterExpression<Entity, DerivativeEntity>(filterExpire, days);
     }
     #endregion
+    #region 直接判断是否过期，要求实现IWithTerm
+    /// <summary>
+    /// 返回一个表达式，它用来筛选过期或未过期的实体
+    /// </summary>
+    /// <inheritdoc cref="IWithLife{Entity}.GetFilterExpression{DerivativeEntity}(bool)"/>
+    public static Expression<Func<Entity, bool>> GetFilterExpression<Entity>(bool filterExpire)
+        where Entity : class, IWithTerm
+        => filterExpire ?
+        entity => entity.Life < DateTimeOffset.Now :
+        entity => entity.Life >= DateTimeOffset.Now;
+    #endregion
     #endregion
 }

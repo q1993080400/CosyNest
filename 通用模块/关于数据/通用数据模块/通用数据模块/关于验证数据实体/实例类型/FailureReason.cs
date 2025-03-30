@@ -7,11 +7,12 @@ namespace System.DataFrancis;
 /// </summary>
 public sealed record FailureReason
 {
-    #region 验证失败的属性
+    #region 验证失败的成员
     /// <summary>
-    /// 验证失败的属性
+    /// 验证失败的成员，
+    /// 它一般是属性或类型（如果整个类型验证不通过）
     /// </summary>
-    public required PropertyInfo Property { get; init; }
+    public required MemberInfo MemberInfo { get; init; }
     #endregion
     #region 验证失败的原因
     /// <summary>

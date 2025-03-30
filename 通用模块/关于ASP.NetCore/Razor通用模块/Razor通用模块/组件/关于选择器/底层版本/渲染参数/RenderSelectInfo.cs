@@ -12,6 +12,12 @@ public sealed record RenderSelectInfo<Candidate>
     /// </summary>
     public required IReadOnlyCollection<RenderSelectElementInfo<Candidate>> CandidatesInfo { get; init; }
     #endregion
+    #region 获取经过分组后的候选项参数
+    /// <summary>
+    /// 获取经过分组后的候选项参数
+    /// </summary>
+    public required IEnumerable<IGrouping<string?, RenderSelectElementInfo<Candidate>>> CandidatesInfoGrouping { get; init; }
+    #endregion
     #region 提交选择元素的方法
     /// <summary>
     /// 提交待选择元素的方法

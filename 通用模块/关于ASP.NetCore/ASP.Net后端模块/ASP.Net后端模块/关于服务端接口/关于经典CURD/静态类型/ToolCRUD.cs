@@ -26,6 +26,22 @@ public static class ToolCRUD
         return [.. pipe.Query<DBEntity>().ToArray().Projection()];
     }
     #endregion
+    #region 直接返回单个对象
+    /// <summary>
+    /// 直接返回数据库中唯一一个对象，
+    /// 如果不存在或者存在多个对象，会引发异常，
+    /// 它通常仅用于应用全局配置等场合，请谨慎使用它
+    /// </summary>
+    /// <returns></returns>
+    /// <inheritdoc cref="GetAll{DBEntity, Info}(IServiceProvider)"/>
+    public static async Task<Info> GetSingle<DBEntity, Info>(IServiceProvider serviceProvider)
+        where DBEntity : class, IProjection<Info>
+        where Info : class
+    {
+        await using var pipe = serviceProvider.RequiredDataPipe();
+        return pipe.Query<DBEntity>().Single().Projection();
+    }
+    #endregion
     #region 返回添加或更新时，被改变的实体
     /// <summary>
     /// 执行典型的添加或更新操作，

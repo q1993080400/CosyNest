@@ -9,6 +9,6 @@
     var candidates = FilterCandidate is null ?
     Candidates : Candidates.Where(FilterCandidate).ToHashSet();
     <Selector Candidates="candidates" InitializationSelect="InitializationSelect"
-              RenderComponent="RenderComponent" Submit="Submit"
+              RenderComponent="RenderComponent" Submit="Submit" Group=Group
               MinSelectCount="MinSelectCount" MaxSelectCount="MaxSelectCount" />
 }

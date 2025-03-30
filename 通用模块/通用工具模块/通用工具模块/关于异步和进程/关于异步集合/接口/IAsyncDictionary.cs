@@ -69,7 +69,7 @@ public interface IAsyncDictionary<Key, Value> : IAsyncCollection<KeyValuePair<Ke
     /// <param name="cancellation">用于取消异步任务的令牌</param>
     /// <returns></returns>
     async Task<bool> ContainsKeyAsync(Key key, CancellationToken cancellation = default)
-     => (await TryGetValueAsync(key, cancellation)).Exist;
+     => (await TryGetValueAsync(key, cancellation)).Success;
     #endregion
     #endregion
     #region 关于读取或写入键值对
@@ -82,7 +82,7 @@ public interface IAsyncDictionary<Key, Value> : IAsyncCollection<KeyValuePair<Ke
     /// <param name="cancellation">用于取消异步任务的令牌</param>
     /// <returns>一个元组，它的项分别是是否存在指定的键，
     /// 以及获取到的值，如果键不存在，则为默认值</returns>
-    Task<(bool Exist, Value? Value)> TryGetValueAsync(Key key, CancellationToken cancellation = default);
+    Task<TryGetObject<Value>> TryGetValueAsync(Key key, CancellationToken cancellation = default);
     #endregion
     #region 读取或写入值（异步索引器）
     /// <summary>

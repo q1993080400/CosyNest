@@ -18,7 +18,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         var data = info.DataSource;
         var query = GenerateQueryExpression(info);
         var sort = info.SortFunction?.Invoke(query) ?? query.OrderBy(static x => 0);
-        return GenerateSortExpression(description.SortCondition, info.SkipVirtualization, info.GenerateVirtuallySort, sort);
+        return GenerateSortExpression(description.SortCondition, info.GenerateVirtuallySort, sort);
     }
     #endregion
     #endregion
@@ -40,8 +40,6 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
             var where = GenerateWhereExpression<Obj>(isTrue, info.Reconsitution);
             dataSource = dataSource.Where(where);
         }
-        if (info.SkipVirtualization)
-            return dataSource;
         if (isVirtually.Count > 0)
         {
             var generateVirtuallyQuery = info.GenerateVirtuallyQuery ??
@@ -127,7 +125,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         var propertyType = property.PropertyType;
         var propertyAccessExpression = Property(expression, property);
         var nextProperty = propertyAccess[1..];
-        if (propertyType.IsRealizeGeneric(typeof(ICollection<>)).IsRealize)
+        if (propertyType.IsGenericRealize(typeof(ICollection<>)).IsRealize)
         {
             var elementType = propertyType.GetGenericArguments()[0];
             var parameter = Parameter(elementType);
@@ -216,21 +214,17 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// </summary>
     /// <typeparam name="Obj">表达式的对象类型</typeparam>
     /// <param name="sortConditions">这个集合描述所有排序表达式</param>
-    /// <param name="skipVirtualization">如果这个值为<see langword="true"/>，
-    /// 则跳过所有虚拟化条件，由用户自行处理它们</param>
     /// <param name="generateVirtuallySort">构造虚拟排序条件的函数，
     /// 它的第一个参数是虚拟排序条件，第二个参数是当前排序好的表达式，返回值是经过虚拟排序的表达式</param>
     /// <param name="dataSource">数据源对象</param>
     /// <returns></returns>
     private static IOrderedQueryable<Obj> GenerateSortExpression<Obj>
-        (IReadOnlyCollection<SortCondition> sortConditions, bool skipVirtualization,
+        (IReadOnlyCollection<SortCondition> sortConditions,
         Func<SortCondition, IOrderedQueryable<Obj>, IOrderedQueryable<Obj>>? generateVirtuallySort,
         IOrderedQueryable<Obj> dataSource)
     {
         var (isVirtually, isTrue) = sortConditions.Split(static x => x.IsVirtually);
         dataSource = isTrue.Aggregate(dataSource, GenerateSortSingleExpression);
-        if (skipVirtualization)
-            return dataSource;
         if (isVirtually.Count > 0)
         {
             if (generateVirtuallySort is null)

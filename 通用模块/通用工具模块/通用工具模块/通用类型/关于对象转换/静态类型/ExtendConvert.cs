@@ -157,5 +157,18 @@ public static partial class ExtendTool
         where NewDel : Delegate
         => (NewDel)oldDelegate.To(typeof(NewDel));
     #endregion
+    #region 同步委托转异步委托
+    /// <summary>
+    /// 将一个<see cref="Action"/>封装为异步委托
+    /// </summary>
+    /// <param name="action">要转换的同步委托</param>
+    /// <returns></returns>
+    public static Func<Task> ToAsync(this Action action)
+        => () =>
+        {
+            action();
+            return Task.CompletedTask;
+        };
+    #endregion
     #endregion
 }

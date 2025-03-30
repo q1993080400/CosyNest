@@ -7,9 +7,9 @@
 /// </summary>
 public interface IInstruct
 {
-    #region 指示是否被释放
+    #region 指示对象是否可以继续使用
     /// <summary>
-    /// 如果这个值为<see langword="true"/>，代表该对象仍然可以使用，
+    /// 如果这个值为<see langword="true"/>，代表该对象仍然可以继续使用，
     /// 否则代表对象不可用，试图访问它可能会引发异常
     /// </summary>
     bool IsAvailable { get; }
