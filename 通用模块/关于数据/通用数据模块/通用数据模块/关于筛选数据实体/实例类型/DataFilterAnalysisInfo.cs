@@ -47,6 +47,14 @@ public sealed record DataFilterAnalysisInfo<Obj>
     /// </summary>
     public Func<IQueryable<Obj>, IOrderedQueryable<Obj>>? SortFunction { get; init; }
     #endregion
+    #region 是否跳过虚拟条件
+    /// <summary>
+    /// 如果这个值为<see langword="true"/>，
+    /// 指示跳过虚拟查询和排序条件，
+    /// 它们已经被用户自行处理
+    /// </summary>
+    public bool SkipVirtually { get; init; }
+    #endregion
     #region 重构函数
     /// <summary>
     /// 这个委托允许重构生成的每个真实查询表达式，

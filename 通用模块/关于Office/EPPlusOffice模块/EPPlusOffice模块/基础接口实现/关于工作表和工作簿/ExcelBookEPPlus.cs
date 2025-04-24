@@ -96,7 +96,9 @@ sealed class ExcelBookEPPlus : ExcelBook, IExcelBook
     #region 静态构造函数
     static ExcelBookEPPlus()
     {
-        ExcelPackage.LicenseContext ??= LicenseContext.NonCommercial;
+        var license = ExcelPackage.License;
+        license.SetNonCommercialOrganization("My Noncommercial organization");
+        license.SetNonCommercialPersonal("My Name");
     }
     #endregion
     #endregion

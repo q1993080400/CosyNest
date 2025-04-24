@@ -50,7 +50,7 @@ public static partial class ExtendBlazorWebAssembly
     {
         var host = webAssemblyHostBuilder.HostEnvironment.BaseAddress;
         services.AddScoped(_ => CreateNet.HostProvide(host));
-        services.AddScoped(_ => new TagLazy<string>(() => Task.FromResult(host)));
+        services.AddScoped(_ => new TagLazy<UriHost>(() => Task.FromResult(new UriHost(host))));
         return services;
     }
     #endregion

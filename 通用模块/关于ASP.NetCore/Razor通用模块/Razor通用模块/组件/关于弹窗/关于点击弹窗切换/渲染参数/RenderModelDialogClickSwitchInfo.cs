@@ -16,12 +16,12 @@ public sealed record RenderModelDialogClickSwitchInfo
     /// <summary>
     /// 这个委托可以切换弹窗状态
     /// </summary>
-    public required Action Switch { get; init; }
+    public required EventCallback Switch { get; init; }
     #endregion
     #region 关闭弹窗
     /// <summary>
     /// 这个委托可以用来关闭弹窗
     /// </summary>
-    public required Action Close { get; init; }
+    public required EventCallback Close { get; init; }
     #endregion
 }

@@ -61,7 +61,7 @@ public static partial class ExtendTimer
             #region 用于等待的本地函数
             async Task<bool> Wait(TimerInfo info)
             {
-                if (!await info.Wait)
+                if (!await info.Wait())
                     return false;
                 var now = DateTime.Now;
                 var nowDate = DateOnly.FromDateTime(now);
@@ -81,7 +81,7 @@ public static partial class ExtendTimer
             return new()
             {
                 NextTimeState = (NextTimeState.Ambiguity, default),
-                Wait = Wait(info)
+                Wait = () => Wait(info)
             };
         };
     }

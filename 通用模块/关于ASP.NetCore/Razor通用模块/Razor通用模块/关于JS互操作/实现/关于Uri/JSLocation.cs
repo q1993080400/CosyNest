@@ -18,7 +18,11 @@ sealed class JSLocation(IJSRuntime jsRuntime) : IJSLocation
     #endregion
     #region 获取协议部分
     public ValueTask<string> Protocol(CancellationToken cancellation)
-          => jsRuntime.GetProperty<string>("location.protocol", cancellation);
+        => jsRuntime.GetProperty<string>("location.protocol", cancellation);
+    #endregion
+    #region 获取源部分
+    public ValueTask<string> Origin(CancellationToken cancellation = default)
+        => jsRuntime.GetProperty<string>("location.origin", cancellation);
     #endregion
     #region 获取或设置锚部分
     public IAsyncProperty<string> Hash { get; }

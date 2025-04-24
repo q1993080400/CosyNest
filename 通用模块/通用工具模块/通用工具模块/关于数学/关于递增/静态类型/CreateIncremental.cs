@@ -21,10 +21,10 @@ public static partial class CreateBaseMath
     /// 创建一个每次调用都会自增的数字
     /// </summary>
     /// <typeparam name="Obj">要自增的对象类型</typeparam>
-    /// <param name="obj">递增的初始数据</param>
     /// <returns></returns>
-    public static IIncremental<Obj> IncrementalNum<Obj>(Obj obj = default)
+    /// <inheritdoc cref="IncrementalNum{Obj}.IncrementalNum(Obj, bool)"/>
+    public static IIncremental<Obj> IncrementalNum<Obj>(Obj seed = default, bool increaseFirst = false)
         where Obj : struct, IIncrementOperators<Obj>
-        => new IncrementalNum<Obj>(obj);
+        => new IncrementalNum<Obj>(seed, increaseFirst);
     #endregion
 }

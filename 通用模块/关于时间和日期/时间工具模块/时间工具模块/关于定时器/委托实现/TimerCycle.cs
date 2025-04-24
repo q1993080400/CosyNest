@@ -14,50 +14,47 @@ sealed class TimerCycle
         #region 进行等待的本地函数
         async Task<bool> Wait()
         {
-            if (Immediately)
+            #region 返回等待时间的本地函数
+            TimeSpan GetDelay()
             {
-                Immediately = false;
-                Next = DateTimeOffset.Now + Interval;
-                return true;
+                if (StartTime is { } startTime)
+                {
+                    StartTime = null;
+                    var delay = startTime - DateTimeOffset.Now;
+                    return delay > TimeSpan.Zero ? delay : TimeSpan.FromMilliseconds(1);
+                }
+                return Interval;
             }
-            var delay = Next - DateTimeOffset.Now;
-            if (delay <= TimeSpan.Zero)
-                throw new NotSupportedException($"定时器不得在已经过去的时间触发");
+            #endregion
+            var delay = GetDelay();
             using var timer = new PeriodicTimer(delay);
-            var success = await timer.WaitForNextTickAsync(cancellationToken);
-            Next = DateTimeOffset.Now + Interval;
-            return success;
+            return await timer.WaitForNextTickAsync(cancellationToken);
         }
         #endregion
         return cancellationToken.IsCancellationRequested ?
             null :
             new()
             {
-                NextTimeState = (NextTimeState.HasNext, Next.Add(Interval)),
-                Wait = Wait()
+                NextTimeState = (NextTimeState.HasNext, (StartTime ?? DateTimeOffset.Now).Add(Interval)),
+                Wait = Wait
             };
     }
     #endregion
     #endregion
     #region 内部成员
-    #region 下次触发的时间
+    #region 定时器启动的时间
     /// <summary>
-    /// 获取下次触发的时间
+    /// 获取定时器启动的时间，
+    /// 如果为<see langword="null"/>，
+    /// 或者这个时间发生在过去，表示立即启动
     /// </summary>
-    private DateTimeOffset Next { get; set; }
+    private DateTimeOffset? StartTime { get; set; }
     #endregion
     #region 定时器触发间隔
     /// <summary>
     /// 返回定时器的触发间隔
     /// </summary>
     private TimeSpan Interval { get; }
-    #endregion
-    #region 是否立即触发
-    /// <summary>
-    /// 如果这个值为<see langword="true"/>，
-    /// 则立即触发一次定时器，否则等待定时器完成后才触发
-    /// </summary>
-    private bool Immediately { get; set; }
     #endregion
     #endregion
     #region 构造函数
@@ -66,19 +63,13 @@ sealed class TimerCycle
     /// </summary>
     /// <param name="interval">定时器的触发间隔</param>
     /// <param name="startTime">定时器第一次触发的时间，
-    /// 如果这个时间发生在过去，则引发一个异常，
-    /// 如果为<see langword="null"/>，立即触发一次定时器</param>
+    /// 如果为<see langword="null"/>，或者这个时间发生在过去，立即触发一次定时器</param>
     public TimerCycle(TimeSpan interval, DateTimeOffset? startTime)
     {
         if (interval.TotalMilliseconds < 1)
             throw new NotSupportedException($"定时器目前的触发周期是{interval}，它不能小于1毫秒");
-        var now = DateTimeOffset.Now;
-        var startTimeValue = startTime ?? now;
-        if (startTimeValue < now)
-            throw new NotSupportedException($"定时器开始的时间{startTimeValue}早于现在时间，无法创建这个定时器");
-        Next = startTimeValue;
         Interval = interval;
-        Immediately = startTimeValue == now;
+        StartTime = startTime ?? DateTimeOffset.Now;
     }
     #endregion
 }

@@ -1,5 +1,4 @@
-﻿using System.MathFrancis.Plane;
-using System.Office.Excel.Realize;
+﻿using System.Office.Excel.Realize;
 
 using NPOI.SS.UserModel;
 

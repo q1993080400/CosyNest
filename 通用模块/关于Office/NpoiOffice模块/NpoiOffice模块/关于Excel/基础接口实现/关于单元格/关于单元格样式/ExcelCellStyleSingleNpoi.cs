@@ -1,7 +1,6 @@
 ﻿using NPOI.SS.UserModel;
 
 using System.Drawing;
-using System.Media.Drawing.Text;
 
 using ICell = NPOI.SS.UserModel.ICell;
 using IColor = System.Media.Drawing.IColor;

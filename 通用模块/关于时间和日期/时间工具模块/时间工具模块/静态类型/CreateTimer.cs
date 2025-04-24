@@ -50,7 +50,7 @@ public static class CreateTimer
             return new()
             {
                 NextTimeState = (NextTimeState.HasNext, dateTime + timeSpan),
-                Wait = Wait(timeSpan)
+                Wait = () => Wait(timeSpan)
             };
         };
     }
@@ -74,7 +74,7 @@ public static class CreateTimer
             static TimerInfo Immediately()
             => new()
             {
-                Wait = Task.FromResult(true),
+                Wait = () => Task.FromResult(true),
                 NextTimeState = (NextTimeState.NotNext, default)
             };
             #endregion
@@ -92,7 +92,7 @@ public static class CreateTimer
                 new()
                 {
                     NextTimeState = (NextTimeState.NotNext, default),
-                    Wait = Wait()
+                    Wait = Wait
                 } : Immediately();
             }
             return Immediately();

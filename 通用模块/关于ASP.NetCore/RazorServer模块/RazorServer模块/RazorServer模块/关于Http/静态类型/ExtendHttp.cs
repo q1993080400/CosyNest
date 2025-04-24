@@ -23,17 +23,17 @@ public static partial class ExtendBlazorServer
         services.AddScoped(serviceProvider =>
         {
             var jsWindow = serviceProvider.GetRequiredService<IJSWindow>();
-            return new TagLazy<string>(async () =>
+            return new TagLazy<UriHost>(async () =>
             {
-                var href = await jsWindow.Location.Href.Get();
-                var uri = new UriComplete(href);
-                return uri.UriHost.ThrowIfNull();
+                var origin = await jsWindow.Location.Origin();
+                return new(origin);
             });
         });
         services.AddScoped(serviceProvider =>
         {
-            var tag = serviceProvider.GetRequiredService<TagLazy<string>>();
-            return CreateNet.HostProvide(tag.CheckContent());
+            var tag = serviceProvider.GetRequiredService<TagLazy<UriHost>>();
+            var host = tag.Content ?? new UriHost("127.0.0.1");
+            return CreateNet.HostProvide(host);
         });
         return services;
     }

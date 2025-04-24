@@ -18,7 +18,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
         var data = info.DataSource;
         var query = GenerateQueryExpression(info);
         var sort = info.SortFunction?.Invoke(query) ?? query.OrderBy(static x => 0);
-        return GenerateSortExpression(description.SortCondition, info.GenerateVirtuallySort, sort);
+        return GenerateSortExpression(description.SortCondition, info.GenerateVirtuallySort, sort, info.SkipVirtually);
     }
     #endregion
     #endregion
@@ -40,7 +40,7 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
             var where = GenerateWhereExpression<Obj>(isTrue, info.Reconsitution);
             dataSource = dataSource.Where(where);
         }
-        if (isVirtually.Count > 0)
+        if ((isVirtually.Count, info.SkipVirtually) is ( > 0, false))
         {
             var generateVirtuallyQuery = info.GenerateVirtuallyQuery ??
                 throw new NotSupportedException("存在虚拟查询条件，但是没有指定转换虚拟查询条件的函数");
@@ -217,15 +217,16 @@ sealed class DataFilterAnalysisDefault : IDataFilterAnalysis
     /// <param name="generateVirtuallySort">构造虚拟排序条件的函数，
     /// 它的第一个参数是虚拟排序条件，第二个参数是当前排序好的表达式，返回值是经过虚拟排序的表达式</param>
     /// <param name="dataSource">数据源对象</param>
+    /// <param name="skipVirtually">指示是否跳过虚拟排序条件</param>
     /// <returns></returns>
     private static IOrderedQueryable<Obj> GenerateSortExpression<Obj>
         (IReadOnlyCollection<SortCondition> sortConditions,
         Func<SortCondition, IOrderedQueryable<Obj>, IOrderedQueryable<Obj>>? generateVirtuallySort,
-        IOrderedQueryable<Obj> dataSource)
+        IOrderedQueryable<Obj> dataSource, bool skipVirtually)
     {
         var (isVirtually, isTrue) = sortConditions.Split(static x => x.IsVirtually);
         dataSource = isTrue.Aggregate(dataSource, GenerateSortSingleExpression);
-        if (isVirtually.Count > 0)
+        if ((isVirtually.Count, skipVirtually) is ( > 0, false))
         {
             if (generateVirtuallySort is null)
                 throw new NotSupportedException("存在虚拟排序条件，但是没有指定转换虚拟排序条件的函数");

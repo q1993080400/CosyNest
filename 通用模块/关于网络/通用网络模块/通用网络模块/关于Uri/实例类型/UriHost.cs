@@ -30,15 +30,12 @@ public sealed record UriHost : UriBase
     /// 获取主机的端口
     /// </summary>
     public int Port
-        => PortExplicit switch
+        => (PortExplicit, Agreement) switch
         {
-            { } p => p,
-            null => Agreement switch
-            {
-                "http" => 80,
-                "https" => 443,
-                var agreement => throw new NotSupportedException($"协议{agreement}是未知的，不知道它的默认端口")
-            }
+            ({ } p, _) => p,
+            (null, "http") => 80,
+            (null, "https") => 443,
+            (null, var agreement) => throw new NotSupportedException($"协议{agreement}是未知的，不知道它的默认端口")
         };
     #endregion
     #region 主机地址

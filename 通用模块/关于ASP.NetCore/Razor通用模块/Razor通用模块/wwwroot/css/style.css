@@ -468,6 +468,14 @@ input[type=file]
     align-items: center;
 }
 
+/*为弹窗优化的相对于屏幕的中部居中布局*/
+dialog .centerMiddAbsolute
+{
+    position: unset;
+    min-width: unset;
+    min-height: unset;
+}
+
 /*表示一个紧凑居中布局，它一般用来排列按钮*/
 .compactCentered
 {

@@ -7,7 +7,7 @@
 /// </summary>
 public interface IIncremental<out Obj>
 {
-    #region 获取递增的时间
+    #region 获取递增后的对象
     /// <summary>
     /// 获取一个<typeparamref name="Obj"/>，
     /// 每次调用它的时候，返回值都会递增

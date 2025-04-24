@@ -21,13 +21,23 @@ public interface IJSLocation
     /// 获取主机名称和端口号
     /// </summary>
     /// <param name="cancellation">用于取消异步任务的令牌</param>
+    /// <returns></returns>
     ValueTask<string> Host(CancellationToken cancellation = default);
+    #endregion
+    #region 获取源部分
+    /// <summary>
+    /// 获取源部分，它包括协议，主机和端口
+    /// </summary>
+    /// <param name="cancellation">用于取消异步任务的令牌</param>
+    /// <returns></returns>
+    ValueTask<string> Origin(CancellationToken cancellation = default);
     #endregion
     #region 获取协议部分
     /// <summary>
     /// 获取Uri的协议部分
     /// </summary>
     /// <param name="cancellation">用于取消异步任务的令牌</param>
+    /// <returns></returns>
     ValueTask<string> Protocol(CancellationToken cancellation = default);
     #endregion
     #region 获取或设置锚部分

@@ -22,10 +22,11 @@ public sealed partial class BootstrapFormViewerPropertyReadOnly : ComponentBase
     #endregion
     #region 属性的值
     /// <summary>
-    /// 获取属性的值
+    /// 获取属性的值，
+    /// 如果属性不是文件或文件的集合，
+    /// 可以不指定它
     /// </summary>
     [Parameter]
-    [EditorRequired]
     public object? Value { get; set; }
     #endregion
     #region 格式化后的文本

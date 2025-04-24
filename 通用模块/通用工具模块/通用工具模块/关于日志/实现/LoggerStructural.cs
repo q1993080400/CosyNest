@@ -18,8 +18,14 @@ sealed class LoggerStructural<LogObject>
     {
         if (!IsEnabled(logLevel))
             return;
-        var log = createLog(exception, state);
-        await setLog(log, serviceProvider);
+        try
+        {
+            var log = createLog(exception, state);
+            await setLog(log, serviceProvider);
+        }
+        catch (Exception)
+        {
+        }
     }
     #endregion
     #region 是否启用

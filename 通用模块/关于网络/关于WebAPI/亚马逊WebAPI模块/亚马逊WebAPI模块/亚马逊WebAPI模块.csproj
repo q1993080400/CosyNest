@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9</TargetFramework>
+		<AssemblyName>AmazonWebAPI</AssemblyName>
+		<RootNamespace>System.NetFrancis.Amazon</RootNamespace>
+		<LangVersion>preview</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<NoWarn>1701;1702;IDE0130</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AWSSDK.CloudFront" Version="3.7.404.73" PrivateAssets="compile" />
+		<PackageReference Include="AWSSDK.CloudFrontKeyValueStore" Version="3.7.400.138" PrivateAssets="compile" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\关于安全\通用安全模块\通用安全模块\通用安全模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于数学\数学工具模块\数学工具模块\数学工具模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于数据\通用数据模块\通用数据模块\通用数据模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于树形文档模型\树形文档模型模块\树形文档模型模块\树形文档模型模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于硬件与操作系统\底层交互模块\底层交互模块\底层交互模块.csproj" />
+		<ProjectReference Include="..\..\..\..\关于编译和表达式树\编译和表达式树模块\编译和表达式树模块\编译和表达式树模块.csproj" />
+		<ProjectReference Include="..\..\..\..\通用工具模块\通用工具模块\通用工具模块.csproj" />
+		<ProjectReference Include="..\..\..\通用网络模块\通用网络模块\通用网络模块.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -71,7 +71,7 @@ sealed class BrowserWebDriver : Release, IBrowser
     public ValueTask<Obj> InvokingScript<Obj>(string script, CancellationToken cancellationToken = default)
     {
         var obj = WebDriver.ExecuteScript(script);
-        return ValueTask.FromResult(obj.To<Obj>());
+        return ValueTask.FromResult(obj.To<Obj>()!);
     }
     #endregion
     #endregion 

@@ -11,7 +11,7 @@
         var mod => throw new NotSupportedException($"无法识别{mod}模式")
     };
     var css = $"{centerMod} centerCommon";
-    <div class="@css" @attributes="ContainerAttributes">
+    <div class="@css @AdditionalCSS" @attributes="ContainerAttributes">
         <div>
             @ChildContent
         </div>

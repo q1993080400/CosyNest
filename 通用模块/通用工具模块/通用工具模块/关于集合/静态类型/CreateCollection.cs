@@ -3,7 +3,7 @@
 /// <summary>
 /// 这个静态类可以用来帮助创建集合
 /// </summary>
-public static class CreateCollection
+public static partial class CreateCollection
 {
     #region 创建迭代器
     #region 创建包含指定数量元素的迭代器

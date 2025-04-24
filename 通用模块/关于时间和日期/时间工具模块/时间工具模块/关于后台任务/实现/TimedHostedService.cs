@@ -63,25 +63,27 @@ public abstract class TimedHostedService : BackgroundService, IHostedServiceExpl
     protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var timer = StartHostedInfo.Timer;
+        var hostServiceProvider = StartHostedInfo.ServiceProvider;
         while (!stoppingToken.IsCancellationRequested)
         {
             var info = timer(stoppingToken);
             if (info is null)
                 break;
-            if (!await info.Wait)
+            if (!await info.Wait())
                 break;
             if (IsRun)
                 continue;
             IsRun = true;
-            using var scope = StartHostedInfo.ServiceProvider.CreateScope();
-            var serviceProvider = scope.ServiceProvider;
             try
             {
+                var serviceScopeFactory = hostServiceProvider.GetRequiredService<IServiceScopeFactory>();
+                await using var scope = serviceScopeFactory.CreateAsyncScope();
+                var serviceProvider = scope.ServiceProvider;
                 await OnTrigger(serviceProvider, false, stoppingToken);
             }
             catch (Exception ex)
             {
-                ex.Log(serviceProvider);
+                ex.Log(hostServiceProvider);
                 if (StartHostedInfo.ExitImmediately)
                     break;
             }

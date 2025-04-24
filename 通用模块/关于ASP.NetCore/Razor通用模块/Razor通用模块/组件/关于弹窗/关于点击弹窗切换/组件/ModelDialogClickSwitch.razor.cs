@@ -33,18 +33,18 @@ public sealed partial class ModelDialogClickSwitch : ComponentBase
         => new()
         {
             IsOpen = IsOpen,
-            Close = () =>
+            Close = CreateRazor.EventCallbackNotRefresh(() =>
             {
                 if (!IsOpen)
                     return;
                 IsOpen = false;
                 this.StateHasChanged();
-            },
-            Switch = () =>
+            }),
+            Switch = CreateRazor.EventCallbackNotRefresh(() =>
             {
                 IsOpen = !IsOpen;
                 this.StateHasChanged();
-            }
+            })
         };
     #endregion
     #endregion

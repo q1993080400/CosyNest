@@ -1,5 +1,4 @@
 ﻿using System.MathFrancis;
-using System.MathFrancis.Plane;
 
 using NPOI.SS.Util;
 

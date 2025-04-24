@@ -1,4 +1,7 @@
-﻿using System.TimeFrancis;
+﻿using System.Design;
+using System.TimeFrancis;
+
+using Timer = System.TimeFrancis.Timer;
 
 namespace System;
 
@@ -15,6 +18,29 @@ public static partial class ExtendTimer
     /// <returns></returns>
     public static IServiceCollection AddHostedServiceExplicitIntermediary(this IServiceCollection services)
         => services.AddSingleton<IHostedServiceExplicitIntermediary, HostedServiceExplicitIntermediary>();
+    #endregion
+    #region 添加后台任务主机
+    /// <summary>
+    /// 添加一个定期执行的后台任务主机
+    /// </summary>
+    /// <typeparam name="HostedService">后台任务主机的类型</typeparam>
+    /// <param name="services">要添加的服务容器</param>
+    /// <param name="timer">控制在何时触发后台任务的定时器</param>
+    /// <param name="exitImmediately">如果这个值为<see langword="true"/>，
+    /// 在发生异常的时候，会立即退出整个主机，否则只会忽略异常，等待下一个循环</param>
+    /// <returns></returns>
+    public static IServiceCollection AddHostedService<HostedService>(this IServiceCollection services, Timer timer, bool exitImmediately = false)
+        where HostedService : TimedHostedService, ICreate<HostedService, StartHostedInfo>
+        => services.AddHostedService(serviceProvider =>
+        {
+            var info = new StartHostedInfo()
+            {
+                Timer = timer,
+                ServiceProvider = serviceProvider,
+                ExitImmediately = exitImmediately
+            };
+            return HostedService.Create(info);
+        });
     #endregion
     #region 显式触发后台任务
     /// <summary>
